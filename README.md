@@ -7,5 +7,5 @@ http://www.youtube.com/watch?v=xeSZ3R2RPQY
 
 TODO
 ----
--make server a singleton, to easily expose vars from anywhere
--macros to minimize typing on server shareParam method
+- make server a singleton, to easily expose vars from anywhere
+- macros to minimize typing on server shareParam method
