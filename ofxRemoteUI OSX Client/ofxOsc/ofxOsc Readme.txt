@@ -1,0 +1,1 @@
+This has been slightly modified for it to work outside the OpenFrameworks environment; mostly remove ofLog(), ofToString(), a few included headers and such.
