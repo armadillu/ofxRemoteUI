@@ -1860,10 +1860,9 @@
 				<string key="NSClassName">NSFontManager</string>
 			</object>
 			<object class="NSButton" id="272706894">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">268</int>
 				<string key="NSFrameSize">{64, 64}</string>
-				<reference key="NSSuperview"/>
 				<string key="NSReuseIdentifierKey">_NS:9</string>
 				<bool key="NSEnabled">YES</bool>
 				<object class="NSButtonCell" key="NSCell" id="246796410">

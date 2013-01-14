@@ -21,7 +21,6 @@ void testApp::setup(){
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentFrameRate);
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawOutlines);
 
-
 }
 
 //--------------------------------------------------------------

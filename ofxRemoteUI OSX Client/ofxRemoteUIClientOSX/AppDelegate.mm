@@ -40,8 +40,8 @@
 	vector<string> paramList = client.getAllParamNamesList();
 	vector<string> updatedParamsList = client.getChangedParamsList();
 
-	NSLog(@"Client holds %d params so far", (int) paramList.size());
-	NSLog(@"Client reports %d params changed since last check", (int)updatedParamsList.size());
+	//NSLog(@"Client holds %d params so far", (int) paramList.size());
+	//NSLog(@"Client reports %d params changed since last check", (int)updatedParamsList.size());
 
 	//TODO remove params that are on the local DB that are not anymore in the server
 	//	for (id key in [widgets allKeys]) { // see what's on the UI now
@@ -71,7 +71,7 @@
 			//if param has been changed, update the UI
 			if(find(updatedParamsList.begin(), updatedParamsList.end(), paramName) != updatedParamsList.end()){ // found in list
 				[widgets[paramName] updateUI];
-				printf("updating UI for %s\n", paramName.c_str());
+				//printf("updating UI for %s\n", paramName.c_str());
 			}
 		}
 	}
@@ -172,6 +172,7 @@
 
 	if (connectButton.state == 1){
 		float lag = client.connectionLag();
+		//printf("lag: %f\n", lag);
 		if (lag > CONNECTION_TIMEOUT || lag < 0.0f){
 			[self connect]; //force disconnect if lag is too large
 			[progress stopAnimation:self];
@@ -188,13 +189,15 @@
 
 -(void)update{
 
-	client.update(REFRESH_RATE);
+	if (connectButton.state == 1 ){
 
+		client.update(REFRESH_RATE);
 
-	if(updateContinuosly){
-		client.requestCompleteUpdate();
-		[self syncLocalParamsToClientParams];
-		[tableView reloadData];
+		if(updateContinuosly){
+			client.requestCompleteUpdate();
+			[self syncLocalParamsToClientParams];
+			[tableView reloadData];
+		}
 	}
 }
 
