@@ -8,22 +8,19 @@ void testApp::setup(){
 	ofSetFrameRate(60);
 	ofSetVerticalSync(true);
 
-	circleSize = 30;
-	numCircles = 25;
-	speed = 1;
 	drawOutlines = false;
 	currentFrameRate = "unInited";
-	
-	//expose vars to ofxRemoteUI server
-	server.shareParam("circlSize", &circleSize, 5, 50);
-	server.shareParam("speed", &speed, 1, 10);
-	server.shareParam("numCircles", &numCircles, 0, 100);
-	server.shareParam("drawOutlines", &drawOutlines);
-	server.shareParam("currentFrameRate", &currentFrameRate);
-	server.shareParam("lineWidth", &lineWidth, 1, 20);
+	x = y = 0;
 
 	//start server
-	server.setup(1./30); 
+	OFX_REMOTEUI_SERVER_SETUP(10000);
+
+	//expose vars to ofxRemoteUI server, AFTER SETUP!
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(x, 0, ofGetWidth());
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(y, 0, ofGetHeight());
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentFrameRate);
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawOutlines);
+
 
 }
 
@@ -32,37 +29,40 @@ void testApp::update(){
 
 	float dt = 0.016666;
 
-	//currentFrameRate = ofToString( ofGetFrameRate() );
-	server.update(dt);
+	currentFrameRate = ofToString( ofGetFrameRate() );
+	OFX_REMOTEUI_SERVER_UPDATE(dt);
 }
+
 
 //--------------------------------------------------------------
 void testApp::draw(){
 
-	glLineWidth(lineWidth);
-
 	if (drawOutlines) ofNoFill();
 	else ofFill();
 
-	for(int i = 0; i < numCircles; i++){
+	ofTranslate(x, y);
 
+	for(int i = 0; i < 30; i++){
 		unsigned char r = i * 34;
 		unsigned char g = i * 93;
 		unsigned char b = i * 17;
 		ofSetColor(r,g,b);
 		ofCircle(
-					ofGetWidth() * ofNoise(ofGetFrameNum() * 0.001 * speed + i),
-					ofGetWidth() * ofNoise(ofGetFrameNum() * 0.004 * speed + 4 * i),
-					circleSize
+					-ofGetWidth() * 0.5 + ofGetWidth() * ofNoise((ofGetFrameNum() + 20 * i) * 0.004  + i),
+					-ofGetHeight() * 0.5 + ofGetHeight() * ofNoise((ofGetFrameNum() + 10 * i) * 0.004 + 4 * i),
+					25
 				 );
 	}
 
-	ofDrawBitmapStringHighlight("circleSize: " + ofToString(circleSize) + "\n" +
-								"numCircles: " + ofToString(numCircles) + "\n" +
-								"speed: " + ofToString(speed) + "\n" +
-								"lineWidth: " + ofToString(lineWidth) + "\n" +
+
+	ofSetupScreen();
+	ofDrawBitmapStringHighlight(
+								"x: " + ofToString(x) + "\n" +
+								"y: " + ofToString(y) + "\n" +
 								"drawOutlines: " + ofToString(drawOutlines) + "\n" +
 								"currentFrameRate: " + currentFrameRate ,
-								20, 20, ofColor::black, ofColor::red);
+								20, 20,
+								ofColor::black, ofColor::red
+								);
 
 }

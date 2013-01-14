@@ -9,7 +9,8 @@
 #import <Cocoa/Cocoa.h>
 #include "ofxRemoteUI.h"
 #import "Item.h"
-#define REFRESH_RATE 1.0f/15.0f
+#define REFRESH_RATE			1.0f/15.0f
+#define STATUS_REFRESH_RATE		1.0
 
 @interface AppDelegate : NSObject <NSApplicationDelegate, NSTableViewDataSource, NSTableViewDelegate>{
 
@@ -19,14 +20,18 @@
 	IBOutlet NSButton *updateContinuouslyCheckbox;
 	IBOutlet NSButton *connectButton;
 	IBOutlet NSTextField *addressField;
+	IBOutlet NSTextField *portField;
+	IBOutlet NSImageView *statusImage;
+	IBOutlet NSProgressIndicator *progress;
 
 	bool updateContinuosly;
 
 	map<string, Item*> widgets;
+	vector<string> keyOrder; // used to keep the order in which the items were added
 
 	ofxRemoteUIClient client;
 	NSTimer * timer;
-
+	NSTimer * statusTimer;
 }
 
 

@@ -10,14 +10,12 @@ public:
 		void setup();
 		void update();
 		void draw();
+		void exit(){ OFX_REMOTEUI_SERVER_CLOSE(); }
 
-		ofxRemoteUIServer server;
 
-		float circleSize;
-		float speed;
-		int numCircles;
+		float x;
+		float y;
 		bool drawOutlines;
-		float lineWidth;
 		string currentFrameRate;
 
 };

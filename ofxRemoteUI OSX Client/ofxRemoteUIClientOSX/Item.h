@@ -18,6 +18,8 @@
 -(void)updateValues:(RemoteUIParam)p;
 -(void)updateUI;
 
+-(void)disableChanges;
+-(void)enableChanges;
 
 
 

@@ -12,10 +12,19 @@
 #include "ofxOsc.h"
 
 #include <map>
+#include <set>
+#include <vector>
 using namespace std;
 
-#define OFXREMOTEUI_SERVER_PORT 34834
-#define OFXREMOTEUI_CLIENT_PORT (OFXREMOTEUI_SERVER_PORT + 1)
+#define OFXREMOTEUI_PORT		34834
+#define LATENCY_TEST_RATE		1.0f
+#define CONNECTION_TIMEOUT		6.0f
+
+//easy param sharing macro, share from from anywhere!
+#define OFX_REMOTEUI_SERVER_SHARE_PARAM(val,...)	( ofxRemoteUIServer::instance()->shareParam( #val, &val, ##__VA_ARGS__ ) )
+#define OFX_REMOTEUI_SERVER_SETUP(port, ...)		( ofxRemoteUIServer::instance()->setup(port, ##__VA_ARGS__) )
+#define OFX_REMOTEUI_SERVER_UPDATE(deltaTime)		( ofxRemoteUIServer::instance()->update(deltaTime) )
+#define OFX_REMOTEUI_SERVER_CLOSE()					( ofxRemoteUIServer::instance()->close() )
 
 /*
 
@@ -31,35 +40,38 @@ using namespace std;
  ...
  CLIENT:	SEND TYP VAR_NAME val (varType)		//client sends a var change to server
  ...
- CLIENT:	CIAO								//client disconnects ?
- SERVER:	CIAO								//server disconnects ?
+ CLIENT:	TEST								//every second, client sends a msg to server to measure delay
+ SERVER:	TEST
+ CLIENT:	TEST								//TODO? server doesnt need to know about latency... so maybe we dont do this
+ ...
+
+ CLIENT:	CIAO								//client disconnects - not really needed? TODO
+ SERVER:	CIAO								//server disconnects - not really needed? TODO
 
  
  // SERVER API
 
-	server.setup(refreshRate);
-	server.shareParam("paramName", &paramName, ... );
+	server->setup(refreshRate);
+	server->shareParam("paramName", &paramName, ... );
 	...
-	server.update(dt);
+	server->update(dt);
 
- 
  // CLIENT API
  
 	client.setup(ipAddress, refreshRate);
 	client.trackParam("paramName", &paramName);
 	...
 	client.update();
- 
+
 
 	float getMinThresholdForParam("paramMame"); //only applies to int and float
 	float getMaxThresholdForParam("paramMame"); //only applies to int and float
 
 	//get a report of params that changed on the server side since last check
-	vector<string> updatedParamsList = client.getChangeList();
+	vector<string> updatedParamsList = client.getChangedParamsList();
  
 	//push a param change to the server, will send the current value of the param to server
 	client.sendUpdatedParam("paramName");
-
 
  */
 
@@ -72,7 +84,7 @@ enum RemoteUIParamType{
 };
 
 enum ActionType{
-	HELO_ACTION, REQUEST_ACTION, SEND_ACTION, CIAO_ACTION
+	HELO_ACTION, REQUEST_ACTION, SEND_ACTION, CIAO_ACTION, TEST_ACTION
 };
 
 enum ArgType{
@@ -99,6 +111,33 @@ public:
 		boolVal = false;
 		stringVal = "empty";
 	};
+
+
+	bool isEqualTo(RemoteUIParam &p){
+
+		bool equal = true;
+		switch (type) {
+			case REMOTEUI_PARAM_FLOAT:
+				if(p.floatVal != floatVal) equal = false;
+				if(p.minFloat != minFloat) equal = false;
+				if(p.maxFloat != maxFloat) equal = false;
+				break;
+			case REMOTEUI_PARAM_INT:
+				if(p.intVal != intVal) equal = false;
+				if(p.minInt != minInt) equal = false;
+				if(p.maxInt != maxInt) equal = false;
+				break;
+			case REMOTEUI_PARAM_BOOL:
+				if(p.boolVal != boolVal) equal = false;
+				break;
+			case REMOTEUI_PARAM_STRING:
+				if(p.stringVal != stringVal) equal = false;
+				break;
+			default: printf("weird RemoteUIParam at isEqualTo()!\n"); break;
+		}
+		return equal;
+	}
+
 
 	void print(){
 		switch (type) {
@@ -135,8 +174,10 @@ class ofxRemoteUI{
 public:
 
 	vector<string> getAllParamNamesList();
+	vector<string> getChangedParamsList();
 	RemoteUIParam getParamForName(string paramName);
 	bool ready();
+	float connectionLag();
 
 protected:
 
@@ -151,23 +192,32 @@ protected:
 
 	void updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage dm);
 	void syncParamToPointer(string paramName);
+	void addParamToDB(RemoteUIParam p, string paramName);
 
 	void sendHELLO();
 	void sendCIAO();
-
-	void connect(string address, int port);
+	void sendTEST();
 
 	bool readyToSend;
 	ofxOscSender sender;
 	ofxOscReceiver receiver;
 
 	float time;
+
+	float timeSinceLastReply;
+	float avgTimeSinceLastReply;
+	bool waitingForReply;
+
 	float updateInterval;
+	int port;
 
 	map<string, RemoteUIParam> params;
+	map<int, string> keyOrder; // used to keep the order in which the params were added
+
+	set<string> paramsChangedSinceLastCheck;
+
 
 private:
-
 
 	string stringForParamType(RemoteUIParamType t);
 
@@ -178,19 +228,24 @@ class ofxRemoteUIServer: public ofxRemoteUI{ //this is injected into your app
 
 public:
 
-	ofxRemoteUIServer();
-	void setup(float updateInterval = 0.5/*sec*/);
+	static ofxRemoteUIServer* instance();
+
+	void setup(int port = OFXREMOTEUI_PORT, float updateInterval = 0.1/*sec*/);
 	void update(float dt);
+	void close();
 
 	void shareParam(string paramName, float* param, float min, float max);
-	void shareParam(string paramName, bool* param );
+	void shareParam(string paramName, bool* param, int nothing = 0, int nothing2 = 0); //"nothing" args are just to match other methods
 	void shareParam(string paramName, int* param, int min, int max);
-	void shareParam(string paramName, string* param );
+	void shareParam(string paramName, string* param, int nothing = 0, int nothing2 = 0 ); //"nothing" args are just to match other methods
 
 private:
 
+	void connect(string address, int port);
 
-	void addParamToDB(RemoteUIParam p, string paramName);
+	ofxRemoteUIServer(); // use ofxRemoteUIServer::instance() instead!
+	static ofxRemoteUIServer* singleton;
+
 
 };
 
@@ -200,14 +255,27 @@ class ofxRemoteUIClient: public ofxRemoteUI{
 public:
 
 	ofxRemoteUIClient();
-	void setup(string address, float updateInterval_ = 0.5);
+	void setup(string address, int port = OFXREMOTEUI_PORT);
 	void update(float dt);
 	void requestCompleteUpdate();
 	void sendParamUpdate(RemoteUIParam p, string paramName);
 
+	//by doing this you allow ofxRemoteUIClient to modify your params
+	//you can find out which params got changed by calling getChangedParamsList()
+	void trackParam(string paramName, float* param);
+	void trackParam(string paramName, bool* param); 
+	void trackParam(string paramName, int* param);
+	void trackParam(string paramName, string* param);
+
+	float getMinThresholdForParam(string paramMame); //only applies to int and float
+	float getMaxThresholdForParam(string paramMame); //only applies to int and float
+
+	//send the server an update on a param (will take actual value from the supplied pointer in trackParam())
+	void sendUpdatedParam(string paramName);
+
 private:
 
-	void sendREQUEST();
+	void sendREQUEST(); //a request for a complete list of server params
 	string host;
 };
 

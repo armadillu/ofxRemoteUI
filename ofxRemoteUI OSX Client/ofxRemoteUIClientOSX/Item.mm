@@ -13,6 +13,13 @@
 	return self;
 }
 
+-(void)disableChanges;{
+	[widget setEnabled:false];
+}
+
+-(void)enableChanges;{
+	[widget setEnabled:true];
+}
 
 -(void)setCellView:(ItemCellView*)v{
 

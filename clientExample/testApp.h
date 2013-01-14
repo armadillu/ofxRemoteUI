@@ -2,10 +2,7 @@
 #define _TEST_APP
 
 #include "ofMain.h"
-//#import "CocoaStuff.h"
-//#include "ofxCocoaWindowNibless.h"
 #include "ofxRemoteUI.h"
-
 
 
 class testApp : public ofBaseApp{
@@ -13,17 +10,19 @@ class testApp : public ofBaseApp{
 		void setup();
 		void update();
 		void draw();
+
+		void mousePressed( int x, int y, int button );
+		
 		
 
 		ofxRemoteUIClient client;
 
-		float circleSize;
-		float speed;
-		int numCircles;
+		float x;
+		float y;
 		bool drawOutlines;
-		float lineWidth;
 		string currentFrameRate;
 
+		float time;
 };
 
 #endif
