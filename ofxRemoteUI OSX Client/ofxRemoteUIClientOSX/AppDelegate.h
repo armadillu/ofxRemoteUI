@@ -23,7 +23,7 @@
 	IBOutlet NSTextField *portField;
 	IBOutlet NSImageView *statusImage;
 	IBOutlet NSProgressIndicator *progress;
-
+	IBOutlet NSTextField *lagField;
 	bool updateContinuosly;
 
 	map<string, Item*> widgets;

@@ -37,7 +37,9 @@ Then tell the server to share them:
 
 And use the supplied OSX Client to view and edit them
 
+PD: to use ofxOsc in your project, which ofxRemoteUI requires, you wil need to add this to you project's header search paths:
 
+    ../../../addons/ofxOsc/libs ../../../addons/ofxOsc/libs/oscpack ../../../addons/ofxOsc/libs/oscpack/src ../../../addons/ofxOsc/libs/oscpack/src/ip ../../../addons/ofxOsc/libs/oscpack/src/ip/posix ../../../addons/ofxOsc/libs/oscpack/src/ip/win32 ../../../addons/ofxOsc/libs/oscpack/src/osc ../../../addons/ofxOsc/src
 
 ### TODO
 

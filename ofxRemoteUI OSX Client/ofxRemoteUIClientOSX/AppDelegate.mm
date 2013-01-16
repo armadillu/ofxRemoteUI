@@ -25,10 +25,25 @@
 	//NSLog(@"%@", [df stringForKey:@"lastAddress"]);
 	if([df stringForKey:@"lastAddress"]) [addressField setStringValue:[df stringForKey:@"lastAddress"]];
 	if([df stringForKey:@"lastPort"]) [portField setStringValue:[df stringForKey:@"lastPort"]];
-
+	lagField.stringValue = @"";
 	[self performSelector:@selector(connect) withObject:nil afterDelay:0.0];
+
+	//get notified when window is resized
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(windowResized:) name:NSWindowDidResizeNotification
+											   object: window];
 }
 
+
+- (void)windowResized:(NSNotification *)notification;{
+
+	for( map<string,Item*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
+		string key = (*ii).first;
+		Item* t = widgets[key];
+		[t remapSlider];
+	}
+
+}
 
 -(NSString*)stringFromString:(string) s{
 	return  [NSString stringWithCString:s.c_str() encoding:[NSString defaultCStringEncoding]];
@@ -64,6 +79,7 @@
 		map<string,Item*>::iterator it = widgets.find(paramName);
 		if ( it == widgets.end() ){	//not found, this is a new param... lets make an UI item for it
 			Item * row = [[Item alloc] initWithParam: p paramName: paramName];
+			
 			keyOrder.push_back(paramName);
 			widgets[paramName] = row;
 		}else{
@@ -145,6 +161,7 @@
 		//first load of vars
 		[self performSelector:@selector(pressedSync:) withObject:nil afterDelay:0.5];
 		[progress startAnimation:self];
+		lagField.stringValue = @"";
 
 	}else{
 		[addressField setEnabled:true];
@@ -157,11 +174,17 @@
 		[tableView reloadData];
 		[statusImage setImage:[NSImage imageNamed:@"offline.png"]];
 		[progress stopAnimation:self];
+		lagField.stringValue = @"";
 	}
 }
 
 
-/////// OF ///////////////////////////
+
+- (void)windowDidResize:(NSNotification *)notification{
+
+}
+
+
 
 -(void)setup{
 	//client.setup("127.0.0.1", 0.1);
@@ -179,6 +202,7 @@
 			[statusImage setImage:[NSImage imageNamed:@"offline"]];
 		}else{
 			if (lag > 0.0f){
+				lagField.stringValue = [NSString stringWithFormat:@"%.1fms", lag];
 				[progress stopAnimation:self];
 				[statusImage setImage:[NSImage imageNamed:@"connected.png"]];
 			}
@@ -224,6 +248,7 @@
 		//NSLog(@"viewForTableColumn %@", item);
 		ItemCellView *result = [myTableView makeViewWithIdentifier:tableColumn.identifier owner:self];
 		[item setCellView:result];
+		[item performSelector:@selector(remapSlider) withObject:nil afterDelay:0.01];
 		[item updateUI];
 
 		//NSLog(@"item: %@", item);

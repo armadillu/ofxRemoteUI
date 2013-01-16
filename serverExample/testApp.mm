@@ -17,9 +17,10 @@ void testApp::setup(){
 
 	//expose vars to ofxRemoteUI server, AFTER SETUP!
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(x, 0, ofGetWidth());
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(y, 0, ofGetHeight());
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentFrameRate);
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawOutlines);
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentFrameRate);
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawOutlines2);
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(y, 0, ofGetHeight());
 
 }
 

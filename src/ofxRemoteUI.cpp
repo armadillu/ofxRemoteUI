@@ -57,6 +57,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	waitingForReply = false;
 	avgTimeSinceLastReply = timeSinceLastReply = time = 0.0f;
 	port = port_;
+	cout << "ofxRemoteUIClient listening at port " << port << " ... " << endl;
 	receiver.setup(port);
 }
 

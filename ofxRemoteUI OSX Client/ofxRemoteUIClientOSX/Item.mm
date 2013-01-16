@@ -21,6 +21,22 @@
 	[widget setEnabled:true];
 }
 
+-(void)remapSlider;{
+	if ([widget isKindOfClass: [NSSlider class]]){
+		float w = [widget frame].size.width;
+		int numTicks = w / 7;
+
+		if ([widget allowsTickMarkValuesOnly]){ // for int sliders, lets make sure there arent more marks than possible values
+			int range = 1 + [widget maxValue] - [widget minValue];
+			if (numTicks > range){
+				numTicks = range;
+			}
+		}
+		[widget setNumberOfTickMarks: numTicks];
+	}
+}
+
+
 -(void)setCellView:(ItemCellView*)v{
 
 	cellView = v;

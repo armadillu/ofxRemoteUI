@@ -16,6 +16,7 @@ public:
 		float x;
 		float y;
 		bool drawOutlines;
+		bool drawOutlines2;
 		string currentFrameRate;
 
 };

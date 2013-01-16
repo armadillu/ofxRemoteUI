@@ -9,6 +9,8 @@
 #ifndef __emptyExample__ofxRemoteUI__
 #define __emptyExample__ofxRemoteUI__
 
+// you will need to add this to your "Header Search Path" for ofxOsc to compile
+// ../../../addons/ofxOsc/libs ../../../addons/ofxOsc/libs/oscpack ../../../addons/ofxOsc/libs/oscpack/src ../../../addons/ofxOsc/libs/oscpack/src/ip ../../../addons/ofxOsc/libs/oscpack/src/ip/posix ../../../addons/ofxOsc/libs/oscpack/src/ip/win32 ../../../addons/ofxOsc/libs/oscpack/src/osc ../../../addons/ofxOsc/src
 #include "ofxOsc.h"
 
 #include <map>
@@ -16,7 +18,7 @@
 #include <vector>
 using namespace std;
 
-#define OFXREMOTEUI_PORT		34834
+#define OFXREMOTEUI_PORT		10001
 #define LATENCY_TEST_RATE		1.0f
 #define CONNECTION_TIMEOUT		6.0f
 

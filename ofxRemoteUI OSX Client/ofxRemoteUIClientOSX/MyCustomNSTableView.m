@@ -10,12 +10,14 @@
 
 @implementation MyCustomNSTableView
 
+//this is to allow focus on the textfield when inside a table
+
 - (void)mouseDown:(NSEvent *)theEvent {
 	[super mouseDown:theEvent];
 	NSPoint point = [self convertPoint:theEvent.locationInWindow fromView:nil];
 	NSView *theView = [self hitTest:point];
 	if ([theView isKindOfClass:[NSTextField class]]) {
-		NSLog(@"%@",[(NSTextField *)theView stringValue]);
+		//NSLog(@"%@",[(NSTextField *)theView stringValue]);
 		NSTextField * field = (NSTextField *)theView;
 		//[[field window] setInitialFirstResponder: [textViewContainer textView]];
 		[[field window] makeFirstResponder: field];
