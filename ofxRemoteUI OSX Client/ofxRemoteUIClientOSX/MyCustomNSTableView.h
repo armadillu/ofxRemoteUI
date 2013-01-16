@@ -13,3 +13,8 @@
 - (void)mouseDown:(NSEvent *)theEvent ;
 
 @end
+
+
+@interface NSColor (ColorChangingFun)
+	+(NSColor*)_blueAlternatingRowColor;
+@end

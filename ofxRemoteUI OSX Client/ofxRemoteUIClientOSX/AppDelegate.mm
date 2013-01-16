@@ -35,6 +35,11 @@
 }
 
 
+- (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender{
+    return YES;
+}
+
+
 - (void)windowResized:(NSNotification *)notification;{
 
 	for( map<string,Item*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){

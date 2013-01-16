@@ -24,3 +24,14 @@
 	}
 }
 @end
+
+
+@implementation NSColor (ColorChangingFun)
+
++(NSColor*)_blueAlternatingRowColor{
+    return [NSColor colorWithDeviceRed:243/255. green:245/255. blue:249/255. alpha:1.0];
+	//return [NSColor colorWithDeviceRed:230/255. green:230/255. blue:230/255. alpha:1.0];
+}
+
+@end
+

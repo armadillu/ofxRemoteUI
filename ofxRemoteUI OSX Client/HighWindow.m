@@ -13,7 +13,7 @@
 -(void)awakeFromNib{
 
 	[super awakeFromNib];
-	[self setLevel: NSFloatingWindowLevel ];
+	//[self setLevel: NSFloatingWindowLevel ];
 }
 
 
