@@ -65,6 +65,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 void ofxRemoteUIClient::setup(string address, int port_){
 
 	params.clear();
+	keyOrder.clear();
 	port = port_;
 	avgTimeSinceLastReply = timeSinceLastReply = time = 0.0f;
 	waitingForReply = false;

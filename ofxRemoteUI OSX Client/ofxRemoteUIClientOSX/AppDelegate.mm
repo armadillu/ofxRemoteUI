@@ -154,6 +154,8 @@
 	[df setObject: portField.stringValue forKey:@"lastPort"];
 
 	if ([[connectButton title] isEqualToString:@"Connect"]){ //we are not connected
+		widgets.clear();
+		keyOrder.clear();
 		[addressField setEnabled:false];
 		[portField setEnabled:false];
 		connectButton.title = @"Disconnect";
@@ -176,6 +178,7 @@
 		[updateFromServerButton setEnabled: false];
 		[updateContinuouslyCheckbox setEnabled:false];
 		widgets.clear();
+		keyOrder.clear();
 		[tableView reloadData];
 		[statusImage setImage:[NSImage imageNamed:@"offline.png"]];
 		[progress stopAnimation:self];
