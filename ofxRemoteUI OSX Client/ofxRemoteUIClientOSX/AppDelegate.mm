@@ -15,6 +15,48 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)note {
 
+	// setup recent connections ///////////////
+
+	//[[addressField cell] setSearchButtonCell:nil];
+	[[addressField cell] setCancelButtonCell:nil];
+	[[addressField cell] setSendsSearchStringImmediately:NO];
+	[[addressField cell] setSendsActionOnEndEditing:NO];
+	[addressField setRecentsAutosaveName:@"recentHosts"];
+
+	NSMenu *cellMenu = [[NSMenu alloc] initWithTitle:@"Search Menu"];
+	[cellMenu setAutoenablesItems:YES];
+    NSMenuItem *item;
+
+    item = [[NSMenuItem alloc] initWithTitle:@"Clear" action:nil keyEquivalent:@""];
+    [item setTag:NSSearchFieldClearRecentsMenuItemTag];
+	[item setTarget:self];
+    [cellMenu insertItem:item atIndex:0];
+	[item release];
+
+    item = [NSMenuItem separatorItem];
+    [item setTag:NSSearchFieldRecentsTitleMenuItemTag];
+	[item setTarget:nil];
+    [cellMenu insertItem:item atIndex:1];
+
+
+    item = [[NSMenuItem alloc] initWithTitle:@"Recent Searches" action:NULL keyEquivalent:@""];
+    [item setTag:NSSearchFieldRecentsTitleMenuItemTag];
+	[item setTarget:nil];
+    [cellMenu insertItem:item atIndex:2];
+	[item release];
+
+
+    item = [[NSMenuItem alloc] initWithTitle:@"Recents" action:NULL keyEquivalent:@""];
+    [item setTag:NSSearchFieldRecentsMenuItemTag];
+	[item setTarget:nil];
+    [cellMenu insertItem:item atIndex:3];
+	[item release];
+
+    id searchCell = [addressField cell];
+    [searchCell setSearchMenuTemplate:cellMenu];
+
+	///////////////////////////////////////////////
+
 	[self setup];
 	timer = [NSTimer scheduledTimerWithTimeInterval:REFRESH_RATE target:self selector:@selector(update) userInfo:nil repeats:YES];
 	statusTimer = [NSTimer scheduledTimerWithTimeInterval:STATUS_REFRESH_RATE target:self selector:@selector(statusUpdate) userInfo:nil repeats:YES];
@@ -143,6 +185,7 @@
 
 
 -(IBAction)pressedConnect:(id)sender{
+	//NSLog(@"pressedConnect");
 	[self connect];
 }
 

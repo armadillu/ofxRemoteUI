@@ -19,7 +19,7 @@
 	IBOutlet NSButton *updateFromServerButton;
 	IBOutlet NSButton *updateContinuouslyCheckbox;
 	IBOutlet NSButton *connectButton;
-	IBOutlet NSTextField *addressField;
+	IBOutlet NSSearchField *addressField; //NSSearchField
 	IBOutlet NSTextField *portField;
 	IBOutlet NSImageView *statusImage;
 	IBOutlet NSProgressIndicator *progress;
