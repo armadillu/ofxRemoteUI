@@ -204,7 +204,12 @@
 		connectButton.title = @"Disconnect";
 		connectButton.state = 1;
 		NSLog(@"ofxRemoteUIClientOSX Connecting to %@", addressField.stringValue);
-		client.setup([addressField.stringValue UTF8String], [portField.stringValue intValue]);
+		int port = [portField.stringValue intValue];
+		if (port < OFXREMOTEUI_PORT) {
+			port = OFXREMOTEUI_PORT;
+			portField.stringValue = [NSString stringWithFormat:@"%d", OFXREMOTEUI_PORT];
+		}
+		client.setup([addressField.stringValue UTF8String], port);
 		[updateFromServerButton setEnabled: true];
 		[updateContinuouslyCheckbox setEnabled: true];
 		[statusImage setImage:nil];
