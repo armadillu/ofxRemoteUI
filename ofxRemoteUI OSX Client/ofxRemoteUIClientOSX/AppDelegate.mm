@@ -205,9 +205,9 @@
 		connectButton.state = 1;
 		NSLog(@"ofxRemoteUIClientOSX Connecting to %@", addressField.stringValue);
 		int port = [portField.stringValue intValue];
-		if (port < OFXREMOTEUI_PORT) {
-			port = OFXREMOTEUI_PORT;
-			portField.stringValue = [NSString stringWithFormat:@"%d", OFXREMOTEUI_PORT];
+		if (port < OFXREMOTEUI_PORT - 1) {
+			port = OFXREMOTEUI_PORT - 1;
+			portField.stringValue = [NSString stringWithFormat:@"%d", OFXREMOTEUI_PORT - 1];
 		}
 		client.setup([addressField.stringValue UTF8String], port);
 		[updateFromServerButton setEnabled: true];
@@ -301,10 +301,11 @@
 
 	if (row <= keyOrder.size() && row >= 0){
 		Item * item = widgets[ keyOrder[row] ];
-		//NSLog(@"viewForTableColumn %@", item);
+		NSLog(@"viewForTableColumn %@", item);
 		ItemCellView *result = [myTableView makeViewWithIdentifier:tableColumn.identifier owner:self];
 		[item setCellView:result];
-		[item performSelector:@selector(remapSlider) withObject:nil afterDelay:0.01];
+		//[item performSelector:@selector(remapSlider) withObject:nil afterDelay:0.01];
+		[item remapSlider];
 		[item updateUI];
 
 		//NSLog(@"item: %@", item);
