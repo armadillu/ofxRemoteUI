@@ -7,7 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#include "ofxRemoteUI.h"
+#include "ofxRemoteUIClient.h"
 #import "Item.h"
 #define REFRESH_RATE			1.0f/15.0f
 #define STATUS_REFRESH_RATE		1.0
@@ -29,7 +29,7 @@
 	map<string, Item*> widgets;
 	vector<string> keyOrder; // used to keep the order in which the items were added
 
-	ofxRemoteUIClient client;
+	ofxRemoteUIClient * client;
 	NSTimer * timer;
 	NSTimer * statusTimer;
 }

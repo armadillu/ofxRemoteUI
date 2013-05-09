@@ -9,317 +9,14 @@
 #include "ofxRemoteUI.h"
 #include <iostream>
 
-ofxRemoteUIServer* ofxRemoteUIServer::singleton = NULL;
-
-
-ofxRemoteUIServer* ofxRemoteUIServer::instance(){
-	if (!singleton){   // Only allow one instance of class to be generated.
-		singleton = new ofxRemoteUIServer();
-	}
-	return singleton;
-}
-
-
-ofxRemoteUIServer::ofxRemoteUIServer(){
-	readyToSend = false;
-	timeSinceLastReply = 0;
-	avgTimeSinceLastReply = 0;
-	waitingForReply = false;
-}
-
-
-
-ofxRemoteUIClient::ofxRemoteUIClient(){
-	readyToSend = false;
-	timeSinceLastReply = 0;
-	avgTimeSinceLastReply = 0;
-	waitingForReply = false;
-}
-
-
 bool ofxRemoteUI::ready(){
 	return readyToSend;
-}
-
-void ofxRemoteUIServer::close(){
-	if(readyToSend)
-		sendCIAO();
 }
 
 float ofxRemoteUI::connectionLag(){
 	return avgTimeSinceLastReply;
 }
 
-
-void ofxRemoteUIServer::setup(int port_, float updateInterval_){
-	params.clear();
-	updateInterval = updateInterval_;
-	waitingForReply = false;
-	avgTimeSinceLastReply = timeSinceLastReply = time = 0.0f;
-	port = port_;
-	cout << "ofxRemoteUIClient listening at port " << port << " ... " << endl;
-	receiver.setup(port);
-}
-
-
-void ofxRemoteUIClient::setup(string address, int port_){
-
-	params.clear();
-	keyOrder.clear();
-	port = port_;
-	avgTimeSinceLastReply = timeSinceLastReply = time = 0.0f;
-	waitingForReply = false;
-	host = address;
-	cout << "ofxRemoteUIClient listening at port " << port + 1 << " ... " << endl;
-	receiver.setup(port + 1);
-
-	cout << "ofxRemoteUIClient connecting to " << address << endl;
-	sender.setup(address, port);
-}
-
-
-void ofxRemoteUIServer::update(float dt){
-
-	time += dt;
-	timeSinceLastReply  += dt;
-	if(readyToSend){
-		if (time > updateInterval){
-			time = 0.0f;
-			vector<string> changes = scanForUpdatedParamsAndSync(); //sends changed params to client
-			//cout << "ofxRemoteUIServer: sent " << ofToString(changes.size()) << " updates to client" << endl;
-			//sendUpdateForParamsInList(changes);
-		}
-	}
-
-	while( receiver.hasWaitingMessages() ){// check for waiting messages from client
-
-		ofxOscMessage m;
-		receiver.getNextMessage(&m);
-
-		if (!readyToSend){ // if not connected, connect to our friend so we can talk back
-			connect(m.getRemoteIp(), port + 1);
-		}
-
-		DecodedMessage dm = decode(m);
-
-		switch (dm.action) {
-
-			case HELO_ACTION: //if client says hi, say hi back
-				sendHELLO();
-				//cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " says HELLO!"  << endl;
-				break;
-
-			case REQUEST_ACTION:{ //send all params to client
-				//cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " sends REQU!"  << endl;
-				vector<string>paramsList = getAllParamNamesList();
-				sendUpdateForParamsInList(paramsList);
-			}
-				break;
-
-			case SEND_ACTION:{ //client is sending us an updated val
-				//cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " sends SEND!"  << endl;
-				updateParamFromDecodedMessage(m, dm);
-			}
-				break;
-
-			case CIAO_ACTION:
-				//cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " says CIAO!" << endl;
-				sendCIAO();
-				readyToSend = false;
-				break;
-
-			case TEST_ACTION: // we got a request from client, lets bounce back asap.
-				sendTEST();
-				//cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " says TEST!" << endl;
-				break;
-
-			default: cout << "ofxRemoteUIServer::update >> ERR!" <<endl; break;
-		}
-	}
-}
-
-
-void ofxRemoteUIClient::update(float dt){
-
-	if (!readyToSend){ // if not connected, connect
-
-		cout << "ofxRemoteUIClient: sending HELLO!" << endl;
-		sendHELLO();	//on first connect, send HI!
-		sendTEST();		//and a lag test
-		readyToSend = true;
-
-	}else{
-
-		time += dt;
-		timeSinceLastReply += dt;
-		//printf("waiting for reply: %d\n", waitingForReply);
-		if (time > LATENCY_TEST_RATE){
-			if (!waitingForReply){
-				time = 0.0f;
-				sendTEST();
-			}else{
-				if (time > CONNECTION_TIMEOUT){
-					avgTimeSinceLastReply = -1;
-				}
-			}
-		}
-	}
-
-	while( receiver.hasWaitingMessages() ){// check for waiting messages from client
-
-		ofxOscMessage m;
-		receiver.getNextMessage(&m);
-
-		DecodedMessage dm = decode(m);
-
-		switch (dm.action) {
-
-			case HELO_ACTION: //server says hi back, we ask for a big update
-				//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " answered HELLO!" << endl;
-				requestCompleteUpdate();
-				break;
-
-			case REQUEST_ACTION: //should not happen, server doesnt request
-				//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " send REQU??? WTF!!!"  << endl;
-				break;
-
-			case SEND_ACTION:{ //server is sending us an updated val
-					//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " sends us a param update SEND!"  << endl;
-					updateParamFromDecodedMessage(m, dm);
-				}
-				break;
-
-			case CIAO_ACTION:
-				//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says CIAO!" << endl;
-				sendCIAO();
-				readyToSend = false;
-				break;
-
-			case TEST_ACTION: // we got a reply from the server, lets measure how long it took;
-				waitingForReply = false;
-				if (avgTimeSinceLastReply > 0.0f){
-					avgTimeSinceLastReply = 0.8 * (avgTimeSinceLastReply) + 0.2 * (timeSinceLastReply);
-				}else{
-					avgTimeSinceLastReply = timeSinceLastReply ;
-				}
-				timeSinceLastReply = 0.0f;
-				//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " replied TEST!" << " and took " << avgTimeSinceLastReply << endl;
-				break;
-
-			default: cout << "ofxRemoteUIClient::update >> ERR!" <<endl; break;
-		}
-	}
-}
-
-
-void ofxRemoteUIServer::shareParam(string paramName, float* param, float min, float max){
-	RemoteUIParam p;
-	p.type = REMOTEUI_PARAM_FLOAT;
-	p.floatValAddr = param;
-	p.floatVal = *param;
-	p.maxFloat = max;
-	p.minFloat = min;
-	addParamToDB(p, paramName);
-	cout << "ofxRemoteUIServer: sharing Param " << paramName << endl;
-}
-
-
-void ofxRemoteUIServer::shareParam(string paramName, bool* param, int nothing , int nothing2  ){
-	RemoteUIParam p;
-	p.type = REMOTEUI_PARAM_BOOL;
-	p.boolValAddr = param;
-	p.boolVal = *param;
-	addParamToDB(p, paramName);
-	cout << "ofxRemoteUIServer: sharing Param " << paramName << endl;
-}
-
-
-void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int max){
-	RemoteUIParam p;
-	p.type = REMOTEUI_PARAM_INT;
-	p.intValAddr = param;
-	p.intVal = *param;
-	p.maxInt = max;
-	p.minInt = min;
-	addParamToDB(p, paramName);
-	cout << "ofxRemoteUIServer: sharing Param " << paramName << endl;
-}
-
-
-void ofxRemoteUIServer::shareParam(string paramName, string* param, int nothing, int nothing2 ){
-	RemoteUIParam p;
-	p.type = REMOTEUI_PARAM_STRING;
-	p.stringValAddr = param;
-	p.stringVal = *param;
-	addParamToDB(p, paramName);
-	cout << "ofxRemoteUIServer: sharing Param " << paramName << endl;
-}
-
-
-void ofxRemoteUIClient::trackParam(string paramName, float* param){
-	RemoteUIParam p;
-	map<string,RemoteUIParam>::iterator it = params.find(paramName);
-	if ( it == params.end() ){	//not found! we add it
-		p.type = REMOTEUI_PARAM_FLOAT;
-	}else{
-		p = params[paramName];
-		if (p.type != REMOTEUI_PARAM_FLOAT ){
-			cout << "wtf called trackParam(float) on a param that's not a float!" << endl;
-		}
-	}
-	p.floatValAddr = param;
-	
-	//params[paramName] = p;
-	addParamToDB(p, paramName);
-}
-
-void ofxRemoteUIClient::trackParam(string paramName, int* param){
-	RemoteUIParam p;
-	map<string,RemoteUIParam>::iterator it = params.find(paramName);
-	if ( it == params.end() ){	//not found! we add it
-		p.type = REMOTEUI_PARAM_INT;
-	}else{
-		p = params[paramName];
-		if (p.type != REMOTEUI_PARAM_INT ){
-			cout << "wtf called trackParam(int) on a param that's not a int!" << endl;
-		}
-	}
-	p.intValAddr = param;
-	//params[paramName] = p;
-	addParamToDB(p, paramName);
-}
-
-void ofxRemoteUIClient::trackParam(string paramName, string* param){
-	RemoteUIParam p;
-	map<string,RemoteUIParam>::iterator it = params.find(paramName);
-	if ( it == params.end() ){	//not found! we add it
-		p.type = REMOTEUI_PARAM_STRING;
-	}else{
-		p = params[paramName];
-		if (p.type != REMOTEUI_PARAM_STRING ){
-			cout << "wtf called trackParam(string) on a param that's not a string!" << endl;
-		}
-	}
-	p.stringValAddr = param;
-	//params[paramName] = p;
-	addParamToDB(p, paramName);
-}
-
-void ofxRemoteUIClient::trackParam(string paramName, bool* param){
-	RemoteUIParam p;
-	map<string,RemoteUIParam>::iterator it = params.find(paramName);
-	if ( it == params.end() ){	//not found! we add it
-		p.type = REMOTEUI_PARAM_BOOL;
-	}else{
-		p = params[paramName];
-		if (p.type != REMOTEUI_PARAM_BOOL ){
-			cout << "wtf called trackParam(bool) on a param that's not a bool!" << endl;
-		}
-	}
-	p.boolValAddr = param;
-	//params[paramName] = p;
-	addParamToDB(p, paramName);
-}
 
 void ofxRemoteUI::addParamToDB(RemoteUIParam p, string paramName){
 
@@ -335,20 +32,13 @@ void ofxRemoteUI::addParamToDB(RemoteUIParam p, string paramName){
 	}
 }
 
-void ofxRemoteUIServer::connect(string ipAddress, int port){
-	avgTimeSinceLastReply = timeSinceLastReply = time = 0.0f;
-	waitingForReply = false;
-	//params.clear();
-	sender.setup(ipAddress, port);
-	readyToSend = true;
-}
-
 
 vector<string> ofxRemoteUI::getChangedParamsList(){
 	std::vector<string> result (paramsChangedSinceLastCheck.begin(), paramsChangedSinceLastCheck.end());
 	paramsChangedSinceLastCheck.clear();
 	return result;
 }
+
 
 DecodedMessage ofxRemoteUI::decode(ofxOscMessage m){
 
@@ -509,15 +199,6 @@ void ofxRemoteUI::sendUpdateForParamsInList(vector<string>paramsPendingUpdate){
 }
 
 
-void ofxRemoteUIClient::sendParamUpdate(RemoteUIParam p, string paramName){
-
-	//p.print();
-	params[paramName] = p; //TODO error check!
-	vector<string>list;
-	list.push_back(paramName);
-	sendUpdateForParamsInList(list);
-}
-
 
 void ofxRemoteUI::syncParamToPointer(string paramName){
 
@@ -611,27 +292,6 @@ RemoteUIParam ofxRemoteUI::getParamForName(string paramName){
 	return p;
 }
 
-
-void ofxRemoteUIClient::requestCompleteUpdate(){
-	//cout << "ofxRemoteUIClient: requestCompleteUpdate()" << endl;
-	if(readyToSend){
-		sendREQUEST();
-	}
-}
-
-
-void ofxRemoteUIClient::sendUpdatedParam(string paramName){
-
-	map<string,RemoteUIParam>::iterator it = params.find(paramName);
-	if ( it != params.end() ){
-		syncParamToPointer(paramName);
-		sendParam(paramName, params[paramName]);
-	}else{
-		cout << "ofxRemoteUIClient::sendUpdatedParam >> param '" + paramName + "' not found!" << endl;
-	}
-}
-
-
 void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
 	ofxOscMessage m;
 	//printf("sending >> %s ", paramName.c_str());
@@ -653,12 +313,6 @@ void ofxRemoteUI::sendTEST(){
 	timeSinceLastReply = 0.0f;
 	ofxOscMessage m;
 	m.setAddress("TEST");
-	sender.sendMessage(m);
-}
-
-void ofxRemoteUIClient::sendREQUEST(){
-	ofxOscMessage m;
-	m.setAddress("REQU");
 	sender.sendMessage(m);
 }
 

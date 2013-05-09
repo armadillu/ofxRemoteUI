@@ -2,7 +2,7 @@
 #define _TEST_APP
 
 #include "ofMain.h"
-#include "ofxRemoteUI.h"
+#include "ofxRemoteUIClient.h"
 
 
 class testApp : public ofBaseApp{

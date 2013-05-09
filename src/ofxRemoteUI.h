@@ -18,15 +18,19 @@
 #include <vector>
 using namespace std;
 
-#define OFXREMOTEUI_PORT		10001
-#define LATENCY_TEST_RATE		1.0f
-#define CONNECTION_TIMEOUT		6.0f
+#define OFXREMOTEUI_PORT					10001
+#define LATENCY_TEST_RATE					1.0f
+#define CONNECTION_TIMEOUT					6.0f
+#define OFX_REMOTEUI_SETTINGS_FILENAME		"ofxRemoteUISettings.xml"
+#define OFX_REMOTEUI_XML_TAG				"OFX_REMOTE_UI_PARAMS"
 
 //easy param sharing macro, share from from anywhere!
 #define OFX_REMOTEUI_SERVER_SHARE_PARAM(val,...)	( ofxRemoteUIServer::instance()->shareParam( #val, &val, ##__VA_ARGS__ ) )
 #define OFX_REMOTEUI_SERVER_SETUP(port, ...)		( ofxRemoteUIServer::instance()->setup(port, ##__VA_ARGS__) )
 #define OFX_REMOTEUI_SERVER_UPDATE(deltaTime)		( ofxRemoteUIServer::instance()->update(deltaTime) )
 #define OFX_REMOTEUI_SERVER_CLOSE()					( ofxRemoteUIServer::instance()->close() )
+#define	OFX_REMOTEUI_SERVER_SAVE_TO_XML()			( ofxRemoteUIServer::instance()->saveToXML() )
+#define	OFX_REMOTEUI_SERVER_LOAD_FROM_XML()			( ofxRemoteUIServer::instance()->loadFromXML() )
 
 /*
 
@@ -223,62 +227,6 @@ private:
 
 	string stringForParamType(RemoteUIParamType t);
 
-};
-
-
-class ofxRemoteUIServer: public ofxRemoteUI{ //this is injected into your app
-
-public:
-
-	static ofxRemoteUIServer* instance();
-
-	void setup(int port = OFXREMOTEUI_PORT, float updateInterval = 0.1/*sec*/);
-	void update(float dt);
-	void close();
-
-	void shareParam(string paramName, float* param, float min, float max);
-	void shareParam(string paramName, bool* param, int nothing = 0, int nothing2 = 0); //"nothing" args are just to match other methods
-	void shareParam(string paramName, int* param, int min, int max);
-	void shareParam(string paramName, string* param, int nothing = 0, int nothing2 = 0 ); //"nothing" args are just to match other methods
-
-private:
-
-	void connect(string address, int port);
-
-	ofxRemoteUIServer(); // use ofxRemoteUIServer::instance() instead!
-	static ofxRemoteUIServer* singleton;
-
-
-};
-
-
-class ofxRemoteUIClient: public ofxRemoteUI{
-
-public:
-
-	ofxRemoteUIClient();
-	void setup(string address, int port = OFXREMOTEUI_PORT);
-	void update(float dt);
-	void requestCompleteUpdate();
-	void sendParamUpdate(RemoteUIParam p, string paramName);
-
-	//by doing this you allow ofxRemoteUIClient to modify your params
-	//you can find out which params got changed by calling getChangedParamsList()
-	void trackParam(string paramName, float* param);
-	void trackParam(string paramName, bool* param); 
-	void trackParam(string paramName, int* param);
-	void trackParam(string paramName, string* param);
-
-	float getMinThresholdForParam(string paramMame); //only applies to int and float
-	float getMaxThresholdForParam(string paramMame); //only applies to int and float
-
-	//send the server an update on a param (will take actual value from the supplied pointer in trackParam())
-	void sendUpdatedParam(string paramName);
-
-private:
-
-	void sendREQUEST(); //a request for a complete list of server params
-	string host;
 };
 
 #endif

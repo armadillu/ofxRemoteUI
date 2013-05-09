@@ -15,6 +15,8 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)note {
 
+	client = new ofxRemoteUIClient();
+	
 	// setup recent connections ///////////////
 
 	//[[addressField cell] setSearchButtonCell:nil];
@@ -99,8 +101,8 @@
 
 -(void)syncLocalParamsToClientParams{ 
 
-	vector<string> paramList = client.getAllParamNamesList();
-	vector<string> updatedParamsList = client.getChangedParamsList();
+	vector<string> paramList = client->getAllParamNamesList();
+	vector<string> updatedParamsList = client->getChangedParamsList();
 
 	//NSLog(@"Client holds %d params so far", (int) paramList.size());
 	//NSLog(@"Client reports %d params changed since last check", (int)updatedParamsList.size());
@@ -119,7 +121,7 @@
 	for(int i = 0; i < paramList.size(); i++){
 
 		string paramName = paramList[i];
-		RemoteUIParam p = client.getParamForName(paramName);
+		RemoteUIParam p = client->getParamForName(paramName);
 		//printf("%s >> ",paramName.c_str());
 		//p.print();
 
@@ -161,8 +163,8 @@
 
 
 -(IBAction)pressedSync:(id)sender;{
-	client.requestCompleteUpdate();
-	//delay a bit the screen update so taht we have gathered the values
+	client->requestCompleteUpdate();
+	//delay a bit the screen update so that we have gathered the values
 	[self performSelector:@selector(syncLocalParamsToClientParams) withObject:nil afterDelay: 3 * REFRESH_RATE];
 	[tableView performSelector:@selector(reloadData) withObject:nil afterDelay: 3 * REFRESH_RATE];
 }
@@ -209,12 +211,12 @@
 			port = OFXREMOTEUI_PORT - 1;
 			portField.stringValue = [NSString stringWithFormat:@"%d", OFXREMOTEUI_PORT - 1];
 		}
-		client.setup([addressField.stringValue UTF8String], port);
+		client->setup([addressField.stringValue UTF8String], port);
 		[updateFromServerButton setEnabled: true];
 		[updateContinuouslyCheckbox setEnabled: true];
 		[statusImage setImage:nil];
 		//first load of vars
-		[self performSelector:@selector(pressedSync:) withObject:nil afterDelay:0.5];
+		[self performSelector:@selector(pressedSync:) withObject:nil afterDelay:0.15];
 		[progress startAnimation:self];
 		lagField.stringValue = @"";
 
@@ -243,14 +245,14 @@
 
 
 -(void)setup{
-	//client.setup("127.0.0.1", 0.1);
+	//client->setup("127.0.0.1", 0.1);
 }
 
 
 -(void)statusUpdate{
 
 	if (connectButton.state == 1){
-		float lag = client.connectionLag();
+		float lag = client->connectionLag();
 		//printf("lag: %f\n", lag);
 		if (lag > CONNECTION_TIMEOUT || lag < 0.0f){
 			[self connect]; //force disconnect if lag is too large
@@ -271,10 +273,10 @@
 
 	if (connectButton.state == 1 ){
 
-		client.update(REFRESH_RATE);
+		client->update(REFRESH_RATE);
 
 		if(updateContinuosly){
-			client.requestCompleteUpdate();
+			client->requestCompleteUpdate();
 			[self syncLocalParamsToClientParams];
 			[tableView reloadData];
 		}
@@ -287,7 +289,7 @@
 	//NSLog(@"usr changed param! %s", name.c_str());
 	if( connectButton.state == 1 ){
 		//printf("client sending: "); p.print();
-		client.sendParamUpdate(p, name);
+		client->sendParamUpdate(p, name);
 	}
 }
 
@@ -301,7 +303,7 @@
 
 	if (row <= keyOrder.size() && row >= 0){
 		Item * item = widgets[ keyOrder[row] ];
-		NSLog(@"viewForTableColumn %@", item);
+		//NSLog(@"viewForTableColumn %@", item);
 		ItemCellView *result = [myTableView makeViewWithIdentifier:tableColumn.identifier owner:self];
 		[item setCellView:result];
 		//[item performSelector:@selector(remapSlider) withObject:nil afterDelay:0.01];

@@ -15,13 +15,15 @@ void testApp::setup(){
 	//start server
 	OFX_REMOTEUI_SERVER_SETUP(10000);
 
+	numCircles = 30;
 	//expose vars to ofxRemoteUI server, AFTER SETUP!
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(x, 0, ofGetWidth());
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawOutlines);
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentFrameRate);
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawOutlines2);
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(y, 0, ofGetHeight());
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawOutlines);
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(numCircles, 0, 30);
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentFrameRate);
 
+	OFX_REMOTEUI_SERVER_LOAD_FROM_XML(); //load values from XML if you want to do so
 }
 
 //--------------------------------------------------------------
@@ -37,12 +39,12 @@ void testApp::update(){
 //--------------------------------------------------------------
 void testApp::draw(){
 
-	if (drawOutlines) ofNoFill();
+	if (drawOutlines == 1) ofNoFill();
 	else ofFill();
 
 	ofTranslate(x, y);
 
-	for(int i = 0; i < 30; i++){
+	for(int i = 0; i < numCircles; i++){
 		unsigned char r = i * 34;
 		unsigned char g = i * 93;
 		unsigned char b = i * 17;
@@ -64,5 +66,12 @@ void testApp::draw(){
 								20, 20,
 								ofColor::black, ofColor::red
 								);
+
+}
+
+void testApp::exit(){
+
+	OFX_REMOTEUI_SERVER_CLOSE();
+	OFX_REMOTEUI_SERVER_SAVE_TO_XML(); //save values to XML
 
 }

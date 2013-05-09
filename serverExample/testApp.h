@@ -2,7 +2,7 @@
 #define _TEST_APP
 
 #include "ofMain.h"
-#include "ofxRemoteUI.h"
+#include "ofxRemoteUIServer.h"
 
 class testApp : public ofBaseApp{
 
@@ -10,13 +10,13 @@ public:
 		void setup();
 		void update();
 		void draw();
-		void exit(){ OFX_REMOTEUI_SERVER_CLOSE(); }
+		void exit();
 
 
 		float x;
 		float y;
 		bool drawOutlines;
-		bool drawOutlines2;
+		int numCircles;
 		string currentFrameRate;
 
 };
