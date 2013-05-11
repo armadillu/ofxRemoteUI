@@ -82,6 +82,7 @@ void ofxRemoteUIServer::saveToXML(){
 	s.saveFile(OFX_REMOTEUI_SETTINGS_FILENAME);
 }
 
+
 void ofxRemoteUIServer::loadFromXML(){
 
 	ofxXmlSettings s;
@@ -99,6 +100,7 @@ void ofxRemoteUIServer::loadFromXML(){
 					float val = s.getValue("REMOTEUI_PARAM_FLOAT", 0.0, i);
 					if(params[paramName].floatValAddr != NULL){
 						*params[paramName].floatValAddr = val;
+						params[paramName].floatVal = val;
 						*params[paramName].floatValAddr = ofClamp(*params[paramName].floatValAddr, params[paramName].minFloat, params[paramName].maxFloat);
 						cout << "ofxRemoteUIServer loading a FLOAT '" << paramName <<"' (" << ofToString( *params[paramName].floatValAddr, 3) << ") from XML" << endl;
 					}else{
@@ -114,6 +116,7 @@ void ofxRemoteUIServer::loadFromXML(){
 					float val = s.getValue("REMOTEUI_PARAM_INT", 0, i);
 					if(params[paramName].intValAddr != NULL){
 						*params[paramName].intValAddr = val;
+						params[paramName].intVal = val;
 						*params[paramName].intValAddr = ofClamp(*params[paramName].intValAddr, params[paramName].minInt, params[paramName].maxInt);
 						cout << "ofxRemoteUIServer loading an INT '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" << endl;
 					}else{
@@ -129,6 +132,7 @@ void ofxRemoteUIServer::loadFromXML(){
 					float val = s.getValue("REMOTEUI_PARAM_BOOL", false, i);
 					if(params[paramName].boolValAddr != NULL){
 						*params[paramName].boolValAddr = val;
+						params[paramName].boolVal = val;
 						cout << "ofxRemoteUIServer loading a BOOL '" << paramName <<"' (" << (bool) *params[paramName].boolValAddr << ") from XML" << endl;
 					}else{
 						cout << "ofxRemoteUIServer ERROR at loading BOOL (" << paramName << ")" << endl;
@@ -141,7 +145,10 @@ void ofxRemoteUIServer::loadFromXML(){
 				for (int i=0; i< numStrings; i++){
 					string paramName = s.getAttribute("REMOTEUI_PARAM_STRING", "paramName", "", i);
 					float val = s.getValue("REMOTEUI_PARAM_STRING", false, i);
-					if(params[paramName].stringValAddr != NULL) *params[paramName].stringValAddr = val;
+					if(params[paramName].stringValAddr != NULL){
+						params[paramName].stringVal = val;
+						*params[paramName].stringValAddr = val;
+					}
 					else cout << "ofxRemoteUIServer ERROR at loading STRING (" << paramName << ")" << endl;
 					cout << "ofxRemoteUIServer loading a STRING '" << paramName <<"' (" << (string) *params[paramName].stringValAddr << ") from XML" << endl;
 				}
@@ -232,7 +239,7 @@ void ofxRemoteUIServer::shareParam(string paramName, float* param, float min, fl
 	p.floatVal = *param = ofClamp(*param, min, max);
 	p.r = c.r;  p.g = c.g; p.b = c.b; p.a = c.a;
 	addParamToDB(p, paramName);
-	cout << "ofxRemoteUIServer: sharing Param " << paramName << endl;
+	cout << "ofxRemoteUIServer Sharing Param '" << paramName << "'" << endl;
 }
 
 
@@ -243,7 +250,7 @@ void ofxRemoteUIServer::shareParam(string paramName, bool* param, ofColor c, int
 	p.boolVal = *param;
 	p.r = c.r;  p.g = c.g; p.b = c.b; p.a = c.a;
 	addParamToDB(p, paramName);
-	cout << "ofxRemoteUIServer: sharing Param " << paramName << endl;
+	cout << "ofxRemoteUIServer Sharing Param '" << paramName << "'" << endl;
 }
 
 
@@ -257,7 +264,7 @@ void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int ma
 	p.r = c.r;  p.g = c.g; p.b = c.b; p.a = c.a;
 	p.intVal = *param = ofClamp(*param, min, max);
 	addParamToDB(p, paramName);
-	cout << "ofxRemoteUIServer: sharing Param " << paramName << endl;
+	cout << "ofxRemoteUIServer Sharing Param '" << paramName << "'" << endl;
 }
 
 
@@ -268,7 +275,7 @@ void ofxRemoteUIServer::shareParam(string paramName, string* param, ofColor c, i
 	p.stringVal = *param;
 	p.r = c.r;  p.g = c.g; p.b = c.b; p.a = c.a;
 	addParamToDB(p, paramName);
-	cout << "ofxRemoteUIServer: sharing Param " << paramName << endl;
+	cout << "ofxRemoteUIServer Sharing Param '" << paramName << "'" <<endl;
 }
 
 

@@ -118,6 +118,7 @@
 			keyOrder.push_back(paramName);
 			widgets[paramName] = row;
 			//[row remapSlider];
+			[widgets[paramName] updateUI];
 		}else{
 			[widgets[paramName] updateValues:p];
 			//if param has been changed, update the UI

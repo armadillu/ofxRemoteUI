@@ -197,6 +197,7 @@ void ofxRemoteUI::sendUpdateForParamsInList(vector<string>paramsPendingUpdate){
 	for(int i = 0; i < paramsPendingUpdate.size(); i++){
 		//cout << "ofxRemoteUIServer: sending updated param " + paramsPendingUpdate[i] << endl;
 		RemoteUIParam p = params[paramsPendingUpdate[i]];
+		//p.print();
 		sendParam(paramsPendingUpdate[i], p);
 	}
 }
