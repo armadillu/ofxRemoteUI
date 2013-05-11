@@ -222,45 +222,51 @@ void ofxRemoteUIServer::update(float dt){
 	}
 }
 
-void ofxRemoteUIServer::shareParam(string paramName, float* param, float min, float max){
+void ofxRemoteUIServer::shareParam(string paramName, float* param, float min, float max, ofColor c){
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_FLOAT;
 	p.floatValAddr = param;
 	p.floatVal = *param;
 	p.maxFloat = max;
 	p.minFloat = min;
+	p.floatVal = *param = ofClamp(*param, min, max);
+	p.r = c.r;  p.g = c.g; p.b = c.b; p.a = c.a;
 	addParamToDB(p, paramName);
 	cout << "ofxRemoteUIServer: sharing Param " << paramName << endl;
 }
 
 
-void ofxRemoteUIServer::shareParam(string paramName, bool* param, int nothing , int nothing2  ){
+void ofxRemoteUIServer::shareParam(string paramName, bool* param, int nothing , int nothing2, ofColor c ){
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_BOOL;
 	p.boolValAddr = param;
 	p.boolVal = *param;
+	p.r = c.r;  p.g = c.g; p.b = c.b; p.a = c.a;
 	addParamToDB(p, paramName);
 	cout << "ofxRemoteUIServer: sharing Param " << paramName << endl;
 }
 
 
-void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int max){
+void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int max, ofColor c ){
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_INT;
 	p.intValAddr = param;
 	p.intVal = *param;
 	p.maxInt = max;
 	p.minInt = min;
+	p.r = c.r;  p.g = c.g; p.b = c.b; p.a = c.a;
+	p.intVal = *param = ofClamp(*param, min, max);
 	addParamToDB(p, paramName);
 	cout << "ofxRemoteUIServer: sharing Param " << paramName << endl;
 }
 
 
-void ofxRemoteUIServer::shareParam(string paramName, string* param, int nothing, int nothing2 ){
+void ofxRemoteUIServer::shareParam(string paramName, string* param, int nothing, int nothing2, ofColor c ){
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_STRING;
 	p.stringValAddr = param;
 	p.stringVal = *param;
+	p.r = c.r;  p.g = c.g; p.b = c.b; p.a = c.a;
 	addParamToDB(p, paramName);
 	cout << "ofxRemoteUIServer: sharing Param " << paramName << endl;
 }

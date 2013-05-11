@@ -107,17 +107,6 @@
 	//NSLog(@"Client holds %d params so far", (int) paramList.size());
 	//NSLog(@"Client reports %d params changed since last check", (int)updatedParamsList.size());
 
-	//TODO remove params that are on the local DB that are not anymore in the server
-	//	for (id key in [widgets allKeys]) { // see what's on the UI now
-	//
-	//		NSLog(@"%@ - %@",key,[widgets objectForKey:key]);
-	//
-	//		string paramName = string([key UTF8String]);
-	//		if (std::find(paramList.begin(), paramList.end(), paramName) == paramList.end()){ // if this UI element is NOT the list, we r fine
-	//
-	//		}
-	//	}
-
 	for(int i = 0; i < paramList.size(); i++){
 
 		string paramName = paramList[i];
@@ -198,7 +187,7 @@
 	[df setObject: addressField.stringValue forKey:@"lastAddress"];
 	[df setObject: portField.stringValue forKey:@"lastPort"];
 
-	if ([[connectButton title] isEqualToString:@"Connect"]){ //we are not connected
+	if ([[connectButton title] isEqualToString:@"Connect"]){ //we are not connected, let's connect
 		widgets.clear();
 		keyOrder.clear();
 		[addressField setEnabled:false];
@@ -220,13 +209,19 @@
 		[progress startAnimation:self];
 		lagField.stringValue = @"";
 
-	}else{
+	}else{ // let's disconnect
+
 		[addressField setEnabled:true];
 		[portField setEnabled:true];
 		connectButton.state = 0;
 		connectButton.title = @"Connect";
 		[updateFromServerButton setEnabled: false];
 		[updateContinuouslyCheckbox setEnabled:false];
+		for( map<string,Item*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
+			string key = (*ii).first;
+			Item* t = widgets[key];
+			[t release];
+		}
 		widgets.clear();
 		keyOrder.clear();
 		[tableView reloadData];
@@ -271,7 +266,7 @@
 
 -(void)update{
 
-	if (connectButton.state == 1 ){
+	if ( connectButton.state == 1 ){ // if connected
 
 		client->update(REFRESH_RATE);
 
@@ -279,6 +274,10 @@
 			client->requestCompleteUpdate();
 			[self syncLocalParamsToClientParams];
 			[tableView reloadData];
+		}
+
+		if(!client->isReadyToSend()){	//if the other side disconnected, or error
+			[self connect]; //this disconnects if we were connectd
 		}
 	}
 }
@@ -305,8 +304,18 @@
 		Item * item = widgets[ keyOrder[row] ];
 		//NSLog(@"viewForTableColumn %@", item);
 		ItemCellView *result = [myTableView makeViewWithIdentifier:tableColumn.identifier owner:self];
+		//[result superview]
+
+		if ( result.layer == nil){ // set bg color of widget
+			if (item->param.a > 0 ){
+				CALayer *viewLayer = [CALayer layer];
+				[viewLayer setBackgroundColor:CGColorCreateGenericRGB(item->param.r / 255., item->param.g / 255., item->param.b / 255., item->param.a / 255.)];
+				[result setWantsLayer:YES]; // view's backing store is using a Core Animation Layer
+				[result setLayer:viewLayer];
+			}
+		}
+
 		[item setCellView:result];
-		//[item performSelector:@selector(remapSlider) withObject:nil afterDelay:0.01];
 		[item remapSlider];
 		[item updateUI];
 

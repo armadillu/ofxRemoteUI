@@ -19,6 +19,7 @@ public:
 		int numCircles;
 		string currentFrameRate;
 
+	int test;
 };
 
 #endif

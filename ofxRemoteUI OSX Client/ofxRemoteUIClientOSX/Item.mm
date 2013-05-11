@@ -142,7 +142,7 @@
 }
 
 -(IBAction)updateBool:(id)sender{
-	printf("%d\n", [sender intValue]);
+	//printf("%d\n", [sender intValue]);
 	param.boolVal = [sender intValue];
 	cellView.button.title = param.boolVal ? @"ON" : @"OFF";
 	if ([[NSApp delegate] respondsToSelector:@selector(userChangedParam:paramName:)]){

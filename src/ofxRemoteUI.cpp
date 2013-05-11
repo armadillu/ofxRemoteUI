@@ -97,13 +97,14 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 	}
 
 	RemoteUIParam p = original;
+	int arg = 0;
 
 	switch (dm.argument) {
 		case FLT_ARG:
 			p.type = REMOTEUI_PARAM_FLOAT;
- 			p.floatVal = m.getArgAsFloat(0);
-			p.minFloat = m.getArgAsFloat(1);
-			p.maxFloat = m.getArgAsFloat(2);
+ 			p.floatVal = m.getArgAsFloat(arg); arg++;
+			p.minFloat = m.getArgAsFloat(arg); arg++;
+			p.maxFloat = m.getArgAsFloat(arg); arg++;
 			//cout << "updated " << dm.paramName << "to a new value: " << p.floatVal << endl;
 			if (p.floatValAddr){
 				*p.floatValAddr = p.floatVal;
@@ -111,9 +112,9 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 
 		case INT_ARG:
 			p.type = REMOTEUI_PARAM_INT;
-			p.intVal = m.getArgAsInt32(0);
-			p.minInt = m.getArgAsInt32(1);
-			p.maxInt = m.getArgAsInt32(2);
+			p.intVal = m.getArgAsInt32(arg); arg++;
+			p.minInt = m.getArgAsInt32(arg); arg++;
+			p.maxInt = m.getArgAsInt32(arg); arg++;
 			//cout << "updated " << dm.paramName << "to a new value: " << p.intVal << endl;
 			if (p.intValAddr){
 				*p.intValAddr = p.intVal;
@@ -121,7 +122,7 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 
 		case BOL_ARG:
 			p.type = REMOTEUI_PARAM_BOOL;
-			p.boolVal = m.getArgAsInt32(0) == 0 ? false : true;
+			p.boolVal = m.getArgAsInt32(arg) == 0 ? false : true; arg++;
 			//cout << "updated " << dm.paramName << "to a new value: " << p.boolVal << endl;
 			if (p.boolValAddr){
 				*p.boolValAddr = p.boolVal;
@@ -129,7 +130,7 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 
 		case STR_ARG:
 			p.type = REMOTEUI_PARAM_STRING;
-			p.stringVal = m.getArgAsString(0);
+			p.stringVal = m.getArgAsString(arg); arg++;
 			//cout << "updated " << dm.paramName << "to a new value: " << (p.stringVal) << endl;
 			if (p.stringValAddr){
 				*p.stringValAddr = p.stringVal;
@@ -138,6 +139,11 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 		case NULL_ARG: cout << "updateParamFromDecodedMessage NULL type!" << endl; break;
 		default: cout << "updateParamFromDecodedMessage unknown type!" << endl; break;
 	}
+
+	p.r = m.getArgAsInt32(arg); arg++;
+	p.g = m.getArgAsInt32(arg); arg++;
+	p.b = m.getArgAsInt32(arg); arg++;
+	p.a = m.getArgAsInt32(arg); arg++;
 
 	//keep track of the change
 	//if(std::find(paramsChangedSinceLastCheck.begin(), paramsChangedSinceLastCheck.end(), paramName) == paramsChangedSinceLastCheck.end()){ //not found
@@ -288,7 +294,6 @@ RemoteUIParam ofxRemoteUI::getParamForName(string paramName){
 	}else{
 		cout << "ofxRemoteUIClient::getParamForName >> param " + paramName + " not found!" << endl;
 	}
-
 	return p;
 }
 
@@ -303,6 +308,7 @@ void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
 		case REMOTEUI_PARAM_BOOL: m.addIntArg(p.boolVal ? 1 : 0); /*cout << "sending bool" << endl; */ break;
 		case REMOTEUI_PARAM_STRING: m.addStringArg(p.stringVal); /*cout << "sending string" << endl; */ break;
 	}
+	m.addIntArg(p.r); m.addIntArg(p.g); m.addIntArg(p.b); m.addIntArg(p.a); // set bg color!
 	if(timeSinceLastReply == 0.0f) timeSinceLastReply = 0.0;
 	sender.sendMessage(m);
 }

@@ -116,6 +116,7 @@ public:
 		intVal = minInt = maxInt = 0;
 		boolVal = false;
 		stringVal = "empty";
+		r = g = b = a = 0;
 	};
 
 
@@ -172,6 +173,9 @@ public:
 
 	string * stringValAddr;
 	string stringVal;
+
+	unsigned char r,g,b,a; // color [0,255]
+
 };
 
 
@@ -204,23 +208,22 @@ protected:
 	void sendCIAO();
 	void sendTEST();
 
-	bool readyToSend;
-	ofxOscSender sender;
-	ofxOscReceiver receiver;
+	bool							readyToSend;
+	ofxOscSender					sender;
+	ofxOscReceiver					receiver;
 
-	float time;
+	float							time;
+	float							timeSinceLastReply;
+	float							avgTimeSinceLastReply;
+	bool							waitingForReply;
 
-	float timeSinceLastReply;
-	float avgTimeSinceLastReply;
-	bool waitingForReply;
+	float							updateInterval;
+	int								port;
 
-	float updateInterval;
-	int port;
+	map<string, RemoteUIParam>		params;
+	map<int, string>				keyOrder; // used to keep the order in which the params were added
 
-	map<string, RemoteUIParam> params;
-	map<int, string> keyOrder; // used to keep the order in which the params were added
-
-	set<string> paramsChangedSinceLastCheck;
+	set<string>						paramsChangedSinceLastCheck;
 
 
 private:

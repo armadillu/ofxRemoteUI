@@ -69,12 +69,12 @@ void ofxRemoteUIClient::update(float dt){
 		switch (dm.action) {
 
 			case HELO_ACTION: //server says hi back, we ask for a big update
-				//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " answered HELLO!" << endl;
+				cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " answered HELLO!" << endl;
 				requestCompleteUpdate();
 				break;
 
 			case REQUEST_ACTION: //should not happen, server doesnt request
-				//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " send REQU??? WTF!!!"  << endl;
+				cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " send REQU??? WTF!!!"  << endl;
 				break;
 
 			case SEND_ACTION:{ //server is sending us an updated val
@@ -84,8 +84,10 @@ void ofxRemoteUIClient::update(float dt){
 				break;
 
 			case CIAO_ACTION:
-				//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says CIAO!" << endl;
+				cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says CIAO!" << endl;
 				sendCIAO();
+				params.clear();
+				keyOrder.clear();
 				readyToSend = false;
 				break;
 
@@ -97,7 +99,7 @@ void ofxRemoteUIClient::update(float dt){
 					avgTimeSinceLastReply = timeSinceLastReply ;
 				}
 				timeSinceLastReply = 0.0f;
-				//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " replied TEST!" << " and took " << avgTimeSinceLastReply << endl;
+				cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " replied TEST!" << " and took " << avgTimeSinceLastReply << endl;
 				break;
 
 			default: cout << "ofxRemoteUIClient::update >> ERR!" <<endl; break;
@@ -202,6 +204,11 @@ void ofxRemoteUIClient::sendUpdatedParam(string paramName){
 	}else{
 		cout << "ofxRemoteUIClient::sendUpdatedParam >> param '" + paramName + "' not found!" << endl;
 	}
+}
+
+
+bool ofxRemoteUIClient::isReadyToSend(){
+	return readyToSend;
 }
 
 

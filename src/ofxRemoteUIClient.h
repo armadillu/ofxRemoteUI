@@ -43,6 +43,8 @@ public:
 	//send the server an update on a param (will take actual value from the supplied pointer in trackParam())
 	void sendUpdatedParam(string paramName);
 
+	bool isReadyToSend();
+
 private:
 
 	void sendREQUEST(); //a request for a complete list of server params

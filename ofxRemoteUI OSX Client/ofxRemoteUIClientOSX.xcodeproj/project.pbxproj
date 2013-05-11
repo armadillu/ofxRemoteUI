@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		73002CDB140ABCF60035299A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73002CDA140ABCF60035299A /* Cocoa.framework */; };
+		BB395E96173E6326002FA815 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB395E95173E6326002FA815 /* QuartzCore.framework */; };
 		BB4E4403169F278B00A94935 /* IpEndpointName.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB4E43DE169F278B00A94935 /* IpEndpointName.cpp */; };
 		BB4E4404169F278B00A94935 /* NetworkingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB4E43E3169F278B00A94935 /* NetworkingUtils.cpp */; };
 		BB4E4405169F278B00A94935 /* UdpSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB4E43E4169F278B00A94935 /* UdpSocket.cpp */; };
@@ -45,6 +46,7 @@
 		73002CDD140ABCF60035299A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		73002CDE140ABCF60035299A /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		73002CDF140ABCF60035299A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		BB395E95173E6326002FA815 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
 		BB4E43DE169F278B00A94935 /* IpEndpointName.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IpEndpointName.cpp; sourceTree = "<group>"; };
 		BB4E43DF169F278B00A94935 /* IpEndpointName.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IpEndpointName.h; sourceTree = "<group>"; };
 		BB4E43E0169F278B00A94935 /* NetworkingUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkingUtils.h; sourceTree = "<group>"; };
@@ -109,6 +111,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB395E96173E6326002FA815 /* QuartzCore.framework in Frameworks */,
 				73002CDB140ABCF60035299A /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -119,6 +122,7 @@
 		73002CCB140ABCF60035299A = {
 			isa = PBXGroup;
 			children = (
+				BB395E95173E6326002FA815 /* QuartzCore.framework */,
 				BBDCBE2716A063A400F1C5EC /* ReadMe.txt */,
 				BB65837A16A315B2000B45F0 /* icon.icns */,
 				BBDCBDF216A051A900F1C5EC /* ofxRemoteUI */,

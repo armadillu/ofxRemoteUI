@@ -7,6 +7,7 @@
 
 @interface Item : NSObject{
 
+	@public
 	RemoteUIParam param;
 	string paramName;
 	ItemCellView * cellView;

@@ -17,11 +17,12 @@ void testApp::setup(){
 
 	numCircles = 30;
 	//expose vars to ofxRemoteUI server, AFTER SETUP!
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(x, 0, ofGetWidth());
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(x, 0, ofGetWidth(), ofColor::red);
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(y, 0, ofGetHeight());
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawOutlines);
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(numCircles, 0, 30);
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentFrameRate);
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(test, 0, 5);
 
 	OFX_REMOTEUI_SERVER_LOAD_FROM_XML(); //load values from XML if you want to do so
 }
