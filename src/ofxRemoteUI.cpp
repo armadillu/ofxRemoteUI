@@ -13,6 +13,7 @@ bool ofxRemoteUI::ready(){
 	return readyToSend;
 }
 
+
 float ofxRemoteUI::connectionLag(){
 	return avgTimeSinceLastReply;
 }
@@ -145,10 +146,6 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 	p.b = m.getArgAsInt32(arg); arg++;
 	p.a = m.getArgAsInt32(arg); arg++;
 
-	//keep track of the change
-	//if(std::find(paramsChangedSinceLastCheck.begin(), paramsChangedSinceLastCheck.end(), paramName) == paramsChangedSinceLastCheck.end()){ //not found
-	//	paramsChangedSinceLastCheck.push_back(paramName);
-	//}
 	if ( !p.isEqualTo(original)  || newParam ){ // if the udpdate changed the param, keep track of it
 		paramsChangedSinceLastCheck.insert(paramName);
 	}
@@ -297,6 +294,7 @@ RemoteUIParam ofxRemoteUI::getParamForName(string paramName){
 	return p;
 }
 
+
 void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
 	ofxOscMessage m;
 	//printf("sending >> %s ", paramName.c_str());
@@ -312,6 +310,7 @@ void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
 	if(timeSinceLastReply == 0.0f) timeSinceLastReply = 0.0;
 	sender.sendMessage(m);
 }
+
 
 void ofxRemoteUI::sendTEST(){
 	//cout << "sendTEST()" << endl;

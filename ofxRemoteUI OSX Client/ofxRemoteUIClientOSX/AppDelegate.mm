@@ -91,15 +91,15 @@
 		Item* t = widgets[key];
 		[t remapSlider];
 	}
-
 }
+
 
 -(NSString*)stringFromString:(string) s{
 	return  [NSString stringWithCString:s.c_str() encoding:[NSString defaultCStringEncoding]];
 }
 
 
--(void)syncLocalParamsToClientParams{ 
+-(BOOL)syncLocalParamsToClientParams{
 
 	vector<string> paramList = client->getAllParamNamesList();
 	vector<string> updatedParamsList = client->getChangedParamsList();
@@ -111,25 +111,24 @@
 
 		string paramName = paramList[i];
 		RemoteUIParam p = client->getParamForName(paramName);
-		//printf("%s >> ",paramName.c_str());
-		//p.print();
 
 		map<string,Item*>::iterator it = widgets.find(paramName);
 		if ( it == widgets.end() ){	//not found, this is a new param... lets make an UI item for it
-			Item * row = [[Item alloc] initWithParam: p paramName: paramName];
-			
+			Item * row = [[Item alloc] initWithParam: p paramName: paramName];			
 			keyOrder.push_back(paramName);
 			widgets[paramName] = row;
+			//[row remapSlider];
 		}else{
 			[widgets[paramName] updateValues:p];
 			//if param has been changed, update the UI
 			if(find(updatedParamsList.begin(), updatedParamsList.end(), paramName) != updatedParamsList.end()){ // found in list
 				[widgets[paramName] updateUI];
-				//printf("updating UI for %s\n", paramName.c_str());
+				printf("updating UI for %s\n", paramName.c_str());
 			}
 		}
 	}
-	//[tableView reloadData];
+
+	return ( client->hasReceivedUpdate() );
 }
 
 
@@ -152,10 +151,22 @@
 
 
 -(IBAction)pressedSync:(id)sender;{
+	
 	client->requestCompleteUpdate();
 	//delay a bit the screen update so that we have gathered the values
-	[self performSelector:@selector(syncLocalParamsToClientParams) withObject:nil afterDelay: 3 * REFRESH_RATE];
-	[tableView performSelector:@selector(reloadData) withObject:nil afterDelay: 3 * REFRESH_RATE];
+	[self performSelector:@selector(handleUpdate:) withObject:nil afterDelay: REFRESH_RATE];
+}
+
+-(void) handleUpdate:(id)timer{
+
+	if( [self syncLocalParamsToClientParams] ){ //if we update, refresh UI
+		[tableView performSelector:@selector(reloadData) withObject:nil afterDelay: 0];
+	}else{	// retry again in a while
+		if(connectButton.state == 1){
+			[self performSelector:@selector(handleUpdate:) withObject:nil afterDelay: 2 * REFRESH_RATE];
+		}
+		NSLog(@"no data yet; retry....");
+	}
 }
 
 
@@ -182,6 +193,7 @@
 
 
 -(void) connect{
+	
 	//NSLog(@"connect!");
 	NSUserDefaults * df = [NSUserDefaults standardUserDefaults];
 	[df setObject: addressField.stringValue forKey:@"lastAddress"];
@@ -230,7 +242,6 @@
 		lagField.stringValue = @"";
 	}
 }
-
 
 
 - (void)windowDidResize:(NSNotification *)notification{
@@ -317,7 +328,7 @@
 
 		[item setCellView:result];
 		[item remapSlider];
-		[item updateUI];
+		[item updateUI];		
 
 		//NSLog(@"item: %@", item);
 		//result.detailTextField.stringValue = item.itemKind;

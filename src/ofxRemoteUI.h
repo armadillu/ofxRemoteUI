@@ -25,12 +25,12 @@ using namespace std;
 #define OFX_REMOTEUI_XML_TAG				"OFX_REMOTE_UI_PARAMS"
 
 //easy param sharing macro, share from from anywhere!
-#define OFX_REMOTEUI_SERVER_SHARE_PARAM(val,...)	( ofxRemoteUIServer::instance()->shareParam( #val, &val, ##__VA_ARGS__ ) )
-#define OFX_REMOTEUI_SERVER_SETUP(port, ...)		( ofxRemoteUIServer::instance()->setup(port, ##__VA_ARGS__) )
-#define OFX_REMOTEUI_SERVER_UPDATE(deltaTime)		( ofxRemoteUIServer::instance()->update(deltaTime) )
-#define OFX_REMOTEUI_SERVER_CLOSE()					( ofxRemoteUIServer::instance()->close() )
-#define	OFX_REMOTEUI_SERVER_SAVE_TO_XML()			( ofxRemoteUIServer::instance()->saveToXML() )
-#define	OFX_REMOTEUI_SERVER_LOAD_FROM_XML()			( ofxRemoteUIServer::instance()->loadFromXML() )
+#define OFX_REMOTEUI_SERVER_SHARE_PARAM(val,...)		( ofxRemoteUIServer::instance()->shareParam( #val, &val, ##__VA_ARGS__ ) )
+#define OFX_REMOTEUI_SERVER_SETUP(port, ...)			( ofxRemoteUIServer::instance()->setup(port, ##__VA_ARGS__) )
+#define OFX_REMOTEUI_SERVER_UPDATE(deltaTime)			( ofxRemoteUIServer::instance()->update(deltaTime) )
+#define OFX_REMOTEUI_SERVER_CLOSE()						( ofxRemoteUIServer::instance()->close() )
+#define	OFX_REMOTEUI_SERVER_SAVE_TO_XML()				( ofxRemoteUIServer::instance()->saveToXML() )
+#define	OFX_REMOTEUI_SERVER_LOAD_FROM_XML()				( ofxRemoteUIServer::instance()->loadFromXML() )
 
 /*
 
@@ -186,6 +186,7 @@ public:
 	vector<string> getAllParamNamesList();
 	vector<string> getChangedParamsList();
 	RemoteUIParam getParamForName(string paramName);
+
 	bool ready();
 	float connectionLag();
 
@@ -198,7 +199,7 @@ protected:
 	vector<string> scanForUpdatedParamsAndSync();
 
 	void sendUpdateForParamsInList(vector<string>paramsPendingUpdate);
-	bool hasParamChanged(RemoteUIParam p);
+	bool hasParamChanged(RemoteUIParam p);	
 
 	void updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage dm);
 	void syncParamToPointer(string paramName);

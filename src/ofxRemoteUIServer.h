@@ -35,9 +35,9 @@ public:
 	void saveToXML();
 
 	void shareParam(string paramName, float* param, float min, float max, ofColor bgColor = ofColor(0,0,0,0) );
-	void shareParam(string paramName, bool* param, int nothing = 0, int nothing2 = 0, ofColor bgColor = ofColor(0,0,0,0) ); //"nothing" args are just to match other methods
+	void shareParam(string paramName, bool* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
 	void shareParam(string paramName, int* param, int min, int max, ofColor bgColor = ofColor(0,0,0,0) );
-	void shareParam(string paramName, string* param, int nothing = 0, int nothing2 = 0, ofColor bgColor = ofColor(0,0,0,0) ); //"nothing" args are just to match other methods
+	void shareParam(string paramName, string* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
 
 private:
 

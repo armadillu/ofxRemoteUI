@@ -14,6 +14,7 @@ ofxRemoteUIClient::ofxRemoteUIClient(){
 	timeSinceLastReply = 0;
 	avgTimeSinceLastReply = 0;
 	waitingForReply = false;
+	gotNewInfo = false;
 }
 
 
@@ -41,7 +42,6 @@ void ofxRemoteUIClient::update(float dt){
 		sendHELLO();	//on first connect, send HI!
 		sendTEST();		//and a lag test
 		readyToSend = true;
-
 	}else{
 
 		time += dt;
@@ -69,22 +69,23 @@ void ofxRemoteUIClient::update(float dt){
 		switch (dm.action) {
 
 			case HELO_ACTION: //server says hi back, we ask for a big update
-				cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " answered HELLO!" << endl;
+				//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " answered HELLO!" << endl;
 				requestCompleteUpdate();
 				break;
 
 			case REQUEST_ACTION: //should not happen, server doesnt request
-				cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " send REQU??? WTF!!!"  << endl;
+				//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " send REQU??? WTF!!!"  << endl;
 				break;
 
 			case SEND_ACTION:{ //server is sending us an updated val
 					//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " sends us a param update SEND!"  << endl;
 					updateParamFromDecodedMessage(m, dm);
+					gotNewInfo = true;
 				}
 				break;
 
 			case CIAO_ACTION:
-				cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says CIAO!" << endl;
+				//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says CIAO!" << endl;
 				sendCIAO();
 				params.clear();
 				keyOrder.clear();
@@ -99,7 +100,7 @@ void ofxRemoteUIClient::update(float dt){
 					avgTimeSinceLastReply = timeSinceLastReply ;
 				}
 				timeSinceLastReply = 0.0f;
-				cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " replied TEST!" << " and took " << avgTimeSinceLastReply << endl;
+				//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " replied TEST!" << " and took " << avgTimeSinceLastReply << endl;
 				break;
 
 			default: cout << "ofxRemoteUIClient::update >> ERR!" <<endl; break;
@@ -192,6 +193,15 @@ void ofxRemoteUIClient::requestCompleteUpdate(){
 	if(readyToSend){
 		sendREQUEST();
 	}
+}
+
+bool ofxRemoteUIClient::hasReceivedUpdate(){
+
+	if (gotNewInfo){
+		return true;
+		gotNewInfo = false;
+	}
+	return false;
 }
 
 

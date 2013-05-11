@@ -43,6 +43,7 @@
 -(void)setup;
 -(void)update;
 
+-(BOOL)syncLocalParamsToClientParams;
 
 -(void)userChangedParam:(RemoteUIParam)p paramName:(string)name; //this is a delegate method, items will call this on widgetChange
 

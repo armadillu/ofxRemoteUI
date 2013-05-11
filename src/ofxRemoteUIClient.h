@@ -44,11 +44,16 @@ public:
 	void sendUpdatedParam(string paramName);
 
 	bool isReadyToSend();
+	bool hasReceivedUpdate();
+
 
 private:
 
 	void sendREQUEST(); //a request for a complete list of server params
-	string host;
+
+	string					host;
+	bool					gotNewInfo;
+
 };
 
 #endif
