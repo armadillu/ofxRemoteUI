@@ -23,6 +23,9 @@
 		BB4E440E169F278B00A94935 /* ofxOscReceiver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB4E43FE169F278B00A94935 /* ofxOscReceiver.cpp */; };
 		BB4E440F169F278B00A94935 /* ofxOscSender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB4E4400169F278B00A94935 /* ofxOscSender.cpp */; };
 		BB65837B16A315B2000B45F0 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = BB65837A16A315B2000B45F0 /* icon.icns */; };
+		BB6CC35D174698DE0043F523 /* MyScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = BB6CC35C174698DE0043F523 /* MyScrollView.m */; };
+		BB94E57F17464E1800A7A3CC /* View.xib in Resources */ = {isa = PBXBuildFile; fileRef = BB94E57D17464E1800A7A3CC /* View.xib */; };
+		BB94E5AE17468EAE00A7A3CC /* ColorView.m in Sources */ = {isa = PBXBuildFile; fileRef = BB94E5AD17468EAE00A7A3CC /* ColorView.m */; };
 		BBCC327B16A59D5D005D9CFC /* HighWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = BBCC327A16A59D5D005D9CFC /* HighWindow.m */; };
 		BBD3270F173BFFF200D59359 /* ofxRemoteUIClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */; };
 		BBDCBDD716A050C200F1C5EC /* ofxOsc Readme.txt in Resources */ = {isa = PBXBuildFile; fileRef = BBDCBDD616A050C200F1C5EC /* ofxOsc Readme.txt */; };
@@ -32,10 +35,8 @@
 		BBDCBDF716A051B000F1C5EC /* ofxRemoteUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBDCBDF516A051B000F1C5EC /* ofxRemoteUI.cpp */; };
 		BBDCBDF816A0523200F1C5EC /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBDCBDE816A0513D00F1C5EC /* AppDelegate.mm */; };
 		BBDCBDF916A0523500F1C5EC /* Item.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBDCBDEA16A0513D00F1C5EC /* Item.mm */; };
-		BBDCBDFA16A0523700F1C5EC /* ItemCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = BBDCBDEC16A0513D00F1C5EC /* ItemCellView.m */; };
 		BBDCBDFB16A0523A00F1C5EC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = BBDCBDED16A0513D00F1C5EC /* main.m */; };
 		BBDCBE2816A063A400F1C5EC /* ReadMe.txt in Resources */ = {isa = PBXBuildFile; fileRef = BBDCBE2716A063A400F1C5EC /* ReadMe.txt */; };
-		BBDCBE2B16A0665D00F1C5EC /* MyCustomNSTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = BBDCBE2A16A0665D00F1C5EC /* MyCustomNSTableView.m */; };
 		BBE6075A16A466A7002F1707 /* offline.png in Resources */ = {isa = PBXBuildFile; fileRef = BBE6075716A466A7002F1707 /* offline.png */; };
 		BBE6075B16A466A7002F1707 /* connected.png in Resources */ = {isa = PBXBuildFile; fileRef = BBE6075816A466A7002F1707 /* connected.png */; };
 /* End PBXBuildFile section */
@@ -80,6 +81,11 @@
 		BB4E4400169F278B00A94935 /* ofxOscSender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxOscSender.cpp; sourceTree = "<group>"; };
 		BB4E4401169F278B00A94935 /* ofxOscSender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxOscSender.h; sourceTree = "<group>"; };
 		BB65837A16A315B2000B45F0 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = icon.icns; sourceTree = "<group>"; };
+		BB6CC35B174698DE0043F523 /* MyScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyScrollView.h; sourceTree = "<group>"; };
+		BB6CC35C174698DE0043F523 /* MyScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyScrollView.m; sourceTree = "<group>"; };
+		BB94E57E17464E1800A7A3CC /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = View.xib; sourceTree = "<group>"; };
+		BB94E5AC17468EAE00A7A3CC /* ColorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ColorView.h; sourceTree = "<group>"; };
+		BB94E5AD17468EAE00A7A3CC /* ColorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ColorView.m; sourceTree = "<group>"; };
 		BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUIClient.cpp; sourceTree = "<group>"; };
 		BBAAAFA8173BF54B00FE94C4 /* ofxRemoteUIClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUIClient.h; sourceTree = "<group>"; };
 		BBCC327916A59D5D005D9CFC /* HighWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HighWindow.h; sourceTree = "<group>"; };
@@ -92,16 +98,12 @@
 		BBDCBDE816A0513D00F1C5EC /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = ofxRemoteUIClientOSX/AppDelegate.mm; sourceTree = "<group>"; };
 		BBDCBDE916A0513D00F1C5EC /* Item.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Item.h; path = ofxRemoteUIClientOSX/Item.h; sourceTree = "<group>"; };
 		BBDCBDEA16A0513D00F1C5EC /* Item.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = Item.mm; path = ofxRemoteUIClientOSX/Item.mm; sourceTree = "<group>"; };
-		BBDCBDEB16A0513D00F1C5EC /* ItemCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ItemCellView.h; path = ofxRemoteUIClientOSX/ItemCellView.h; sourceTree = "<group>"; };
-		BBDCBDEC16A0513D00F1C5EC /* ItemCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ItemCellView.m; path = ofxRemoteUIClientOSX/ItemCellView.m; sourceTree = "<group>"; };
 		BBDCBDED16A0513D00F1C5EC /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = main.m; path = ofxRemoteUIClientOSX/main.m; sourceTree = "<group>"; };
 		BBDCBDF516A051B000F1C5EC /* ofxRemoteUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUI.cpp; sourceTree = "<group>"; };
 		BBDCBDF616A051B000F1C5EC /* ofxRemoteUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUI.h; sourceTree = "<group>"; };
 		BBDCBDFC16A0526C00F1C5EC /* ofxRemoteUIClientOSX-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "ofxRemoteUIClientOSX-Info.plist"; path = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist"; sourceTree = SOURCE_ROOT; };
 		BBDCBDFD16A0526C00F1C5EC /* ofxRemoteUIClientOSX-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "ofxRemoteUIClientOSX-Prefix.pch"; path = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch"; sourceTree = SOURCE_ROOT; };
 		BBDCBE2716A063A400F1C5EC /* ReadMe.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ReadMe.txt; sourceTree = "<group>"; };
-		BBDCBE2916A0665D00F1C5EC /* MyCustomNSTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MyCustomNSTableView.h; path = ofxRemoteUIClientOSX/MyCustomNSTableView.h; sourceTree = "<group>"; };
-		BBDCBE2A16A0665D00F1C5EC /* MyCustomNSTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MyCustomNSTableView.m; path = ofxRemoteUIClientOSX/MyCustomNSTableView.m; sourceTree = "<group>"; };
 		BBE6075716A466A7002F1707 /* offline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = offline.png; path = ofxRemoteUIClientOSX/offline.png; sourceTree = SOURCE_ROOT; };
 		BBE6075816A466A7002F1707 /* connected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = connected.png; path = ofxRemoteUIClientOSX/connected.png; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -122,7 +124,6 @@
 		73002CCB140ABCF60035299A = {
 			isa = PBXGroup;
 			children = (
-				BB395E95173E6326002FA815 /* QuartzCore.framework */,
 				BBDCBE2716A063A400F1C5EC /* ReadMe.txt */,
 				BB65837A16A315B2000B45F0 /* icon.icns */,
 				BBDCBDF216A051A900F1C5EC /* ofxRemoteUI */,
@@ -145,6 +146,7 @@
 		73002CD9140ABCF60035299A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BB395E95173E6326002FA815 /* QuartzCore.framework */,
 				73002CDA140ABCF60035299A /* Cocoa.framework */,
 				73002CDC140ABCF60035299A /* Other Frameworks */,
 			);
@@ -293,13 +295,13 @@
 				BBDCBDE816A0513D00F1C5EC /* AppDelegate.mm */,
 				BBDCBDE916A0513D00F1C5EC /* Item.h */,
 				BBDCBDEA16A0513D00F1C5EC /* Item.mm */,
-				BBDCBDEB16A0513D00F1C5EC /* ItemCellView.h */,
-				BBDCBDEC16A0513D00F1C5EC /* ItemCellView.m */,
 				BBDCBDED16A0513D00F1C5EC /* main.m */,
-				BBDCBE2916A0665D00F1C5EC /* MyCustomNSTableView.h */,
-				BBDCBE2A16A0665D00F1C5EC /* MyCustomNSTableView.m */,
 				BBCC327916A59D5D005D9CFC /* HighWindow.h */,
 				BBCC327A16A59D5D005D9CFC /* HighWindow.m */,
+				BB94E5AC17468EAE00A7A3CC /* ColorView.h */,
+				BB94E5AD17468EAE00A7A3CC /* ColorView.m */,
+				BB6CC35B174698DE0043F523 /* MyScrollView.h */,
+				BB6CC35C174698DE0043F523 /* MyScrollView.m */,
 			);
 			name = src;
 			sourceTree = "<group>";
@@ -310,6 +312,7 @@
 				BBDCBDDE16A0512300F1C5EC /* Credits.rtf */,
 				BBDCBDE016A0512300F1C5EC /* InfoPlist.strings */,
 				BBDCBDE216A0512300F1C5EC /* MainMenu.xib */,
+				BB94E57D17464E1800A7A3CC /* View.xib */,
 			);
 			name = en.lproj;
 			path = ofxRemoteUIClientOSX/en.lproj;
@@ -390,6 +393,7 @@
 				BB65837B16A315B2000B45F0 /* icon.icns in Resources */,
 				BBE6075A16A466A7002F1707 /* offline.png in Resources */,
 				BBE6075B16A466A7002F1707 /* connected.png in Resources */,
+				BB94E57F17464E1800A7A3CC /* View.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -417,16 +421,24 @@
 				BBDCBDF816A0523200F1C5EC /* AppDelegate.mm in Sources */,
 				BBD3270F173BFFF200D59359 /* ofxRemoteUIClient.cpp in Sources */,
 				BBDCBDF916A0523500F1C5EC /* Item.mm in Sources */,
-				BBDCBDFA16A0523700F1C5EC /* ItemCellView.m in Sources */,
 				BBDCBDFB16A0523A00F1C5EC /* main.m in Sources */,
-				BBDCBE2B16A0665D00F1C5EC /* MyCustomNSTableView.m in Sources */,
 				BBCC327B16A59D5D005D9CFC /* HighWindow.m in Sources */,
+				BB94E5AE17468EAE00A7A3CC /* ColorView.m in Sources */,
+				BB6CC35D174698DE0043F523 /* MyScrollView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		BB94E57D17464E1800A7A3CC /* View.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BB94E57E17464E1800A7A3CC /* en */,
+			);
+			name = View.xib;
+			sourceTree = "<group>";
+		};
 		BBDCBDDE16A0512300F1C5EC /* Credits.rtf */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -522,6 +534,7 @@
 		73002CF5140ABCF60035299A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist";
@@ -535,6 +548,7 @@
 		73002CF6140ABCF60035299A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist";

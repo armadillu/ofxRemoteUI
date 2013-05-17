@@ -23,6 +23,7 @@ void testApp::setup(){
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(numCircles, 0, 30);
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentFrameRate, ofColor(0,255,0,32));
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(test, 0, 5);
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(test2, 1, 5);
 
 	OFX_REMOTEUI_SERVER_LOAD_FROM_XML(); //load values from XML if you want to do so
 }

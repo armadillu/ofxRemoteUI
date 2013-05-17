@@ -7,7 +7,6 @@
 //
 
 #import "Item.h"
-#import "ItemCellView.h"
 #import "AppDelegate.h"
 
 
@@ -76,6 +75,13 @@
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(windowResized:) name:NSWindowDidResizeNotification
 											   object: window];
+
+	//debug
+//	CALayer *viewLayer = [CALayer layer];
+//	[viewLayer setBackgroundColor:CGColorCreateGenericRGB(0,0,0,0.1)];
+//	[listContainer setWantsLayer:YES]; // view's backing store is using a Core Animation Layer
+//	[listContainer setLayer:viewLayer];
+
 }
 
 
@@ -91,21 +97,26 @@
 		Item* t = widgets[key];
 		[t remapSlider];
 	}
+	[self adjustScrollView];
 }
+
 
 
 -(NSString*)stringFromString:(string) s{
 	return  [NSString stringWithCString:s.c_str() encoding:[NSString defaultCStringEncoding]];
 }
 
+-(void)syncLocalParamsToClientParams{
 
--(BOOL)syncLocalParamsToClientParams{
+	[self cleanUp];
 
 	vector<string> paramList = client->getAllParamNamesList();
 	vector<string> updatedParamsList = client->getChangedParamsList();
 
 	//NSLog(@"Client holds %d params so far", (int) paramList.size());
 	//NSLog(@"Client reports %d params changed since last check", (int)updatedParamsList.size());
+
+	int c = 0;
 
 	for(int i = 0; i < paramList.size(); i++){
 
@@ -114,22 +125,59 @@
 
 		map<string,Item*>::iterator it = widgets.find(paramName);
 		if ( it == widgets.end() ){	//not found, this is a new param... lets make an UI item for it
-			Item * row = [[Item alloc] initWithParam: p paramName: paramName];			
-			keyOrder.push_back(paramName);
+			Item * row = [[Item alloc] initWithParam: p paramName: paramName ID: c];
+			c++;
+			//NSLog(@">>> Item alloc'd >>> %s", paramName.c_str());
+			orderedKeys.push_back(paramName);
 			widgets[paramName] = row;
-			//[row remapSlider];
-			[widgets[paramName] updateUI];
-		}else{
-			[widgets[paramName] updateValues:p];
-			//if param has been changed, update the UI
-			if(find(updatedParamsList.begin(), updatedParamsList.end(), paramName) != updatedParamsList.end()){ // found in list
-				[widgets[paramName] updateUI];
-				printf("updating UI for %s\n", paramName.c_str());
-			}
 		}
 	}
+	//[self layOutParams];
+}
 
-	return ( client->hasReceivedUpdate() );
+
+
+-(void)adjustScrollView{
+	int totalH = ROW_HEIGHT * (orderedKeys.size() );
+	MyScrollView * scroll = [listContainer superview];
+	[listContainer setFrame: CGRectMake( 0, 0, scroll.frame.size.width,totalH)];
+	float yOff = totalH - scroll.frame.size.height;
+	if (yOff > 0) {
+		[scroll  scrollToPoint:NSMakePoint(0, yOff)];
+		yOff = 0;
+	}
+	[scroll setFrameOrigin: NSMakePoint( 0, yOff )];
+}
+
+
+-(void) layOutParams{
+
+	//remove all views, start over
+	NSArray * subviews = [listContainer subviews];
+	for( int i = 0 ; i < [subviews count]; i++){
+		[[subviews objectAtIndex:i] removeFromSuperview];
+		[[subviews objectAtIndex:i] release];
+	}
+
+	int h = 0;
+	MyScrollView * scroll = [listContainer superview];
+	float scrollW = scroll.frame.size.width;
+
+	[self adjustScrollView];
+
+	for(int i = 0; i < orderedKeys.size(); i++){
+		string key = orderedKeys[i];
+		Item * item = widgets[key];
+		NSRect r = item->ui.frame;
+		item->ui.frame = NSMakeRect( 0, (orderedKeys.size()-1) * ROW_HEIGHT - h, scrollW, r.size.height);
+		[listContainer addSubview: item->ui];
+		h += r.size.height;
+		[item updateUI];
+		[item remapSlider];
+
+	}
+	NSLog(@"layout %d params (subviews: %d)", orderedKeys.size(), [[listContainer subviews] count]);
+
 }
 
 
@@ -152,22 +200,17 @@
 
 
 -(IBAction)pressedSync:(id)sender;{
-	
+
 	client->requestCompleteUpdate();
 	//delay a bit the screen update so that we have gathered the values
-	[self performSelector:@selector(handleUpdate:) withObject:nil afterDelay: REFRESH_RATE];
+	[self performSelector:@selector(handleUpdate:) withObject:nil afterDelay: REFRESH_RATE * 5];
 }
+
 
 -(void) handleUpdate:(id)timer{
 
-	if( [self syncLocalParamsToClientParams] ){ //if we update, refresh UI
-		[tableView performSelector:@selector(reloadData) withObject:nil afterDelay: 0];
-	}else{	// retry again in a while
-		if(connectButton.state == 1){
-			[self performSelector:@selector(handleUpdate:) withObject:nil afterDelay: 2 * REFRESH_RATE];
-		}
-		NSLog(@"no data yet; retry....");
-	}
+	[self syncLocalParamsToClientParams];
+	[self layOutParams];
 }
 
 
@@ -201,8 +244,6 @@
 	[df setObject: portField.stringValue forKey:@"lastPort"];
 
 	if ([[connectButton title] isEqualToString:@"Connect"]){ //we are not connected, let's connect
-		widgets.clear();
-		keyOrder.clear();
 		[addressField setEnabled:false];
 		[portField setEnabled:false];
 		connectButton.title = @"Disconnect";
@@ -218,7 +259,7 @@
 		[updateContinuouslyCheckbox setEnabled: true];
 		[statusImage setImage:nil];
 		//first load of vars
-		[self performSelector:@selector(pressedSync:) withObject:nil afterDelay:0.15];
+		[self pressedSync:nil];
 		[progress startAnimation:self];
 		lagField.stringValue = @"";
 
@@ -230,22 +271,23 @@
 		connectButton.title = @"Connect";
 		[updateFromServerButton setEnabled: false];
 		[updateContinuouslyCheckbox setEnabled:false];
-		for( map<string,Item*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
-			string key = (*ii).first;
-			Item* t = widgets[key];
-			[t release];
-		}
-		widgets.clear();
-		keyOrder.clear();
-		[tableView reloadData];
 		[statusImage setImage:[NSImage imageNamed:@"offline.png"]];
 		[progress stopAnimation:self];
 		lagField.stringValue = @"";
+		[self cleanUp];
 	}
 }
 
-
-- (void)windowDidResize:(NSNotification *)notification{
+-(void)cleanUp{
+	for( map<string,Item*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
+		string key = (*ii).first;
+		Item* t = widgets[key];
+		//NSLog(@"release %s", key.c_str());
+		[t release];
+	}
+	widgets.clear();
+	orderedKeys.clear();
+	[self adjustScrollView];
 
 }
 
@@ -285,7 +327,6 @@
 		if(updateContinuosly){
 			client->requestCompleteUpdate();
 			[self syncLocalParamsToClientParams];
-			[tableView reloadData];
 		}
 
 		if(!client->isReadyToSend()){	//if the other side disconnected, or error
@@ -302,54 +343,6 @@
 		//printf("client sending: "); p.print();
 		client->sendParamUpdate(p, name);
 	}
-}
-
-
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
-	return widgets.size();
-}
-
-
-- (NSView *)tableView:(NSTableView *)myTableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-
-	if (row <= keyOrder.size() && row >= 0){
-		Item * item = widgets[ keyOrder[row] ];
-		//NSLog(@"viewForTableColumn %@", item);
-		ItemCellView *result = [myTableView makeViewWithIdentifier:tableColumn.identifier owner:self];
-		//[result superview]
-
-		if ( result.layer == nil){ // set bg color of widget
-			if (item->param.a > 0 ){
-				CALayer *viewLayer = [CALayer layer];
-				[viewLayer setBackgroundColor:CGColorCreateGenericRGB(item->param.r / 255., item->param.g / 255., item->param.b / 255., item->param.a / 255.)];
-				[result setWantsLayer:YES]; // view's backing store is using a Core Animation Layer
-				[result setLayer:viewLayer];
-			}
-		}
-
-		[item setCellView:result];
-		[item remapSlider];
-		[item updateUI];		
-
-		//NSLog(@"item: %@", item);
-		//result.detailTextField.stringValue = item.itemKind;
-		return result;
-	}else{
-		return nil;
-	}
-}
-
-
-- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row{
-	return NO;
-}
-
-- (BOOL)tableView:(NSTableView *)tableView shouldSelectTableColumn:(NSTableColumn *)tableColumn{
-	return NO;
-}
-
-- (BOOL)selectionShouldChangeInTableView:(NSTableView *)tableView;{
-	return NO;
 }
 
 

@@ -1,27 +1,39 @@
 
 #include "ofxRemoteUI.h"
-#include "ItemCellView.h"
 #import <Foundation/Foundation.h>
 #include <string>
-
+#import "ColorView.h"
 
 @interface Item : NSObject{
 
 	@public
 	RemoteUIParam param;
 	string paramName;
-	ItemCellView * cellView;
 	NSControl * widget; //
+	//int row;//
+
+	IBOutlet ColorView * ui;
+	IBOutlet ColorView * bg;
+	IBOutlet NSSlider *slider;
+	IBOutlet NSTextField *textView;
+	IBOutlet NSButton *button;
+	IBOutlet NSTextField *paramLabel;
+	IBOutlet NSTextField *sliderVal;
+	IBOutlet NSTextField *sliderMin;
+	IBOutlet NSTextField *sliderMax;
+
+	int numberID; // to handle alternating rows in table draw
 }
 
+-(void)dealloc;
+
 -(id)initWithParam: (RemoteUIParam)p paramName:(string)name;
--(void)setCellView:(ItemCellView*)v;
 -(void)updateValues:(RemoteUIParam)p;
 -(void)updateUI;
 
 -(void)disableChanges;
 -(void)enableChanges;
-
+-(void)remapSlider;
 
 
 

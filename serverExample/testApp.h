@@ -20,6 +20,7 @@ public:
 		string currentFrameRate;
 
 	int test;
+	int test2;
 };
 
 #endif

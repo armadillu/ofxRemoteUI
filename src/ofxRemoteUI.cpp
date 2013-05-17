@@ -26,7 +26,7 @@ void ofxRemoteUI::addParamToDB(RemoteUIParam p, string paramName){
 	if ( it == params.end() ){	//not found!
 		//cout << "adding key: " << paramName <<endl;
 		params[paramName] = p;
-		keyOrder[ (int)keyOrder.size() ] = paramName;
+		orderedKeys[ (int)orderedKeys.size() ] = paramName;
 	}else{
 		params[paramName] = p;
 		cout << "already have a Param with that name on the DB : " << paramName <<"!!" << endl;
@@ -165,7 +165,7 @@ vector<string> ofxRemoteUI::getAllParamNamesList(){
 	vector<string>paramsList;
 	//get list of params in add order
 	//cout << "getAllParamNamesList(): ";
-	for( map<int,string>::iterator ii = keyOrder.begin(); ii != keyOrder.end(); ++ii ){
+	for( map<int,string>::iterator ii = orderedKeys.begin(); ii != orderedKeys.end(); ++ii ){
 		string paramName = (*ii).second;
 		paramsList.push_back(paramName);
 		//cout << paramName << ", ";

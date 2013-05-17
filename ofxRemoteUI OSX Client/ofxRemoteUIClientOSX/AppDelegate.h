@@ -9,13 +9,16 @@
 #import <Cocoa/Cocoa.h>
 #include "ofxRemoteUIClient.h"
 #import "Item.h"
+#import "MyScrollView.h"
+
 #define REFRESH_RATE			1.0f/15.0f
 #define STATUS_REFRESH_RATE		1.0
+#define ROW_HEIGHT				34
+#define ROW_WIDTH				350
 
-@interface AppDelegate : NSObject <NSApplicationDelegate, NSTableViewDataSource, NSTableViewDelegate>{
+@interface AppDelegate : NSObject <NSApplicationDelegate>{
 
 	IBOutlet NSWindow *window;
-	IBOutlet NSTableView *tableView;
 	IBOutlet NSButton *updateFromServerButton;
 	IBOutlet NSButton *updateContinuouslyCheckbox;
 	IBOutlet NSButton *connectButton;
@@ -24,10 +27,12 @@
 	IBOutlet NSImageView *statusImage;
 	IBOutlet NSProgressIndicator *progress;
 	IBOutlet NSTextField *lagField;
+	IBOutlet NSView *listContainer;
+
 	bool updateContinuosly;
 
 	map<string, Item*> widgets;
-	vector<string> keyOrder; // used to keep the order in which the items were added
+	vector<string> orderedKeys; // used to keep the order in which the items were added
 
 	ofxRemoteUIClient * client;
 	NSTimer * timer;
@@ -43,7 +48,7 @@
 -(void)setup;
 -(void)update;
 
--(BOOL)syncLocalParamsToClientParams;
+-(void)syncLocalParamsToClientParams;
 
 -(void)userChangedParam:(RemoteUIParam)p paramName:(string)name; //this is a delegate method, items will call this on widgetChange
 

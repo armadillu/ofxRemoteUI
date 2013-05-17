@@ -184,7 +184,7 @@ class ofxRemoteUI{
 public:
 
 	vector<string> getAllParamNamesList();
-	vector<string> getChangedParamsList();
+	vector<string> getChangedParamsList(); //in user add order
 	RemoteUIParam getParamForName(string paramName);
 
 	bool ready();
@@ -222,7 +222,7 @@ protected:
 	int								port;
 
 	map<string, RemoteUIParam>		params;
-	map<int, string>				keyOrder; // used to keep the order in which the params were added
+	map<int, string>				orderedKeys; // used to keep the order in which the params were added
 
 	set<string>						paramsChangedSinceLastCheck;
 

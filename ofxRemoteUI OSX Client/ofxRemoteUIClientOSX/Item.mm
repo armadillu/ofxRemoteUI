@@ -5,21 +5,53 @@
 
 @implementation Item
 
+-(void)dealloc{
 
--(id)initWithParam: (RemoteUIParam)p paramName:(string)name{
+	//NSLog(@"dealloc Item %s ", paramName.c_str());
+	[ui removeFromSuperview];
+	[ui release];
+	[super dealloc];
+}
 
+-(id)initWithParam: (RemoteUIParam)p paramName:(string)name ID:(int)n{
+	numberID = n;
+	widget = nil;
 	param = p;
 	paramName = name;
+	BOOL didLoad = [NSBundle loadNibNamed:@"View" owner:self];
 	return self;
 }
+
+
+-(void)awakeFromNib{
+	//NSLog(@"Item awakeFromNib %s", paramName.c_str());
+	if (numberID%2 == 1)
+		[ui setBackgroundColor:[NSColor whiteColor]];
+	else
+		[ui setBackgroundColor:[NSColor colorWithCalibratedRed:0.914 green:0.945 blue:0.998 alpha:1.000]];
+
+	if (param.a > 0 ){
+		[bg setBackgroundColor: [NSColor colorWithDeviceRed: param.r/255.
+													  green: param.g/255.
+													   blue: param.b/255.
+													  alpha: param.a/255.]
+		 ];
+		[ui setBackgroundColor:[NSColor whiteColor]];
+	}
+	[self setupUI];
+
+}
+
 
 -(void)disableChanges;{
 	[widget setEnabled:false];
 }
 
+
 -(void)enableChanges;{
 	[widget setEnabled:true];
 }
+
 
 -(void)remapSlider;{
 	if ([widget isKindOfClass: [NSSlider class]]){
@@ -37,58 +69,56 @@
 }
 
 
--(void)setCellView:(ItemCellView*)v{
-
-	cellView = v;
+-(void)setupUI{
 
 	switch (param.type) {
 		case REMOTEUI_PARAM_FLOAT:
-			widget = v.slider;
+			widget = slider;
 			[widget setAction:@selector(updateFloat:)];
-			[v.slider setMaxValue:param.maxFloat];
-			[v.slider setMinValue:param.minFloat];
-			[v.button removeFromSuperview];
-			[v.textView removeFromSuperview];
-			[v.slider setAllowsTickMarkValuesOnly:false];
+			[slider setMaxValue:param.maxFloat];
+			[slider setMinValue:param.minFloat];
+			[button setHidden:YES];
+			[textView setHidden:YES];
+			[slider setAllowsTickMarkValuesOnly:false];
 			break;
 
 		case REMOTEUI_PARAM_INT:
-			widget = v.slider;
-			[v.slider setMaxValue:param.maxInt];
-			[v.slider setMinValue:param.minInt];
-			[v.slider setAllowsTickMarkValuesOnly:true];
+			widget = slider;
+			[slider setMaxValue:param.maxInt];
+			[slider setMinValue:param.minInt];
+			[slider setAllowsTickMarkValuesOnly:true];
 			[widget setAction:@selector(updateInt:)];
-			[v.button removeFromSuperview];
-			[v.textView removeFromSuperview];
+			[button setHidden:YES];
+			[textView setHidden:YES];
 			break;
 
 		case REMOTEUI_PARAM_BOOL:
-			widget = v.button;
-			[v.button setAction:@selector(updateBool:)];
-			[v.slider removeFromSuperview];
-			[v.textView removeFromSuperview];
-			[v.sliderMax removeFromSuperview];
-			[v.sliderMin removeFromSuperview];
-			[v.sliderVal removeFromSuperview];
+			widget = button;
+			[button setAction:@selector(updateBool:)];
+			[slider setHidden:YES];
+			[textView setHidden:YES];
+			[sliderMax setHidden:YES];
+			[sliderMin setHidden:YES];
+			[sliderVal setHidden:YES];
 			break;
 
 		case REMOTEUI_PARAM_STRING:
-			widget = v.textView;
-			[v.textView setAction:@selector(updateString:)];
-			[v.slider removeFromSuperview];
-			[v.button removeFromSuperview];
-			[v.sliderMax removeFromSuperview];
-			[v.sliderMin removeFromSuperview];
-			[v.sliderVal removeFromSuperview];
+			widget = textView;
+			[textView setAction:@selector(updateString:)];
+			[slider setHidden:YES];
+			[button setHidden:YES];
+			[sliderMax setHidden:YES];
+			[sliderMin setHidden:YES];
+			[sliderVal setHidden:YES];
 			break;
 
-		default:
+		default:NSLog(@"wtf is this?");
 			break;
 	}
-
-	v.paramLabel.stringValue = [self stringFromString:paramName];
+	paramLabel.stringValue = [self stringFromString:paramName];
 	[widget setTarget:self];
 }
+
 
 -(void)updateValues:(RemoteUIParam)p;{
 	param = p;
@@ -98,29 +128,30 @@
 -(void)updateUI{
 	switch (param.type) {
 		case REMOTEUI_PARAM_FLOAT:
-			[cellView.slider setFloatValue:param.floatVal];
-			[cellView.sliderVal setStringValue:[NSString stringWithFormat:@"%.2f", param.floatVal ]];
-			[cellView.sliderMax setStringValue:[NSString stringWithFormat:@"%.1f", param.maxFloat ]];
-			[cellView.sliderMin setStringValue:[NSString stringWithFormat:@"%.1f", param.minFloat ]];
+			[slider setFloatValue:param.floatVal];
+			[sliderVal setStringValue:[NSString stringWithFormat:@"%.2f", param.floatVal ]];
+			[sliderMax setStringValue:[NSString stringWithFormat:@"%.1f", param.maxFloat ]];
+			[sliderMin setStringValue:[NSString stringWithFormat:@"%.1f", param.minFloat ]];
 			break;
 
 		case REMOTEUI_PARAM_INT:
-			[cellView.slider setIntegerValue:param.intVal];
-			[cellView.sliderVal setStringValue:[NSString stringWithFormat:@"%d", param.intVal ]];
-			[cellView.sliderMax setStringValue:[NSString stringWithFormat:@"%d", param.maxInt ]];
-			[cellView.sliderMin setStringValue:[NSString stringWithFormat:@"%d", param.minInt ]];
+			[slider setIntegerValue:param.intVal];
+			[sliderVal setStringValue:[NSString stringWithFormat:@"%d", param.intVal ]];
+			[sliderMax setStringValue:[NSString stringWithFormat:@"%d", param.maxInt ]];
+			[sliderMin setStringValue:[NSString stringWithFormat:@"%d", param.minInt ]];
 			break;
 
 		case REMOTEUI_PARAM_BOOL:
-			[cellView.button setState:param.boolVal];
-			cellView.button.title = param.boolVal ? @"ON" : @"OFF";
+			[button setState:param.boolVal];
+			button.title = param.boolVal ? @"ON" : @"OFF";
 			break;
 
 		case REMOTEUI_PARAM_STRING:
-			[cellView.textView setStringValue: [self stringFromString: param.stringVal]];
+			[textView setStringValue: [self stringFromString: param.stringVal]];
 			break;
 
 		default:
+			NSLog(@"updateUI wtf");
 			break;
 	}
 }
@@ -128,7 +159,7 @@
 
 -(IBAction)updateFloat:(id)sender{
 	param.floatVal = [sender floatValue];
-	[cellView.sliderVal setStringValue:[NSString stringWithFormat:@"%.2f", param.floatVal ]];
+	[sliderVal setStringValue:[NSString stringWithFormat:@"%.2f", param.floatVal ]];
 	if ([[NSApp delegate] respondsToSelector:@selector(userChangedParam:paramName:)]){
 		 [[NSApp delegate] userChangedParam: param paramName: paramName];  //blindly send message to App Delegate (TODO!)
 	}
@@ -136,7 +167,7 @@
 
 -(IBAction)updateInt:(id)sender{
 	param.intVal = [sender intValue];
-	[cellView.sliderVal setStringValue:[NSString stringWithFormat:@"%d", param.intVal ]];
+	[sliderVal setStringValue:[NSString stringWithFormat:@"%d", param.intVal ]];
 	if ([[NSApp delegate] respondsToSelector:@selector(userChangedParam:paramName:)]){
 		[[NSApp delegate] userChangedParam: param paramName: paramName];  //blindly send message to App Delegate (TODO!)
 	}
@@ -145,7 +176,7 @@
 -(IBAction)updateBool:(id)sender{
 	//printf("%d\n", [sender intValue]);
 	param.boolVal = [sender intValue];
-	cellView.button.title = param.boolVal ? @"ON" : @"OFF";
+	button.title = param.boolVal ? @"ON" : @"OFF";
 	if ([[NSApp delegate] respondsToSelector:@selector(userChangedParam:paramName:)]){
 		[[NSApp delegate] userChangedParam: param paramName: paramName];  //blindly send message to App Delegate (TODO!)
 	}

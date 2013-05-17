@@ -21,7 +21,7 @@ ofxRemoteUIClient::ofxRemoteUIClient(){
 void ofxRemoteUIClient::setup(string address, int port_){
 
 	params.clear();
-	keyOrder.clear();
+	orderedKeys.clear();
 	port = port_;
 	avgTimeSinceLastReply = timeSinceLastReply = time = 0.0f;
 	waitingForReply = false;
@@ -88,7 +88,7 @@ void ofxRemoteUIClient::update(float dt){
 				//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says CIAO!" << endl;
 				sendCIAO();
 				params.clear();
-				keyOrder.clear();
+				orderedKeys.clear();
 				readyToSend = false;
 				break;
 
@@ -189,7 +189,7 @@ void ofxRemoteUIClient::sendParamUpdate(RemoteUIParam p, string paramName){
 
 
 void ofxRemoteUIClient::requestCompleteUpdate(){
-	//cout << "ofxRemoteUIClient: requestCompleteUpdate()" << endl;
+	cout << "ofxRemoteUIClient: requestCompleteUpdate()" << endl;
 	if(readyToSend){
 		sendREQUEST();
 	}
