@@ -39,7 +39,7 @@
 			</object>
 			<object class="NSCustomView" id="1005">
 				<reference key="NSNextResponder"/>
-				<int key="NSvFlags">18</int>
+				<int key="NSvFlags">15</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSCustomView" id="34091846">
 						<reference key="NSNextResponder" ref="1005"/>
@@ -128,7 +128,7 @@
 								<string key="NSFrame">{{174, 2}, {43, 11}}</string>
 								<reference key="NSSuperview" ref="34091846"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="839355504"/>
+								<reference key="NSNextKeyView"/>
 								<string key="NSReuseIdentifierKey">_NS:1535</string>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSTextFieldCell" key="NSCell" id="717334439">
@@ -277,7 +277,7 @@
 					</object>
 					<object class="NSCustomView" id="36979102">
 						<reference key="NSNextResponder" ref="1005"/>
-						<int key="NSvFlags">274</int>
+						<int key="NSvFlags">279</int>
 						<string key="NSFrameSize">{350, 34}</string>
 						<reference key="NSSuperview" ref="1005"/>
 						<reference key="NSWindow"/>
@@ -550,7 +550,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">68</int>
+			<int key="maxID">71</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">

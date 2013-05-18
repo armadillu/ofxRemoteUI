@@ -13,8 +13,8 @@
 
 #define REFRESH_RATE			1.0f/15.0f
 #define STATUS_REFRESH_RATE		1.0
-#define ROW_HEIGHT				34
-#define ROW_WIDTH				350
+#define ROW_HEIGHT				34.0f
+#define ROW_WIDTH				350.0f
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>{
 
@@ -28,6 +28,7 @@
 	IBOutlet NSProgressIndicator *progress;
 	IBOutlet NSTextField *lagField;
 	IBOutlet NSView *listContainer;
+	IBOutlet MyScrollView * scroll;
 
 	bool updateContinuosly;
 
@@ -37,6 +38,7 @@
 	ofxRemoteUIClient * client;
 	NSTimer * timer;
 	NSTimer * statusTimer;
+	NSPoint lastLayout;
 }
 
 

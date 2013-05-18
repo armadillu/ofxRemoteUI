@@ -92,19 +92,21 @@
 
 - (void)windowResized:(NSNotification *)notification;{
 
+
+	//NSPoint p = [self calcNumRowsCols];
+	//NSLog( @"%f %f  -  %f %f", p.x, p.y, lastLayout.x, lastLayout.y );
+
+	//if ( p.x != lastLayout.x || p.y != lastLayout.y ){
+		[self layOutParams];
+	//}
 	for( map<string,Item*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
 		string key = (*ii).first;
 		Item* t = widgets[key];
 		[t remapSlider];
 	}
-	[self adjustScrollView];
 }
 
 
-
--(NSString*)stringFromString:(string) s{
-	return  [NSString stringWithCString:s.c_str() encoding:[NSString defaultCStringEncoding]];
-}
 
 -(void)syncLocalParamsToClientParams{
 
@@ -127,7 +129,6 @@
 		if ( it == widgets.end() ){	//not found, this is a new param... lets make an UI item for it
 			Item * row = [[Item alloc] initWithParam: p paramName: paramName ID: c];
 			c++;
-			//NSLog(@">>> Item alloc'd >>> %s", paramName.c_str());
 			orderedKeys.push_back(paramName);
 			widgets[paramName] = row;
 		}
@@ -138,45 +139,87 @@
 
 
 -(void)adjustScrollView{
+
 	int totalH = ROW_HEIGHT * (orderedKeys.size() );
-	MyScrollView * scroll = [listContainer superview];
-	[listContainer setFrame: CGRectMake( 0, 0, scroll.frame.size.width,totalH)];
-	float yOff = totalH - scroll.frame.size.height;
-	if (yOff > 0) {
-		[scroll  scrollToPoint:NSMakePoint(0, yOff)];
-		yOff = 0;
-	}
-	[scroll setFrameOrigin: NSMakePoint( 0, yOff )];
+	[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, totalH)];
+//	float yOff = totalH - scroll.frame.size.height;
+//	if (yOff > 0) {
+//		[scroll.contentView  scrollToPoint:NSMakePoint(0, yOff)];
+//		yOff = 0;
+//	}
+//	[listContainer setFrameOrigin: NSMakePoint( 0, yOff )];
 }
 
 
--(void) layOutParams{
+-(void)layOutParams{
 
 	//remove all views, start over
 	NSArray * subviews = [listContainer subviews];
-	for( int i = 0 ; i < [subviews count]; i++){
+	for( int i = [subviews count]-1 ; i >= 0 ; i-- ){
 		[[subviews objectAtIndex:i] removeFromSuperview];
-		[[subviews objectAtIndex:i] release];
+		//[[subviews objectAtIndex:i] release];
+	}
+	[self adjustScrollView];
+
+	float scrollW = listContainer.frame.size.width;
+	float scrollH = scroll.frame.size.height;
+	int numParams = orderedKeys.size();
+	int numCol = ceil(scrollW / ROW_WIDTH);
+	int howManyPerCol = floor( scrollH / ROW_HEIGHT );
+	int howManyThisCol = 0;
+	int colIndex = 0;
+	int numUsedColumns = ceil(numParams / (float)howManyPerCol);
+	float rowW = scrollW / numUsedColumns;
+	bool forceOneCol = false;
+
+	if (rowW < ROW_WIDTH){
+		rowW = ROW_WIDTH;
+		forceOneCol = true;
+		numUsedColumns = 1;
+		rowW = scrollW / numUsedColumns;
 	}
 
 	int h = 0;
-	MyScrollView * scroll = [listContainer superview];
-	float scrollW = scroll.frame.size.width;
-
-	[self adjustScrollView];
-
-	for(int i = 0; i < orderedKeys.size(); i++){
+	for(int i = 0; i < numParams; i++){
 		string key = orderedKeys[i];
 		Item * item = widgets[key];
 		NSRect r = item->ui.frame;
-		item->ui.frame = NSMakeRect( 0, (orderedKeys.size()-1) * ROW_HEIGHT - h, scrollW, r.size.height);
+
+		item->ui.frame = NSMakeRect( colIndex * rowW, (numParams - 1) * ROW_HEIGHT - h , rowW, r.size.height);
 		[listContainer addSubview: item->ui];
 		h += r.size.height;
+		howManyThisCol++;
+		if (forceOneCol == false && howManyThisCol >= howManyPerCol ){
+			colIndex++;
+			howManyThisCol = 0;
+			h = 0;
+		}
 		[item updateUI];
 		[item remapSlider];
-
 	}
-	NSLog(@"layout %d params (subviews: %d)", orderedKeys.size(), [[listContainer subviews] count]);
+
+//	NSLog(@"\n");
+//	NSLog(@"numParams: %d ", numParams);
+//	NSLog(@"howManyPerCol: %d ", howManyPerCol);
+//	NSLog(@"numCol: %d ", numCol);
+//	NSLog(@"numUsedColumns: %d ", numUsedColumns);
+//	NSLog(@"rowW: %f ", rowW);
+//	NSLog(@"forceOneCol: %d ", forceOneCol);
+//	NSLog(@"colIndex: %d ", colIndex);
+
+	lastLayout.x = colIndex;
+	lastLayout.y = howManyPerCol;
+	//[self adjustScrollView];
+	int off = ((int)[scroll.contentView frame].size.height ) % ((int)(ROW_HEIGHT));
+
+//	NSLog(@"h: %d  off %d", h, off);
+
+	if(forceOneCol){
+		[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, numParams * ROW_HEIGHT + off)];
+		lastLayout.y = numParams;
+	}else{
+		[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, howManyPerCol * ROW_HEIGHT + off)];
+	}
 
 }
 
@@ -287,7 +330,6 @@
 	}
 	widgets.clear();
 	orderedKeys.clear();
-	[self adjustScrollView];
 
 }
 

@@ -757,6 +757,7 @@
 							<string key="NSFrame">{{-1, 59}, {351, 5}}</string>
 							<reference key="NSSuperview" ref="439893737"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="110799128"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<string key="NSOffsets">{0, 0}</string>
 							<object class="NSTextFieldCell" key="NSTitleCell">
@@ -1189,11 +1190,11 @@
 										<bool key="EncodedWithXMLCoder">YES</bool>
 										<object class="NSView" id="694941873">
 											<reference key="NSNextResponder" ref="217020381"/>
-											<int key="NSvFlags">268</int>
+											<int key="NSvFlags">274</int>
 											<string key="NSFrameSize">{350, 301}</string>
 											<reference key="NSSuperview" ref="217020381"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="297290460"/>
+											<reference key="NSNextKeyView" ref="102414226"/>
 											<string key="NSReuseIdentifierKey">_NS:13</string>
 										</object>
 									</object>
@@ -1214,39 +1215,40 @@
 								<object class="NSScroller" id="102414226">
 									<reference key="NSNextResponder" ref="110799128"/>
 									<int key="NSvFlags">-2147483392</int>
-									<string key="NSFrame">{{334, 1}, {15, 299}}</string>
+									<string key="NSFrame">{{339, 0}, {11, 290}}</string>
 									<reference key="NSSuperview" ref="110799128"/>
 									<reference key="NSWindow"/>
-									<reference key="NSNextKeyView" ref="719151494"/>
+									<reference key="NSNextKeyView" ref="297290460"/>
 									<string key="NSReuseIdentifierKey">_NS:15</string>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+									<int key="NSsFlags">512</int>
 									<reference key="NSTarget" ref="110799128"/>
 									<string key="NSAction">_doScroller:</string>
-									<double key="NSPercent">0.99335548172757471</double>
+									<double key="NSPercent">0.96345514950166111</double>
 									<int key="NSKnobStyle">1</int>
 								</object>
 								<object class="NSScroller" id="719151494">
 									<reference key="NSNextResponder" ref="110799128"/>
 									<int key="NSvFlags">-2147483392</int>
-									<string key="NSFrame">{{-100, -100}, {303, 15}}</string>
+									<string key="NSFrame">{{-100, -100}, {339, 11}}</string>
 									<reference key="NSSuperview" ref="110799128"/>
 									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="217020381"/>
 									<string key="NSReuseIdentifierKey">_NS:26</string>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
-									<int key="NSsFlags">1</int>
+									<int key="NSsFlags">513</int>
 									<reference key="NSTarget" ref="110799128"/>
 									<string key="NSAction">_doScroller:</string>
-									<double key="NSPercent">0.50602412223815918</double>
+									<double key="NSPercent">0.96857142857142853</double>
 									<int key="NSKnobStyle">1</int>
 								</object>
 							</object>
 							<string key="NSFrame">{{0, 62}, {350, 301}}</string>
 							<reference key="NSSuperview" ref="439893737"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="102414226"/>
+							<reference key="NSNextKeyView" ref="719151494"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
-							<int key="NSsFlags">2576</int>
+							<int key="NSsFlags">133648</int>
 							<reference key="NSVScroller" ref="102414226"/>
 							<reference key="NSHScroller" ref="719151494"/>
 							<reference key="NSContentView" ref="217020381"/>
@@ -1259,7 +1261,7 @@
 					<string key="NSFrameSize">{350, 363}</string>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
-					<reference key="NSNextKeyView" ref="110799128"/>
+					<reference key="NSNextKeyView" ref="1050166834"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {2048, 1130}}</string>
 				<string key="NSMinSize">{350, 272}</string>
@@ -1731,6 +1733,14 @@
 						<reference key="destination" ref="694941873"/>
 					</object>
 					<int key="connectionID">739</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">scroll</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="110799128"/>
+					</object>
+					<int key="connectionID">742</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -2792,7 +2802,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">740</int>
+			<int key="maxID">742</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2849,6 +2859,7 @@
 							<string>listContainer</string>
 							<string>portField</string>
 							<string>progress</string>
+							<string>scroll</string>
 							<string>statusImage</string>
 							<string>updateContinuouslyCheckbox</string>
 							<string>updateFromServerButton</string>
@@ -2862,6 +2873,7 @@
 							<string>NSView</string>
 							<string>NSTextField</string>
 							<string>NSProgressIndicator</string>
+							<string>MyScrollView</string>
 							<string>NSImageView</string>
 							<string>NSButton</string>
 							<string>NSButton</string>
@@ -2878,6 +2890,7 @@
 							<string>listContainer</string>
 							<string>portField</string>
 							<string>progress</string>
+							<string>scroll</string>
 							<string>statusImage</string>
 							<string>updateContinuouslyCheckbox</string>
 							<string>updateFromServerButton</string>
@@ -2908,6 +2921,10 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">progress</string>
 								<string key="candidateClassName">NSProgressIndicator</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">scroll</string>
+								<string key="candidateClassName">MyScrollView</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">statusImage</string>

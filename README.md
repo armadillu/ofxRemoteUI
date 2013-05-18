@@ -1,7 +1,7 @@
 # ofxRemoteUI
 
 
-OF addon allows you to serve any variables you want (bool, float, int, string) on the network, so that you can modify them from away. Uses server client architecture, where your app is the server. It communicate both ways; you can modify variables from a client, but you can also see pull variable states from the client, so that you can track variable values remotely.
+OF addon allows you to serve any variables you want (bool, float, int, string) on the network, so that you can modify them from away. Uses server client architecture, where your app is the server. It communicates both ways; you can modify your project's variables from a client, but you can also pull your app's variable states from the client, so that you can track values that evolve programatically.
 
 It's OSC based, and it includes a native OSX Client. 
 
