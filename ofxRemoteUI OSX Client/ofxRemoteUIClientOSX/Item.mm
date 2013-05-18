@@ -54,6 +54,7 @@
 
 
 -(void)remapSlider;{
+	
 	if ([widget isKindOfClass: [NSSlider class]]){
 		float w = [widget frame].size.width;
 		int numTicks = w / 7;
@@ -77,8 +78,8 @@
 			[widget setAction:@selector(updateFloat:)];
 			[slider setMaxValue:param.maxFloat];
 			[slider setMinValue:param.minFloat];
-			[button setHidden:YES];
-			[textView setHidden:YES];
+			[button removeFromSuperview];
+			[textView removeFromSuperview];
 			[slider setAllowsTickMarkValuesOnly:false];
 			break;
 
@@ -88,28 +89,28 @@
 			[slider setMinValue:param.minInt];
 			[slider setAllowsTickMarkValuesOnly:true];
 			[widget setAction:@selector(updateInt:)];
-			[button setHidden:YES];
-			[textView setHidden:YES];
+			[button removeFromSuperview];
+			[textView removeFromSuperview];
 			break;
 
 		case REMOTEUI_PARAM_BOOL:
 			widget = button;
 			[button setAction:@selector(updateBool:)];
-			[slider setHidden:YES];
-			[textView setHidden:YES];
-			[sliderMax setHidden:YES];
-			[sliderMin setHidden:YES];
-			[sliderVal setHidden:YES];
+			[slider removeFromSuperview];
+			[textView removeFromSuperview];
+			[sliderMax removeFromSuperview];
+			[sliderMin removeFromSuperview];
+			[sliderVal removeFromSuperview];
 			break;
 
 		case REMOTEUI_PARAM_STRING:
 			widget = textView;
 			[textView setAction:@selector(updateString:)];
-			[slider setHidden:YES];
-			[button setHidden:YES];
-			[sliderMax setHidden:YES];
-			[sliderMin setHidden:YES];
-			[sliderVal setHidden:YES];
+			[slider removeFromSuperview];
+			[button removeFromSuperview];
+			[sliderMax removeFromSuperview];
+			[sliderMin removeFromSuperview];
+			[sliderVal removeFromSuperview];
 			break;
 
 		default:NSLog(@"wtf is this?");

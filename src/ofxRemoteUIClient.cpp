@@ -189,7 +189,7 @@ void ofxRemoteUIClient::sendParamUpdate(RemoteUIParam p, string paramName){
 
 
 void ofxRemoteUIClient::requestCompleteUpdate(){
-	cout << "ofxRemoteUIClient: requestCompleteUpdate()" << endl;
+	//cout << "ofxRemoteUIClient: requestCompleteUpdate()" << endl;
 	if(readyToSend){
 		sendREQUEST();
 	}

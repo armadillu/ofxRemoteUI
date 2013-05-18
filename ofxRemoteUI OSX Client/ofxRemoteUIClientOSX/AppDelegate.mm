@@ -110,7 +110,7 @@
 
 -(void)syncLocalParamsToClientParams{
 
-	[self cleanUp];
+	[self cleanUpParams];
 
 	vector<string> paramList = client->getAllParamNamesList();
 	vector<string> updatedParamsList = client->getChangedParamsList();
@@ -133,21 +133,14 @@
 			widgets[paramName] = row;
 		}
 	}
-	//[self layOutParams];
+	[self layOutParams];
 }
-
 
 
 -(void)adjustScrollView{
 
 	int totalH = ROW_HEIGHT * (orderedKeys.size() );
 	[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, totalH)];
-//	float yOff = totalH - scroll.frame.size.height;
-//	if (yOff > 0) {
-//		[scroll.contentView  scrollToPoint:NSMakePoint(0, yOff)];
-//		yOff = 0;
-//	}
-//	[listContainer setFrameOrigin: NSMakePoint( 0, yOff )];
 }
 
 
@@ -317,11 +310,11 @@
 		[statusImage setImage:[NSImage imageNamed:@"offline.png"]];
 		[progress stopAnimation:self];
 		lagField.stringValue = @"";
-		[self cleanUp];
+		[self cleanUpParams];
 	}
 }
 
--(void)cleanUp{
+-(void)cleanUpParams{
 	for( map<string,Item*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
 		string key = (*ii).first;
 		Item* t = widgets[key];
@@ -330,7 +323,6 @@
 	}
 	widgets.clear();
 	orderedKeys.clear();
-
 }
 
 
