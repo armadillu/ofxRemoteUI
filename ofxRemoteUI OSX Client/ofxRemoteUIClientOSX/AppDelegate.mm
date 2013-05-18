@@ -108,7 +108,7 @@
 
 
 
--(void)syncLocalParamsToClientParams{
+-(BOOL)fullParamsUpdate{
 
 	[self cleanUpParams];
 
@@ -118,22 +118,54 @@
 	//NSLog(@"Client holds %d params so far", (int) paramList.size());
 	//NSLog(@"Client reports %d params changed since last check", (int)updatedParamsList.size());
 
-	int c = 0;
+	if(paramList.size() > 0){
+
+		int c = 0;
+
+		for(int i = 0; i < paramList.size(); i++){
+
+			string paramName = paramList[i];
+			RemoteUIParam p = client->getParamForName(paramName);
+
+			map<string,Item*>::iterator it = widgets.find(paramName);
+			if ( it == widgets.end() ){	//not found, this is a new param... lets make an UI item for it
+				Item * row = [[Item alloc] initWithParam: p paramName: paramName ID: c];
+				c++;
+				orderedKeys.push_back(paramName);
+				widgets[paramName] = row;
+			}
+		}
+		[self layOutParams];
+		return YES;
+	}else{
+		return NO;
+	}
+}
+
+-(void) partialParamsUpdate{
+
+	vector<string> paramList = client->getAllParamNamesList();
 
 	for(int i = 0; i < paramList.size(); i++){
 
 		string paramName = paramList[i];
-		RemoteUIParam p = client->getParamForName(paramName);
 
 		map<string,Item*>::iterator it = widgets.find(paramName);
 		if ( it == widgets.end() ){	//not found, this is a new param... lets make an UI item for it
-			Item * row = [[Item alloc] initWithParam: p paramName: paramName ID: c];
-			c++;
-			orderedKeys.push_back(paramName);
-			widgets[paramName] = row;
+			NSLog(@"uh?");
+		}else{
+			Item * item = widgets[paramName];
+			RemoteUIParam p = client->getParamForName(paramName);
+			[item updateParam:p];
+			[item updateUI];
 		}
 	}
-	[self layOutParams];
+//	for( map<string,Item*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
+//		string key = (*ii).first;
+//		Item* t = widgets[key];
+//		[t disableChanges];
+//	}
+
 }
 
 
@@ -157,22 +189,30 @@
 	float scrollW = listContainer.frame.size.width;
 	float scrollH = scroll.frame.size.height;
 	int numParams = orderedKeys.size();
-	int numCol = ceil(scrollW / ROW_WIDTH);
 	int howManyPerCol = floor( scrollH / ROW_HEIGHT );
 	int howManyThisCol = 0;
 	int colIndex = 0;
-	int numUsedColumns = ceil(numParams / (float)howManyPerCol);
+	int numUsedColumns = ceil((float)numParams / (float)howManyPerCol);
 	float rowW = scrollW / numUsedColumns;
-	bool forceOneCol = false;
-
-	if (rowW < ROW_WIDTH){
-		rowW = ROW_WIDTH;
-		forceOneCol = true;
-		numUsedColumns = 1;
+	bool didTweak = false;
+	while (rowW < ROW_WIDTH && numUsedColumns > 1) {
+		numUsedColumns--;
 		rowW = scrollW / numUsedColumns;
+		didTweak = true;
 	}
 
+	if(didTweak){
+		howManyPerCol = numParams / (float)numUsedColumns;
+	}
+//	NSLog(@"\n");
+//	NSLog(@"numParams: %d ", numParams);
+//	NSLog(@"howManyPerCol: %d ", howManyPerCol);
+//	NSLog(@"numUsedColumns: %d ", numUsedColumns);
+//	NSLog(@"scrollW: %f ", scrollW);
+//	NSLog(@"rowW B4: %f ", rowW);
+
 	int h = 0;
+	int maxPerCol = 0;
 	for(int i = 0; i < numParams; i++){
 		string key = orderedKeys[i];
 		Item * item = widgets[key];
@@ -182,38 +222,33 @@
 		[listContainer addSubview: item->ui];
 		h += r.size.height;
 		howManyThisCol++;
-		if (forceOneCol == false && howManyThisCol >= howManyPerCol ){
+		if (howManyThisCol >= howManyPerCol ){
 			colIndex++;
+			if (maxPerCol < howManyThisCol) maxPerCol = howManyThisCol;
 			howManyThisCol = 0;
 			h = 0;
 		}
 		[item updateUI];
 		[item remapSlider];
 	}
+	if (maxPerCol == 0){
+		maxPerCol = scrollH / ROW_HEIGHT;
+	}
 
-//	NSLog(@"\n");
 //	NSLog(@"numParams: %d ", numParams);
-//	NSLog(@"howManyPerCol: %d ", howManyPerCol);
 //	NSLog(@"numCol: %d ", numCol);
-//	NSLog(@"numUsedColumns: %d ", numUsedColumns);
 //	NSLog(@"rowW: %f ", rowW);
-//	NSLog(@"forceOneCol: %d ", forceOneCol);
 //	NSLog(@"colIndex: %d ", colIndex);
+//	NSLog(@"maxPerCol: %d ", maxPerCol);
 
 	lastLayout.x = colIndex;
-	lastLayout.y = howManyPerCol;
+	lastLayout.y = maxPerCol;
 	//[self adjustScrollView];
 	int off = ((int)[scroll.contentView frame].size.height ) % ((int)(ROW_HEIGHT));
 
-//	NSLog(@"h: %d  off %d", h, off);
+//	NSLog(@" off %d", off);
 
-	if(forceOneCol){
-		[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, numParams * ROW_HEIGHT + off)];
-		lastLayout.y = numParams;
-	}else{
-		[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, howManyPerCol * ROW_HEIGHT + off)];
-	}
-
+	[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, maxPerCol * ROW_HEIGHT + off)];
 }
 
 
@@ -236,18 +271,19 @@
 
 
 -(IBAction)pressedSync:(id)sender;{
-
-	client->requestCompleteUpdate();
+	if(!waitingForResults){
+		client->requestCompleteUpdate();
+		//NSLog(@"waitingForResults YES");
+		waitingForResults = YES;
+	}else{
+		//NSLog(@"cant syn yet, waitingo n tohers");
+	}
 	//delay a bit the screen update so that we have gathered the values
-	[self performSelector:@selector(handleUpdate:) withObject:nil afterDelay: REFRESH_RATE * 5];
+	//[self performSelector:@selector(fullParamsUpdate) withObject:nil afterDelay: REFRESH_RATE * 2];
 }
 
 
--(void) handleUpdate:(id)timer{
 
-	[self syncLocalParamsToClientParams];
-	[self layOutParams];
-}
 
 
 -(IBAction)pressedContinuously:(NSButton *)sender;{
@@ -358,9 +394,19 @@
 
 		client->update(REFRESH_RATE);
 
+		if( waitingForResults ){
+			if ( [self fullParamsUpdate] ){
+				waitingForResults = false;
+				//NSLog(@"fullParamsUpdate");
+			}else{
+				//NSLog(@"NOT yet...");
+			}
+		}
+
 		if(updateContinuosly){
 			client->requestCompleteUpdate();
-			[self syncLocalParamsToClientParams];
+			//[self partialParamsUpdate];
+			[self performSelector:@selector(partialParamsUpdate) withObject:nil afterDelay: 0];
 		}
 
 		if(!client->isReadyToSend()){	//if the other side disconnected, or error

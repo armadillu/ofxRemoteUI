@@ -12,7 +12,7 @@
 #import "MyScrollView.h"
 
 #define REFRESH_RATE			1.0f/15.0f
-#define STATUS_REFRESH_RATE		1.0
+#define STATUS_REFRESH_RATE		0.333f
 #define ROW_HEIGHT				34.0f
 #define ROW_WIDTH				350.0f
 
@@ -39,6 +39,8 @@
 	NSTimer * timer;
 	NSTimer * statusTimer;
 	NSPoint lastLayout;
+
+	BOOL waitingForResults;
 }
 
 
@@ -50,7 +52,8 @@
 -(void)setup;
 -(void)update;
 
--(void)syncLocalParamsToClientParams;
+-(BOOL)fullParamsUpdate;
+-(void)partialParamsUpdate;
 
 -(void)userChangedParam:(RemoteUIParam)p paramName:(string)name; //this is a delegate method, items will call this on widgetChange
 

@@ -121,7 +121,7 @@
 }
 
 
--(void)updateValues:(RemoteUIParam)p;{
+-(void)updateParam:(RemoteUIParam)p;{
 	param = p;
 }
 
@@ -149,6 +149,7 @@
 
 		case REMOTEUI_PARAM_STRING:
 			[textView setStringValue: [self stringFromString: param.stringVal]];
+			//[textView setStringValue: [NSString stringWithFormat:@"%@", [NSDate date]]];
 			break;
 
 		default:

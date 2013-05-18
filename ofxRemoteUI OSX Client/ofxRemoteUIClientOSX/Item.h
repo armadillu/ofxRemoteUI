@@ -28,7 +28,7 @@
 -(void)dealloc;
 
 -(id)initWithParam: (RemoteUIParam)p paramName:(string)name;
--(void)updateValues:(RemoteUIParam)p;
+-(void)updateParam:(RemoteUIParam)p;
 -(void)updateUI;
 
 -(void)disableChanges;

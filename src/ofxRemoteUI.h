@@ -19,7 +19,7 @@
 using namespace std;
 
 #define OFXREMOTEUI_PORT					10001
-#define LATENCY_TEST_RATE					1.0f
+#define LATENCY_TEST_RATE					0.3333
 #define CONNECTION_TIMEOUT					6.0f
 #define OFX_REMOTEUI_SETTINGS_FILENAME		"ofxRemoteUISettings.xml"
 #define OFX_REMOTEUI_XML_TAG				"OFX_REMOTE_UI_PARAMS"
