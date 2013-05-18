@@ -76,11 +76,21 @@
 											 selector:@selector(windowResized:) name:NSWindowDidResizeNotification
 											   object: window];
 
-	//debug
-//	CALayer *viewLayer = [CALayer layer];
-//	[viewLayer setBackgroundColor:CGColorCreateGenericRGB(0,0,0,0.1)];
-//	[listContainer setWantsLayer:YES]; // view's backing store is using a Core Animation Layer
-//	[listContainer setLayer:viewLayer];
+
+	CALayer *viewLayer = [CALayer layer];
+	//[viewLayer setBackgroundColor:CGColorCreateGenericRGB(0,0,0,0.1)];
+	[listContainer setWantsLayer:YES]; // view's backing store is using a Core Animation Layer
+	[listContainer setLayer:viewLayer];
+	//disable implicit CAAnims
+	NSMutableDictionary *newActions = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+									   [NSNull null], @"onOrderIn",
+									   [NSNull null], @"onOrderOut",
+									   [NSNull null], @"sublayers",
+									   [NSNull null], @"contents",
+									   [NSNull null], @"bounds",
+									   nil];
+	viewLayer.actions = newActions;
+
 
 }
 
@@ -92,13 +102,15 @@
 
 - (void)windowResized:(NSNotification *)notification;{
 
-
-	//NSPoint p = [self calcNumRowsCols];
-	//NSLog( @"%f %f  -  %f %f", p.x, p.y, lastLayout.x, lastLayout.y );
-
-	//if ( p.x != lastLayout.x || p.y != lastLayout.y ){
-		[self layOutParams];
-	//}
+	layoutParam p = [self calcLayoutParams];
+	if ( p.colsRows.x != lastLayout.colsRows.x || p.colsRows.y != lastLayout.colsRows.y ){
+		[self layOutParams:p];
+		//NSLog(@"layOutParams");
+	}else{
+		int off = ((int)[scroll.contentView frame].size.height ) % ((int)(ROW_HEIGHT));
+		[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, p.maxPerCol * ROW_HEIGHT + off)];
+	}
+	
 	for( map<string,Item*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
 		string key = (*ii).first;
 		Item* t = widgets[key];
@@ -135,12 +147,13 @@
 				widgets[paramName] = row;
 			}
 		}
-		[self layOutParams];
+		[self layOutParams: [self calcLayoutParams]];
 		return YES;
 	}else{
 		return NO;
 	}
 }
+
 
 -(void) partialParamsUpdate{
 
@@ -170,27 +183,18 @@
 
 
 -(void)adjustScrollView{
-
 	int totalH = ROW_HEIGHT * (orderedKeys.size() );
 	[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, totalH)];
 }
 
 
--(void)layOutParams{
+-(layoutParam)calcLayoutParams{
 
-	//remove all views, start over
-	NSArray * subviews = [listContainer subviews];
-	for( int i = [subviews count]-1 ; i >= 0 ; i-- ){
-		[[subviews objectAtIndex:i] removeFromSuperview];
-		//[[subviews objectAtIndex:i] release];
-	}
-	[self adjustScrollView];
-
+	layoutParam p;
 	float scrollW = listContainer.frame.size.width;
 	float scrollH = scroll.frame.size.height;
 	int numParams = orderedKeys.size();
 	int howManyPerCol = floor( scrollH / ROW_HEIGHT );
-	int howManyThisCol = 0;
 	int colIndex = 0;
 	int numUsedColumns = ceil((float)numParams / (float)howManyPerCol);
 	float rowW = scrollW / numUsedColumns;
@@ -204,23 +208,13 @@
 	if(didTweak){
 		howManyPerCol = numParams / (float)numUsedColumns;
 	}
-//	NSLog(@"\n");
-//	NSLog(@"numParams: %d ", numParams);
-//	NSLog(@"howManyPerCol: %d ", howManyPerCol);
-//	NSLog(@"numUsedColumns: %d ", numUsedColumns);
-//	NSLog(@"scrollW: %f ", scrollW);
-//	NSLog(@"rowW B4: %f ", rowW);
 
 	int h = 0;
 	int maxPerCol = 0;
-	for(int i = 0; i < numParams; i++){
-		string key = orderedKeys[i];
-		Item * item = widgets[key];
-		NSRect r = item->ui.frame;
+	int howManyThisCol = 0;
 
-		item->ui.frame = NSMakeRect( colIndex * rowW, (numParams - 1) * ROW_HEIGHT - h , rowW, r.size.height);
-		[listContainer addSubview: item->ui];
-		h += r.size.height;
+	for(int i = 0; i < numParams; i++){
+		h += ROW_HEIGHT;
 		howManyThisCol++;
 		if (howManyThisCol >= howManyPerCol ){
 			colIndex++;
@@ -228,27 +222,56 @@
 			howManyThisCol = 0;
 			h = 0;
 		}
-		[item updateUI];
-		[item remapSlider];
 	}
 	if (maxPerCol == 0){
 		maxPerCol = scrollH / ROW_HEIGHT;
 	}
 
-//	NSLog(@"numParams: %d ", numParams);
-//	NSLog(@"numCol: %d ", numCol);
-//	NSLog(@"rowW: %f ", rowW);
-//	NSLog(@"colIndex: %d ", colIndex);
-//	NSLog(@"maxPerCol: %d ", maxPerCol);
+	p.colsRows.x = colIndex;
+	p.colsRows.y = maxPerCol;
+	p.rowW = rowW;
+	p.howManyPerCol = howManyPerCol;
+	p.maxPerCol = maxPerCol;
+	return p;
+}
 
-	lastLayout.x = colIndex;
-	lastLayout.y = maxPerCol;
-	//[self adjustScrollView];
+
+-(void)layOutParams:(layoutParam) p{
+
+	//remove all views, start over
+	NSArray * subviews = [listContainer subviews];
+	for( int i = [subviews count]-1 ; i >= 0 ; i-- ){
+		[[subviews objectAtIndex:i] removeFromSuperview];
+		//[[subviews objectAtIndex:i] release];
+	}
+	[self adjustScrollView];
+
+	int numParams = orderedKeys.size();
+	int h = 0;
+	int howManyThisCol = 0;
+	int colIndex = 0;
+
+	for(int i = 0; i < numParams; i++){
+		string key = orderedKeys[i];
+		Item * item = widgets[key];
+		NSRect r = item->ui.frame;
+
+		item->ui.frame = NSMakeRect( colIndex * p.rowW, (numParams - 1) * ROW_HEIGHT - h , p.rowW, r.size.height);
+		[listContainer addSubview: item->ui];
+		h += r.size.height;
+		howManyThisCol++;
+		if (howManyThisCol >= p.howManyPerCol ){ // next column
+			colIndex++;
+			howManyThisCol = 0;
+			h = 0;
+		}
+		[item updateUI];
+		[item remapSlider];
+	}
+
+	lastLayout = p;
 	int off = ((int)[scroll.contentView frame].size.height ) % ((int)(ROW_HEIGHT));
-
-//	NSLog(@" off %d", off);
-
-	[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, maxPerCol * ROW_HEIGHT + off)];
+	[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, p.maxPerCol * ROW_HEIGHT + off)];
 }
 
 
@@ -283,7 +306,20 @@
 }
 
 
+-(IBAction)filterType:(id)sender{
+	NSString * filter = [sender stringValue];
 
+	for( map<string,Item*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
+		string key = (*ii).first;
+		Item* t = widgets[key];
+		NSString * paramName = [NSString stringWithFormat:@"%s", t->paramName.c_str()];
+		if ([paramName rangeOfString:filter options:NSCaseInsensitiveSearch].location != NSNotFound || [filter length] == 0){
+			[t fadeIn];
+		}else{
+			[t fadeOut];
+		}
+	}
+}
 
 
 -(IBAction)pressedContinuously:(NSButton *)sender;{

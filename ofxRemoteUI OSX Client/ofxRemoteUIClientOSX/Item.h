@@ -31,6 +31,8 @@
 -(void)updateParam:(RemoteUIParam)p;
 -(void)updateUI;
 
+-(void)fadeOut;
+-(void)fadeIn;
 -(void)disableChanges;
 -(void)enableChanges;
 -(void)remapSlider;

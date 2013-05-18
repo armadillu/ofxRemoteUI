@@ -19,7 +19,34 @@
 	param = p;
 	paramName = name;
 	BOOL didLoad = [NSBundle loadNibNamed:@"View" owner:self];
+
+	[ui setWantsLayer:NO];
+	CALayer *viewLayer = [CALayer layer];
+	[ui setLayer:viewLayer];
+
+	//disable implicit caAnims
+	NSMutableDictionary *newActions = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+									   [NSNull null], @"onOrderIn",
+									   [NSNull null], @"onOrderOut",
+									   [NSNull null], @"sublayers",
+									   [NSNull null], @"contents",
+									   [NSNull null], @"bounds",
+									   nil];
+	viewLayer.actions = newActions;
+	[newActions release];
+
 	return self;
+}
+
+-(void)fadeOut{
+	[ui setWantsLayer:YES];
+	[ui layer].opacity = 0.2;
+}
+
+
+-(void)fadeIn{
+	[ui setWantsLayer:NO];
+	[ui layer].opacity = 1;
 }
 
 

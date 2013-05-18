@@ -16,6 +16,13 @@
 #define ROW_HEIGHT				34.0f
 #define ROW_WIDTH				350.0f
 
+struct layoutParam{
+	NSPoint colsRows;
+	int howManyPerCol;
+	int maxPerCol;
+	float rowW;
+};
+
 @interface AppDelegate : NSObject <NSApplicationDelegate>{
 
 	IBOutlet NSWindow *window;
@@ -38,7 +45,7 @@
 	ofxRemoteUIClient * client;
 	NSTimer * timer;
 	NSTimer * statusTimer;
-	NSPoint lastLayout;
+	layoutParam lastLayout;
 
 	BOOL waitingForResults;
 }
@@ -47,6 +54,8 @@
 -(IBAction)pressedSync:(id)sender;
 -(IBAction)pressedContinuously:(id)sender;
 -(IBAction)pressedConnect:(id)sender;
+-(IBAction)filterType:(id)sender;
+
 -(void) connect;
 
 -(void)setup;
