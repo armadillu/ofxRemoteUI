@@ -368,6 +368,7 @@
 		[statusImage setImage:nil];
 		//first load of vars
 		[self pressedSync:nil];
+		[self performSelector:@selector(pressedSync:) withObject:nil afterDelay:REFRESH_RATE];
 		[progress startAnimation:self];
 		lagField.stringValue = @"";
 
@@ -383,6 +384,7 @@
 		[progress stopAnimation:self];
 		lagField.stringValue = @"";
 		[self cleanUpParams];
+		waitingForResults = false;
 	}
 }
 
@@ -426,9 +428,9 @@
 
 -(void)update{
 
-	if ( connectButton.state == 1 ){ // if connected
+	client->update(REFRESH_RATE);
 
-		client->update(REFRESH_RATE);
+	if ( connectButton.state == 1 ){ // if connected
 
 		if( waitingForResults ){
 			if ( [self fullParamsUpdate] ){

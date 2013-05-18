@@ -7,7 +7,7 @@ It's OSC based, and it includes a native OSX Client.
 
 It uses Macros + the singleton pattern to make it very easy to share any variable you want to edit remotely, in any class of your project. 
 
-[http://www.youtube.com/watch?v=kp1rajoN0o4](http://www.youtube.com/watch?v=kp1rajoN0o4)  
+[http://youtu.be/e6mzo8YavoM](http://youtu.be/e6mzo8YavoM)  
 
 
 ### How to use

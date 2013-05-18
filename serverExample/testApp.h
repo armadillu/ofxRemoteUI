@@ -18,9 +18,6 @@ public:
 		bool drawOutlines;
 		int numCircles;
 		string currentFrameRate;
-
-	int test;
-	int test2;
 };
 
 #endif

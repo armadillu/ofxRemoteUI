@@ -85,7 +85,7 @@ void ofxRemoteUIClient::update(float dt){
 				break;
 
 			case CIAO_ACTION:
-				//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says CIAO!" << endl;
+				cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says CIAO!" << endl;
 				sendCIAO();
 				params.clear();
 				orderedKeys.clear();
