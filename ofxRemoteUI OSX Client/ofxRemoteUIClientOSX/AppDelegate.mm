@@ -58,7 +58,6 @@
 
 	///////////////////////////////////////////////
 
-	[self setup];
 	timer = [NSTimer scheduledTimerWithTimeInterval:REFRESH_RATE target:self selector:@selector(update) userInfo:nil repeats:YES];
 	statusTimer = [NSTimer scheduledTimerWithTimeInterval:STATUS_REFRESH_RATE target:self selector:@selector(statusUpdate) userInfo:nil repeats:YES];
 	updateContinuosly = false;
@@ -404,7 +403,7 @@
 		connectButton.title = @"Connect";
 		[updateFromServerButton setEnabled: false];
 		[updateContinuouslyCheckbox setEnabled:false];
-		[statusImage setImage:[NSImage imageNamed:@"offline.png"]];
+		[statusImage setImage:[NSImage imageNamed:@"offline"]];
 		[progress stopAnimation:self];
 		lagField.stringValue = @"";
 		[self cleanUpParams];
@@ -412,15 +411,18 @@
 	}
 }
 
+
 -(void)cleanUpParams{
 	for( map<string,Item*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
 		string key = (*ii).first;
 		Item* t = widgets[key];
-		//NSLog(@"release %s", key.c_str());
 		[t release];
 	}
 	widgets.clear();
 	orderedKeys.clear();
+
+	//also remove the spacer bars. Dont ask me why, but dynamic array walking crashes! :?
+	//that why this ghetto walk is here
 	NSArray * subviews = [listContainer subviews];
 	for( int i = [subviews count]-1 ; i >= 0 ; i-- ){
 		[[subviews objectAtIndex:i] removeFromSuperview];
@@ -429,10 +431,6 @@
 }
 
 
-
--(void)setup{
-	//client->setup("127.0.0.1", 0.1);
-}
 
 
 -(void)statusUpdate{
@@ -463,10 +461,11 @@
 
 		if( waitingForResults ){
 			if ( [self fullParamsUpdate] ){
+				client->update(REFRESH_RATE); // just to be super sure, we run a second update
+				[self partialParamsUpdate];
 				waitingForResults = false;
-				//NSLog(@"fullParamsUpdate");
 			}else{
-				//NSLog(@"NOT yet...");
+				NSLog(@"NOT yet...");
 				client->requestCompleteUpdate();
 			}
 		}

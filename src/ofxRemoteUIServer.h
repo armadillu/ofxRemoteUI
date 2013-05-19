@@ -38,6 +38,7 @@ public:
 	void shareParam(string paramName, bool* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
 	void shareParam(string paramName, int* param, int min, int max, ofColor bgColor = ofColor(0,0,0,0) );
 	void shareParam(string paramName, string* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
+	void setParamColor( ofColor c );
 
 private:
 
@@ -45,6 +46,10 @@ private:
 
 	ofxRemoteUIServer(); // use ofxRemoteUIServer::instance() instead!
 	static ofxRemoteUIServer* singleton;
+	void setColorForParam(RemoteUIParam &p, ofColor c);
+
+	bool colorSet; //if user called setParamColor()
+	ofColor paramColor;
 
 
 };

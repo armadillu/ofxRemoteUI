@@ -9,21 +9,28 @@ void testApp::setup(){
 	ofSetVerticalSync(true);
 
 	drawOutlines = false;
-	currentFrameRate = "unInited";
+	currentSentence = "unInited";
 	x = y = 0;
-
-	//start server
-	OFX_REMOTEUI_SERVER_SETUP(10000);
-
 	numCircles = 30;
-	//expose vars to ofxRemoteUI server, AFTER SETUP!
+
+
+	OFX_REMOTEUI_SERVER_SETUP(10000); 	//start server
+
+	//expose vars to the server. Always do so after setting up the server.
+	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_COLOR( ofColor(255,0,0,64) ); // set a bg color for the upcoming params
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(x, 0, ofGetWidth() );
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(y, 0, ofGetHeight());
+
+	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_COLOR( ofColor(0,255,0,64) ); // start a new "group" of params by setting a new color
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawOutlines);
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(numCircles, 0, 30);
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentFrameRate);
+	
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentSentence, ofColor(0,0,255,64)); // you can also set a color on a per-param basis
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentMouseX, 0, ofGetWidth(), ofColor(255,64));
 
-	OFX_REMOTEUI_SERVER_LOAD_FROM_XML(); //load values from XML if you want to do so
+	OFX_REMOTEUI_SERVER_LOAD_FROM_XML();	//load values from XML, if you want to do so
+											//this will result on the UI showing the params
+											//as they were when last saved (on quit in this case)
 }
 
 //--------------------------------------------------------------
@@ -31,7 +38,7 @@ void testApp::update(){
 
 	float dt = 0.016666;
 
-	currentFrameRate = ofToString( ofGetFrameRate() );
+	currentMouseX = ofGetMouseX() + 100 *sinf( ofGetFrameNum());
 	OFX_REMOTEUI_SERVER_UPDATE(dt);
 }
 
@@ -62,7 +69,7 @@ void testApp::draw(){
 								"x: " + ofToString(x) + "\n" +
 								"y: " + ofToString(y) + "\n" +
 								"drawOutlines: " + ofToString(drawOutlines) + "\n" +
-								"currentFrameRate: " + currentFrameRate ,
+								"currentSentence: " + currentSentence ,
 								20, 20,
 								ofColor::black, ofColor::red
 								);
@@ -71,7 +78,7 @@ void testApp::draw(){
 
 void testApp::exit(){
 
-	OFX_REMOTEUI_SERVER_CLOSE();
-	OFX_REMOTEUI_SERVER_SAVE_TO_XML(); //save values to XML
+	OFX_REMOTEUI_SERVER_CLOSE();		//setop the server
+	OFX_REMOTEUI_SERVER_SAVE_TO_XML();	//save values to XML
 
 }

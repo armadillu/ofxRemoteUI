@@ -51,11 +51,12 @@
 
 
 -(void)awakeFromNib{
-	//NSLog(@"Item awakeFromNib %s", paramName.c_str());
+
+	// create alternating row look
 	if (numberID%2 == 1)
 		[bg setBackgroundColor:[NSColor whiteColor]];
 	else
-		[bg setBackgroundColor:[NSColor colorWithCalibratedRed:0.960 green:0.960 blue:1 alpha:1.000]];
+		[bg setBackgroundColor:[NSColor colorWithCalibratedRed:0.950 green:0.950 blue:1 alpha:1.000]];
 
 	if (param.a > 0 ){
 		[bg setBackgroundColor: [NSColor colorWithDeviceRed: param.r/255.

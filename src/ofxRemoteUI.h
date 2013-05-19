@@ -24,8 +24,10 @@ using namespace std;
 #define OFX_REMOTEUI_SETTINGS_FILENAME		"ofxRemoteUISettings.xml"
 #define OFX_REMOTEUI_XML_TAG				"OFX_REMOTE_UI_PARAMS"
 
+
 //easy param sharing macro, share from from anywhere!
 #define OFX_REMOTEUI_SERVER_SHARE_PARAM(val,...)		( ofxRemoteUIServer::instance()->shareParam( #val, &val, ##__VA_ARGS__ ) )
+#define OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_COLOR(c)	( ofxRemoteUIServer::instance()->setParamColor( c ) )
 #define OFX_REMOTEUI_SERVER_SETUP(port, ...)			( ofxRemoteUIServer::instance()->setup(port, ##__VA_ARGS__) )
 #define OFX_REMOTEUI_SERVER_UPDATE(deltaTime)			( ofxRemoteUIServer::instance()->update(deltaTime) )
 #define OFX_REMOTEUI_SERVER_CLOSE()						( ofxRemoteUIServer::instance()->close() )

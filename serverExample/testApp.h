@@ -17,7 +17,10 @@ public:
 		float y;
 		bool drawOutlines;
 		int numCircles;
-		string currentFrameRate;
+
+
+		string currentSentence; 
+		int currentMouseX;
 };
 
 #endif
