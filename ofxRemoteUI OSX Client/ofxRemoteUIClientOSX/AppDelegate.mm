@@ -276,6 +276,7 @@
 		[item updateUI];
 		[item remapSlider];
 	}
+	int off = ((int)[scroll.contentView frame].size.height ) % ((int)(ROW_HEIGHT));
 
 	for (int i = 1; i < colIndex + 1; i++) {
 		NSBox * box;
@@ -284,11 +285,15 @@
 		[listContainer addSubview:box];
 	}
 
+	for (int i = 0; i < p.maxPerCol ; i++) {
+		NSBox * box;
+		box = [[NSBox alloc] initWithFrame: NSMakeRect( -10,(numParams - 1) * ROW_HEIGHT - ROW_HEIGHT * i, scroll.frame.size.width + 20, 1)];
+		[box setAutoresizingMask: NSViewMinYMargin | NSViewWidthSizable ];
+		[listContainer addSubview:box];
+	}
+
 	lastLayout = p;
-	int off = ((int)[scroll.contentView frame].size.height ) % ((int)(ROW_HEIGHT));
 	[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, p.maxPerCol * ROW_HEIGHT + off)];
-
-
 }
 
 

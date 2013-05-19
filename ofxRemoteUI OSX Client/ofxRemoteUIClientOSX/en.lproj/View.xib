@@ -48,7 +48,7 @@
 							<object class="NSButton" id="963148419">
 								<reference key="NSNextResponder" ref="34091846"/>
 								<int key="NSvFlags">269</int>
-								<string key="NSFrame">{{84, 0}, {67, 32}}</string>
+								<string key="NSFrame">{{84, 1}, {67, 32}}</string>
 								<reference key="NSSuperview" ref="34091846"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="1070573946"/>
@@ -82,7 +82,7 @@
 							<object class="NSTextField" id="6468260">
 								<reference key="NSNextResponder" ref="34091846"/>
 								<int key="NSvFlags">266</int>
-								<string key="NSFrame">{{20, 6}, {194, 22}}</string>
+								<string key="NSFrame">{{20, 7}, {194, 22}}</string>
 								<reference key="NSSuperview" ref="34091846"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="771456133"/>
@@ -92,7 +92,7 @@
 									<int key="NSCellFlags">-1804599231</int>
 									<int key="NSCellFlags2">272761856</int>
 									<string key="NSContents">ff</string>
-									<object class="NSFont" key="NSSupport">
+									<object class="NSFont" key="NSSupport" id="26">
 										<string key="NSName">LucidaGrande</string>
 										<double key="NSSize">11</double>
 										<int key="NSfFlags">3100</int>
@@ -125,10 +125,10 @@
 							<object class="NSTextField" id="1070573946">
 								<reference key="NSNextResponder" ref="34091846"/>
 								<int key="NSvFlags">265</int>
-								<string key="NSFrame">{{174, 2}, {43, 11}}</string>
+								<string key="NSFrame">{{174, 3}, {43, 11}}</string>
 								<reference key="NSSuperview" ref="34091846"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView"/>
+								<reference key="NSNextKeyView" ref="839355504"/>
 								<string key="NSReuseIdentifierKey">_NS:1535</string>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSTextFieldCell" key="NSCell" id="717334439">
@@ -163,7 +163,7 @@
 							<object class="NSTextField" id="771456133">
 								<reference key="NSNextResponder" ref="34091846"/>
 								<int key="NSvFlags">269</int>
-								<string key="NSFrame">{{41, 1}, {150, 11}}</string>
+								<string key="NSFrame">{{41, 2}, {150, 11}}</string>
 								<reference key="NSSuperview" ref="34091846"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="963148419"/>
@@ -184,7 +184,7 @@
 							<object class="NSTextField" id="412928412">
 								<reference key="NSNextResponder" ref="34091846"/>
 								<int key="NSvFlags">268</int>
-								<string key="NSFrame">{{17, 2}, {43, 11}}</string>
+								<string key="NSFrame">{{17, 3}, {43, 11}}</string>
 								<reference key="NSSuperview" ref="34091846"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="241456079"/>
@@ -205,7 +205,7 @@
 							<object class="NSSlider" id="241456079">
 								<reference key="NSNextResponder" ref="34091846"/>
 								<int key="NSvFlags">266</int>
-								<string key="NSFrame">{{20, 11}, {194, 17}}</string>
+								<string key="NSFrame">{{20, 12}, {194, 17}}</string>
 								<reference key="NSSuperview" ref="34091846"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="6468260"/>
@@ -243,21 +243,17 @@
 							<object class="NSTextField" id="217789030">
 								<reference key="NSNextResponder" ref="839355504"/>
 								<int key="NSvFlags">265</int>
-								<string key="NSFrame">{{6, 9}, {108, 17}}</string>
+								<string key="NSFrame">{{6, 7}, {108, 17}}</string>
 								<reference key="NSSuperview" ref="839355504"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView"/>
 								<string key="NSReuseIdentifierKey">_NS:1535</string>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSTextFieldCell" key="NSCell" id="283200427">
-									<int key="NSCellFlags">605028416</int>
-									<int key="NSCellFlags2">272634880</int>
+									<int key="NSCellFlags">606076993</int>
+									<int key="NSCellFlags2">272767040</int>
 									<string key="NSContents">Label</string>
-									<object class="NSFont" key="NSSupport">
-										<string key="NSName">LucidaGrande</string>
-										<double key="NSSize">12</double>
-										<int key="NSfFlags">16</int>
-									</object>
+									<reference key="NSSupport" ref="26"/>
 									<string key="NSCellIdentifier">_NS:1535</string>
 									<reference key="NSControlView" ref="217789030"/>
 									<bool key="NSDrawsBackground">YES</bool>
@@ -265,6 +261,7 @@
 									<reference key="NSTextColor" ref="329677200"/>
 								</object>
 								<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+								<bool key="NSControlAutosetMaxLayoutWidth">YES</bool>
 							</object>
 						</array>
 						<string key="NSFrame">{{227, -1}, {123, 34}}</string>
