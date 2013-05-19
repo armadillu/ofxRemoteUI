@@ -448,7 +448,7 @@
 			if (lag > 0.0f){
 				lagField.stringValue = [NSString stringWithFormat:@"%.1fms", lag];
 				[progress stopAnimation:self];
-				[statusImage setImage:[NSImage imageNamed:@"connected.png"]];
+				[statusImage setImage:[NSImage imageNamed:@"connected"]];
 			}
 		}
 	}

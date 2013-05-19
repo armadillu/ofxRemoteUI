@@ -26,6 +26,9 @@
 		BB6CC35D174698DE0043F523 /* MyScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = BB6CC35C174698DE0043F523 /* MyScrollView.m */; };
 		BB94E57F17464E1800A7A3CC /* View.xib in Resources */ = {isa = PBXBuildFile; fileRef = BB94E57D17464E1800A7A3CC /* View.xib */; };
 		BB94E5AE17468EAE00A7A3CC /* ColorView.m in Sources */ = {isa = PBXBuildFile; fileRef = BB94E5AD17468EAE00A7A3CC /* ColorView.m */; };
+		BBB1F6FB1749003B00992119 /* connected.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB1F6F91749003B00992119 /* connected.png */; };
+		BBB1F6FC1749003B00992119 /* connected@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB1F6FA1749003B00992119 /* connected@2x.png */; };
+		BBB1F6FE174900D100992119 /* offline@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB1F6FD174900D100992119 /* offline@2x.png */; };
 		BBCC327B16A59D5D005D9CFC /* HighWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = BBCC327A16A59D5D005D9CFC /* HighWindow.m */; };
 		BBD3270F173BFFF200D59359 /* ofxRemoteUIClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */; };
 		BBDCBDD716A050C200F1C5EC /* ofxOsc Readme.txt in Resources */ = {isa = PBXBuildFile; fileRef = BBDCBDD616A050C200F1C5EC /* ofxOsc Readme.txt */; };
@@ -38,7 +41,6 @@
 		BBDCBDFB16A0523A00F1C5EC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = BBDCBDED16A0513D00F1C5EC /* main.m */; };
 		BBDCBE2816A063A400F1C5EC /* ReadMe.txt in Resources */ = {isa = PBXBuildFile; fileRef = BBDCBE2716A063A400F1C5EC /* ReadMe.txt */; };
 		BBE6075A16A466A7002F1707 /* offline.png in Resources */ = {isa = PBXBuildFile; fileRef = BBE6075716A466A7002F1707 /* offline.png */; };
-		BBE6075B16A466A7002F1707 /* connected.png in Resources */ = {isa = PBXBuildFile; fileRef = BBE6075816A466A7002F1707 /* connected.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -88,6 +90,9 @@
 		BB94E5AD17468EAE00A7A3CC /* ColorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ColorView.m; sourceTree = "<group>"; };
 		BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUIClient.cpp; sourceTree = "<group>"; };
 		BBAAAFA8173BF54B00FE94C4 /* ofxRemoteUIClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUIClient.h; sourceTree = "<group>"; };
+		BBB1F6F91749003B00992119 /* connected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = connected.png; path = ofxRemoteUIClientOSX/connected.png; sourceTree = SOURCE_ROOT; };
+		BBB1F6FA1749003B00992119 /* connected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "connected@2x.png"; path = "ofxRemoteUIClientOSX/connected@2x.png"; sourceTree = SOURCE_ROOT; };
+		BBB1F6FD174900D100992119 /* offline@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "offline@2x.png"; path = "ofxRemoteUIClientOSX/offline@2x.png"; sourceTree = SOURCE_ROOT; };
 		BBCC327916A59D5D005D9CFC /* HighWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HighWindow.h; sourceTree = "<group>"; };
 		BBCC327A16A59D5D005D9CFC /* HighWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HighWindow.m; sourceTree = "<group>"; };
 		BBDCBDD616A050C200F1C5EC /* ofxOsc Readme.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "ofxOsc Readme.txt"; sourceTree = "<group>"; };
@@ -105,7 +110,6 @@
 		BBDCBDFD16A0526C00F1C5EC /* ofxRemoteUIClientOSX-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "ofxRemoteUIClientOSX-Prefix.pch"; path = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch"; sourceTree = SOURCE_ROOT; };
 		BBDCBE2716A063A400F1C5EC /* ReadMe.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ReadMe.txt; sourceTree = "<group>"; };
 		BBE6075716A466A7002F1707 /* offline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = offline.png; path = ofxRemoteUIClientOSX/offline.png; sourceTree = SOURCE_ROOT; };
-		BBE6075816A466A7002F1707 /* connected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = connected.png; path = ofxRemoteUIClientOSX/connected.png; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -166,8 +170,10 @@
 		73002CE0140ABCF60035299A /* other */ = {
 			isa = PBXGroup;
 			children = (
+				BBB1F6F91749003B00992119 /* connected.png */,
+				BBB1F6FA1749003B00992119 /* connected@2x.png */,
 				BBE6075716A466A7002F1707 /* offline.png */,
-				BBE6075816A466A7002F1707 /* connected.png */,
+				BBB1F6FD174900D100992119 /* offline@2x.png */,
 				73002CE1140ABCF60035299A /* Supporting Files */,
 			);
 			name = other;
@@ -392,8 +398,10 @@
 				BBDCBE2816A063A400F1C5EC /* ReadMe.txt in Resources */,
 				BB65837B16A315B2000B45F0 /* icon.icns in Resources */,
 				BBE6075A16A466A7002F1707 /* offline.png in Resources */,
-				BBE6075B16A466A7002F1707 /* connected.png in Resources */,
 				BB94E57F17464E1800A7A3CC /* View.xib in Resources */,
+				BBB1F6FB1749003B00992119 /* connected.png in Resources */,
+				BBB1F6FC1749003B00992119 /* connected@2x.png in Resources */,
+				BBB1F6FE174900D100992119 /* offline@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -535,12 +543,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				DEAD_CODE_STRIPPING = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = ofxRemoteUIClientOSX;
 				SDKROOT = macosx10.7;
+				STRIP_INSTALLED_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -549,12 +559,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				DEAD_CODE_STRIPPING = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = ofxRemoteUIClientOSX;
 				SDKROOT = macosx10.7;
+				STRIP_INSTALLED_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
