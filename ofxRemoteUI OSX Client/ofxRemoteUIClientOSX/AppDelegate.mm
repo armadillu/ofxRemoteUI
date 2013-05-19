@@ -69,7 +69,7 @@
 	if([df stringForKey:@"lastAddress"]) [addressField setStringValue:[df stringForKey:@"lastAddress"]];
 	if([df stringForKey:@"lastPort"]) [portField setStringValue:[df stringForKey:@"lastPort"]];
 	lagField.stringValue = @"";
-	[self performSelector:@selector(connect) withObject:nil afterDelay:0.0];
+	[self connect];
 
 	//get notified when window is resized
 	[[NSNotificationCenter defaultCenter] addObserver:self
@@ -277,9 +277,18 @@
 		[item remapSlider];
 	}
 
+	for (int i = 1; i < colIndex + 1; i++) {
+		NSBox * box;
+		box = [[NSBox alloc] initWithFrame: NSMakeRect( i *  p.rowW, -ROW_HEIGHT, 1, 3 * ROW_HEIGHT + ROW_HEIGHT * (orderedKeys.size() ))];
+		[box setAutoresizingMask: NSViewHeightSizable | NSViewMinXMargin | NSViewMaxXMargin | NSViewMaxYMargin | NSViewMinYMargin ];
+		[listContainer addSubview:box];
+	}
+
 	lastLayout = p;
 	int off = ((int)[scroll.contentView frame].size.height ) % ((int)(ROW_HEIGHT));
 	[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, p.maxPerCol * ROW_HEIGHT + off)];
+
+
 }
 
 
@@ -360,6 +369,7 @@
 	[df setObject: portField.stringValue forKey:@"lastPort"];
 
 	if ([[connectButton title] isEqualToString:@"Connect"]){ //we are not connected, let's connect
+		//NSLog(@"connecting");
 		[addressField setEnabled:false];
 		[portField setEnabled:false];
 		connectButton.title = @"Disconnect";
@@ -379,9 +389,10 @@
 		[self performSelector:@selector(pressedSync:) withObject:nil afterDelay:REFRESH_RATE];
 		[progress startAnimation:self];
 		lagField.stringValue = @"";
+		client->update(REFRESH_RATE);
 
 	}else{ // let's disconnect
-
+		//NSLog(@"disconnecting");
 		[addressField setEnabled:true];
 		[portField setEnabled:true];
 		connectButton.state = 0;
@@ -405,6 +416,11 @@
 	}
 	widgets.clear();
 	orderedKeys.clear();
+	NSArray * subviews = [listContainer subviews];
+	for( int i = [subviews count]-1 ; i >= 0 ; i-- ){
+		[[subviews objectAtIndex:i] removeFromSuperview];
+		//[[subviews objectAtIndex:i] release];
+	}
 }
 
 
@@ -446,6 +462,7 @@
 				//NSLog(@"fullParamsUpdate");
 			}else{
 				//NSLog(@"NOT yet...");
+				client->requestCompleteUpdate();
 			}
 		}
 
@@ -456,6 +473,7 @@
 		}
 
 		if(!client->isReadyToSend()){	//if the other side disconnected, or error
+			NSLog(@"disconnect cos its NOT isReadyToSend");
 			[self connect]; //this disconnects if we were connectd
 		}
 	}

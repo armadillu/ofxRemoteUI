@@ -23,6 +23,7 @@
 	IBOutlet NSTextField *sliderMax;
 
 	int numberID; // to handle alternating rows in table draw
+	
 }
 
 -(void)dealloc;

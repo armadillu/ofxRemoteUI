@@ -89,7 +89,7 @@ void ofxRemoteUIClient::update(float dt){
 				sendCIAO();
 				params.clear();
 				orderedKeys.clear();
-				readyToSend = false;
+				//readyToSend = false;
 				break;
 
 			case TEST_ACTION: // we got a reply from the server, lets measure how long it took;

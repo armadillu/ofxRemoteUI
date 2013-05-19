@@ -53,9 +53,9 @@
 -(void)awakeFromNib{
 	//NSLog(@"Item awakeFromNib %s", paramName.c_str());
 	if (numberID%2 == 1)
-		[ui setBackgroundColor:[NSColor whiteColor]];
+		[bg setBackgroundColor:[NSColor whiteColor]];
 	else
-		[ui setBackgroundColor:[NSColor colorWithCalibratedRed:0.914 green:0.945 blue:0.998 alpha:1.000]];
+		[bg setBackgroundColor:[NSColor colorWithCalibratedRed:0.960 green:0.960 blue:1 alpha:1.000]];
 
 	if (param.a > 0 ){
 		[bg setBackgroundColor: [NSColor colorWithDeviceRed: param.r/255.
@@ -63,7 +63,6 @@
 													   blue: param.b/255.
 													  alpha: param.a/255.]
 		 ];
-		[ui setBackgroundColor:[NSColor whiteColor]];
 	}
 	[self setupUI];
 
