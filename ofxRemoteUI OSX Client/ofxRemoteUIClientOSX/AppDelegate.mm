@@ -95,6 +95,14 @@
 }
 
 
+- (void)applicationDidBecomeActive:(NSNotification *)notification{
+
+	if(connectButton.state == 0){
+		[self connect];
+	}
+}
+
+
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender{
     return YES;
 }
