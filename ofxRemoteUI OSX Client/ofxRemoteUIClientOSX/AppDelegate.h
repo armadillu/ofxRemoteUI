@@ -14,7 +14,7 @@
 #define REFRESH_RATE			1.0f/20.0f
 #define STATUS_REFRESH_RATE		0.333f
 #define ROW_HEIGHT				34.0f
-#define ROW_WIDTH				350.0f
+#define ROW_WIDTH				280.0f
 
 struct layoutParam{
 	NSPoint colsRows;
