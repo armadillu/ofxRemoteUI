@@ -20,7 +20,7 @@ class testApp : public ofBaseApp{
 		float x;
 		float y;
 		bool drawOutlines;
-		string currentFrameRate;
+		string currentSentence;
 
 		float time;
 };
