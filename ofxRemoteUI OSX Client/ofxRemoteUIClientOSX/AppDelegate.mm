@@ -90,6 +90,7 @@
 									   nil];
 	viewLayer.actions = newActions;
 
+	currentGroup = ""; //empty group means show all params
 
 }
 
@@ -190,7 +191,9 @@
 
 
 -(void)adjustScrollView{
-	int totalH = ROW_HEIGHT * (orderedKeys.size() );
+
+	vector<string> paramsInGroup = [self getParamsInGroup:currentGroup];
+	int totalH = ROW_HEIGHT * (paramsInGroup.size() );
 	[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, totalH)];
 }
 
@@ -200,7 +203,10 @@
 	LayoutConfig p;
 	float scrollW = listContainer.frame.size.width;
 	float scrollH = scroll.frame.size.height;
-	int numParams = orderedKeys.size();
+
+	vector<string> paramsInGroup = [self getParamsInGroup:currentGroup];
+
+	int numParams = paramsInGroup.size();
 	int howManyPerCol = floor( scrollH / ROW_HEIGHT );
 	int colIndex = 0;
 	int numUsedColumns = ceil((float)numParams / (float)howManyPerCol);
@@ -242,6 +248,43 @@
 	return p;
 }
 
+-(vector<string>)getParamsInGroup:(string)group{
+
+	if ( group.length() == 0){
+		return orderedKeys;
+	}
+	vector<string>paramsInGroup;
+
+	int numParams = orderedKeys.size();
+
+	for(int i = 0; i < numParams; i++){
+		string key = orderedKeys[i];
+		Item * item = widgets[key];
+		RemoteUIParam p = item->param;
+		if (p.group == group){
+			paramsInGroup.push_back(key);
+		}
+	}
+	return paramsInGroup;
+}
+
+
+-(vector<string>)getAllGroupsInParams{
+
+	vector<string> v; //all groups
+
+	int numParams = orderedKeys.size();
+
+	for(int i = 0; i < numParams; i++){
+		string key = orderedKeys[i];
+		Item * item = widgets[key];
+		RemoteUIParam p = item->param;
+		if (std::find(v.begin(), v.end(), p.group) == v.end()){
+			v.push_back(p.group);
+		}
+	}
+	return v;
+}
 
 -(void)layoutWidgetsWithConfig:(LayoutConfig) p{
 
@@ -253,13 +296,16 @@
 	}
 	[self adjustScrollView];
 
-	int numParams = orderedKeys.size();
+
+	vector<string> paramsInGroup = [self getParamsInGroup:currentGroup];
+	int numParams = paramsInGroup.size();
+
 	int h = 0;
 	int howManyThisCol = 0;
 	int colIndex = 0;
 
 	for(int i = 0; i < numParams; i++){
-		string key = orderedKeys[i];
+		string key = paramsInGroup[i];
 		Item * item = widgets[key];
 		NSRect r = item->ui.frame;
 
@@ -279,7 +325,7 @@
 
 	for (int i = 1; i < colIndex + 1; i++) {
 		NSBox * box;
-		box = [[NSBox alloc] initWithFrame: NSMakeRect( i *  p.rowW, -ROW_HEIGHT, 1, 3 * ROW_HEIGHT + ROW_HEIGHT * (orderedKeys.size() ))];
+		box = [[NSBox alloc] initWithFrame: NSMakeRect( i *  p.rowW, -ROW_HEIGHT, 1, 3 * ROW_HEIGHT + ROW_HEIGHT * numParams )];
 		[box setAutoresizingMask: NSViewHeightSizable | NSViewMinXMargin | NSViewMaxXMargin | NSViewMaxYMargin | NSViewMinYMargin ];
 		[listContainer addSubview:box];
 	}
@@ -324,6 +370,31 @@
 	}
 	//delay a bit the screen update so that we have gathered the values
 	//[self performSelector:@selector(fullParamsUpdate) withObject:nil afterDelay: REFRESH_RATE * 2];
+}
+
+-(IBAction)userChoseGroup:(id)sender{
+	int index = [sender indexOfSelectedItem];
+	NSString * gr = [[sender itemAtIndex:index] title];
+	if ( [gr isEqualToString:ALL_PARAMS_GROUP]){
+		currentGroup = "";
+	}else{
+		currentGroup = [gr UTF8String];
+	}
+
+	NSLog(@"user chose group: _%s_",currentGroup.c_str());
+	[self layoutWidgetsWithConfig: [self calcLayoutParams]];
+}
+
+-(void)updateGroupPopup{
+	
+	NSMutableArray *menuItemNameArray = [NSMutableArray arrayWithCapacity:4];
+	[menuItemNameArray addObject: ALL_PARAMS_GROUP ];
+	vector<string> allGroupNames = [self getAllGroupsInParams];
+	for(int i = 0 ; i < allGroupNames.size(); i++){
+		[menuItemNameArray addObject: [NSString stringWithFormat:@"%s",allGroupNames[i].c_str()] ];
+	}
+    [groups removeAllItems];
+    [groups addItemsWithTitles: menuItemNameArray];
 }
 
 
@@ -464,6 +535,7 @@
 				client->update(REFRESH_RATE); // just to be super sure, we run a second update
 				[self partialParamsUpdate];
 				waitingForResults = false;
+				[self updateGroupPopup];
 			}else{
 				//NSLog(@"NOT yet...");
 				client->requestCompleteUpdate();

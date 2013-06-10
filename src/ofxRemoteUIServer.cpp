@@ -26,6 +26,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	avgTimeSinceLastReply = 0;
 	waitingForReply = false;
 	colorSet = false;
+	upcomingGroup = DEFAULT_PARAM_GROUP;
 }
 
 
@@ -34,6 +35,10 @@ void ofxRemoteUIServer::close(){
 		sendCIAO();
 }
 
+
+void ofxRemoteUIServer::setParamGroup(string g){
+	upcomingGroup = g;
+}
 
 void ofxRemoteUIServer::setParamColor( ofColor c ){
 	colorSet = true;
@@ -273,6 +278,7 @@ void ofxRemoteUIServer::shareParam(string paramName, float* param, float min, fl
 	p.maxFloat = max;
 	p.minFloat = min;
 	p.floatVal = *param = ofClamp(*param, min, max);
+	p.group = upcomingGroup;
 	setColorForParam(p, c);
 	addParamToDB(p, paramName);
 	cout << "ofxRemoteUIServer Sharing Param '" << paramName << "'" << endl;
@@ -284,6 +290,7 @@ void ofxRemoteUIServer::shareParam(string paramName, bool* param, ofColor c, int
 	p.type = REMOTEUI_PARAM_BOOL;
 	p.boolValAddr = param;
 	p.boolVal = *param;
+	p.group = upcomingGroup;
 	setColorForParam(p, c);
 	addParamToDB(p, paramName);
 	cout << "ofxRemoteUIServer Sharing Param '" << paramName << "'" << endl;
@@ -297,6 +304,7 @@ void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int ma
 	p.intVal = *param;
 	p.maxInt = max;
 	p.minInt = min;
+	p.group = upcomingGroup;
 	setColorForParam(p, c);
 	p.intVal = *param = ofClamp(*param, min, max);
 	addParamToDB(p, paramName);
@@ -309,6 +317,7 @@ void ofxRemoteUIServer::shareParam(string paramName, string* param, ofColor c, i
 	p.type = REMOTEUI_PARAM_STRING;
 	p.stringValAddr = param;
 	p.stringVal = *param;
+	p.group = upcomingGroup;
 	setColorForParam(p, c);
 	addParamToDB(p, paramName);
 	cout << "ofxRemoteUIServer Sharing Param '" << paramName << "'" <<endl;

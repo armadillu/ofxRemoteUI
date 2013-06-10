@@ -15,6 +15,7 @@
 #define STATUS_REFRESH_RATE		0.333f
 #define ROW_HEIGHT				34.0f
 #define ROW_WIDTH				280.0f
+#define ALL_PARAMS_GROUP		@"All Params"
 
 struct LayoutConfig{
 	NSPoint colsRows;
@@ -22,6 +23,7 @@ struct LayoutConfig{
 	int maxPerCol;
 	float rowW;
 };
+
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>{
 
@@ -36,6 +38,8 @@ struct LayoutConfig{
 	IBOutlet NSTextField *lagField;
 	IBOutlet NSView *listContainer;
 	IBOutlet MyScrollView * scroll;
+	IBOutlet NSPopUpButton * groups;
+	
 
 	bool updateContinuosly;
 
@@ -47,6 +51,7 @@ struct LayoutConfig{
 	NSTimer * statusTimer;
 	LayoutConfig lastLayout;
 
+	string currentGroup;
 	BOOL waitingForResults;
 }
 
@@ -55,8 +60,9 @@ struct LayoutConfig{
 -(IBAction)pressedContinuously:(id)sender;
 -(IBAction)pressedConnect:(id)sender;
 -(IBAction)filterType:(id)sender;
+-(IBAction)userChoseGroup:(id)sender;
 
--(void) connect;
+-(void)connect;
 
 -(void)update;
 
@@ -64,5 +70,8 @@ struct LayoutConfig{
 -(void)partialParamsUpdate;
 
 -(void)userChangedParam:(RemoteUIParam)p paramName:(string)name; //this is a delegate method, items will call this on widgetChange
+
+-(vector<string>)getParamsInGroup:(string)group;
+-(vector<string>)getAllGroupsInParams;
 
 @end

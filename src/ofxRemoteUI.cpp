@@ -100,6 +100,7 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 	RemoteUIParam p = original;
 	int arg = 0;
 
+	p.group = dm.paramGroup;
 	switch (dm.argument) {
 		case FLT_ARG:
 			p.type = REMOTEUI_PARAM_FLOAT;
@@ -145,6 +146,7 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 	p.g = m.getArgAsInt32(arg); arg++;
 	p.b = m.getArgAsInt32(arg); arg++;
 	p.a = m.getArgAsInt32(arg); arg++;
+	p.group = m.getArgAsString(arg); arg++;
 
 	if ( !p.isEqualTo(original)  || newParam ){ // if the udpdate changed the param, keep track of it
 		paramsChangedSinceLastCheck.insert(paramName);
@@ -308,6 +310,7 @@ void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
 		case REMOTEUI_PARAM_STRING: m.addStringArg(p.stringVal); /*cout << "sending string" << endl; */ break;
 	}
 	m.addIntArg(p.r); m.addIntArg(p.g); m.addIntArg(p.b); m.addIntArg(p.a); // set bg color!
+	m.addStringArg(p.group);
 	if(timeSinceLastReply == 0.0f) timeSinceLastReply = 0.0;
 	sender.sendMessage(m);
 }

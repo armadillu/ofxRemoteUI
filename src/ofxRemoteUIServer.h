@@ -39,6 +39,7 @@ public:
 	void shareParam(string paramName, int* param, int min, int max, ofColor bgColor = ofColor(0,0,0,0) );
 	void shareParam(string paramName, string* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
 	void setParamColor( ofColor c );
+	void setParamGroup(string g);
 
 private:
 
@@ -50,6 +51,7 @@ private:
 
 	bool colorSet; //if user called setParamColor()
 	ofColor paramColor;
+	string upcomingGroup;
 
 
 };
