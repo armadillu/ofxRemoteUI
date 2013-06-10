@@ -109,10 +109,10 @@
 
 - (void)windowResized:(NSNotification *)notification;{
 
-	layoutParam p = [self calcLayoutParams];
+	LayoutConfig p = [self calcLayoutParams];
 	if ( p.colsRows.x != lastLayout.colsRows.x || p.colsRows.y != lastLayout.colsRows.y ){
-		[self layOutParams:p];
-		//NSLog(@"layOutParams");
+		[self calcLayoutConfig:p];
+		//NSLog(@"calcLayoutConfig");
 	}else{
 		int off = ((int)[scroll.contentView frame].size.height ) % ((int)(ROW_HEIGHT));
 		[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, p.maxPerCol * ROW_HEIGHT + off)];
@@ -154,7 +154,7 @@
 				widgets[paramName] = row;
 			}
 		}
-		[self layOutParams: [self calcLayoutParams]];
+		[self calcLayoutConfig: [self calcLayoutParams]];
 		return YES;
 	}else{
 		return NO;
@@ -195,9 +195,9 @@
 }
 
 
--(layoutParam)calcLayoutParams{
+-(LayoutConfig)calcLayoutParams{
 
-	layoutParam p;
+	LayoutConfig p;
 	float scrollW = listContainer.frame.size.width;
 	float scrollH = scroll.frame.size.height;
 	int numParams = orderedKeys.size();
@@ -243,7 +243,7 @@
 }
 
 
--(void)layOutParams:(layoutParam) p{
+-(void)calcLayoutConfig:(LayoutConfig) p{
 
 	//remove all views, start over
 	NSArray * subviews = [listContainer subviews];
@@ -465,7 +465,7 @@
 				[self partialParamsUpdate];
 				waitingForResults = false;
 			}else{
-				NSLog(@"NOT yet...");
+				//NSLog(@"NOT yet...");
 				client->requestCompleteUpdate();
 			}
 		}

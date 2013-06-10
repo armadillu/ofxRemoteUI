@@ -16,7 +16,7 @@
 #define ROW_HEIGHT				34.0f
 #define ROW_WIDTH				280.0f
 
-struct layoutParam{
+struct LayoutConfig{
 	NSPoint colsRows;
 	int howManyPerCol;
 	int maxPerCol;
@@ -45,7 +45,7 @@ struct layoutParam{
 	ofxRemoteUIClient * client;
 	NSTimer * timer;
 	NSTimer * statusTimer;
-	layoutParam lastLayout;
+	LayoutConfig lastLayout;
 
 	BOOL waitingForResults;
 }
