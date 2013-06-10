@@ -5,7 +5,7 @@ OF addon allows you to serve any variables you want (bool, float, int, string) o
 
 It's OSC based, and it includes a native OSX Client. The Native OSX Client allows param colorization for better clarity, and live param search.
 
-You can also set it to store the current values on quit, so you can keep the values as you had it on your last session.
+You can also set it to store the current values on quit, so you can keep the values as you had it on your last session. It uses ofxXmlSettings to do so.
 
 It uses Macros + the singleton pattern to make it very easy to share any variable you want to edit remotely, in any class of your project. 
 
@@ -25,7 +25,7 @@ Easy! Declare variables in your project, as you normally would:
 
 Then tell the server to share them:
 
-	void setup(){
+	void setup(){	
 	
 		OFX_REMOTEUI_SERVER_SETUP(); //start server
 		
@@ -35,7 +35,6 @@ Then tell the server to share them:
 
 		//load values from XML, as they were last saved
 		OFX_REMOTEUI_SERVER_LOAD_FROM_XML();
-
 	}
 	
 	void update(){
