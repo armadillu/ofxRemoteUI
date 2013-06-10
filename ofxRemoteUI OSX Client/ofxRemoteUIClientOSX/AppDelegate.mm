@@ -75,6 +75,8 @@
 											 selector:@selector(windowResized:) name:NSWindowDidResizeNotification
 											   object: window];
 
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(windowBecameMain:) name:NSWindowDidBecomeKeyNotification object:window];
+
 
 	CALayer *viewLayer = [CALayer layer];
 	//[viewLayer setBackgroundColor:CGColorCreateGenericRGB(0,0,0,0.1)];
@@ -91,7 +93,14 @@
 	viewLayer.actions = newActions;
 
 	currentGroup = ""; //empty group means show all params
+}
 
+
+-(void)windowBecameMain:(id)a{
+	if(connectButton.state == 0){
+		[self connect];
+	}
+	//[window resignKeyWindow];
 }
 
 
