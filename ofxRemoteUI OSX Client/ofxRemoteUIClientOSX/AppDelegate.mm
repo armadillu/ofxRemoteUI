@@ -92,6 +92,7 @@
 									   nil];
 	viewLayer.actions = newActions;
 
+	[self updateGroupPopup];
 	currentGroup = ""; //empty group means show all params
 }
 
