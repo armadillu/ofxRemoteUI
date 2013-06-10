@@ -111,8 +111,8 @@
 
 	LayoutConfig p = [self calcLayoutParams];
 	if ( p.colsRows.x != lastLayout.colsRows.x || p.colsRows.y != lastLayout.colsRows.y ){
-		[self calcLayoutConfig:p];
-		//NSLog(@"calcLayoutConfig");
+		[self layoutWidgetsWithConfig:p];
+		//NSLog(@"layoutWidgetsWithConfig");
 	}else{
 		int off = ((int)[scroll.contentView frame].size.height ) % ((int)(ROW_HEIGHT));
 		[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, p.maxPerCol * ROW_HEIGHT + off)];
@@ -154,7 +154,7 @@
 				widgets[paramName] = row;
 			}
 		}
-		[self calcLayoutConfig: [self calcLayoutParams]];
+		[self layoutWidgetsWithConfig: [self calcLayoutParams]];
 		return YES;
 	}else{
 		return NO;
@@ -243,7 +243,7 @@
 }
 
 
--(void)calcLayoutConfig:(LayoutConfig) p{
+-(void)layoutWidgetsWithConfig:(LayoutConfig) p{
 
 	//remove all views, start over
 	NSArray * subviews = [listContainer subviews];
