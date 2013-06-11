@@ -3,9 +3,10 @@
 
 OF addon allows you to serve any variables you want (bool, float, int, string) on the network, so that you can modify them from away. Uses server client architecture, where your app is the server. It communicates both ways; you can modify your project's variables from a client, but you can also pull your app's variable states from the client, so that you can track values that evolve programatically.
 
-It's OSC based, and it includes a native OSX Client. The Native OSX Client allows param colorization for better clarity, and live param search.
+It's OSC based, and it includes a native OSX Client. The Native OSX Client allows param colorization for better clarity, and live param search. It also supports grouping params into categories, to and filter by category in the OSX Client.
 
-You can also set it to store the current values on quit, so you can keep the values as you had it on your last session. It uses ofxXmlSettings to do so. It allows to group params into categories and filter them in the OSX Client, in case you start having too many.
+
+You can also set it to store the current values when quitting the app, so that you can carry on when you left of last time you used it. It uses ofxXmlSettings to store the settings. 
 
 It uses Macros + the singleton pattern to make it very easy to share any variable you want to edit remotely, in any class of your project. 
 
