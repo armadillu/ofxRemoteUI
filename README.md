@@ -5,13 +5,13 @@ OF addon allows you to serve any variables you want (bool, float, int, string) o
 
 It's OSC based, and it includes a native OSX Client. The Native OSX Client allows param colorization for better clarity, and live param search.
 
-You can also set it to store the current values on quit, so you can keep the values as you had it on your last session. It uses ofxXmlSettings to do so.
+You can also set it to store the current values on quit, so you can keep the values as you had it on your last session. It uses ofxXmlSettings to do so. It allows to group params into categories and filter them in the OSX Client, in case you start having too many.
 
 It uses Macros + the singleton pattern to make it very easy to share any variable you want to edit remotely, in any class of your project. 
 
 [http://youtu.be/e6mzo8YavoM](http://youtu.be/e6mzo8YavoM)
 
-![OSX Client](http://farm4.staticflickr.com/3830/8752916271_f7acc01712_o.png "OSX Client")
+![OSX Client](http://farm4.staticflickr.com/3741/9012132676_f37c27f3c4_o.png "OSX Client")
 
 ### How to use
 
