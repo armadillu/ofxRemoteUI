@@ -94,6 +94,15 @@
 									   nil];
 	viewLayer.actions = newActions;
 
+	//make windows resize-snap to height of param
+	NSRect r = [window frame];
+	NSLog(@"%f",	r.size.height );
+	float hh = r.size.height - 284;
+	int num = hh / ROW_HEIGHT;
+	r.size.height = 284 + num * ROW_HEIGHT;
+	[window setFrame:r display:NO];
+	[window setResizeIncrements:NSMakeSize(1, ROW_HEIGHT)];
+
 	[self updateGroupPopup];
 	currentGroup = ""; //empty group means show all params
 
