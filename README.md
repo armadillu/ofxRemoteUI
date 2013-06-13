@@ -9,6 +9,8 @@ It can also be set to store the current values when quitting the app (or wheneve
 
 It uses Macros + the singleton pattern to make it very easy to share any variable you want to edit remotely, in any class of your project. 
 
+--Update!-- @kritzikratzi made a Processing version of this! https://github.com/kritzikratzi/remoteUI-java
+
 [demo video](http://youtu.be/e6mzo8YavoM)
 
 ![OSX Client](http://farm4.staticflickr.com/3741/9012132676_f37c27f3c4_o.png "OSX Client")
