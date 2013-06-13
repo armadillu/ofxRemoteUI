@@ -14,8 +14,8 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)note {
 
-	client = new ofxRemoteUIClient();
-	
+	launched = FALSE;
+
 	// setup recent connections ///////////////
 
 	//[[addressField cell] setSearchButtonCell:nil];
@@ -58,6 +58,8 @@
 
 	///////////////////////////////////////////////
 
+	client = new ofxRemoteUIClient();
+
 	timer = [NSTimer scheduledTimerWithTimeInterval:REFRESH_RATE target:self selector:@selector(update) userInfo:nil repeats:YES];
 	statusTimer = [NSTimer scheduledTimerWithTimeInterval:STATUS_REFRESH_RATE target:self selector:@selector(statusUpdate) userInfo:nil repeats:YES];
 	updateContinuosly = false;
@@ -94,6 +96,9 @@
 
 	[self updateGroupPopup];
 	currentGroup = ""; //empty group means show all params
+
+	NSLog(@"applicationDidFinishLaunching done!");
+	launched = TRUE;
 }
 
 
@@ -107,7 +112,7 @@
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification{
 
-	if(connectButton.state == 0){
+	if(connectButton.state == 0 && launched){
 		[self connect];
 	}
 }

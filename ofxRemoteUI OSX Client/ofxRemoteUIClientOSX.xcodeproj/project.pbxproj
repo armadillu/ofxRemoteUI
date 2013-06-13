@@ -546,6 +546,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				DEAD_CODE_STRIPPING = YES;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist";
@@ -562,6 +563,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				DEAD_CODE_STRIPPING = YES;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist";

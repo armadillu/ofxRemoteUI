@@ -308,10 +308,28 @@
 									<reference key="NSOnImage" ref="35465992"/>
 									<reference key="NSMixedImage" ref="502551668"/>
 								</object>
+								<object class="NSMenuItem" id="209845263">
+									<reference key="NSMenu" ref="789758025"/>
+									<string key="NSTitle">Copy Params As Text</string>
+									<string key="NSKeyEquiv">C</string>
+									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="35465992"/>
+									<reference key="NSMixedImage" ref="502551668"/>
+								</object>
 								<object class="NSMenuItem" id="29853731">
 									<reference key="NSMenu" ref="789758025"/>
 									<string key="NSTitle">Paste</string>
 									<string key="NSKeyEquiv">v</string>
+									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="35465992"/>
+									<reference key="NSMixedImage" ref="502551668"/>
+								</object>
+								<object class="NSMenuItem" id="734988053">
+									<reference key="NSMenu" ref="789758025"/>
+									<string key="NSTitle">Paste Text As Params</string>
+									<string key="NSKeyEquiv">V</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="35465992"/>
@@ -645,7 +663,6 @@
 									</object>
 								</object>
 							</object>
-							<bool key="NSNoAutoenable">YES</bool>
 						</object>
 					</object>
 					<object class="NSMenuItem" id="713487014">
@@ -1745,6 +1762,22 @@
 					<int key="connectionID">535</int>
 				</object>
 				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">copy:</string>
+						<reference key="source" ref="1014"/>
+						<reference key="destination" ref="860595796"/>
+					</object>
+					<int key="connectionID">762</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">paste:</string>
+						<reference key="source" ref="1014"/>
+						<reference key="destination" ref="29853731"/>
+					</object>
+					<int key="connectionID">763</int>
+				</object>
+				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">window</string>
 						<reference key="source" ref="976324537"/>
@@ -1908,17 +1941,17 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">copySpecial:</string>
 						<reference key="source" ref="976324537"/>
-						<reference key="destination" ref="860595796"/>
+						<reference key="destination" ref="209845263"/>
 					</object>
-					<int key="connectionID">760</int>
+					<int key="connectionID">768</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">pasteSpecial:</string>
 						<reference key="source" ref="976324537"/>
-						<reference key="destination" ref="29853731"/>
+						<reference key="destination" ref="734988053"/>
 					</object>
-					<int key="connectionID">761</int>
+					<int key="connectionID">769</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -2040,6 +2073,8 @@
 							<reference ref="676164635"/>
 							<reference ref="507821607"/>
 							<reference ref="288088188"/>
+							<reference ref="209845263"/>
+							<reference ref="734988053"/>
 						</object>
 						<reference key="parent" ref="952259628"/>
 					</object>
@@ -2761,6 +2796,16 @@
 						<reference key="object" ref="936953302"/>
 						<reference key="parent" ref="168674912"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">764</int>
+						<reference key="object" ref="209845263"/>
+						<reference key="parent" ref="789758025"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">766</int>
+						<reference key="object" ref="734988053"/>
+						<reference key="parent" ref="789758025"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -2888,6 +2933,8 @@
 					<string>754.IBPluginDependency</string>
 					<string>755.IBPluginDependency</string>
 					<string>756.IBPluginDependency</string>
+					<string>764.IBPluginDependency</string>
+					<string>766.IBPluginDependency</string>
 					<string>79.IBPluginDependency</string>
 					<string>81.IBPluginDependency</string>
 					<string>83.IBPluginDependency</string>
@@ -3041,6 +3088,8 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="unlocalizedProperties">
@@ -3055,7 +3104,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">761</int>
+			<int key="maxID">769</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

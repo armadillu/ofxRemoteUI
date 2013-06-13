@@ -23,8 +23,8 @@ ofxRemoteUIClient::ofxRemoteUIClient(){
 
 void ofxRemoteUIClient::setup(string address, int port_){
 
-	params.clear();
-	orderedKeys.clear();
+//	if (params.size() > 0) params.clear();
+//	if (orderedKeys.size() > 0) orderedKeys.clear();
 	port = port_;
 	avgTimeSinceLastReply = timeSinceLastReply = time = 0.0f;
 	waitingForReply = false;

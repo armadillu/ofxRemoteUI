@@ -53,6 +53,8 @@ struct LayoutConfig{
 
 	string currentGroup;
 	BOOL waitingForResults;
+
+	BOOL launched;
 }
 
 
