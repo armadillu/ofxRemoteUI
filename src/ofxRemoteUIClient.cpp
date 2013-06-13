@@ -8,6 +8,9 @@
 
 #include "ofxRemoteUIClient.h"
 #include <iostream>
+#include "uriencode.h"
+#include <sstream>
+
 
 ofxRemoteUIClient::ofxRemoteUIClient(){
 	readyToSend = false;
@@ -227,4 +230,69 @@ void ofxRemoteUIClient::sendREQUEST(){
 	m.setAddress("REQU");
 	sender.sendMessage(m);
 }
+
+
+string ofxRemoteUIClient::getValuesAsString(){
+	stringstream out;
+	map<int,string>::iterator it = orderedKeys.begin();
+	while( it != orderedKeys.end() ){
+		RemoteUIParam param = params[it->second];
+		out << UriEncode(it->second) << "=";
+
+		switch (param.type) {
+			case REMOTEUI_PARAM_FLOAT: out << param.floatVal << endl; break;
+			case REMOTEUI_PARAM_INT: out << param.intVal << endl; break;
+			case REMOTEUI_PARAM_BOOL: out << (param.boolVal?"1":"0") << endl; break;
+			case REMOTEUI_PARAM_STRING: out << UriEncode(param.stringVal) << endl; break;
+		}
+
+		++it;
+	}
+
+	return out.str();
+}
+
+
+void ofxRemoteUIClient::setValuesFromString( string values ){
+
+	stringstream in(values);
+	string name, value;
+	vector<string>changedParam;
+
+	while( !in.eof() ){
+		getline( in, name, '=' );
+		getline( in, value, '\n' );
+
+		if( params.find( name ) != params.end() ){
+			RemoteUIParam param = params[name];
+			RemoteUIParam original = params[name];
+			changedParam.push_back(name);
+			stringstream valstr( UriDecode(value) );
+
+			switch (param.type) {
+				case REMOTEUI_PARAM_FLOAT: valstr >> param.floatVal; break;
+				case REMOTEUI_PARAM_INT: valstr >> param.intVal; break;
+				case REMOTEUI_PARAM_BOOL: valstr >> param.boolVal; break;
+				case REMOTEUI_PARAM_STRING: param.stringVal = valstr.str(); break;
+			}
+
+			if ( !param.isEqualTo(original) ){ // if the udpdate changed the param, keep track of it
+				params[name] = param;
+				paramsChangedSinceLastCheck.insert(name);
+			}
+		}
+	}
+
+	vector<string>::iterator it = changedParam.begin();
+	while( it != changedParam.end() ){
+		if ( params.find( *it ) != params.end()){
+			RemoteUIParam param = params[*it];
+			sendParamUpdate(param, *it);
+			cout << "sending update for " << *it << endl;
+		}
+		it++;
+	}
+	
+}
+
 

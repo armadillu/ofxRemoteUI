@@ -82,6 +82,7 @@
 		BB4E43FF169F278B00A94935 /* ofxOscReceiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxOscReceiver.h; sourceTree = "<group>"; };
 		BB4E4400169F278B00A94935 /* ofxOscSender.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxOscSender.cpp; sourceTree = "<group>"; };
 		BB4E4401169F278B00A94935 /* ofxOscSender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxOscSender.h; sourceTree = "<group>"; };
+		BB5F5EB01769462600F1FA92 /* uriencode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = uriencode.h; sourceTree = "<group>"; };
 		BB65837A16A315B2000B45F0 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = icon.icns; sourceTree = "<group>"; };
 		BB6CC35B174698DE0043F523 /* MyScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyScrollView.h; sourceTree = "<group>"; };
 		BB6CC35C174698DE0043F523 /* MyScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyScrollView.m; sourceTree = "<group>"; };
@@ -335,6 +336,7 @@
 		BBDCBDF416A051B000F1C5EC /* src */ = {
 			isa = PBXGroup;
 			children = (
+				BB5F5EB01769462600F1FA92 /* uriencode.h */,
 				BBDCBDF516A051B000F1C5EC /* ofxRemoteUI.cpp */,
 				BBDCBDF616A051B000F1C5EC /* ofxRemoteUI.h */,
 				BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */,

@@ -136,6 +136,27 @@
 	}
 }
 
+-(IBAction)pasteSpecial:(id)sender{
+
+	NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
+	NSArray *classes = [[NSArray alloc] initWithObjects:[NSString class], nil];
+	NSDictionary *options = [NSDictionary dictionary];
+	NSArray *copiedItems = [pasteboard readObjectsForClasses:classes options:options];
+	if (copiedItems != nil) {
+		client->setValuesFromString([[copiedItems objectAtIndex:0] UTF8String]);
+	}
+	[self partialParamsUpdate];
+	[classes release];
+	//[self layoutWidgetsWithConfig: [self calcLayoutParams]];
+}
+
+-(IBAction)copySpecial:(id)sender{
+
+	string val = client->getValuesAsString();
+    [[NSPasteboard generalPasteboard] declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
+    [[NSPasteboard generalPasteboard] setString:[NSString stringWithFormat:@"%s", val.c_str()] forType:NSStringPboardType];
+}
+
 
 
 -(BOOL)fullParamsUpdate{

@@ -46,6 +46,10 @@ public:
 	bool isReadyToSend();
 	bool hasReceivedUpdate();
 
+	string getValuesAsString();
+	void setValuesFromString( string values );
+
+
 
 private:
 

@@ -193,6 +193,7 @@ public:
 	vector<string> getAllParamNamesList();
 	vector<string> getChangedParamsList(); //in user add order
 	RemoteUIParam getParamForName(string paramName);
+	
 
 	bool ready();
 	float connectionLag();
@@ -211,7 +212,7 @@ protected:
 	void updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage dm);
 	void syncParamToPointer(string paramName);
 	void addParamToDB(RemoteUIParam p, string paramName);
-
+	
 	void sendHELLO();
 	void sendCIAO();
 	void sendTEST();

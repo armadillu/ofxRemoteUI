@@ -9,6 +9,7 @@
 #include "ofxRemoteUI.h"
 #include <iostream>
 
+
 bool ofxRemoteUI::ready(){
 	return readyToSend;
 }
@@ -338,4 +339,3 @@ void ofxRemoteUI::sendCIAO(){
 	m.setAddress("CIAO");
 	sender.sendMessage(m);
 }
-

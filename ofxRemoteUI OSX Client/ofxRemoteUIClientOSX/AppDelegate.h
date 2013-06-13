@@ -62,6 +62,9 @@ struct LayoutConfig{
 -(IBAction)filterType:(id)sender;
 -(IBAction)userChoseGroup:(id)sender;
 
+-(IBAction)pasteSpecial:(id)sender;
+-(IBAction)copySpecial:(id)sender;
+
 -(void)connect;
 
 -(void)update;
