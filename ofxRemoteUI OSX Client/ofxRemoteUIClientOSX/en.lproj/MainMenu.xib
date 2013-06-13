@@ -737,7 +737,7 @@
 				<string key="NSWindowRect">{{335, 390}, {350, 363}}</string>
 				<int key="NSWTFlags">1954030592</int>
 				<string key="NSWindowTitle">ofxRemoteUI</string>
-				<string key="NSWindowClass">NSPanel</string>
+				<string key="NSWindowClass">NSWindow</string>
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<string key="NSWindowContentMinSize">{350, 250}</string>
@@ -1135,6 +1135,7 @@
 									<string key="NSFrame">{{274, 10}, {58, 18}}</string>
 									<reference key="NSSuperview" ref="297290460"/>
 									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView"/>
 									<string key="NSReuseIdentifierKey">_NS:9</string>
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSButtonCell" key="NSCell" id="624985738">
@@ -1398,6 +1399,7 @@
 				<string key="NSScreenRect">{{0, 0}, {2048, 1130}}</string>
 				<string key="NSMinSize">{350, 272}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
+				<string key="NSFrameAutosaveName">mainwin</string>
 				<int key="NSWindowCollectionBehavior">18</int>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
