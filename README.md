@@ -32,7 +32,7 @@ Then tell the server to share them:
 	
 		OFX_REMOTEUI_SERVER_SETUP(); //start server
 		
-		OFX_REMOTEUI_SERVER_SHARE_PARAM(x, 0, ofGetWidth()); //Expose vars to the server
+		OFX_REMOTEUI_SERVER_SHARE_PARAM(x, 0, ofGetWidth()); //Expose vars to the server, and set a valid range
 		OFX_REMOTEUI_SERVER_SHARE_PARAM(y, 0, ofGetHeight());
 
 		OFX_REMOTEUI_SERVER_LOAD_FROM_XML(); //load values from XML, as they were last saved
