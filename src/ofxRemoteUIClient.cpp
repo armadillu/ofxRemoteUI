@@ -45,6 +45,7 @@ void ofxRemoteUIClient::update(float dt){
 		sendHELLO();	//on first connect, send HI!
 		sendTEST();		//and a lag test
 		readyToSend = true;
+		
 	}else{
 
 		time += dt;
@@ -57,6 +58,9 @@ void ofxRemoteUIClient::update(float dt){
 			}else{
 				if (time > CONNECTION_TIMEOUT){
 					avgTimeSinceLastReply = -1;
+					readyToSend = false; // testing here
+					params.clear();
+					orderedKeys.clear();
 				}
 			}
 		}

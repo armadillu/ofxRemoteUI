@@ -571,9 +571,9 @@
 
 -(void)update{
 
-	client->update(REFRESH_RATE);
-
 	if ( connectButton.state == 1 ){ // if connected
+
+		client->update(REFRESH_RATE);
 
 		if( waitingForResults ){
 			if ( [self fullParamsUpdate] ){
