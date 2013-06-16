@@ -8,8 +8,6 @@
 
 #include "ofxRemoteUIClient.h"
 #include <iostream>
-#include "uriencode.h"
-#include <sstream>
 
 
 ofxRemoteUIClient::ofxRemoteUIClient(){
@@ -30,10 +28,10 @@ void ofxRemoteUIClient::setup(string address, int port_){
 	waitingForReply = false;
 	host = address;
 	cout << "ofxRemoteUIClient listening at port " << port + 1 << " ... " << endl;
-	receiver.setup(port + 1);
+	oscReceiver.setup(port + 1);
 
 	cout << "ofxRemoteUIClient connecting to " << address << endl;
-	sender.setup(address, port);
+	oscSender.setup(address, port);
 }
 
 
@@ -66,19 +64,21 @@ void ofxRemoteUIClient::update(float dt){
 		}
 	}
 
-	while( receiver.hasWaitingMessages() ){// check for waiting messages from client
+	while( oscReceiver.hasWaitingMessages() ){// check for waiting messages from client
 
 		ofxOscMessage m;
-		receiver.getNextMessage(&m);
+		oscReceiver.getNextMessage(&m);
 
 		DecodedMessage dm = decode(m);
 
 		switch (dm.action) {
 
-			case HELO_ACTION: //server says hi back, we ask for a big update
+			case HELO_ACTION:{ //server says hi back, we ask for a big update
 				//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " answered HELLO!" << endl;
 				requestCompleteUpdate();
-				break;
+				vector<string> a;
+				sendPREL(a); // we also ask for a preset list
+				}break;
 
 			case REQUEST_ACTION: //should not happen, server doesnt request
 				//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " send REQU??? WTF!!!"  << endl;
@@ -110,11 +110,54 @@ void ofxRemoteUIClient::update(float dt){
 				//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " replied TEST!" << " and took " << avgTimeSinceLastReply << endl;
 				break;
 
+			case PRESET_LIST_ACTION: //server sends us the list of current presets
+				fillPresetListFromMessage(m);
+				break;
+
+			case SET_PRESET_ACTION: // server confirms that it has set the preset, request a full update
+				sendREQUEST();
+				break;
+
+			case SAVE_PRESET_ACTION:{ // server confirms that it has save the preset,
+				vector<string> a;
+				sendPREL(a); //request preset list to server, send empty vector
+				}break;
+
+			case DELETE_PRESET_ACTION:{ // server confirms that it has deleted preset
+				vector<string> a;
+				sendPREL(a); //request preset list to server, send empty vector
+				}break;
+
 			default: cout << "ofxRemoteUIClient::update >> ERR!" <<endl; break;
 		}
 	}
 }
 
+
+void ofxRemoteUIClient::setPreset(string preset){
+	sendSETP(preset);
+}
+
+
+void ofxRemoteUIClient::savePresetWithName(string presetName){
+	sendSAVP(presetName);
+}
+
+
+void ofxRemoteUIClient::deletePreset(string presetName){
+	sendDELP(presetName);
+}
+
+
+
+void ofxRemoteUIClient::fillPresetListFromMessage(ofxOscMessage m){
+
+	int n = m.getNumArgs();
+	presetNames.clear();
+	for(int i = 0; i < n; i++){
+		presetNames.push_back( m.getArgAsString(i));
+	}
+}
 
 void ofxRemoteUIClient::trackParam(string paramName, float* param){
 	RemoteUIParam p;
@@ -232,71 +275,8 @@ bool ofxRemoteUIClient::isReadyToSend(){
 void ofxRemoteUIClient::sendREQUEST(){
 	ofxOscMessage m;
 	m.setAddress("REQU");
-	sender.sendMessage(m);
+	oscSender.sendMessage(m);
 }
 
-
-string ofxRemoteUIClient::getValuesAsString(){
-	stringstream out;
-	map<int,string>::iterator it = orderedKeys.begin();
-	while( it != orderedKeys.end() ){
-		RemoteUIParam param = params[it->second];
-		out << UriEncode(it->second) << "=";
-
-		switch (param.type) {
-			case REMOTEUI_PARAM_FLOAT: out << param.floatVal << endl; break;
-			case REMOTEUI_PARAM_INT: out << param.intVal << endl; break;
-			case REMOTEUI_PARAM_BOOL: out << (param.boolVal?"1":"0") << endl; break;
-			case REMOTEUI_PARAM_STRING: out << UriEncode(param.stringVal) << endl; break;
-		}
-
-		++it;
-	}
-
-	return out.str();
-}
-
-
-void ofxRemoteUIClient::setValuesFromString( string values ){
-
-	stringstream in(values);
-	string name, value;
-	vector<string>changedParam;
-
-	while( !in.eof() ){
-		getline( in, name, '=' );
-		getline( in, value, '\n' );
-
-		if( params.find( name ) != params.end() ){
-			RemoteUIParam param = params[name];
-			RemoteUIParam original = params[name];
-			changedParam.push_back(name);
-			stringstream valstr( UriDecode(value) );
-
-			switch (param.type) {
-				case REMOTEUI_PARAM_FLOAT: valstr >> param.floatVal; break;
-				case REMOTEUI_PARAM_INT: valstr >> param.intVal; break;
-				case REMOTEUI_PARAM_BOOL: valstr >> param.boolVal; break;
-				case REMOTEUI_PARAM_STRING: param.stringVal = valstr.str(); break;
-			}
-
-			if ( !param.isEqualTo(original) ){ // if the udpdate changed the param, keep track of it
-				params[name] = param;
-				paramsChangedSinceLastCheck.insert(name);
-			}
-		}
-	}
-
-	vector<string>::iterator it = changedParam.begin();
-	while( it != changedParam.end() ){
-		if ( params.find( *it ) != params.end()){
-			RemoteUIParam param = params[*it];
-			sendParamUpdate(param, *it);
-			cout << "sending update for " << *it << endl;
-		}
-		it++;
-	}
-	
-}
 
 

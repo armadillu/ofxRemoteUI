@@ -38,9 +38,6 @@ void testApp::update(){
 	y = mouseY;
 	//now control some params from the client app
 	//send an update to the server app
-	client.sendUpdatedParam("x");
-	client.sendUpdatedParam("y");
-	client.sendUpdatedParam("drawOutlines");
 
 }
 
@@ -62,4 +59,32 @@ void testApp::draw(){
 
 void testApp::mousePressed( int x, int y, int button ){
 	drawOutlines = !drawOutlines;
+}
+
+void testApp::keyPressed(int key){
+
+	if(key=='1'){
+		client.savePresetWithName("a");
+	}
+	if(key=='2'){
+		client.setPreset("a");
+	}
+	if(key=='3'){
+		client.deletePreset("a");
+	}
+
+	if(key=='4'){
+		vector<string> params = client.getPresetsList();
+		cout << "presets list" << endl;
+ 		for(int i = 0; i < params.size(); i++){
+			cout << params[i] << endl;
+		}
+	}
+
+	if(key==' '){
+		client.sendUpdatedParam("x");
+		client.sendUpdatedParam("y");
+		client.sendUpdatedParam("drawOutlines");
+	}
+
 }

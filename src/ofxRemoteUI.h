@@ -24,6 +24,7 @@ using namespace std;
 #define OFX_REMOTEUI_SETTINGS_FILENAME		"ofxRemoteUISettings.xml"
 #define OFX_REMOTEUI_XML_TAG				"OFX_REMOTE_UI_PARAMS"
 #define DEFAULT_PARAM_GROUP					"defaultGroup"
+#define OFX_REMOTEUI_PRESET_DIR				"ofxRemoteUIPresets"
 
 
 //easy param sharing macro, share from from anywhere!
@@ -33,13 +34,14 @@ using namespace std;
 #define OFX_REMOTEUI_SERVER_SETUP(port, ...)			( ofxRemoteUIServer::instance()->setup(port, ##__VA_ARGS__) )
 #define OFX_REMOTEUI_SERVER_UPDATE(deltaTime)			( ofxRemoteUIServer::instance()->update(deltaTime) )
 #define OFX_REMOTEUI_SERVER_CLOSE()						( ofxRemoteUIServer::instance()->close() )
-#define	OFX_REMOTEUI_SERVER_SAVE_TO_XML()				( ofxRemoteUIServer::instance()->saveToXML() )
-#define	OFX_REMOTEUI_SERVER_LOAD_FROM_XML()				( ofxRemoteUIServer::instance()->loadFromXML() )
+#define	OFX_REMOTEUI_SERVER_SAVE_TO_XML()				( ofxRemoteUIServer::instance()->saveToXML(OFX_REMOTEUI_SETTINGS_FILENAME) )
+#define	OFX_REMOTEUI_SERVER_LOAD_FROM_XML()				( ofxRemoteUIServer::instance()->loadFromXML(OFX_REMOTEUI_SETTINGS_FILENAME) )
 
 /*
 
  // COMM /////////////////////////
 
+ // init / setup connection /////
  CLIENT:	HELO								//client says HI
  SERVER:	HELO								//server says HI
  CLIENT:	REQU								//client requests all params from server
@@ -48,13 +50,32 @@ using namespace std;
  SERVER:	SEND BOL PARAM_NAME3 val (bool)
  SERVER:	SEND STR PARAM_NAME4 val (string)
  ...
+ CLIENT:	PREL								//Preset List - client requests list of presets
+ SERVER:	PREL PRESET_NAME_LIST(n)			//server sends all preset names
+ ...
+
+ // normal operation //////////
  CLIENT:	SEND TYP VAR_NAME val (varType)		//client sends a var change to server
  ...
  CLIENT:	TEST								//every second, client sends a msg to server to measure delay
- SERVER:	TEST
- CLIENT:	TEST								//TODO? server doesnt need to know about latency... so maybe we dont do this
+ SERVER:	TEST								//server replies
  ...
+ CLIENT:	SETP PRESET_NAME					//Set Preset - client wants to change all params according to preset "X"
+ SERVER:	SETP OK								//server says ok
+ CLIENT:	REQU								//client wants values for that preset
+ SERVER:	SEND *****							//server sends all params
+ ...
+ CLIENT:    SAVP PRESET_NAME					//Save Preset - client wants to save current params as a preset named PRESET_NAME
+ SERVER:	SAVP OK								//server OK
+ CLIENT:	PREL								//Client requests full list of presets
+ SERVER:	PREL PRESET_NAME_LIST(n)			//server sends all preset names
+ ...
+ CLIENT:	DELP PRESET_NAME					//client wants to delete preset named PRESET_NAME
+ SERVER:	DELP OK								//server says ok
+ CLIENT:	PREL								//Client requests full list of presets
+ SERVER:	PREL PRESET_NAME_LIST(n)			//server sends all preset names
 
+ // closing connection ////////
  CLIENT:	CIAO								//client disconnects - not really needed? TODO
  SERVER:	CIAO								//server disconnects - not really needed? TODO
 
@@ -94,7 +115,8 @@ enum RemoteUIParamType{
 };
 
 enum ActionType{
-	HELO_ACTION, REQUEST_ACTION, SEND_ACTION, CIAO_ACTION, TEST_ACTION
+	HELO_ACTION, REQUEST_ACTION, SEND_ACTION, CIAO_ACTION, TEST_ACTION, PRESET_LIST_ACTION,
+	SET_PRESET_ACTION, SAVE_PRESET_ACTION, DELETE_PRESET_ACTION
 };
 
 enum ArgType{
@@ -193,10 +215,15 @@ public:
 	vector<string> getAllParamNamesList();
 	vector<string> getChangedParamsList(); //in user add order
 	RemoteUIParam getParamForName(string paramName);
+	vector<string> getPresetsList();
 	
+	string getValuesAsString();
+	void setValuesFromString( string values );	
 
 	bool ready();
 	float connectionLag();
+
+	virtual void sendParamUpdate(RemoteUIParam p, string paramName){};
 
 protected:
 
@@ -216,10 +243,14 @@ protected:
 	void sendHELLO();
 	void sendCIAO();
 	void sendTEST();
+	void sendPREL(vector<string> presetNames);
+	void sendSAVP(string presetName);
+	void sendSETP(string presetName);
+	void sendDELP(string presetName);
 
 	bool							readyToSend;
-	ofxOscSender					sender;
-	ofxOscReceiver					receiver;
+	ofxOscSender					oscSender;
+	ofxOscReceiver					oscReceiver;
 
 	float							time;
 	float							timeSinceLastReply;
@@ -231,9 +262,9 @@ protected:
 
 	map<string, RemoteUIParam>		params;
 	map<int, string>				orderedKeys; // used to keep the order in which the params were added
+	vector<string>					presetNames;
 
 	set<string>						paramsChangedSinceLastCheck;
-
 
 private:
 

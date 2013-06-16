@@ -31,8 +31,8 @@ public:
 	void setup(int port = OFXREMOTEUI_PORT, float updateInterval = 0.1/*sec*/);
 	void update(float dt);
 	void close();
-	void loadFromXML();
-	void saveToXML();
+	void loadFromXML(string fileName);
+	void saveToXML(string fileName);
 
 	void shareParam(string paramName, float* param, float min, float max, ofColor bgColor = ofColor(0,0,0,0) );
 	void shareParam(string paramName, bool* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
@@ -48,6 +48,8 @@ private:
 	ofxRemoteUIServer(); // use ofxRemoteUIServer::instance() instead!
 	static ofxRemoteUIServer* singleton;
 	void setColorForParam(RemoteUIParam &p, ofColor c);
+	vector<string> getAvailablePresets();
+	void deletePreset(string name);
 
 	bool colorSet; //if user called setParamColor()
 	ofColor paramColor;

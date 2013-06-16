@@ -8,6 +8,8 @@
 
 #include "ofxRemoteUIServer.h"
 #include <iostream>
+#include <algorithm>
+#include <string>
 
 ofxRemoteUIServer* ofxRemoteUIServer::singleton = NULL;
 
@@ -27,6 +29,9 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	waitingForReply = false;
 	colorSet = false;
 	upcomingGroup = DEFAULT_PARAM_GROUP;
+	ofDirectory d;
+	d.open(OFX_REMOTEUI_PRESET_DIR);
+	d.create(true);
 }
 
 
@@ -46,7 +51,7 @@ void ofxRemoteUIServer::setParamColor( ofColor c ){
 }
 
 
-void ofxRemoteUIServer::saveToXML(){
+void ofxRemoteUIServer::saveToXML(string fileName){
 
 	ofxXmlSettings s;
 	s.loadFile(OFX_REMOTEUI_SETTINGS_FILENAME);
@@ -92,14 +97,14 @@ void ofxRemoteUIServer::saveToXML(){
 				break;
 		}
 	}
-	s.saveFile(OFX_REMOTEUI_SETTINGS_FILENAME);
+	s.saveFile(fileName);
 }
 
 
-void ofxRemoteUIServer::loadFromXML(){
+void ofxRemoteUIServer::loadFromXML(string fileName){
 
 	ofxXmlSettings s;
-	bool exists = s.loadFile(OFX_REMOTEUI_SETTINGS_FILENAME);
+	bool exists = s.loadFile(fileName);
 
 	if (exists){
 
@@ -193,7 +198,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	avgTimeSinceLastReply = timeSinceLastReply = time = 0.0f;
 	port = port_;
 	cout << "ofxRemoteUIClient listening at port " << port << " ... " << endl;
-	receiver.setup(port);
+	oscReceiver.setup(port);
 }
 
 void ofxRemoteUIServer::update(float dt){
@@ -209,10 +214,10 @@ void ofxRemoteUIServer::update(float dt){
 		}
 	}
 
-	while( receiver.hasWaitingMessages() ){// check for waiting messages from client
+	while( oscReceiver.hasWaitingMessages() ){// check for waiting messages from client
 
 		ofxOscMessage m;
-		receiver.getNextMessage(&m);
+		oscReceiver.getNextMessage(&m);
 
 		if (!readyToSend){ // if not connected, connect to our friend so we can talk back
 			connect(m.getRemoteIp(), port + 1);
@@ -251,9 +256,60 @@ void ofxRemoteUIServer::update(float dt){
 				//cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " says TEST!" << endl;
 				break;
 
+			case PRESET_LIST_ACTION: //client wants us to send a list of all available presets
+				presetNames = getAvailablePresets();
+				cout << "ofxRemoteUIServer: sending preset LIST" << endl;
+				sendPREL(presetNames);
+				break;
+				
+			case SET_PRESET_ACTION:{ // client wants to set a preset
+				//presetNames = getAvailablePresets();
+				string presetName = m.getArgAsString(0);
+				loadFromXML(string(OFX_REMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
+				cout << "ofxRemoteUIServer: setting preset: " << presetName << endl;
+				}break;
+
+			case SAVE_PRESET_ACTION:{ //client wants to save current xml as a new preset
+				string presetName = m.getArgAsString(0);
+				cout << "ofxRemoteUIServer: saving NEW preset: " << presetName << endl;
+				saveToXML(string(OFX_REMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
+				}break;
+
+			case DELETE_PRESET_ACTION:{
+				string presetName = m.getArgAsString(0);
+				cout << "ofxRemoteUIServer: DELETE preset: " << presetName << endl;
+				deletePreset(presetName);
+				}break;
+
 			default: cout << "ofxRemoteUIServer::update >> ERR!" <<endl; break;
 		}
 	}
+}
+
+void ofxRemoteUIServer::deletePreset(string name){
+	ofDirectory dir;
+	dir.open(string(OFX_REMOTEUI_PRESET_DIR) + "/" + name + ".xml");
+	dir.remove(true);
+}
+
+vector<string> ofxRemoteUIServer::getAvailablePresets(){
+
+	vector<string> presets;
+	ofDirectory dir;
+	dir.listDir(ofToDataPath(OFX_REMOTEUI_PRESET_DIR));
+	vector<ofFile> files = dir.getFiles();
+	for(int i = 0; i < files.size(); i++){
+		string fileName = files[i].getFileName();
+		string extension = files[i].getExtension();
+		std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+
+		if (files[i].isFile() && extension == "xml"){
+			cout << "preset name: " << fileName << endl;
+			string presetName = fileName.substr(0, fileName.size()-4);
+			presets.push_back(presetName);
+		}
+	}
+	return presets;
 }
 
 void ofxRemoteUIServer::setColorForParam(RemoteUIParam &p, ofColor c){
@@ -328,7 +384,7 @@ void ofxRemoteUIServer::connect(string ipAddress, int port){
 	avgTimeSinceLastReply = timeSinceLastReply = time = 0.0f;
 	waitingForReply = false;
 	//params.clear();
-	sender.setup(ipAddress, port);
+	oscSender.setup(ipAddress, port);
 	readyToSend = true;
 }
 

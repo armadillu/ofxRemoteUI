@@ -29,6 +29,9 @@ public:
 	void update(float dt);
 	void requestCompleteUpdate();
 	void sendParamUpdate(RemoteUIParam p, string paramName);
+	void setPreset(string preset);
+	void savePresetWithName(string presetName);
+	void deletePreset(string presetName);
 
 	//by doing this you allow ofxRemoteUIClient to modify your params
 	//you can find out which params got changed by calling getChangedParamsList()
@@ -46,14 +49,10 @@ public:
 	bool isReadyToSend();
 	bool hasReceivedUpdate();
 
-	string getValuesAsString();
-	void setValuesFromString( string values );
-
-
-
 private:
 
 	void sendREQUEST(); //a request for a complete list of server params
+	void fillPresetListFromMessage(ofxOscMessage m);
 
 	string					host;
 	bool					gotNewInfo;
