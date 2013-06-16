@@ -48,6 +48,7 @@ struct LayoutConfig{
 	vector<string> orderedKeys; // used to keep the order in which the items were added
 
 	ofxRemoteUIClient * client;
+
 	NSTimer * timer;
 	NSTimer * statusTimer;
 	LayoutConfig lastLayout;
@@ -56,6 +57,10 @@ struct LayoutConfig{
 	string currentPreset;
 
 	BOOL launched;
+
+@public
+
+	bool needFullParamsUpdate;
 }
 
 -(ofxRemoteUIClient *)getClient;
@@ -76,7 +81,7 @@ struct LayoutConfig{
 
 -(void)update;
 
--(BOOL)fullParamsUpdate;
+-(void)fullParamsUpdate;
 -(void)partialParamsUpdate;
 
 -(void)userChangedParam:(RemoteUIParam)p paramName:(string)name; //this is a delegate method, items will call this on widgetChange

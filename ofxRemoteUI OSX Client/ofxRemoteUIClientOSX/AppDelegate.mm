@@ -15,14 +15,17 @@ void clientCallback(RemoteUICallBackArg a){
 	AppDelegate * me = [NSApp delegate];
 	switch (a) {
 		case PARAMS_UPDATED:
-			NSLog(@"## Callback: PARAMS_UPDATED");
-			[me fullParamsUpdate];
+			//NSLog(@"## Callback: PARAMS_UPDATED");
+			if(me->needFullParamsUpdate){ //a bit ugly here...
+				[me fullParamsUpdate];
+				me->needFullParamsUpdate = NO;
+			}
 			[me partialParamsUpdate];
 			[me updateGroupPopup];
 			break;
 
 		case PRESETS_UPDATED:{
-			NSLog(@"## Callback: PRESETS_UPDATED");
+			//NSLog(@"## Callback: PRESETS_UPDATED");
 			vector<string> list = [me getClient]->getPresetsList();
 			if ( list.size() > 0 ){
 				[me updatePresetsPopup];
@@ -30,7 +33,7 @@ void clientCallback(RemoteUICallBackArg a){
 			}break;
 
 		case SERVER_DISCONNECTED:{
-			NSLog(@"## Callback: SERVER_DISCONNECTED");
+			//NSLog(@"## Callback: SERVER_DISCONNECTED");
 		}break;
 
 		default:
@@ -209,15 +212,15 @@ void clientCallback(RemoteUICallBackArg a){
 
 
 
--(BOOL)fullParamsUpdate{
+-(void)fullParamsUpdate{
 
 	[self cleanUpGUIParams];
 
 	vector<string> paramList = client->getAllParamNamesList();
-	vector<string> updatedParamsList = client->getChangedParamsList();
+	//vector<string> updatedParamsList = client->getChangedParamsList();
 
-	NSLog(@"Client holds %d params so far", (int) paramList.size());
-	NSLog(@"Client reports %d params changed since last check", (int)updatedParamsList.size());
+	//NSLog(@"Client holds %d params so far", (int) paramList.size());
+	//NSLog(@"Client reports %d params changed since last check", (int)updatedParamsList.size());
 
 	if(paramList.size() > 0 /*&& updatedParamsList.size() > 0*/){
 
@@ -237,9 +240,6 @@ void clientCallback(RemoteUICallBackArg a){
 			}
 		}
 		[self layoutWidgetsWithConfig: [self calcLayoutParams]];
-		return YES;
-	}else{
-		return NO;
 	}
 }
 
@@ -470,13 +470,13 @@ void clientCallback(RemoteUICallBackArg a){
 	string prest = [preset UTF8String];
 	client->setPreset(prest);
 	currentPreset = prest;
-	NSLog(@"user chose preset: %@", preset );
+	//NSLog(@"user chose preset: %@", preset );
 }
 
 
 -(IBAction)userAddPreset:(id)sender{
 	NSString * newPreset = [self showAlertWithInput:@"Add a new Preset" defaultValue:@"myPreset"];
-	NSLog(@"user add preset: %@", newPreset);
+	//NSLog(@"user add preset: %@", newPreset);
 	if(newPreset != nil){
 		currentPreset = [newPreset UTF8String];
 		client->savePresetWithName([newPreset UTF8String]);
@@ -489,7 +489,7 @@ void clientCallback(RemoteUICallBackArg a){
 	if (index == 0) return; //empty preset does nothing, cant be deleted
 
 	NSString * preset = [[presetsMenu itemAtIndex:index] title];
-	NSLog(@"user delete preset: %@", preset );
+	//NSLog(@"user delete preset: %@", preset );
 	client->deletePreset([preset UTF8String]);
 	currentPreset = "";
 }
@@ -507,9 +507,9 @@ void clientCallback(RemoteUICallBackArg a){
     [groupsMenu addItemsWithTitles: menuItemNameArray];
 }
 
+
 -(void)updatePresetsPopup{
 
-	NSLog(@"updatePresetsPopup");
 	NSMutableArray *menuItemNameArray = [NSMutableArray arrayWithCapacity:4];
 	vector<string> presetsList = client->getPresetsList();
 	[menuItemNameArray addObject: DIRTY_PRESET_NAME ];
@@ -529,7 +529,6 @@ void clientCallback(RemoteUICallBackArg a){
 		[presetsMenu selectItemAtIndex:0];
 	}
 }
-
 
 
 -(IBAction)filterType:(id)sender{
@@ -598,7 +597,7 @@ void clientCallback(RemoteUICallBackArg a){
 		[self performSelector:@selector(pressedSync:) withObject:nil afterDelay:REFRESH_RATE];
 		[progress startAnimation:self];
 		lagField.stringValue = @"";
-		client->update(REFRESH_RATE);
+		needFullParamsUpdate = YES;
 
 	}else{ // let's disconnect
 		//NSLog(@"disconnecting");
@@ -667,8 +666,6 @@ void clientCallback(RemoteUICallBackArg a){
 
 		if(updateContinuosly){
 			client->requestCompleteUpdate();
-			//[self partialParamsUpdate];
-			[self performSelector:@selector(partialParamsUpdate) withObject:nil afterDelay: 0];
 		}
 
 		if(!client->isReadyToSend()){	//if the other side disconnected, or error

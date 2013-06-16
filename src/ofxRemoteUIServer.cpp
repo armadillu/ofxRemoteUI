@@ -240,7 +240,7 @@ void ofxRemoteUIServer::update(float dt){
 			}
 				break;
 
-			case SEND_ACTION:{ //client is sending us an updated val
+			case SEND_PARAM_ACTION:{ //client is sending us an updated val
 				//cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " sends SEND!"  << endl;
 				updateParamFromDecodedMessage(m, dm);
 			}
@@ -259,7 +259,6 @@ void ofxRemoteUIServer::update(float dt){
 
 			case PRESET_LIST_ACTION: //client wants us to send a list of all available presets
 				presetNames = getAvailablePresets();
-				cout << "ofxRemoteUIServer: sending preset LIST" << endl;
 				if (presetNames.size() == 0){
 					presetNames.push_back(OFX_REMOTEUI_NO_PRESETS);
 				}
@@ -301,7 +300,6 @@ void ofxRemoteUIServer::deletePreset(string name){
 
 vector<string> ofxRemoteUIServer::getAvailablePresets(){
 
-	cout << "getAvailablePresets" << endl;
 	vector<string> presets;
 	ofDirectory dir;
 	dir.listDir(ofToDataPath(OFX_REMOTEUI_PRESET_DIR));
