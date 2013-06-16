@@ -16,7 +16,7 @@ Also, the OSX client allows to copy all params as plain text. You can also paste
 
 [demo video](http://youtu.be/e6mzo8YavoM)
 
-![OSX Client](http://farm8.staticflickr.com/7419/9060718938_86604273e5_o.png "OSX Client")
+![OSX Client](http://farm4.staticflickr.com/3721/9062611508_e86273db52_o.png "OSX Client")
 
 ### How to use
 
