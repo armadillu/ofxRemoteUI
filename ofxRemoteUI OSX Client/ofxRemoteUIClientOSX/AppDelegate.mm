@@ -9,6 +9,7 @@
 #import "Item.h"
 #import "AppDelegate.h"
 
+//ofxRemoteUIClient callback entry point
 void clientCallback(RemoteUICallBackArg a){
 
 	AppDelegate * me = [NSApp delegate];
@@ -477,8 +478,6 @@ void clientCallback(RemoteUICallBackArg a){
 	NSString * newPreset = [self showAlertWithInput:@"Add a new Preset" defaultValue:@"myPreset"];
 	NSLog(@"user add preset: %@", newPreset);
 	if(newPreset != nil){
-
-		//[presetsMenu selectItemWithTitle:newPreset];
 		currentPreset = [newPreset UTF8String];
 		client->savePresetWithName([newPreset UTF8String]);
 	}
@@ -492,8 +491,7 @@ void clientCallback(RemoteUICallBackArg a){
 	NSString * preset = [[presetsMenu itemAtIndex:index] title];
 	NSLog(@"user delete preset: %@", preset );
 	client->deletePreset([preset UTF8String]);
-	[presetsMenu removeItemAtIndex:index];
-	[presetsMenu selectItemAtIndex:0]; //select "no preset"
+	currentPreset = "";
 }
 
 
@@ -523,8 +521,12 @@ void clientCallback(RemoteUICallBackArg a){
     [presetsMenu removeAllItems];
     [presetsMenu addItemsWithTitles: menuItemNameArray];
 	NSString* selPres = [NSString stringWithFormat:@"%s", currentPreset.c_str()];
-	if ([menuItemNameArray containsObject:selPres]) {
-		[presetsMenu selectItemWithTitle:selPres];
+	if ([selPres length] > 0){
+		if ([menuItemNameArray containsObject:selPres]) {
+			[presetsMenu selectItemWithTitle:selPres];
+		}
+	}else{
+		[presetsMenu selectItemAtIndex:0];
 	}
 }
 

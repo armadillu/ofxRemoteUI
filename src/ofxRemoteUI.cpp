@@ -62,7 +62,7 @@ DecodedMessage ofxRemoteUI::decode(ofxOscMessage m){
 		else
 			if (action == "REQU") dm.action = REQUEST_ACTION;
 			else
-				if (action == "SEND") dm.action = SEND_ACTION;
+				if (action == "SEND") dm.action = SEND_PARAM_ACTION;
 				else
 					if (action == "CIAO") dm.action = CIAO_ACTION;
 					else
@@ -422,7 +422,7 @@ void ofxRemoteUI::sendPREL( vector<string> presetNames_ ){
 	ofxOscMessage m;
 	m.setAddress("PREL");
 	if (presetNames_.size() == 0){ // if we are the client requesting a preset list, delete our current list
-		presetNames.clear();		
+		presetNames.clear();
 		m.addStringArg("OK");
 	}
 	for(int i = 0; i < presetNames_.size(); i++){

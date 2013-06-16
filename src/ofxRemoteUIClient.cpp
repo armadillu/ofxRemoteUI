@@ -87,7 +87,7 @@ void ofxRemoteUIClient::update(float dt){
 				callBack(PARAMS_UPDATED);
 				break;
 
-			case SEND_ACTION:{ //server is sending us an updated val
+			case SEND_PARAM_ACTION:{ //server is sending us an updated val
 					//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " sends us a param update SEND!"  << endl;
 					updateParamFromDecodedMessage(m, dm);
 					gotNewInfo = true;
@@ -122,16 +122,19 @@ void ofxRemoteUIClient::update(float dt){
 			case SET_PRESET_ACTION: // server confirms that it has set the preset, request a full update
 				cout << "ofxRemoteUIClient:: SET_PRESET_ACTION OK!" << endl;
 				requestCompleteUpdate();
+				callBack(PRESETS_UPDATED);
 				break;
 
 			case SAVE_PRESET_ACTION:{ // server confirms that it has save the preset,
 				vector<string> a;
-				//sendPREL(a); //request preset list to server, send empty vector
+				sendPREL(a); //request preset list to server, send empty vector
+				//callBack(PRESETS_UPDATED);
 				}break;
 
 			case DELETE_PRESET_ACTION:{ // server confirms that it has deleted preset
 				vector<string> a;
-				//sendPREL(a); //request preset list to server, send empty vector
+				sendPREL(a); //request preset list to server, send empty vector
+				//callBack(PRESETS_UPDATED);
 				}break;
 
 			default: cout << "ofxRemoteUIClient::update >> ERR!" <<endl; break;
@@ -158,7 +161,7 @@ void ofxRemoteUIClient::deletePreset(string presetName){
 
 void ofxRemoteUIClient::fillPresetListFromMessage(ofxOscMessage m){
 
-	cout << "ofxRemoteUIClient got list of presets: "<< endl;
+	//cout << "ofxRemoteUIClient got list of presets: "<< endl;
 	int n = m.getNumArgs();
 
 	//check if server has no presets at all
@@ -170,7 +173,7 @@ void ofxRemoteUIClient::fillPresetListFromMessage(ofxOscMessage m){
 	presetNames.clear();
 	for(int i = 0; i < n; i++){
 		presetNames.push_back( m.getArgAsString(i));
-		cout << m.getArgAsString(i) << endl;
+		//cout << m.getArgAsString(i) << endl;
 	}
 }
 
