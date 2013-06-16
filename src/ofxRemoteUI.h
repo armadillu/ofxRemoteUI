@@ -49,6 +49,7 @@ using namespace std;
  SERVER:	SEND INT PARAM_NAME2 val (int)
  SERVER:	SEND BOL PARAM_NAME3 val (bool)
  SERVER:	SEND STR PARAM_NAME4 val (string)
+ SERVER:	REQU OK								//server closes REQU
  ...
  CLIENT:	PREL								//Preset List - client requests list of presets
  SERVER:	PREL PRESET_NAME_LIST(n)			//server sends all preset names
@@ -64,9 +65,11 @@ using namespace std;
  SERVER:	SETP OK								//server says ok
  CLIENT:	REQU								//client wants values for that preset
  SERVER:	SEND *****							//server sends all params
+ SERVER:	REQU OK
  ...
  CLIENT:    SAVP PRESET_NAME					//Save Preset - client wants to save current params as a preset named PRESET_NAME
- SERVER:	SAVP OK								//server OK
+												//overwrites if already exists
+ SERVER:	SAVP OK								//server replies OK
  CLIENT:	PREL								//Client requests full list of presets
  SERVER:	PREL PRESET_NAME_LIST(n)			//server sends all preset names
  ...
@@ -76,8 +79,8 @@ using namespace std;
  SERVER:	PREL PRESET_NAME_LIST(n)			//server sends all preset names
 
  // closing connection ////////
- CLIENT:	CIAO								//client disconnects - not really needed? TODO
- SERVER:	CIAO								//server disconnects - not really needed? TODO
+ CLIENT:	CIAO								//client disconnects
+ SERVER:	CIAO								//server disconnects
 
  
 
