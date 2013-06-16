@@ -505,6 +505,11 @@ void clientCallback(RemoteUICallBackArg a){
 	}
     [groupsMenu removeAllItems];
     [groupsMenu addItemsWithTitles: menuItemNameArray];
+	if(currentGroup.size() > 0){
+		[groupsMenu selectItemWithTitle:[NSString stringWithFormat:@"%s",currentGroup.c_str()] ];
+	}else{
+		[groupsMenu selectItemAtIndex:0];
+	}
 }
 
 
