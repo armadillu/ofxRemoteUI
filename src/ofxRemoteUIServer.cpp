@@ -63,6 +63,7 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 	int numInts = 0;
 	int numStrings = 0;
 	int numBools = 0;
+	int numEnums = 0;
 
 	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		string key = (*ii).first;
@@ -79,6 +80,12 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 				s.setValue("REMOTEUI_PARAM_INT", (int)*t.intValAddr, numInts);
 				s.setAttribute("REMOTEUI_PARAM_INT", "paramName", key, numInts);
 				numInts++;
+				break;
+			case REMOTEUI_PARAM_ENUM:
+				cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.intValAddr <<") to XML" << endl;
+				s.setValue("REMOTEUI_PARAM_ENUM", (int)*t.intValAddr, numInts);
+				s.setAttribute("REMOTEUI_PARAM_ENUM", "paramName", key, numInts);
+				numEnums++;
 				break;
 			case REMOTEUI_PARAM_BOOL:
 				cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.boolValAddr <<") to XML" << endl;
@@ -148,6 +155,26 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 					}
 				}
 			}
+
+			int numEnums = s.getNumTags("REMOTEUI_PARAM_ENUM");
+			if(numInts > 0){
+				for (int i=0; i< numInts; i++){
+					string paramName = s.getAttribute("REMOTEUI_PARAM_ENUM", "paramName", "", i);
+					float val = s.getValue("REMOTEUI_PARAM_ENUM", 0, i);
+					map<string,RemoteUIParam>::iterator it = params.find(paramName);
+					if ( it != params.end() ){	// found!
+						if(params[paramName].intValAddr != NULL){
+							*params[paramName].intValAddr = val;
+							params[paramName].intVal = val;
+							*params[paramName].intValAddr = ofClamp(*params[paramName].intValAddr, params[paramName].minInt, params[paramName].maxInt);
+							cout << "ofxRemoteUIServer loading an ENUM '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" << endl;
+						}else{
+							cout << "ofxRemoteUIServer ERROR at loading ENUM (" << paramName << ")" << endl;
+						}
+					}
+				}
+			}
+
 
 			int numBools = s.getNumTags("REMOTEUI_PARAM_BOOL");
 			if(numBools > 0){
@@ -365,6 +392,21 @@ void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int ma
 	p.intVal = *param;
 	p.maxInt = max;
 	p.minInt = min;
+	p.group = upcomingGroup;
+	setColorForParam(p, c);
+	p.intVal = *param = ofClamp(*param, min, max);
+	addParamToDB(p, paramName);
+	cout << "ofxRemoteUIServer Sharing Param '" << paramName << "'" << endl;
+}
+
+void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int max, vector<string> names, ofColor c ){
+	RemoteUIParam p;
+	p.type = REMOTEUI_PARAM_ENUM;
+	p.intValAddr = param;
+	p.intVal = *param;
+	p.maxInt = max;
+	p.minInt = min;
+	p.enumList = names;
 	p.group = upcomingGroup;
 	setColorForParam(p, c);
 	p.intVal = *param = ofClamp(*param, min, max);

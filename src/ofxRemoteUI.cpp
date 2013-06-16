@@ -90,6 +90,10 @@ DecodedMessage ofxRemoteUI::decode(ofxOscMessage m){
 				if (arg1 == "BOL") dm.argument = BOL_ARG;
 				else
 					if (arg1 == "STR") dm.argument = STR_ARG;
+					else
+						if (arg1 == "ENU") dm.argument = ENUM_ARG;
+
+
 	}
 
 	if (msgAddress.length() >= 9) {
@@ -136,6 +140,23 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 			//cout << "updated " << dm.paramName << "to a new value: " << p.intVal << endl;
 			if (p.intValAddr){
 				*p.intValAddr = p.intVal;
+			}break;
+
+		case ENUM_ARG:{
+			p.type = REMOTEUI_PARAM_ENUM;
+			p.intVal = m.getArgAsInt32(arg); arg++;
+			p.minInt = m.getArgAsInt32(arg); arg++;
+			p.maxInt = m.getArgAsInt32(arg); arg++;
+			//cout << "updated " << dm.paramName << "to a new value: " << p.intVal << endl;
+			if (p.intValAddr){
+				*p.intValAddr = p.intVal;
+			}
+			int n = m.getNumArgs() - 5 - 3; // 3 >> the int vals, 5 >> 4 colors + 1 group
+			int i = 0;
+			for (i = 0; i < n; i++) {
+				p.enumList.push_back( m.getArgAsString(arg + i) );
+			}
+			arg = arg + i;
 			}break;
 
 		case BOL_ARG:
@@ -232,10 +253,12 @@ void ofxRemoteUI::syncParamToPointer(string paramName){
 				p.floatVal = *p.floatValAddr;
 			}break;
 
+		case REMOTEUI_PARAM_ENUM:
 		case REMOTEUI_PARAM_INT:
 			if (p.intValAddr){
 				p.intVal = *p.intValAddr;
 			}break;
+
 
 		case REMOTEUI_PARAM_BOOL:
 			if (p.boolValAddr){
@@ -259,28 +282,25 @@ bool ofxRemoteUI::hasParamChanged(RemoteUIParam p){
 			if (p.floatValAddr){
 				if (*p.floatValAddr != p.floatVal) return true; else return false;
 			}
-			//cout << "RemoteUIParam REMOTEUI_PARAM_FLOAT missing reference" << endl;
 			return false;
 
+		case REMOTEUI_PARAM_ENUM:
 		case REMOTEUI_PARAM_INT:
 			if (p.intValAddr){
 				if (*p.intValAddr != p.intVal) return true; else return false;
 			}
-			//cout << "RemoteUIParam REMOTEUI_PARAM_INT missing reference" << endl;
 			return false;
 
 		case REMOTEUI_PARAM_BOOL:
 			if (p.boolValAddr){
 				if (*p.boolValAddr != p.boolVal) return true; else return false;
 			}
-			//cout << "RemoteUIParam REMOTEUI_PARAM_BOOL missing reference" << endl;
 			return false;
 
 		case REMOTEUI_PARAM_STRING:
 			if (p.stringValAddr){
 				if (*p.stringValAddr != p.stringVal) return true; else return false;
 			}
-			//cout << "RemoteUIParam REMOTEUI_PARAM_STRING missing reference" << endl;
 			return false;
 
 	}
@@ -293,6 +313,7 @@ string ofxRemoteUI::stringForParamType(RemoteUIParamType t){
 	switch (t) {
 		case REMOTEUI_PARAM_FLOAT: return "FLT";
 		case REMOTEUI_PARAM_INT: return "INT";
+		case REMOTEUI_PARAM_ENUM: return "ENU";
 		case REMOTEUI_PARAM_BOOL: return "BOL";
 		case REMOTEUI_PARAM_STRING: return "STR";
 	}
@@ -324,13 +345,12 @@ string ofxRemoteUI::getValuesAsString(){
 		switch (param.type) {
 			case REMOTEUI_PARAM_FLOAT: out << param.floatVal << endl; break;
 			case REMOTEUI_PARAM_INT: out << param.intVal << endl; break;
+			case REMOTEUI_PARAM_ENUM: out << param.intVal << endl; break;
 			case REMOTEUI_PARAM_BOOL: out << (param.boolVal?"1":"0") << endl; break;
 			case REMOTEUI_PARAM_STRING: out << UriEncode(param.stringVal) << endl; break;
 		}
-
 		++it;
 	}
-
 	return out.str();
 }
 
@@ -354,6 +374,7 @@ void ofxRemoteUI::setValuesFromString( string values ){
 			switch (param.type) {
 				case REMOTEUI_PARAM_FLOAT: valstr >> param.floatVal; break;
 				case REMOTEUI_PARAM_INT: valstr >> param.intVal; break;
+				case REMOTEUI_PARAM_ENUM: valstr >> param.intVal; break;
 				case REMOTEUI_PARAM_BOOL: valstr >> param.boolVal; break;
 				case REMOTEUI_PARAM_STRING: param.stringVal = valstr.str(); break;
 			}
@@ -388,6 +409,12 @@ void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
 		case REMOTEUI_PARAM_INT: m.addIntArg(p.intVal); m.addIntArg(p.minInt); m.addIntArg(p.maxInt); break;
 		case REMOTEUI_PARAM_BOOL: m.addIntArg(p.boolVal ? 1 : 0); /*cout << "sending bool" << endl; */ break;
 		case REMOTEUI_PARAM_STRING: m.addStringArg(p.stringVal); /*cout << "sending string" << endl; */ break;
+		case REMOTEUI_PARAM_ENUM:{
+			m.addIntArg(p.intVal); m.addIntArg(p.minInt); m.addIntArg(p.maxInt);
+			for (int i = 0; i < p.enumList.size(); i++) {
+				m.addStringArg(p.enumList[i]);
+			}
+			}break;
 	}
 	m.addIntArg(p.r); m.addIntArg(p.g); m.addIntArg(p.b); m.addIntArg(p.a); // set bg color!
 	m.addStringArg(p.group);

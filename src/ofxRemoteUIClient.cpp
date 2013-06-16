@@ -181,8 +181,6 @@ void ofxRemoteUIClient::trackParam(string paramName, float* param){
 		}
 	}
 	p.floatValAddr = param;
-	
-	//params[paramName] = p;
 	addParamToDB(p, paramName);
 }
 
@@ -199,7 +197,22 @@ void ofxRemoteUIClient::trackParam(string paramName, int* param){
 		}
 	}
 	p.intValAddr = param;
-	//params[paramName] = p;
+	addParamToDB(p, paramName);
+}
+
+
+void ofxRemoteUIClient::trackParam(string paramName, int* param, vector<string> list){ //TODO!
+	RemoteUIParam p;
+	map<string,RemoteUIParam>::iterator it = params.find(paramName);
+	if ( it == params.end() ){	//not found! we add it
+		p.type = REMOTEUI_PARAM_ENUM;
+	}else{
+		p = params[paramName];
+		if (p.type != REMOTEUI_PARAM_ENUM ){
+			cout << "wtf called trackParam(int) on a param that's not a int!" << endl;
+		}
+	}
+	p.intValAddr = param;
 	addParamToDB(p, paramName);
 }
 
@@ -216,7 +229,6 @@ void ofxRemoteUIClient::trackParam(string paramName, string* param){
 		}
 	}
 	p.stringValAddr = param;
-	//params[paramName] = p;
 	addParamToDB(p, paramName);
 }
 
@@ -233,7 +245,6 @@ void ofxRemoteUIClient::trackParam(string paramName, bool* param){
 		}
 	}
 	p.boolValAddr = param;
-	//params[paramName] = p;
 	addParamToDB(p, paramName);
 }
 

@@ -1,7 +1,7 @@
 # ofxRemoteUI
 
 
-OF addon allows you to serve any variables you want (bool, float, int, string) on the network, so that you can modify them remotely. Uses server client architecture, where your app is the server. It communicates both ways; you can modify your project's variables from the client, but you can also pull your app's variable values from the client; this way you can track values that evolve programatically.
+OF addon allows you to serve any variables you want (bool, float, int, enum, string) on the network, so that you can modify them remotely. Uses server client architecture, where your app is the server. It communicates both ways; you can modify your project's variables from the client, but you can also pull your app's variable values from the client; this way you can track values that evolve programatically.
 
 It's OSC based, and it includes a native OSX Client. The Native OSX Client allows param colorization for better clarity, and live param filtering. It also supports grouping the params into categories, to filter them by category in the OSX Client.
 
@@ -49,7 +49,9 @@ Then tell the server to share them:
 		OFX_REMOTEUI_SERVER_SAVE_TO_XML();	//save values to XML
 	}
 
-And use the supplied OSX Client to view and edit them
+And use the supplied OSX Client to view and edit them.
+
+Note: right now, enums need to be consecutive, so that each enum item is ++1 the previous one.
 
 PD: to use ofxOsc in your project, which ofxRemoteUI requires, you wil need to add this to you project's header search paths:
 

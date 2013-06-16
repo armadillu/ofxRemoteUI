@@ -34,6 +34,7 @@ void clientCallback(RemoteUICallBackArg a){
 
 		case SERVER_DISCONNECTED:{
 			//NSLog(@"## Callback: SERVER_DISCONNECTED");
+			[me connect];
 		}break;
 
 		default:

@@ -44,6 +44,7 @@ public:
 	void trackParam(string paramName, bool* param); 
 	void trackParam(string paramName, int* param);
 	void trackParam(string paramName, string* param);
+	void trackParam(string paramName, int* param, vector<string> list);
 
 	float getMinThresholdForParam(string paramMame); //only applies to int and float
 	float getMaxThresholdForParam(string paramMame); //only applies to int and float

@@ -3,16 +3,16 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 
-
 	ofBackground(22);
 	ofSetFrameRate(60);
 	ofSetVerticalSync(true);
 
+	//set some default values
 	drawOutlines = false;
 	currentSentence = "unInited";
 	x = y = 0;
 	numCircles = 30;
-
+	menu = MENU_OPTION_1;
 
 	OFX_REMOTEUI_SERVER_SETUP(10000); 	//start server
 
@@ -29,6 +29,15 @@ void testApp::setup(){
 
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentSentence, ofColor(0,0,255,64)); // you can also set a color on a per-param basis
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentMouseX, 0, ofGetWidth(), ofColor(255,64));
+
+	vector<string> menuItems;
+	menuItems.push_back("MENU_OPTION_0");menuItems.push_back("MENU_OPTION_1");
+	menuItems.push_back("MENU_OPTION_2"); menuItems.push_back("MENU_OPTION_3");
+
+	//no macro for this right now...
+	ofxRemoteUIServer::instance()->shareParam( "Menu Item", (int*)&menu, MENU_OPTION_0, MENU_OPTION_3, menuItems);
+
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(test4, 0, 30);
 
 	OFX_REMOTEUI_SERVER_LOAD_FROM_XML();	//load values from XML, if you want to do so
 											//this will result on the UI showing the params
@@ -72,7 +81,8 @@ void testApp::draw(){
 								"x: " + ofToString(x) + "\n" +
 								"y: " + ofToString(y) + "\n" +
 								"drawOutlines: " + ofToString(drawOutlines) + "\n" +
-								"currentSentence: " + currentSentence ,
+								"currentSentence: " + currentSentence  + "\n" +
+								"menu item: " + ofToString(menu) ,
 								20, 20,
 								ofColor::black, ofColor::red
 								);

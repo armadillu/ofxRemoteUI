@@ -6,6 +6,10 @@
 
 class testApp : public ofBaseApp{
 
+enum MenuItems{
+	MENU_OPTION_0,MENU_OPTION_1,MENU_OPTION_2, MENU_OPTION_3
+};
+
 public:
 		void setup();
 		void update();
@@ -17,6 +21,9 @@ public:
 		float y;
 		bool drawOutlines;
 		int numCircles;
+
+		MenuItems menu;
+		float test4;
 
 
 		string currentSentence; 

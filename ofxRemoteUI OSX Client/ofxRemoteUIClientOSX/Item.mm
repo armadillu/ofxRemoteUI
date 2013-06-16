@@ -108,6 +108,7 @@
 			[button removeFromSuperview];
 			[textView removeFromSuperview];
 			[slider setAllowsTickMarkValuesOnly:false];
+			[enumeratorMenu removeFromSuperview];
 			break;
 
 		case REMOTEUI_PARAM_INT:
@@ -118,7 +119,23 @@
 			[widget setAction:@selector(updateInt:)];
 			[button removeFromSuperview];
 			[textView removeFromSuperview];
+			[enumeratorMenu removeFromSuperview];
 			break;
+
+		case REMOTEUI_PARAM_ENUM:{
+			widget = enumeratorMenu;
+			[widget setAction:@selector(updateEnum:)];
+			[button removeFromSuperview];
+			[slider removeFromSuperview];
+			[textView removeFromSuperview];
+			[sliderMax removeFromSuperview];
+			[sliderMin removeFromSuperview];
+			[sliderVal removeFromSuperview];
+			[enumeratorMenu removeAllItems];
+			for(int i = 0; i < param.enumList.size(); i++){
+				[enumeratorMenu addItemWithTitle:[NSString stringWithFormat:@"%s", param.enumList[i].c_str()]];
+			}
+			}break;
 
 		case REMOTEUI_PARAM_BOOL:
 			widget = button;
@@ -128,6 +145,7 @@
 			[sliderMax removeFromSuperview];
 			[sliderMin removeFromSuperview];
 			[sliderVal removeFromSuperview];
+			[enumeratorMenu removeFromSuperview];
 			break;
 
 		case REMOTEUI_PARAM_STRING:
@@ -138,6 +156,7 @@
 			[sliderMax removeFromSuperview];
 			[sliderMin removeFromSuperview];
 			[sliderVal removeFromSuperview];
+			[enumeratorMenu removeFromSuperview];
 			break;
 
 		default:NSLog(@"wtf is this?");
@@ -169,6 +188,10 @@
 			[sliderMin setStringValue:[NSString stringWithFormat:@"%d", param.minInt ]];
 			break;
 
+		case REMOTEUI_PARAM_ENUM:
+			[enumeratorMenu selectItemAtIndex: param.intVal - param.minInt];
+			break;
+
 		case REMOTEUI_PARAM_BOOL:
 			[button setState:param.boolVal];
 			button.title = param.boolVal ? @"ON" : @"OFF";
@@ -191,6 +214,14 @@
 	[sliderVal setStringValue:[NSString stringWithFormat:@"%.2f", param.floatVal ]];
 	if ([[NSApp delegate] respondsToSelector:@selector(userChangedParam:paramName:)]){
 		 [[NSApp delegate] userChangedParam: param paramName: paramName];  //blindly send message to App Delegate (TODO!)
+	}
+}
+
+-(IBAction)updateEnum:(id)sender{
+	int index = [sender indexOfSelectedItem];
+	param.intVal = param.minInt + index;
+	if ([[NSApp delegate] respondsToSelector:@selector(userChangedParam:paramName:)]){
+		[[NSApp delegate] userChangedParam: param paramName: paramName];  //blindly send message to App Delegate (TODO!)
 	}
 }
 
