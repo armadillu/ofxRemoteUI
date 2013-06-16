@@ -7,6 +7,8 @@ It's OSC based, and it includes a native OSX Client. The Native OSX Client allow
 
 It can also be set to store the current values when quitting the app (or whenever its convenient), so that you can carry on where you left off last time you used it. It uses ofxXmlSettings to store the settings. 
 
+You can also create and delete presets. Presets are stored with your OF app, inside a "ofxRemoteUIPresets" folder, inside your data folder. Whenever you like the current config, you can make a preset to keep it around. You can also delete presets.
+
 It uses Macros + the singleton pattern to make it very easy to share any variable you want to edit remotely, in any class of your project. 
 
 --Update!-- @kritzikratzi made a Processing version of this! https://github.com/kritzikratzi/remoteUI-java
@@ -14,7 +16,7 @@ Also, the OSX client allows to copy all params as plain text. You can also paste
 
 [demo video](http://youtu.be/e6mzo8YavoM)
 
-![OSX Client](http://farm4.staticflickr.com/3741/9012132676_f37c27f3c4_o.png "OSX Client")
+![OSX Client](http://farm8.staticflickr.com/7419/9060718938_86604273e5_o.png "OSX Client")
 
 ### How to use
 
