@@ -25,7 +25,7 @@ using namespace std;
 #define OFX_REMOTEUI_XML_TAG				"OFX_REMOTE_UI_PARAMS"
 #define DEFAULT_PARAM_GROUP					"defaultGroup"
 #define OFX_REMOTEUI_PRESET_DIR				"ofxRemoteUIPresets"
-
+#define OFX_REMOTEUI_NO_PRESETS				"NO_PRESETS"
 
 //easy param sharing macro, share from from anywhere!
 #define OFX_REMOTEUI_SERVER_SHARE_PARAM(val,...)		( ofxRemoteUIServer::instance()->shareParam( #val, &val, ##__VA_ARGS__ ) )
@@ -80,14 +80,15 @@ using namespace std;
  SERVER:	CIAO								//server disconnects - not really needed? TODO
 
  
- // SERVER API
+
+ // SERVER API ////////////////////////////////////////
 
 	server->setup(refreshRate);
 	server->shareParam("paramName", &paramName, ... );
 	...
 	server->update(dt);
 
- // CLIENT API
+ // CLIENT API ////////////////////////////////////////
  
 	client.setup(ipAddress, refreshRate);
 	client.trackParam("paramName", &paramName);
@@ -106,6 +107,9 @@ using namespace std;
 
  */
 
+enum RemoteUICallBackArg{
+	PARAMS_UPDATED, PRESETS_UPDATED, SERVER_DISCONNECTED
+};
 
 enum RemoteUIParamType{
 	REMOTEUI_PARAM_FLOAT = 100,
@@ -239,7 +243,8 @@ protected:
 	void updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage dm);
 	void syncParamToPointer(string paramName);
 	void addParamToDB(RemoteUIParam p, string paramName);
-	
+
+	void sendREQU(bool confirm = false); //a request for a complete list of server params
 	void sendHELLO();
 	void sendCIAO();
 	void sendTEST();

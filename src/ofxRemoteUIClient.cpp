@@ -10,12 +10,13 @@
 #include <iostream>
 
 
+
 ofxRemoteUIClient::ofxRemoteUIClient(){
 	readyToSend = false;
 	timeSinceLastReply = 0;
 	avgTimeSinceLastReply = 0;
 	waitingForReply = false;
-	gotNewInfo = false;
+	callBack = NULL;
 }
 
 
@@ -34,6 +35,9 @@ void ofxRemoteUIClient::setup(string address, int port_){
 	oscSender.setup(address, port);
 }
 
+void ofxRemoteUIClient::disconnect(){
+	readyToSend = false;
+}
 
 void ofxRemoteUIClient::update(float dt){
 
@@ -76,12 +80,11 @@ void ofxRemoteUIClient::update(float dt){
 			case HELO_ACTION:{ //server says hi back, we ask for a big update
 				//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " answered HELLO!" << endl;
 				requestCompleteUpdate();
-				vector<string> a;
-				sendPREL(a); // we also ask for a preset list
 				}break;
 
 			case REQUEST_ACTION: //should not happen, server doesnt request
-				//cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " send REQU??? WTF!!!"  << endl;
+				cout << "ofxRemoteUIClient: send closing REQU"  << endl;
+				callBack(PARAMS_UPDATED);
 				break;
 
 			case SEND_ACTION:{ //server is sending us an updated val
@@ -93,6 +96,7 @@ void ofxRemoteUIClient::update(float dt){
 
 			case CIAO_ACTION:
 				cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says CIAO!" << endl;
+				callBack(SERVER_DISCONNECTED);
 				sendCIAO();
 				params.clear();
 				orderedKeys.clear();
@@ -112,20 +116,22 @@ void ofxRemoteUIClient::update(float dt){
 
 			case PRESET_LIST_ACTION: //server sends us the list of current presets
 				fillPresetListFromMessage(m);
+				callBack(PRESETS_UPDATED);
 				break;
 
 			case SET_PRESET_ACTION: // server confirms that it has set the preset, request a full update
-				sendREQUEST();
+				cout << "ofxRemoteUIClient:: SET_PRESET_ACTION OK!" << endl;
+				requestCompleteUpdate();
 				break;
 
 			case SAVE_PRESET_ACTION:{ // server confirms that it has save the preset,
 				vector<string> a;
-				sendPREL(a); //request preset list to server, send empty vector
+				//sendPREL(a); //request preset list to server, send empty vector
 				}break;
 
 			case DELETE_PRESET_ACTION:{ // server confirms that it has deleted preset
 				vector<string> a;
-				sendPREL(a); //request preset list to server, send empty vector
+				//sendPREL(a); //request preset list to server, send empty vector
 				}break;
 
 			default: cout << "ofxRemoteUIClient::update >> ERR!" <<endl; break;
@@ -152,12 +158,22 @@ void ofxRemoteUIClient::deletePreset(string presetName){
 
 void ofxRemoteUIClient::fillPresetListFromMessage(ofxOscMessage m){
 
+	cout << "ofxRemoteUIClient got list of presets: "<< endl;
 	int n = m.getNumArgs();
+
+	//check if server has no presets at all
+	if (m.getNumArgs() == 1){
+		if(m.getArgAsString(0) == OFX_REMOTEUI_NO_PRESETS){ //if no prests, server sends only one with this value
+			//we know there's no presets
+		}
+	}
 	presetNames.clear();
 	for(int i = 0; i < n; i++){
 		presetNames.push_back( m.getArgAsString(i));
+		cout << m.getArgAsString(i) << endl;
 	}
 }
+
 
 void ofxRemoteUIClient::trackParam(string paramName, float* param){
 	RemoteUIParam p;
@@ -229,7 +245,6 @@ void ofxRemoteUIClient::trackParam(string paramName, bool* param){
 
 
 void ofxRemoteUIClient::sendParamUpdate(RemoteUIParam p, string paramName){
-
 	//p.print();
 	params[paramName] = p; //TODO error check!
 	vector<string>list;
@@ -239,30 +254,11 @@ void ofxRemoteUIClient::sendParamUpdate(RemoteUIParam p, string paramName){
 
 
 void ofxRemoteUIClient::requestCompleteUpdate(){
-	//cout << "ofxRemoteUIClient: requestCompleteUpdate()" << endl;
+	cout << "ofxRemoteUIClient: requestCompleteUpdate()" << endl;
 	if(readyToSend){
-		sendREQUEST();
-	}
-}
-
-bool ofxRemoteUIClient::hasReceivedUpdate(){
-
-	if (gotNewInfo){
-		return true;
-		gotNewInfo = false;
-	}
-	return false;
-}
-
-
-void ofxRemoteUIClient::sendUpdatedParam(string paramName){
-
-	map<string,RemoteUIParam>::iterator it = params.find(paramName);
-	if ( it != params.end() ){
-		syncParamToPointer(paramName);
-		sendParam(paramName, params[paramName]);
-	}else{
-		cout << "ofxRemoteUIClient::sendUpdatedParam >> param '" + paramName + "' not found!" << endl;
+		sendREQU();
+		vector<string> a;
+		sendPREL(a);
 	}
 }
 
@@ -271,12 +267,6 @@ bool ofxRemoteUIClient::isReadyToSend(){
 	return readyToSend;
 }
 
-
-void ofxRemoteUIClient::sendREQUEST(){
-	ofxOscMessage m;
-	m.setAddress("REQU");
-	oscSender.sendMessage(m);
-}
 
 
 

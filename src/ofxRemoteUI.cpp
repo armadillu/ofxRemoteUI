@@ -395,6 +395,16 @@ void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
 	oscSender.sendMessage(m);
 }
 
+//if used by server, confirmation == YES
+//else, NO
+void ofxRemoteUI::sendREQU(bool confirmation){
+	ofxOscMessage m;
+	m.setAddress("REQU");
+	if (confirmation) m.addStringArg("OK");
+	oscSender.sendMessage(m);
+}
+
+
 
 void ofxRemoteUI::sendTEST(){
 	//cout << "sendTEST()" << endl;
@@ -411,6 +421,10 @@ void ofxRemoteUI::sendPREL( vector<string> presetNames_ ){
 	//cout << "sendPRES()" << endl;
 	ofxOscMessage m;
 	m.setAddress("PREL");
+	if (presetNames_.size() == 0){ // if we are the client requesting a preset list, delete our current list
+		presetNames.clear();		
+		m.addStringArg("OK");
+	}
 	for(int i = 0; i < presetNames_.size(); i++){
 		m.addStringArg(presetNames_[i]);
 	}
@@ -469,3 +483,4 @@ void ofxRemoteUI::sendCIAO(){
 	m.setAddress("CIAO");
 	oscSender.sendMessage(m);
 }
+

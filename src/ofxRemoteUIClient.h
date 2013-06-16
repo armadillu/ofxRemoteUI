@@ -26,12 +26,17 @@ public:
 
 	ofxRemoteUIClient();
 	void setup(string address, int port = OFXREMOTEUI_PORT);
+	void setCallback( void (*callb)(RemoteUICallBackArg) ){
+		callBack = callb;
+	}
 	void update(float dt);
-	void requestCompleteUpdate();
-	void sendParamUpdate(RemoteUIParam p, string paramName);
-	void setPreset(string preset);
-	void savePresetWithName(string presetName);
-	void deletePreset(string presetName);
+	void disconnect();
+
+	void requestCompleteUpdate(); //params and presets
+	void sendParamUpdate(RemoteUIParam p, string paramName); //client modified param, send to server
+	void setPreset(string preset); //choose a preset
+	void savePresetWithName(string presetName); //take current params and make a preset with them
+	void deletePreset(string presetName); //delete preset with this name
 
 	//by doing this you allow ofxRemoteUIClient to modify your params
 	//you can find out which params got changed by calling getChangedParamsList()
@@ -44,18 +49,19 @@ public:
 	float getMaxThresholdForParam(string paramMame); //only applies to int and float
 
 	//send the server an update on a param (will take actual value from the supplied pointer in trackParam())
-	void sendUpdatedParam(string paramName);
+
 
 	bool isReadyToSend();
 	bool hasReceivedUpdate();
 
 private:
 
-	void sendREQUEST(); //a request for a complete list of server params
 	void fillPresetListFromMessage(ofxOscMessage m);
 
 	string					host;
 	bool					gotNewInfo;
+	int						pendingOperations;
+	void (*callBack)(RemoteUICallBackArg);
 
 };
 

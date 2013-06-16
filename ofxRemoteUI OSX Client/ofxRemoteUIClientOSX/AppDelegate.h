@@ -16,6 +16,7 @@
 #define ROW_HEIGHT				34.0f
 #define ROW_WIDTH				280.0f
 #define ALL_PARAMS_GROUP		@"*All Params"
+#define DIRTY_PRESET_NAME		@"*No Preset"
 
 struct LayoutConfig{
 	NSPoint colsRows;
@@ -38,8 +39,8 @@ struct LayoutConfig{
 	IBOutlet NSTextField *lagField;
 	IBOutlet NSView *listContainer;
 	IBOutlet MyScrollView * scroll;
-	IBOutlet NSPopUpButton * groups;
-	
+	IBOutlet NSPopUpButton * groupsMenu;
+	IBOutlet NSPopUpButton * presetsMenu;
 
 	bool updateContinuosly;
 
@@ -52,17 +53,21 @@ struct LayoutConfig{
 	LayoutConfig lastLayout;
 
 	string currentGroup;
-	BOOL waitingForResults;
+	string currentPreset;
 
 	BOOL launched;
 }
 
+-(ofxRemoteUIClient *)getClient;
 
 -(IBAction)pressedSync:(id)sender;
 -(IBAction)pressedContinuously:(id)sender;
 -(IBAction)pressedConnect:(id)sender;
 -(IBAction)filterType:(id)sender;
 -(IBAction)userChoseGroup:(id)sender;
+-(IBAction)userChosePreset:(id)sender;
+-(IBAction)userAddPreset:(id)sender;
+-(IBAction)userDeletePreset:(id)sender;
 
 -(IBAction)pasteSpecial:(id)sender;
 -(IBAction)copySpecial:(id)sender;

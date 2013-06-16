@@ -9,8 +9,40 @@
 #import "Item.h"
 #import "AppDelegate.h"
 
+void clientCallback(RemoteUICallBackArg a){
+
+	AppDelegate * me = [NSApp delegate];
+	switch (a) {
+		case PARAMS_UPDATED:
+			NSLog(@"## Callback: PARAMS_UPDATED");
+			[me fullParamsUpdate];
+			[me partialParamsUpdate];
+			[me updateGroupPopup];
+			break;
+
+		case PRESETS_UPDATED:{
+			NSLog(@"## Callback: PRESETS_UPDATED");
+			vector<string> list = [me getClient]->getPresetsList();
+			if ( list.size() > 0 ){
+				[me updatePresetsPopup];
+			}
+			}break;
+
+		case SERVER_DISCONNECTED:{
+			NSLog(@"## Callback: SERVER_DISCONNECTED");
+		}break;
+
+		default:
+			break;
+	}
+}
 
 @implementation AppDelegate
+
+
+-(ofxRemoteUIClient *)getClient;{
+	return client;
+}
 
 - (void)applicationDidFinishLaunching:(NSNotification *)note {
 
@@ -59,6 +91,7 @@
 	///////////////////////////////////////////////
 
 	client = new ofxRemoteUIClient();
+	client->setCallback(clientCallback);
 
 	timer = [NSTimer scheduledTimerWithTimeInterval:REFRESH_RATE target:self selector:@selector(update) userInfo:nil repeats:YES];
 	statusTimer = [NSTimer scheduledTimerWithTimeInterval:STATUS_REFRESH_RATE target:self selector:@selector(statusUpdate) userInfo:nil repeats:YES];
@@ -105,8 +138,10 @@
 
 	[self updateGroupPopup];
 	currentGroup = ""; //empty group means show all params
+	[presetsMenu removeAllItems];
 
 	NSLog(@"applicationDidFinishLaunching done!");
+	currentPreset = "";
 	launched = TRUE;
 }
 
@@ -175,15 +210,15 @@
 
 -(BOOL)fullParamsUpdate{
 
-	[self cleanUpParams];
+	[self cleanUpGUIParams];
 
 	vector<string> paramList = client->getAllParamNamesList();
 	vector<string> updatedParamsList = client->getChangedParamsList();
 
-	//NSLog(@"Client holds %d params so far", (int) paramList.size());
-	//NSLog(@"Client reports %d params changed since last check", (int)updatedParamsList.size());
+	NSLog(@"Client holds %d params so far", (int) paramList.size());
+	NSLog(@"Client reports %d params changed since last check", (int)updatedParamsList.size());
 
-	if(paramList.size() > 0){
+	if(paramList.size() > 0 /*&& updatedParamsList.size() > 0*/){
 
 		int c = 0;
 
@@ -406,16 +441,9 @@
 
 
 -(IBAction)pressedSync:(id)sender;{
-	if(!waitingForResults){
-		client->requestCompleteUpdate();
-		//NSLog(@"waitingForResults YES");
-		waitingForResults = YES;
-	}else{
-		//NSLog(@"cant syn yet, waitingo n tohers");
-	}
-	//delay a bit the screen update so that we have gathered the values
-	//[self performSelector:@selector(fullParamsUpdate) withObject:nil afterDelay: REFRESH_RATE * 2];
+	client->requestCompleteUpdate(); //both params and presets
 }
+
 
 -(IBAction)userChoseGroup:(id)sender{
 	int index = [sender indexOfSelectedItem];
@@ -430,6 +458,45 @@
 	[self layoutWidgetsWithConfig: [self calcLayoutParams]];
 }
 
+
+-(IBAction)userChosePreset:(id)sender{
+	int index = [sender indexOfSelectedItem];
+	if (index == 0) {
+		return; //empty preset does nothing
+		currentPreset = "";
+	}
+	NSString * preset = [[sender itemAtIndex:index] title];
+	string prest = [preset UTF8String];
+	client->setPreset(prest);
+	currentPreset = prest;
+	NSLog(@"user chose preset: %@", preset );
+}
+
+
+-(IBAction)userAddPreset:(id)sender{
+	NSString * newPreset = [self showAlertWithInput:@"Add a new Preset" defaultValue:@"myPreset"];
+	NSLog(@"user add preset: %@", newPreset);
+	if(newPreset != nil){
+
+		//[presetsMenu selectItemWithTitle:newPreset];
+		currentPreset = [newPreset UTF8String];
+		client->savePresetWithName([newPreset UTF8String]);
+	}
+}
+
+
+-(IBAction)userDeletePreset:(id)sender{
+	int index = [presetsMenu indexOfSelectedItem];
+	if (index == 0) return; //empty preset does nothing, cant be deleted
+
+	NSString * preset = [[presetsMenu itemAtIndex:index] title];
+	NSLog(@"user delete preset: %@", preset );
+	client->deletePreset([preset UTF8String]);
+	[presetsMenu removeItemAtIndex:index];
+	[presetsMenu selectItemAtIndex:0]; //select "no preset"
+}
+
+
 -(void)updateGroupPopup{
 	
 	NSMutableArray *menuItemNameArray = [NSMutableArray arrayWithCapacity:4];
@@ -438,9 +505,29 @@
 	for(int i = 0 ; i < allGroupNames.size(); i++){
 		[menuItemNameArray addObject: [NSString stringWithFormat:@"%s",allGroupNames[i].c_str()] ];
 	}
-    [groups removeAllItems];
-    [groups addItemsWithTitles: menuItemNameArray];
+    [groupsMenu removeAllItems];
+    [groupsMenu addItemsWithTitles: menuItemNameArray];
 }
+
+-(void)updatePresetsPopup{
+
+	NSLog(@"updatePresetsPopup");
+	NSMutableArray *menuItemNameArray = [NSMutableArray arrayWithCapacity:4];
+	vector<string> presetsList = client->getPresetsList();
+	[menuItemNameArray addObject: DIRTY_PRESET_NAME ];
+	for(int i = 0 ; i < presetsList.size(); i++){
+		if ( presetsList[i] != OFX_REMOTEUI_NO_PRESETS ){
+			[menuItemNameArray addObject: [NSString stringWithFormat:@"%s",presetsList[i].c_str()] ];
+		}
+	}
+    [presetsMenu removeAllItems];
+    [presetsMenu addItemsWithTitles: menuItemNameArray];
+	NSString* selPres = [NSString stringWithFormat:@"%s", currentPreset.c_str()];
+	if ([menuItemNameArray containsObject:selPres]) {
+		[presetsMenu selectItemWithTitle:selPres];
+	}
+}
+
 
 
 -(IBAction)filterType:(id)sender{
@@ -513,6 +600,8 @@
 
 	}else{ // let's disconnect
 		//NSLog(@"disconnecting");
+		[presetsMenu removeAllItems];
+		[groupsMenu removeAllItems];
 		[addressField setEnabled:true];
 		[portField setEnabled:true];
 		connectButton.state = 0;
@@ -522,13 +611,13 @@
 		[statusImage setImage:[NSImage imageNamed:@"offline"]];
 		[progress stopAnimation:self];
 		lagField.stringValue = @"";
-		[self cleanUpParams];
-		waitingForResults = false;
+		[self cleanUpGUIParams];
+		client->disconnect();
 	}
 }
 
 
--(void)cleanUpParams{
+-(void)cleanUpGUIParams{
 	for( map<string,Item*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
 		string key = (*ii).first;
 		Item* t = widgets[key];
@@ -545,8 +634,6 @@
 		//[[subviews objectAtIndex:i] release];
 	}
 }
-
-
 
 
 -(void)statusUpdate{
@@ -575,17 +662,6 @@
 
 		client->update(REFRESH_RATE);
 
-		if( waitingForResults ){
-			if ( [self fullParamsUpdate] ){
-				client->update(REFRESH_RATE); // just to be super sure, we run a second update
-				[self partialParamsUpdate];
-				waitingForResults = false;
-				[self updateGroupPopup];
-			}else{
-				//NSLog(@"NOT yet...");
-				client->requestCompleteUpdate();
-			}
-		}
 
 		if(updateContinuosly){
 			client->requestCompleteUpdate();
@@ -605,10 +681,43 @@
 -(void)userChangedParam:(RemoteUIParam)p paramName:(string)name{
 	//NSLog(@"usr changed param! %s", name.c_str());
 	if( connectButton.state == 1 ){
+		[presetsMenu selectItemAtIndex:0]; //when user thouches anything, leave the current preset
+		currentPreset = "";
 		//printf("client sending: "); p.print();
 		client->sendParamUpdate(p, name);
 	}
 }
 
+
+
+
+-(NSString *)showAlertWithInput: (NSString *)prompt defaultValue: (NSString *)defaultValue {
+	NSAlert *alert = [NSAlert alertWithMessageText: prompt
+									 defaultButton:@"Add Preset"
+								   alternateButton:@"Cancel"
+									   otherButton:nil
+						 informativeTextWithFormat:@"Type a new for the new preset"];
+
+	NSTextField *input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 170, 24)];
+	[input setStringValue:defaultValue];
+	[input autorelease];
+	[alert layout];
+	[alert setAlertStyle:NSInformationalAlertStyle];
+	[alert setAccessoryView:input];
+	[alert setIcon:nil];
+	//	NSRect fr = [[alert accessoryView] frame];
+	//	fr.origin.y += 10;
+	//	[[alert accessoryView] setFrame: fr];
+	NSInteger button = [alert runModal];
+	if (button == NSAlertDefaultReturn) {
+		[input validateEditing];
+		return [input stringValue];
+	} else if (button == NSAlertAlternateReturn) {
+		return nil;
+	} else {
+		//NSAssert1(NO, @"Invalid input dialog button %d", button);
+		return nil;
+	}
+}
 
 @end

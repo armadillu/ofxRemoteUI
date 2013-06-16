@@ -236,6 +236,7 @@ void ofxRemoteUIServer::update(float dt){
 				//cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " sends REQU!"  << endl;
 				vector<string>paramsList = getAllParamNamesList();
 				sendUpdateForParamsInList(paramsList);
+				sendREQU(true); //once all send, confirm to close the REQU
 			}
 				break;
 
@@ -259,6 +260,9 @@ void ofxRemoteUIServer::update(float dt){
 			case PRESET_LIST_ACTION: //client wants us to send a list of all available presets
 				presetNames = getAvailablePresets();
 				cout << "ofxRemoteUIServer: sending preset LIST" << endl;
+				if (presetNames.size() == 0){
+					presetNames.push_back(OFX_REMOTEUI_NO_PRESETS);
+				}
 				sendPREL(presetNames);
 				break;
 				
@@ -267,6 +271,7 @@ void ofxRemoteUIServer::update(float dt){
 				string presetName = m.getArgAsString(0);
 				loadFromXML(string(OFX_REMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
 				cout << "ofxRemoteUIServer: setting preset: " << presetName << endl;
+				sendSETP("");
 				}break;
 
 			case SAVE_PRESET_ACTION:{ //client wants to save current xml as a new preset
@@ -294,6 +299,7 @@ void ofxRemoteUIServer::deletePreset(string name){
 
 vector<string> ofxRemoteUIServer::getAvailablePresets(){
 
+	cout << "getAvailablePresets" << endl;
 	vector<string> presets;
 	ofDirectory dir;
 	dir.listDir(ofToDataPath(OFX_REMOTEUI_PRESET_DIR));
@@ -302,7 +308,6 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(){
 		string fileName = files[i].getFileName();
 		string extension = files[i].getExtension();
 		std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-
 		if (files[i].isFile() && extension == "xml"){
 			cout << "preset name: " << fileName << endl;
 			string presetName = fileName.substr(0, fileName.size()-4);
