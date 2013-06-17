@@ -689,7 +689,7 @@ void clientCallback(RemoteUICallBackArg a){
 		[presetsMenu selectItemAtIndex:0]; //when user thouches anything, leave the current preset
 		currentPreset = "";
 		//printf("client sending: "); p.print();
-		client->sendParamUpdate(p, name);
+		client->sendUntrackedParamUpdate(p, name);
 	}
 }
 

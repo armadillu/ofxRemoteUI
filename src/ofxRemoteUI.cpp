@@ -390,7 +390,7 @@ void ofxRemoteUI::setValuesFromString( string values ){
 	while( it != changedParam.end() ){
 		if ( params.find( *it ) != params.end()){
 			RemoteUIParam param = params[*it];
-			sendParamUpdate(param, *it);
+			sendUntrackedParamUpdate(param, *it);
 			cout << "sending update for " << *it << endl;
 		}
 		it++;

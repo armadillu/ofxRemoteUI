@@ -6,13 +6,12 @@
 //
 //
 
-#ifndef __emptyExample__ofxRemoteUI__
-#define __emptyExample__ofxRemoteUI__
+#ifndef _ofxRemoteUI__
+#define _ofxRemoteUI__
 
 // you will need to add this to your "Header Search Path" for ofxOsc to compile
 // ../../../addons/ofxOsc/libs ../../../addons/ofxOsc/libs/oscpack ../../../addons/ofxOsc/libs/oscpack/src ../../../addons/ofxOsc/libs/oscpack/src/ip ../../../addons/ofxOsc/libs/oscpack/src/ip/posix ../../../addons/ofxOsc/libs/oscpack/src/ip/win32 ../../../addons/ofxOsc/libs/oscpack/src/osc ../../../addons/ofxOsc/src
 #include "ofxOsc.h"
-
 #include <map>
 #include <set>
 #include <vector>
@@ -20,22 +19,12 @@ using namespace std;
 
 #define OFXREMOTEUI_PORT					10001
 #define LATENCY_TEST_RATE					0.3333
-#define CONNECTION_TIMEOUT					6.0f
+#define CONNECTION_TIMEOUT					4.0f
 #define OFX_REMOTEUI_SETTINGS_FILENAME		"ofxRemoteUISettings.xml"
 #define OFX_REMOTEUI_XML_TAG				"OFX_REMOTE_UI_PARAMS"
 #define DEFAULT_PARAM_GROUP					"defaultGroup"
 #define OFX_REMOTEUI_PRESET_DIR				"ofxRemoteUIPresets"
 #define OFX_REMOTEUI_NO_PRESETS				"NO_PRESETS"
-
-//easy param sharing macro, share from from anywhere!
-#define OFX_REMOTEUI_SERVER_SHARE_PARAM(val,...)		( ofxRemoteUIServer::instance()->shareParam( #val, &val, ##__VA_ARGS__ ) )
-#define OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_COLOR(c)	( ofxRemoteUIServer::instance()->setParamColor( c ) )
-#define OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP(g)	( ofxRemoteUIServer::instance()->setParamGroup( g ) )
-#define OFX_REMOTEUI_SERVER_SETUP(port, ...)			( ofxRemoteUIServer::instance()->setup(port, ##__VA_ARGS__) )
-#define OFX_REMOTEUI_SERVER_UPDATE(deltaTime)			( ofxRemoteUIServer::instance()->update(deltaTime) )
-#define OFX_REMOTEUI_SERVER_CLOSE()						( ofxRemoteUIServer::instance()->close() )
-#define	OFX_REMOTEUI_SERVER_SAVE_TO_XML()				( ofxRemoteUIServer::instance()->saveToXML(OFX_REMOTEUI_SETTINGS_FILENAME) )
-#define	OFX_REMOTEUI_SERVER_LOAD_FROM_XML()				( ofxRemoteUIServer::instance()->loadFromXML(OFX_REMOTEUI_SETTINGS_FILENAME) )
 
 /*
 
@@ -106,7 +95,7 @@ using namespace std;
 	vector<string> updatedParamsList = client.getChangedParamsList();
  
 	//push a param change to the server, will send the current value of the param to server
-	client.sendUpdatedParam("paramName");
+	client.sendTrackedParamUpdate("paramName");
 
  */
 
@@ -233,7 +222,7 @@ public:
 	bool ready();
 	float connectionLag();
 
-	virtual void sendParamUpdate(RemoteUIParam p, string paramName){};
+	virtual void sendUntrackedParamUpdate(RemoteUIParam p, string paramName){};
 
 protected:
 

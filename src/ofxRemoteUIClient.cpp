@@ -19,6 +19,9 @@ ofxRemoteUIClient::ofxRemoteUIClient(){
 	callBack = NULL;
 }
 
+void ofxRemoteUIClient::setCallback( void (*callb)(RemoteUICallBackArg) ){
+	callBack = callb;
+}
 
 void ofxRemoteUIClient::setup(string address, int port_){
 
@@ -82,7 +85,7 @@ void ofxRemoteUIClient::update(float dt){
 				}break;
 
 			case REQUEST_ACTION: //should not happen, server doesnt request
-				callBack(PARAMS_UPDATED);
+				if(callBack!=NULL) callBack(PARAMS_UPDATED);
 				break;
 
 			case SEND_PARAM_ACTION:{ //server is sending us an updated val
@@ -93,7 +96,7 @@ void ofxRemoteUIClient::update(float dt){
 
 			case CIAO_ACTION:
 				cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says CIAO!" << endl;
-				callBack(SERVER_DISCONNECTED);
+				if(callBack!=NULL) callBack(SERVER_DISCONNECTED);
 				sendCIAO();
 				params.clear();
 				orderedKeys.clear();
@@ -112,12 +115,12 @@ void ofxRemoteUIClient::update(float dt){
 
 			case PRESET_LIST_ACTION: //server sends us the list of current presets
 				fillPresetListFromMessage(m);
-				callBack(PRESETS_UPDATED);
+				if(callBack != NULL) callBack(PRESETS_UPDATED);
 				break;
 
 			case SET_PRESET_ACTION: // server confirms that it has set the preset, request a full update
 				requestCompleteUpdate();
-				callBack(PRESETS_UPDATED);
+				if(callBack != NULL) callBack(PRESETS_UPDATED);
 				break;
 
 			case SAVE_PRESET_ACTION:{ // server confirms that it has save the preset,
@@ -249,12 +252,23 @@ void ofxRemoteUIClient::trackParam(string paramName, bool* param){
 }
 
 
-void ofxRemoteUIClient::sendParamUpdate(RemoteUIParam p, string paramName){
+void ofxRemoteUIClient::sendUntrackedParamUpdate(RemoteUIParam p, string paramName){
 	//p.print();
 	params[paramName] = p; //TODO error check!
 	vector<string>list;
 	list.push_back(paramName);
 	sendUpdateForParamsInList(list);
+}
+
+void ofxRemoteUIClient::sendTrackedParamUpdate(string paramName){
+
+	map<string,RemoteUIParam>::iterator it = params.find(paramName);
+	if ( it != params.end() ){
+		syncParamToPointer(paramName);
+		sendParam(paramName, params[paramName]);
+	}else{
+		cout << "ofxRemoteUIClient::sendTrackedParamUpdate >> param '" + paramName + "' not found!" << endl;
+	}
 }
 
 

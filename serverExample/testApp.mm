@@ -34,8 +34,7 @@ void testApp::setup(){
 	menuItems.push_back("MENU_OPTION_0");menuItems.push_back("MENU_OPTION_1");
 	menuItems.push_back("MENU_OPTION_2"); menuItems.push_back("MENU_OPTION_3");
 
-	//no macro for this right now...
-	ofxRemoteUIServer::instance()->shareParam( "Menu Item", (int*)&menu, MENU_OPTION_0, MENU_OPTION_3, menuItems);
+	OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM(menu,MENU_OPTION_0, MENU_OPTION_3, menuItems);
 
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(test4, 0, 30);
 

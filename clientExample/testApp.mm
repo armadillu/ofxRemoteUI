@@ -1,8 +1,7 @@
 #include "testApp.h"
 
-//--------------------------------------------------------------
-void testApp::setup(){
 
+void testApp::setup(){
 
 	ofBackground(22);
 	ofSetFrameRate(60);
@@ -20,7 +19,7 @@ void testApp::setup(){
 	time = 0.0f;
 }
 
-//--------------------------------------------------------------
+
 void testApp::update(){
 
 	float dt = 0.016666;
@@ -38,12 +37,10 @@ void testApp::update(){
 	y = mouseY;
 	//now control some params from the client app
 	//send an update to the server app
-
 }
 
-//--------------------------------------------------------------
-void testApp::draw(){
 
+void testApp::draw(){
 
 	ofDrawBitmapStringHighlight(
 								string("CLIENT\n") +
@@ -57,9 +54,11 @@ void testApp::draw(){
 
 }
 
+
 void testApp::mousePressed( int x, int y, int button ){
 	drawOutlines = !drawOutlines;
 }
+
 
 void testApp::keyPressed(int key){
 
@@ -82,9 +81,9 @@ void testApp::keyPressed(int key){
 	}
 
 	if(key==' '){
-		client.sendUpdatedParam("x");
-		client.sendUpdatedParam("y");
-		client.sendUpdatedParam("drawOutlines");
+		client.sendTrackedParamUpdate("x");
+		client.sendTrackedParamUpdate("y");
+		client.sendTrackedParamUpdate("drawOutlines");
+		client.sendTrackedParamUpdate("currentSentence");
 	}
-
 }
