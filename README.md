@@ -17,7 +17,7 @@ It uses Macros + the singleton pattern to make it very easy to share any variabl
 
 Also, the OSX client allows to copy all params as plain text. You can also paste them back after editing them! Thx to @kritzikratzi for this!
 
---Update!-- @kritzikratzi made a Processing version of this! https://github.com/kritzikratzi/remoteUI-java
+--Update!-- @kritzikratzi made a Processing version of this! http://superduper.org/processing/remoteUI/
 
 
 ![OSX Client](http://farm4.staticflickr.com/3721/9062611508_e86273db52_o.png "OSX Client")

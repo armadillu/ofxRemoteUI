@@ -134,7 +134,6 @@ void clientCallback(RemoteUICallBackArg a){
 
 	//make windows resize-snap to height of param
 	NSRect r = [window frame];
-	NSLog(@"%f",	r.size.height );
 	float hh = r.size.height - 284;
 	int num = hh / ROW_HEIGHT;
 	r.size.height = 284 + num * ROW_HEIGHT;
