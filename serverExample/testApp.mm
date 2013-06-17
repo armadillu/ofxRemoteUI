@@ -27,6 +27,7 @@ void testApp::setup(){
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawOutlines);
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(numCircles, 0, 30);
 
+	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP("whatever"); //make a new group
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentSentence, ofColor(0,0,255,64)); // you can also set a color on a per-param basis
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentMouseX, 0, ofGetWidth(), ofColor(255,64));
 
@@ -48,7 +49,7 @@ void testApp::update(){
 
 	float dt = 0.016666;
 
-	currentMouseX = ofGetMouseX() + 100 *sinf( ofGetFrameNum());
+	currentMouseX = ofGetMouseX();
 	OFX_REMOTEUI_SERVER_UPDATE(dt);
 }
 
