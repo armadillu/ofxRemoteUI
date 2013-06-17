@@ -336,7 +336,7 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(){
 		string extension = files[i].getExtension();
 		std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 		if (files[i].isFile() && extension == "xml"){
-			cout << "preset name: " << fileName << endl;
+			//cout << "preset name: " << fileName << endl;
 			string presetName = fileName.substr(0, fileName.size()-4);
 			presets.push_back(presetName);
 		}
@@ -369,7 +369,7 @@ void ofxRemoteUIServer::shareParam(string paramName, float* param, float min, fl
 	p.group = upcomingGroup;
 	setColorForParam(p, c);
 	addParamToDB(p, paramName);
-	cout << "ofxRemoteUIServer Sharing Param '" << paramName << "'" << endl;
+	cout << "ofxRemoteUIServer Sharing Float Param '" << paramName << "'" << endl;
 }
 
 
@@ -381,7 +381,7 @@ void ofxRemoteUIServer::shareParam(string paramName, bool* param, ofColor c, int
 	p.group = upcomingGroup;
 	setColorForParam(p, c);
 	addParamToDB(p, paramName);
-	cout << "ofxRemoteUIServer Sharing Param '" << paramName << "'" << endl;
+	cout << "ofxRemoteUIServer Sharing Bool Param '" << paramName << "'" << endl;
 }
 
 
@@ -396,7 +396,7 @@ void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int ma
 	setColorForParam(p, c);
 	p.intVal = *param = ofClamp(*param, min, max);
 	addParamToDB(p, paramName);
-	cout << "ofxRemoteUIServer Sharing Param '" << paramName << "'" << endl;
+	cout << "ofxRemoteUIServer Sharing  Int Param '" << paramName << "'" << endl;
 }
 
 void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int max, vector<string> names, ofColor c ){
@@ -411,7 +411,7 @@ void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int ma
 	setColorForParam(p, c);
 	p.intVal = *param = ofClamp(*param, min, max);
 	addParamToDB(p, paramName);
-	cout << "ofxRemoteUIServer Sharing Param '" << paramName << "'" << endl;
+	cout << "ofxRemoteUIServer Sharing Enum Param '" << paramName << "'" << endl;
 }
 
 
@@ -423,7 +423,7 @@ void ofxRemoteUIServer::shareParam(string paramName, string* param, ofColor c, i
 	p.group = upcomingGroup;
 	setColorForParam(p, c);
 	addParamToDB(p, paramName);
-	cout << "ofxRemoteUIServer Sharing Param '" << paramName << "'" <<endl;
+	cout << "ofxRemoteUIServer Sharing String Param '" << paramName << "'" <<endl;
 }
 
 
