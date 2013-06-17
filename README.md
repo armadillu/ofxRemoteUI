@@ -3,6 +3,8 @@
 
 OF addon allows you to serve any variables you want (bool, float, int, enum, string) on the network, so that you can modify them remotely. Uses server client architecture, where your app is the server. It communicates both ways; you can modify your project's variables from the client, but you can also pull your app's variable values from the client; this way you can track values that evolve programatically.
 
+Watch the [demo video](http://youtu.be/QVyAiopGK4U).
+
 I know there's tons of very good UI's already, but one thing that bothers me about most of them is how by using them, your are affecting your framerates quite a lot. That's the main reason that made me build a ofxRemoteUI. Being quite comfy in OSX development, I chose to make a full-featured native OSX client; although clients for other platforms could be developed as well, using the underlying classes.
 
 It's OSC based, and it includes a native OSX Client. The Native OSX Client allows param colorization for better clarity, and live param filtering. It also supports grouping the params into categories, to filter them by category in the OSX Client.
@@ -17,7 +19,6 @@ Also, the OSX client allows to copy all params as plain text. You can also paste
 
 --Update!-- @kritzikratzi made a Processing version of this! https://github.com/kritzikratzi/remoteUI-java
 
-[demo video](http://youtu.be/QVyAiopGK4U)
 
 ![OSX Client](http://farm4.staticflickr.com/3721/9062611508_e86273db52_o.png "OSX Client")
 
