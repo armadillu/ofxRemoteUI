@@ -13,6 +13,7 @@
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSButton</string>
 			<string>NSButtonCell</string>
+			<string>NSColorWell</string>
 			<string>NSCustomObject</string>
 			<string>NSCustomView</string>
 			<string>NSMenu</string>
@@ -170,7 +171,7 @@
 								<string key="NSFrame">{{71, 2}, {88, 11}}</string>
 								<reference key="NSSuperview" ref="34091846"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="963148419"/>
+								<reference key="NSNextKeyView" ref="216794602"/>
 								<string key="NSReuseIdentifierKey">_NS:1535</string>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSTextFieldCell" key="NSCell" id="145770045">
@@ -308,6 +309,25 @@
 								</object>
 								<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 							</object>
+							<object class="NSColorWell" id="216794602">
+								<reference key="NSNextResponder" ref="34091846"/>
+								<int key="NSvFlags">285</int>
+								<set class="NSMutableSet" key="NSDragTypes">
+									<string>NSColor pasteboard type</string>
+								</set>
+								<string key="NSFrame">{{79, 5}, {77, 24}}</string>
+								<reference key="NSSuperview" ref="34091846"/>
+								<reference key="NSWindow"/>
+								<reference key="NSNextKeyView" ref="963148419"/>
+								<string key="NSReuseIdentifierKey">_NS:1116</string>
+								<bool key="NSEnabled">YES</bool>
+								<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+								<bool key="NSIsBordered">YES</bool>
+								<object class="NSColor" key="NSColor">
+									<int key="NSColorSpace">1</int>
+									<bytes key="NSRGB">MSAwLjUgMAA</bytes>
+								</object>
+							</object>
 						</array>
 						<string key="NSFrame">{{0, -1}, {227, 34}}</string>
 						<reference key="NSSuperview" ref="1005"/>
@@ -326,7 +346,6 @@
 								<string key="NSFrame">{{3, 7}, {152, 17}}</string>
 								<reference key="NSSuperview" ref="839355504"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView"/>
 								<string key="NSReuseIdentifierKey">_NS:1535</string>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSTextFieldCell" key="NSCell" id="283200427">
@@ -457,6 +476,14 @@
 					</object>
 					<int key="connectionID">78</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">colorWell</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="216794602"/>
+					</object>
+					<int key="connectionID">80</int>
+				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<array key="orderedObjects">
@@ -505,6 +532,7 @@
 							<reference ref="1070573946"/>
 							<reference ref="963148419"/>
 							<reference ref="1012555934"/>
+							<reference ref="216794602"/>
 						</array>
 						<reference key="parent" ref="1005"/>
 					</object>
@@ -654,6 +682,11 @@
 						<reference key="object" ref="881715751"/>
 						<reference key="parent" ref="954835781"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">79</int>
+						<reference key="object" ref="216794602"/>
+						<reference key="parent" ref="34091846"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -682,6 +715,7 @@
 				<string key="75.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="76.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="77.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="79.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="8.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="9.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			</dictionary>
@@ -689,7 +723,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">78</int>
+			<int key="maxID">80</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -706,6 +740,7 @@
 					<string key="superclassName">NSObject</string>
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="updateBool:">id</string>
+						<string key="updateColor:">id</string>
 						<string key="updateEnum:">id</string>
 						<string key="updateFloat:">id</string>
 						<string key="updateInt:">id</string>
@@ -714,6 +749,10 @@
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
 						<object class="IBActionInfo" key="updateBool:">
 							<string key="name">updateBool:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="updateColor:">
+							<string key="name">updateColor:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="updateEnum:">
@@ -736,6 +775,7 @@
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="bg">ColorView</string>
 						<string key="button">NSButton</string>
+						<string key="colorWell">NSColorWell</string>
 						<string key="enumeratorMenu">NSPopUpButton</string>
 						<string key="paramLabel">NSTextField</string>
 						<string key="slider">NSSlider</string>
@@ -753,6 +793,10 @@
 						<object class="IBToOneOutletInfo" key="button">
 							<string key="name">button</string>
 							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="colorWell">
+							<string key="name">colorWell</string>
+							<string key="candidateClassName">NSColorWell</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="enumeratorMenu">
 							<string key="name">enumeratorMenu</string>

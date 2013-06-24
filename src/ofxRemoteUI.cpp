@@ -92,6 +92,8 @@ DecodedMessage ofxRemoteUI::decode(ofxOscMessage m){
 					if (arg1 == "STR") dm.argument = STR_ARG;
 					else
 						if (arg1 == "ENU") dm.argument = ENUM_ARG;
+						else
+							if (arg1 == "COL") dm.argument = COLOR_ARG;
 
 
 	}
@@ -140,6 +142,20 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 			//cout << "updated " << dm.paramName << "to a new value: " << p.intVal << endl;
 			if (p.intValAddr){
 				*p.intValAddr = p.intVal;
+			}break;
+
+		case COLOR_ARG:
+			p.type = REMOTEUI_PARAM_COLOR;
+			p.redVal = (int)m.getArgAsInt32(arg); arg++;
+			p.greenVal = (int)m.getArgAsInt32(arg); arg++;
+			p.blueVal = (int)m.getArgAsInt32(arg); arg++;
+			p.alphaVal = (int)m.getArgAsInt32(arg); arg++;
+			//cout << "updated " << dm.paramName << " to a new value: " <<(int)p.redVal<<" "<<(int)p.greenVal<<" "<<(int)p.blueVal<<" "<<(int)p.alphaVal << endl;
+			if (p.redValAddr){
+				*p.redValAddr = p.redVal;
+				*(p.redValAddr+1) = p.greenVal;
+				*(p.redValAddr+2) = p.blueVal;
+				*(p.redValAddr+3) = p.alphaVal;
 			}break;
 
 		case ENUM_ARG:{
@@ -231,13 +247,13 @@ vector<string> ofxRemoteUI::scanForUpdatedParamsAndSync(){
 }
 
 
-void ofxRemoteUI::sendUpdateForParamsInList(vector<string>paramsPendingUpdate){
+void ofxRemoteUI::sendUpdateForParamsInList(vector<string>list){
 
-	for(int i = 0; i < paramsPendingUpdate.size(); i++){
-		//cout << "ofxRemoteUIServer: sending updated param " + paramsPendingUpdate[i] << endl;
-		RemoteUIParam p = params[paramsPendingUpdate[i]];
+	for(int i = 0; i < list.size(); i++){
+		RemoteUIParam p = params[list[i]];
+		//cout << "ofxRemoteUIServer: sending updated param " + list[i] << endl;
 		//p.print();
-		sendParam(paramsPendingUpdate[i], p);
+		sendParam(list[i], p);
 	}
 }
 
@@ -259,6 +275,15 @@ void ofxRemoteUI::syncParamToPointer(string paramName){
 				p.intVal = *p.intValAddr;
 			}break;
 
+		case REMOTEUI_PARAM_COLOR:
+			if (p.redValAddr){
+				p.redVal = *p.redValAddr;
+				p.greenVal = *(p.redValAddr+1);
+				p.blueVal = *(p.redValAddr+2);
+				p.alphaVal = *(p.redValAddr+3);
+				//cout << "synch!!!!!!<" << endl;
+				//p.print();
+			}break;
 
 		case REMOTEUI_PARAM_BOOL:
 			if (p.boolValAddr){
@@ -291,6 +316,13 @@ bool ofxRemoteUI::hasParamChanged(RemoteUIParam p){
 			}
 			return false;
 
+		case REMOTEUI_PARAM_COLOR:
+			if (p.redValAddr){
+				if (*p.redValAddr != p.redVal || *(p.redValAddr+1) != p.greenVal || *(p.redValAddr+2) != p.blueVal || *(p.redValAddr+3) != p.alphaVal ) return true;
+				else return false;
+			}
+			return false;
+
 		case REMOTEUI_PARAM_BOOL:
 			if (p.boolValAddr){
 				if (*p.boolValAddr != p.boolVal) return true; else return false;
@@ -313,6 +345,7 @@ string ofxRemoteUI::stringForParamType(RemoteUIParamType t){
 	switch (t) {
 		case REMOTEUI_PARAM_FLOAT: return "FLT";
 		case REMOTEUI_PARAM_INT: return "INT";
+		case REMOTEUI_PARAM_COLOR: return "COL";
 		case REMOTEUI_PARAM_ENUM: return "ENU";
 		case REMOTEUI_PARAM_BOOL: return "BOL";
 		case REMOTEUI_PARAM_STRING: return "STR";
@@ -345,6 +378,7 @@ string ofxRemoteUI::getValuesAsString(){
 		switch (param.type) {
 			case REMOTEUI_PARAM_FLOAT: out << param.floatVal << endl; break;
 			case REMOTEUI_PARAM_INT: out << param.intVal << endl; break;
+			case REMOTEUI_PARAM_COLOR: out << param.redVal << " " << param.greenVal << " " << param.blueVal << " " << param.alphaVal << " " << endl; break;
 			case REMOTEUI_PARAM_ENUM: out << param.intVal << endl; break;
 			case REMOTEUI_PARAM_BOOL: out << (param.boolVal?"1":"0") << endl; break;
 			case REMOTEUI_PARAM_STRING: out << UriEncode(param.stringVal) << endl; break;
@@ -374,6 +408,14 @@ void ofxRemoteUI::setValuesFromString( string values ){
 			switch (param.type) {
 				case REMOTEUI_PARAM_FLOAT: valstr >> param.floatVal; break;
 				case REMOTEUI_PARAM_INT: valstr >> param.intVal; break;
+				case REMOTEUI_PARAM_COLOR: {
+					std::istringstream ss(UriDecode(value));
+					std::string token;
+					std::getline(ss, token, ' '); param.redVal = atoi(token.c_str());
+					std::getline(ss, token, ' '); param.greenVal = atoi(token.c_str());
+					std::getline(ss, token, ' '); param.blueVal = atoi(token.c_str());
+					std::getline(ss, token, ' '); param.alphaVal = atoi(token.c_str());
+				}
 				case REMOTEUI_PARAM_ENUM: valstr >> param.intVal; break;
 				case REMOTEUI_PARAM_BOOL: valstr >> param.boolVal; break;
 				case REMOTEUI_PARAM_STRING: param.stringVal = valstr.str(); break;
@@ -394,9 +436,8 @@ void ofxRemoteUI::setValuesFromString( string values ){
 			cout << "sending update for " << *it << endl;
 		}
 		it++;
-	}	
+	}
 }
-
 
 
 void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
@@ -407,8 +448,9 @@ void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
 	switch (p.type) {
 		case REMOTEUI_PARAM_FLOAT: m.addFloatArg(p.floatVal); m.addFloatArg(p.minFloat); m.addFloatArg(p.maxFloat); break;
 		case REMOTEUI_PARAM_INT: m.addIntArg(p.intVal); m.addIntArg(p.minInt); m.addIntArg(p.maxInt); break;
-		case REMOTEUI_PARAM_BOOL: m.addIntArg(p.boolVal ? 1 : 0); /*cout << "sending bool" << endl; */ break;
-		case REMOTEUI_PARAM_STRING: m.addStringArg(p.stringVal); /*cout << "sending string" << endl; */ break;
+		case REMOTEUI_PARAM_COLOR: m.addIntArg(p.redVal); m.addIntArg(p.greenVal); m.addIntArg(p.blueVal); m.addIntArg(p.alphaVal); break;
+		case REMOTEUI_PARAM_BOOL: m.addIntArg(p.boolVal ? 1 : 0); break;
+		case REMOTEUI_PARAM_STRING: m.addStringArg(p.stringVal); break;
 		case REMOTEUI_PARAM_ENUM:{
 			m.addIntArg(p.intVal); m.addIntArg(p.minInt); m.addIntArg(p.maxInt);
 			for (int i = 0; i < p.enumList.size(); i++) {

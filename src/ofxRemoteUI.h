@@ -26,6 +26,9 @@ using namespace std;
 #define OFX_REMOTEUI_PRESET_DIR				"ofxRemoteUIPresets"
 #define OFX_REMOTEUI_NO_PRESETS				"NO_PRESETS"
 
+#include "RemoteParam.h"
+
+
 /*
 
  // COMM /////////////////////////
@@ -98,113 +101,6 @@ using namespace std;
 	client.sendTrackedParamUpdate("paramName");
 
  */
-
-enum RemoteUICallBackArg{
-	PARAMS_UPDATED, PRESETS_UPDATED, SERVER_DISCONNECTED
-};
-
-enum RemoteUIParamType{
-	REMOTEUI_PARAM_FLOAT = 100,
-	REMOTEUI_PARAM_INT,
-	REMOTEUI_PARAM_BOOL,
-	REMOTEUI_PARAM_STRING,
-	REMOTEUI_PARAM_ENUM,
-};
-
-enum ActionType{
-	HELO_ACTION, REQUEST_ACTION, SEND_PARAM_ACTION, CIAO_ACTION, TEST_ACTION, PRESET_LIST_ACTION,
-	SET_PRESET_ACTION, SAVE_PRESET_ACTION, DELETE_PRESET_ACTION
-};
-
-enum ArgType{
-	FLT_ARG, INT_ARG, BOL_ARG, STR_ARG, NULL_ARG, ENUM_ARG
-};
-
-struct DecodedMessage{
-	ActionType action;
-	ArgType argument;
-	string paramName;
-	string paramGroup;
-};
-
-class RemoteUIParam{ //I am lazy and I know it
-
-public:
-
-	RemoteUIParam(){
-		floatValAddr = NULL;
-		intValAddr = NULL;
-		boolValAddr = NULL;
-		stringValAddr = NULL;
-		floatVal = minFloat = maxFloat = 0;
-		intVal = minInt = maxInt = 0;
-		boolVal = false;
-		stringVal = "empty";
-		r = g = b = a = 0;
-		group = DEFAULT_PARAM_GROUP;
-	};
-
-
-	bool isEqualTo(RemoteUIParam &p){
-
-		bool equal = true;
-		switch (type) {
-			case REMOTEUI_PARAM_FLOAT:
-				if(p.floatVal != floatVal) equal = false;
-				if(p.minFloat != minFloat) equal = false;
-				if(p.maxFloat != maxFloat) equal = false;
-				break;
-			case REMOTEUI_PARAM_ENUM:
-			case REMOTEUI_PARAM_INT:
-				if(p.intVal != intVal) equal = false;
-				if(p.minInt != minInt) equal = false;
-				if(p.maxInt != maxInt) equal = false;
-				break;
-			case REMOTEUI_PARAM_BOOL:
-				if(p.boolVal != boolVal) equal = false;
-				break;
-			case REMOTEUI_PARAM_STRING:
-				if(p.stringVal != stringVal) equal = false;
-				break;
-			default: printf("weird RemoteUIParam at isEqualTo()!\n"); break;
-		}
-		return equal;
-	}
-
-
-	void print(){
-		switch (type) {
-			case REMOTEUI_PARAM_FLOAT: printf("float: %.2f [%.2f, %.2f]\n", floatVal, minFloat, maxFloat); break;
-			case REMOTEUI_PARAM_INT: printf("int: %d [%d, %d]\n", intVal, minInt, maxInt); break;
-			case REMOTEUI_PARAM_ENUM: printf("enum: %d [%d, %d]\n", intVal, minInt, maxInt); break;
-			case REMOTEUI_PARAM_BOOL: printf("bool: %d\n", boolVal); break;
-			case REMOTEUI_PARAM_STRING: printf("string: %s\n", stringVal.c_str()); break;
-			default: printf("weird RemoteUIParam at print()!\n"); break;
-		}
-	};
-
-	RemoteUIParamType type;
-
-	float * floatValAddr;	//used in server
-	float floatVal;			//used in client
-	float minFloat;
-	float maxFloat;
-
-	int * intValAddr;
-	int intVal;
-	int minInt;
-	int maxInt;
-
-	bool * boolValAddr;
-	bool boolVal;
-
-	string * stringValAddr;
-	string stringVal;
-	string group;
-	vector<string> enumList; //for enum type
-
-	unsigned char r,g,b,a; // color [0,255]
-};
 
 
 class ofxRemoteUI{

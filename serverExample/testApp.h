@@ -22,8 +22,8 @@ public:
 		bool drawOutlines;
 		int numCircles;
 
+		ofColor color;
 		MenuItems menu;
-		float test4;
 
 
 		string currentSentence; 

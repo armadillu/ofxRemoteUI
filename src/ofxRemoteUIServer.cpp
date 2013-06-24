@@ -64,6 +64,7 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 	int numStrings = 0;
 	int numBools = 0;
 	int numEnums = 0;
+	int numColors = 0;
 
 	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		string key = (*ii).first;
@@ -81,10 +82,22 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 				s.setAttribute("REMOTEUI_PARAM_INT", "paramName", key, numInts);
 				numInts++;
 				break;
+			case REMOTEUI_PARAM_COLOR:
+				s.addTag("REMOTEUI_PARAM_COLOR");
+				s.setAttribute("REMOTEUI_PARAM_COLOR", "paramName", key, numColors);
+				s.pushTag("REMOTEUI_PARAM_COLOR", numColors);
+				cout << "ofxRemoteUIServer saving '" << key << "' (" << (int)*t.redValAddr << " " << (int)*(t.redValAddr+1) << " " << (int)*(t.redValAddr+2) << " " << (int)*(t.redValAddr+3) << ") to XML" << endl;
+				s.setValue("R", (int)*t.redValAddr);
+				s.setValue("G", (int)*(t.redValAddr+1));
+				s.setValue("B", (int)*(t.redValAddr+2));
+				s.setValue("A", (int)*(t.redValAddr+3));
+				s.popTag();
+				numColors++;
+				break;
 			case REMOTEUI_PARAM_ENUM:
 				cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.intValAddr <<") to XML" << endl;
-				s.setValue("REMOTEUI_PARAM_ENUM", (int)*t.intValAddr, numInts);
-				s.setAttribute("REMOTEUI_PARAM_ENUM", "paramName", key, numInts);
+				s.setValue("REMOTEUI_PARAM_ENUM", (int)*t.intValAddr, numEnums);
+				s.setAttribute("REMOTEUI_PARAM_ENUM", "paramName", key, numEnums);
 				numEnums++;
 				break;
 			case REMOTEUI_PARAM_BOOL:
@@ -153,6 +166,35 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 							cout << "ofxRemoteUIServer ERROR at loading INT (" << paramName << ")" << endl;
 						}
 					}
+				}
+			}
+
+			int numColors = s.getNumTags("REMOTEUI_PARAM_COLOR");
+			if(numColors > 0){
+				for (int i=0; i< numColors; i++){
+					string paramName = s.getAttribute("REMOTEUI_PARAM_COLOR", "paramName", "", i);
+					s.pushTag("REMOTEUI_PARAM_COLOR", i);
+					int r = s.getValue("R", 0);
+					int g = s.getValue("G", 0);
+					int b = s.getValue("B", 0);
+					int a = s.getValue("A", 0);
+					map<string,RemoteUIParam>::iterator it = params.find(paramName);
+					if ( it != params.end() ){	// found!
+						if(params[paramName].redValAddr != NULL){
+							*params[paramName].redValAddr = r;
+							params[paramName].redVal = r;
+							*(params[paramName].redValAddr+1) = g;
+							params[paramName].greenVal = g;
+							*(params[paramName].redValAddr+2) = b;
+							params[paramName].blueVal = b;
+							*(params[paramName].redValAddr+3) = a;
+							params[paramName].alphaVal = a;
+							cout << "ofxRemoteUIServer loading a COLOR '" << paramName <<"' (" << (int)*params[paramName].redValAddr << " " << (int)*(params[paramName].redValAddr+1) << " " << (int)*(params[paramName].redValAddr+2) << " " << (int)*(params[paramName].redValAddr+3)  << ") from XML" << endl;
+						}else{
+							cout << "ofxRemoteUIServer ERROR at loading COLOR (" << paramName << ")" << endl;
+						}
+					}
+					s.popTag();
 				}
 			}
 
@@ -424,6 +466,20 @@ void ofxRemoteUIServer::shareParam(string paramName, string* param, ofColor c, i
 	setColorForParam(p, c);
 	addParamToDB(p, paramName);
 	cout << "ofxRemoteUIServer Sharing String Param '" << paramName << "'" <<endl;
+}
+
+void ofxRemoteUIServer::shareParam(string paramName, unsigned char* param, ofColor bgColor, int nothingUseful){
+	RemoteUIParam p;
+	p.type = REMOTEUI_PARAM_COLOR;
+	p.redValAddr = param;
+	p.redVal = param[0];
+	p.greenVal = param[1];
+	p.blueVal = param[2];
+	p.alphaVal = param[3];
+	p.group = upcomingGroup;
+	setColorForParam(p, bgColor);
+	addParamToDB(p, paramName);
+	cout << "ofxRemoteUIServer Sharing Color Param '" << paramName << "'" <<endl;
 }
 
 

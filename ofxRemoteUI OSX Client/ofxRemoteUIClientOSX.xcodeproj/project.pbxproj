@@ -111,6 +111,7 @@
 		BBDCBDFD16A0526C00F1C5EC /* ofxRemoteUIClientOSX-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "ofxRemoteUIClientOSX-Prefix.pch"; path = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch"; sourceTree = SOURCE_ROOT; };
 		BBDCBE2716A063A400F1C5EC /* ReadMe.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ReadMe.txt; sourceTree = "<group>"; };
 		BBE6075716A466A7002F1707 /* offline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = offline.png; path = ofxRemoteUIClientOSX/offline.png; sourceTree = SOURCE_ROOT; };
+		BBFB932A17785ECC00A5E741 /* RemoteParam.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RemoteParam.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -336,6 +337,7 @@
 		BBDCBDF416A051B000F1C5EC /* src */ = {
 			isa = PBXGroup;
 			children = (
+				BBFB932A17785ECC00A5E741 /* RemoteParam.h */,
 				BB5F5EB01769462600F1FA92 /* uriencode.h */,
 				BBDCBDF516A051B000F1C5EC /* ofxRemoteUI.cpp */,
 				BBDCBDF616A051B000F1C5EC /* ofxRemoteUI.h */,

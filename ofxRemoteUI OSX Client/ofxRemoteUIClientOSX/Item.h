@@ -22,6 +22,7 @@
 	IBOutlet NSTextField *sliderMin;
 	IBOutlet NSTextField *sliderMax;
 	IBOutlet NSPopUpButton * enumeratorMenu;
+	IBOutlet NSColorWell * colorWell;
 
 	int numberID; // to handle alternating rows in table draw
 	

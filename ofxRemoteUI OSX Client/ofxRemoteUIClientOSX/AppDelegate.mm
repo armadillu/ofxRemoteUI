@@ -118,6 +118,8 @@ void clientCallback(RemoteUICallBackArg a){
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(windowBecameMain:) name:NSWindowDidBecomeKeyNotification object:window];
 
 
+	[[NSColorPanel sharedColorPanel] setShowsAlpha: YES];
+
 	CALayer *viewLayer = [CALayer layer];
 	//[viewLayer setBackgroundColor:CGColorCreateGenericRGB(0,0,0,0.1)];
 	[listContainer setWantsLayer:YES]; // view's backing store is using a Core Animation Layer
@@ -454,7 +456,6 @@ void clientCallback(RemoteUICallBackArg a){
 	}else{
 		currentGroup = [gr UTF8String];
 	}
-
 	NSLog(@"user chose group: _%s_",currentGroup.c_str());
 	[self layoutWidgetsWithConfig: [self calcLayoutParams]];
 }
@@ -674,7 +675,7 @@ void clientCallback(RemoteUICallBackArg a){
 		}
 
 		if(!client->isReadyToSend()){	//if the other side disconnected, or error
-			NSLog(@"disconnect cos its NOT isReadyToSend");
+			//NSLog(@"disconnect cos its NOT isReadyToSend");
 			[self connect]; //this disconnects if we were connectd
 		}
 	}

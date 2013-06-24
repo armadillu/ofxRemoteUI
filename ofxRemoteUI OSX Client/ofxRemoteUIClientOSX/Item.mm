@@ -56,13 +56,13 @@
 	if (numberID%2 == 1)
 		[bg setBackgroundColor:[NSColor whiteColor]];
 	else
-		[bg setBackgroundColor:[NSColor colorWithCalibratedRed:0.950 green:0.950 blue:1 alpha:1.000]];
+		[bg setBackgroundColor:[NSColor colorWithDeviceRed:0.950 green:0.950 blue:1 alpha:1.000]];
 
 	if (param.a > 0 ){
 		[bg setBackgroundColor: [NSColor colorWithDeviceRed: param.r/255.
-													  green: param.g/255.
-													   blue: param.b/255.
-													  alpha: param.a/255.]
+														  green: param.g/255.
+														   blue: param.b/255.
+														  alpha: param.a/255.]
 		 ];
 	}
 	[self setupUI];
@@ -109,6 +109,7 @@
 			[textView removeFromSuperview];
 			[slider setAllowsTickMarkValuesOnly:false];
 			[enumeratorMenu removeFromSuperview];
+			[colorWell removeFromSuperview];
 			break;
 
 		case REMOTEUI_PARAM_INT:
@@ -118,6 +119,19 @@
 			[slider setAllowsTickMarkValuesOnly:true];
 			[widget setAction:@selector(updateInt:)];
 			[button removeFromSuperview];
+			[textView removeFromSuperview];
+			[enumeratorMenu removeFromSuperview];
+			[colorWell removeFromSuperview];
+			break;
+
+		case REMOTEUI_PARAM_COLOR:
+			widget = colorWell;
+			[widget setAction:@selector(updateColor:)];
+			[button removeFromSuperview];
+			[slider removeFromSuperview];
+			[sliderMax removeFromSuperview];
+			[sliderMin removeFromSuperview];
+			[sliderVal removeFromSuperview];
 			[textView removeFromSuperview];
 			[enumeratorMenu removeFromSuperview];
 			break;
@@ -131,6 +145,7 @@
 			[sliderMax removeFromSuperview];
 			[sliderMin removeFromSuperview];
 			[sliderVal removeFromSuperview];
+			[colorWell removeFromSuperview];
 			[enumeratorMenu removeAllItems];
 			for(int i = 0; i < param.enumList.size(); i++){
 				[enumeratorMenu addItemWithTitle:[NSString stringWithFormat:@"%s", param.enumList[i].c_str()]];
@@ -145,6 +160,7 @@
 			[sliderMax removeFromSuperview];
 			[sliderMin removeFromSuperview];
 			[sliderVal removeFromSuperview];
+			[colorWell removeFromSuperview];
 			[enumeratorMenu removeFromSuperview];
 			break;
 
@@ -156,6 +172,7 @@
 			[sliderMax removeFromSuperview];
 			[sliderMin removeFromSuperview];
 			[sliderVal removeFromSuperview];
+			[colorWell removeFromSuperview];
 			[enumeratorMenu removeFromSuperview];
 			break;
 
@@ -188,6 +205,15 @@
 			[sliderMin setStringValue:[NSString stringWithFormat:@"%d", param.minInt ]];
 			break;
 
+		case REMOTEUI_PARAM_COLOR:{
+			NSColor * col = [NSColor colorWithSRGBRed:param.redVal/255. green:param.greenVal/255. blue:param.blueVal/255. alpha:param.alphaVal/255.];
+			//col = [col colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
+			//CGFloat comp[] = {param.redVal/255., param.greenVal/255., param.blueVal/255., param.alphaVal/255. };
+			//NSColor * col = [NSColor colorWithColorSpace:[NSColorSpace sRGBColorSpace] components:comp count:4];
+			col = [col colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
+			[colorWell setColor:col];
+			}break;
+
 		case REMOTEUI_PARAM_ENUM:
 			[enumeratorMenu selectItemAtIndex: param.intVal - param.minInt];
 			break;
@@ -205,6 +231,27 @@
 		default:
 			NSLog(@"updateUI wtf");
 			break;
+	}
+}
+
+-(IBAction)updateColor:(id)sender{
+
+	NSColor * col = [sender color];
+	//NSLog(@"colorSP: %@", [col colorSpaceName]);
+	//col = [col colorUsingColorSpaceName:NSCalibratedRGBColorSpace device:[[NSApp mainWindow] deviceDescription]];
+	//NSString*	myColorSpace = [col colorSpaceName];
+	col = [col colorUsingColorSpaceName: NSCalibratedRGBColorSpace device:[[NSApp mainWindow] deviceDescription]];
+	//[sender setColor:col];
+	NSColor * col2 = [col colorUsingColorSpace:[NSColorSpace sRGBColorSpace] ];
+	//[sender performSelector:@selector(setColor:) withObject:col2 afterDelay:1];
+
+	//NSLog(@"colorSP2: %@", [col colorSpaceName]);
+	param.redVal = [col redComponent] * 255.0f;
+	param.greenVal = [col greenComponent] * 255.0f;
+	param.blueVal = [col blueComponent] * 255.0f;
+	param.alphaVal = [col alphaComponent] * 255.0f;
+	if ([[NSApp delegate] respondsToSelector:@selector(userChangedParam:paramName:)]){
+		[[NSApp delegate] userChangedParam: param paramName: paramName];  //blindly send message to App Delegate (TODO!)
 	}
 }
 
@@ -232,6 +279,7 @@
 		[[NSApp delegate] userChangedParam: param paramName: paramName];  //blindly send message to App Delegate (TODO!)
 	}
 }
+
 
 -(IBAction)updateBool:(id)sender{
 	//printf("%d\n", [sender intValue]);

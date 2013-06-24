@@ -41,6 +41,7 @@ public:
 	void trackParam(string paramName, bool* param); 
 	void trackParam(string paramName, int* param);
 	void trackParam(string paramName, string* param);
+	void trackParam(string paramName, unsigned char* param); //color! 4 components!
 	void trackParam(string paramName, int* param, vector<string> list);
 
 

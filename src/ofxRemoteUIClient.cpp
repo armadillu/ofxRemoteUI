@@ -252,6 +252,22 @@ void ofxRemoteUIClient::trackParam(string paramName, bool* param){
 }
 
 
+void ofxRemoteUIClient::trackParam(string paramName, unsigned char* param){
+	RemoteUIParam p;
+	map<string,RemoteUIParam>::iterator it = params.find(paramName);
+	if ( it == params.end() ){	//not found! we add it
+		p.type = REMOTEUI_PARAM_COLOR;
+	}else{
+		p = params[paramName];
+		if (p.type != REMOTEUI_PARAM_COLOR ){
+			cout << "wtf called trackParam(bool) on a param that's not a color!" << endl;
+		}
+	}
+	p.redValAddr = param;
+	addParamToDB(p, paramName);
+}
+
+
 void ofxRemoteUIClient::sendUntrackedParamUpdate(RemoteUIParam p, string paramName){
 	//p.print();
 	params[paramName] = p; //TODO error check!
