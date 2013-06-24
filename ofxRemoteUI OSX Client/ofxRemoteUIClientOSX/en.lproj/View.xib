@@ -311,11 +311,11 @@
 							</object>
 							<object class="NSColorWell" id="216794602">
 								<reference key="NSNextResponder" ref="34091846"/>
-								<int key="NSvFlags">285</int>
+								<int key="NSvFlags">269</int>
 								<set class="NSMutableSet" key="NSDragTypes">
 									<string>NSColor pasteboard type</string>
 								</set>
-								<string key="NSFrame">{{79, 5}, {77, 24}}</string>
+								<string key="NSFrame">{{90, 4}, {55, 26}}</string>
 								<reference key="NSSuperview" ref="34091846"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="963148419"/>
@@ -741,7 +741,6 @@
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="updateBool:">id</string>
 						<string key="updateColor:">id</string>
-						<string key="updateEnum:">id</string>
 						<string key="updateFloat:">id</string>
 						<string key="updateInt:">id</string>
 						<string key="updateString:">id</string>
@@ -753,10 +752,6 @@
 						</object>
 						<object class="IBActionInfo" key="updateColor:">
 							<string key="name">updateColor:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="updateEnum:">
-							<string key="name">updateEnum:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="updateFloat:">
