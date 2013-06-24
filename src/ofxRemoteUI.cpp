@@ -378,7 +378,7 @@ string ofxRemoteUI::getValuesAsString(){
 		switch (param.type) {
 			case REMOTEUI_PARAM_FLOAT: out << param.floatVal << endl; break;
 			case REMOTEUI_PARAM_INT: out << param.intVal << endl; break;
-			case REMOTEUI_PARAM_COLOR: out << param.redVal << " " << param.greenVal << " " << param.blueVal << " " << param.alphaVal << " " << endl; break;
+			case REMOTEUI_PARAM_COLOR: out << (int)param.redVal << " " << (int)param.greenVal << " " << (int)param.blueVal << " " << (int)param.alphaVal << " " << endl; break;
 			case REMOTEUI_PARAM_ENUM: out << param.intVal << endl; break;
 			case REMOTEUI_PARAM_BOOL: out << (param.boolVal?"1":"0") << endl; break;
 			case REMOTEUI_PARAM_STRING: out << UriEncode(param.stringVal) << endl; break;
