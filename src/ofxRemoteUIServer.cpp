@@ -199,8 +199,8 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 			}
 
 			int numEnums = s.getNumTags("REMOTEUI_PARAM_ENUM");
-			if(numInts > 0){
-				for (int i=0; i< numInts; i++){
+			if(numEnums > 0){
+				for (int i=0; i< numEnums; i++){
 					string paramName = s.getAttribute("REMOTEUI_PARAM_ENUM", "paramName", "", i);
 					float val = s.getValue("REMOTEUI_PARAM_ENUM", 0, i);
 					map<string,RemoteUIParam>::iterator it = params.find(paramName);
