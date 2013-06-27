@@ -449,15 +449,24 @@ void clientCallback(RemoteUICallBackArg a){
 
 
 -(IBAction)userChoseGroup:(id)sender{
-	int index = [sender indexOfSelectedItem];
-	NSString * gr = [[sender itemAtIndex:index] title];
-	if ( [gr isEqualToString:ALL_PARAMS_GROUP]){
+
+	NSString * groupName ;
+	if( [sender class] == [NSPopUpButton class] ){
+		int index = [sender indexOfSelectedItem];
+		groupName = [[sender itemAtIndex:index] title];
+	}else{
+		groupName = [sender title];
+		[groupsMenu selectItemWithTitle:groupName];
+	}
+
+	if ( [groupName isEqualToString:ALL_PARAMS_GROUP]){
 		currentGroup = "";
 	}else{
-		currentGroup = [gr UTF8String];
+		currentGroup = [groupName UTF8String];
 	}
 	NSLog(@"user chose group: _%s_",currentGroup.c_str());
 	[self layoutWidgetsWithConfig: [self calcLayoutParams]];
+
 }
 
 
@@ -506,11 +515,36 @@ void clientCallback(RemoteUICallBackArg a){
 	}
     [groupsMenu removeAllItems];
     [groupsMenu addItemsWithTitles: menuItemNameArray];
+
+	//menubar groups
+	[groupsMenuBar removeAllItems];
+	NSMenuItem * m = [groupsMenuBar addItemWithTitle:[menuItemNameArray objectAtIndex:0]
+							 action:@selector(userChoseGroup:)
+					  keyEquivalent: @"0"
+	 ];
+	[m setAction:@selector(userChoseGroup:)];
+	[m setTag:0];
+	for(int i = 0 ; i < allGroupNames.size(); i++){
+		m = [groupsMenuBar addItemWithTitle:[menuItemNameArray objectAtIndex:i+1]
+								 action:@selector(userChoseGroup:)
+						  keyEquivalent: i <= 9 ? [NSString stringWithFormat:@"%d", i+1] : @""
+		 ];
+
+		[m setAction:@selector(userChoseGroup:)];
+		[m setTarget: self];
+		[m setEnabled:YES];
+		[m setTag:i+1];
+	}
+
 	if(currentGroup.size() > 0){
 		[groupsMenu selectItemWithTitle:[NSString stringWithFormat:@"%s",currentGroup.c_str()] ];
 	}else{
 		[groupsMenu selectItemAtIndex:0];
 	}
+}
+
+-(BOOL)validateMenuItem:(NSMenuItem*) item{
+	return YES;
 }
 
 

@@ -41,6 +41,7 @@ struct LayoutConfig{
 	IBOutlet MyScrollView * scroll;
 	IBOutlet NSPopUpButton * groupsMenu;
 	IBOutlet NSPopUpButton * presetsMenu;
+	IBOutlet NSMenu * groupsMenuBar;
 
 	bool updateContinuosly;
 
