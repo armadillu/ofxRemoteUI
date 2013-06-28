@@ -67,7 +67,7 @@ void testApp::keyPressed(int key){
 	}
 	if(key=='2'){
 		client.setPreset("a");
-	}
+	} 
 	if(key=='3'){
 		client.deletePreset("a");
 	}

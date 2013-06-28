@@ -474,7 +474,6 @@ void ofxRemoteUI::sendREQU(bool confirmation){
 }
 
 
-
 void ofxRemoteUI::sendTEST(){
 	//cout << "sendTEST()" << endl;
 	waitingForReply = true;

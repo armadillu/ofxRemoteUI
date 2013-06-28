@@ -29,9 +29,12 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	waitingForReply = false;
 	colorSet = false;
 	upcomingGroup = DEFAULT_PARAM_GROUP;
+	//TODO presets wont work outside OF
+	#if ( OF_VERSION_MINOR > 0 )
 	ofDirectory d;
 	d.open(OFX_REMOTEUI_PRESET_DIR);
 	d.create(true);
+	#endif
 }
 
 
@@ -362,14 +365,20 @@ void ofxRemoteUIServer::update(float dt){
 }
 
 void ofxRemoteUIServer::deletePreset(string name){
+	//TODO presets wont work outside OF
+	#if ( OF_VERSION_MINOR > 0 )
 	ofDirectory dir;
 	dir.open(string(OFX_REMOTEUI_PRESET_DIR) + "/" + name + ".xml");
 	dir.remove(true);
+	#endif
 }
 
 vector<string> ofxRemoteUIServer::getAvailablePresets(){
 
+
 	vector<string> presets;
+	//TODO presets wont work outside OF
+	#if ( OF_VERSION_MINOR > 0 )
 	ofDirectory dir;
 	dir.listDir(ofToDataPath(OFX_REMOTEUI_PRESET_DIR));
 	vector<ofFile> files = dir.getFiles();
@@ -383,6 +392,7 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(){
 			presets.push_back(presetName);
 		}
 	}
+	#endif
 	return presets;
 }
 
