@@ -18,7 +18,7 @@ OF addon allows you to serve any variables you want (bool, float, int, enum, str
 * Easy to use macros
 
 ## Demo Video
-Watch the [demo video](http://youtu.be/QVyAiopGK4U).
+Watch the [demo video](http://www.youtube.com/watch?v=EHS3bd0beKQ).
 
 ## Compatibility
 Works in OpenFrameworks, but also in plain C++ projects.
