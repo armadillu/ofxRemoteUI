@@ -1,5 +1,6 @@
 
 #include "ofStolenUtils.h"
+#include <string.h>
 
 int ofToInt(const std::string& intString) {
 	int x = 0;
