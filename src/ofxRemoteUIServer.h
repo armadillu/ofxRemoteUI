@@ -30,10 +30,9 @@
 #define	OFX_REMOTEUI_SERVER_SAVE_TO_XML()				( ofxRemoteUIServer::instance()->saveToXML(OFX_REMOTEUI_SETTINGS_FILENAME) )
 #define	OFX_REMOTEUI_SERVER_LOAD_FROM_XML()				( ofxRemoteUIServer::instance()->loadFromXML(OFX_REMOTEUI_SETTINGS_FILENAME) )
 
-#ifndef OF_VERSION_MINOR
-	//if OF is not there, redefine ofColor to myColor
-	#define ofColor myColor
 
+#ifndef OF_VERSION_MINOR //if OF is not there, redefine ofColor to myColor
+	#define ofColor myColor
 	struct myColor{
 		myColor(){}
 		myColor(int rr, int gg, int bb, int aa){
@@ -87,7 +86,6 @@ private:
 	bool colorSet; //if user called setParamColor()
 	ofColor paramColor;
 	string upcomingGroup;
-
-
 };
+
 #endif

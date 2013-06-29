@@ -35,6 +35,7 @@
 		BBB1F6FB1749003B00992119 /* connected.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB1F6F91749003B00992119 /* connected.png */; };
 		BBB1F6FC1749003B00992119 /* connected@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB1F6FA1749003B00992119 /* connected@2x.png */; };
 		BBB1F6FE174900D100992119 /* offline@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB1F6FD174900D100992119 /* offline@2x.png */; };
+		BBC75889177EFA1E009C7F74 /* ofxRemoteUIServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5BE177E483400B595F8 /* ofxRemoteUIServer.cpp */; };
 		BBCC327B16A59D5D005D9CFC /* HighWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = BBCC327A16A59D5D005D9CFC /* HighWindow.m */; };
 		BBD3270F173BFFF200D59359 /* ofxRemoteUIClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */; };
 		BBDCBDE416A0512300F1C5EC /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = BBDCBDDE16A0512300F1C5EC /* Credits.rtf */; };
@@ -481,6 +482,7 @@
 				BBDCBDF916A0523500F1C5EC /* Item.mm in Sources */,
 				BBDCBDFB16A0523A00F1C5EC /* main.m in Sources */,
 				BBCC327B16A59D5D005D9CFC /* HighWindow.m in Sources */,
+				BBC75889177EFA1E009C7F74 /* ofxRemoteUIServer.cpp in Sources */,
 				BB94E5AE17468EAE00A7A3CC /* ColorView.m in Sources */,
 				BB6CC35D174698DE0043F523 /* MyScrollView.m in Sources */,
 				BB5CC60C177E49D500B595F8 /* IpEndpointName.cpp in Sources */,

@@ -10,6 +10,10 @@
 #include <iostream>
 #include <algorithm>
 #include <string>
+#include <string.h>
+#include "dirent.h"
+#include "ofStolenUtils.h"
+#include <sys/stat.h>
 
 ofxRemoteUIServer* ofxRemoteUIServer::singleton = NULL;
 
@@ -29,11 +33,17 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	waitingForReply = false;
 	colorSet = false;
 	upcomingGroup = DEFAULT_PARAM_GROUP;
-	//TODO presets wont work outside OF
-	#if ( OF_VERSION_MINOR > 0 )
+
+	#if ( OF_VERSION_MINOR > 0 ) 
 	ofDirectory d;
 	d.open(OFX_REMOTEUI_PRESET_DIR);
 	d.create(true);
+	#else
+		#if defined(_WIN32)
+		_mkdir(OFX_REMOTEUI_PRESET_DIR);
+		#else
+		mkdir(OFX_REMOTEUI_PRESET_DIR, 0777); 
+		#endif
 	#endif
 }
 
@@ -56,8 +66,9 @@ void ofxRemoteUIServer::setParamColor( ofColor c ){
 
 void ofxRemoteUIServer::saveToXML(string fileName){
 
+	cout << "saving to xml: " << fileName <<endl;
 	ofxXmlSettings s;
-	s.loadFile(OFX_REMOTEUI_SETTINGS_FILENAME);
+	s.loadFile(fileName);
 	s.clear();
 	s.addTag(OFX_REMOTEUI_XML_TAG);
 	s.pushTag(OFX_REMOTEUI_XML_TAG);
@@ -365,19 +376,22 @@ void ofxRemoteUIServer::update(float dt){
 }
 
 void ofxRemoteUIServer::deletePreset(string name){
-	//TODO presets wont work outside OF
-	#if ( OF_VERSION_MINOR > 0 )
+
+	#if ( OF_VERSION_MINOR > 0 ) //TODO presets wont work outside OF
 	ofDirectory dir;
 	dir.open(string(OFX_REMOTEUI_PRESET_DIR) + "/" + name + ".xml");
 	dir.remove(true);
+	#else
+		string file = string(OFX_REMOTEUI_PRESET_DIR) + "/" + name + ".xml";
+		remove( file.c_str() );
 	#endif
 }
 
 vector<string> ofxRemoteUIServer::getAvailablePresets(){
 
 	vector<string> presets;
-	//TODO presets wont work outside OF
-	#if ( OF_VERSION_MINOR > 0 )
+
+	#if ( OF_VERSION_MINOR > 0 ) //TODO presets wont work outside OF
 	ofDirectory dir;
 	dir.listDir(ofToDataPath(OFX_REMOTEUI_PRESET_DIR));
 	vector<ofFile> files = dir.getFiles();
@@ -390,6 +404,19 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(){
 			string presetName = fileName.substr(0, fileName.size()-4);
 			presets.push_back(presetName);
 		}
+	}
+	#else
+	DIR *dir;
+	struct dirent *ent;
+	if ((dir = opendir (OFX_REMOTEUI_PRESET_DIR)) != NULL) {
+		while ((ent = readdir (dir)) != NULL) {
+			if ( strcmp( get_filename_ext(ent->d_name), "xml") == 0 ){
+				string fileName = string(ent->d_name);
+				string presetName = fileName.substr(0, fileName.size()-4);
+				presets.push_back(presetName);
+			}
+		}
+		closedir (dir);
 	}
 	#endif
 	return presets;

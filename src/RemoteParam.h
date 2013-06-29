@@ -9,6 +9,7 @@
 #ifndef emptyExample_RemoteParam_h
 #define emptyExample_RemoteParam_h
 
+#include <stdio.h>
 
 enum RemoteUICallBackArg{
 	PARAMS_UPDATED, PRESETS_UPDATED, SERVER_DISCONNECTED

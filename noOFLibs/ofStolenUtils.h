@@ -18,14 +18,9 @@
 #include <iomanip>
 
 /*
-
  THIS IS A SHAMEFUL RIP OF A FEW OF METHODS
- 
  the whole point is for ofxRemoteUI to work also outside OF if required
- 
 */
-
-
 
 int ofToInt(const std::string& intString) ;
 float ofToFloat(const std::string& floatString);
@@ -64,6 +59,6 @@ std::string ofToString(const T& value, int precision, int width, char fill ){
 }
 
 
-
+const char *get_filename_ext(const char *filename) ;
 
 #endif

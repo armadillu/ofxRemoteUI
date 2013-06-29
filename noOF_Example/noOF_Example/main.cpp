@@ -12,6 +12,7 @@
 
 int prevMyParam;
 int myParam = 0;
+bool quitButton = false;
 
 void update();
 
@@ -22,15 +23,17 @@ int main(int argc, const char * argv[]){
 
 	OFX_REMOTEUI_SERVER_SETUP(10000); 	//start server
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(myParam, 0, 100); // share my param
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(quitButton);
 
 	OFX_REMOTEUI_SERVER_LOAD_FROM_XML(); //load from XML
-	int c = 0;
-	while (c < 500) {
+	while (quitButton == false) {
 		update();
 		usleep(100000 / 6.);
-		c++;
 	}
+
+	quitButton = false;
 	OFX_REMOTEUI_SERVER_SAVE_TO_XML();
+	OFX_REMOTEUI_SERVER_CLOSE();
     return 0;
 }
 
