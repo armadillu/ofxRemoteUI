@@ -375,7 +375,6 @@ void ofxRemoteUIServer::deletePreset(string name){
 
 vector<string> ofxRemoteUIServer::getAvailablePresets(){
 
-
 	vector<string> presets;
 	//TODO presets wont work outside OF
 	#if ( OF_VERSION_MINOR > 0 )

@@ -24,11 +24,13 @@ int main(int argc, const char * argv[]){
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(myParam, 0, 100); // share my param
 
 	OFX_REMOTEUI_SERVER_LOAD_FROM_XML(); //load from XML
-	
-	while (true) {
+	int c = 0;
+	while (c < 500) {
 		update();
-		usleep(100000 / 6);
+		usleep(100000 / 6.);
+		c++;
 	}
+	OFX_REMOTEUI_SERVER_SAVE_TO_XML();
     return 0;
 }
 
