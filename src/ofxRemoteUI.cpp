@@ -8,7 +8,7 @@
 
 #include "ofxRemoteUI.h"
 #include <iostream>
-
+#include <stdlib.h>
 #include "uriencode.h"
 #include <sstream>
 
