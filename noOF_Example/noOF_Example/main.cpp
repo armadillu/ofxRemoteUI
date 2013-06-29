@@ -10,9 +10,12 @@
 #include "ofxRemoteUIServer.h"
 #include "unistd.h"
 
-int prevMyParam;
 int myParam = 0;
+ofColor color;
 bool quitButton = false;
+
+int prevMyParam;
+ofColor prevColor;
 
 void update();
 
@@ -23,6 +26,8 @@ int main(int argc, const char * argv[]){
 
 	OFX_REMOTEUI_SERVER_SETUP(10000); 	//start server
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(myParam, 0, 100); // share my param
+	OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color);
+
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(quitButton);
 
 	OFX_REMOTEUI_SERVER_LOAD_FROM_XML(); //load from XML
@@ -43,6 +48,12 @@ void update(){
 	if (prevMyParam != myParam){
 		cout << "myParam is " << myParam << endl;
 	}
+
+	if(color != prevColor){
+		printf("color is %d %d %d %d\n", color.r, color.g, color.b, color.a);
+	}
+
 	prevMyParam = myParam;
+	prevColor = color;
 
 }

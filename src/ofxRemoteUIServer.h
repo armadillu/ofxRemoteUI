@@ -42,6 +42,14 @@
 			r = g = b = bright; a = 255;
 		}
 
+		bool operator==(const myColor& c){
+			return r == c.r && g == c.g && b == c.b && a == c.a;
+		}	
+
+		bool operator!=(const myColor& c){
+			return r != c.r || g != c.g || b != c.b || a != c.a;
+		}
+
 		union  {
 			struct {
 				unsigned char r, g, b, a;
