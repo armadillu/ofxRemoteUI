@@ -12,7 +12,6 @@
 #include <string>
 #include <string.h>
 #include "dirent.h"
-#include "ofStolenUtils.h"
 #include <sys/stat.h>
 
 ofxRemoteUIServer* ofxRemoteUIServer::singleton = NULL;
