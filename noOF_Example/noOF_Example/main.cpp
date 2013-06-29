@@ -55,5 +55,5 @@ void update(){
 
 	prevMyParam = myParam;
 	prevColor = color;
-
 }
+
