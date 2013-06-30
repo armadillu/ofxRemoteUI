@@ -559,7 +559,7 @@ void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int ma
 	setColorForParam(p, c);
 	p.intVal = *param = ofClamp(*param, min, max);
 	addParamToDB(p, paramName);
-	cout << "ofxRemoteUIServer Sharing  Int Param '" << paramName << "'" << endl;
+	cout << "ofxRemoteUIServer Sharing Int Param '" << paramName << "'" << endl;
 }
 
 void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int max, vector<string> names, ofColor c ){

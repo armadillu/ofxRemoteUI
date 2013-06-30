@@ -35,7 +35,7 @@ void ofxRemoteUI::addParamToDB(RemoteUIParam p, string paramName){
 	//see if we already had it, if we didnt, set its add order #
 	map<string,RemoteUIParam>::iterator it = params.find(paramName);
 	if ( it == params.end() ){	//not found!
-		cout << "adding key: " << paramName <<endl;
+		//cout << "adding key: " << paramName <<endl;
 		params[paramName] = p;
 		orderedKeys[ (int)orderedKeys.size() ] = paramName;
 		paramsFromCode[paramName] = p; //cos this didnt exist before, we store it as "from code"
