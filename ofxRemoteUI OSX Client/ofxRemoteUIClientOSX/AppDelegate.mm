@@ -146,7 +146,7 @@ void clientCallback(RemoteUICallBackArg a){
 	currentGroup = ""; //empty group means show all params
 	[presetsMenu removeAllItems];
 
-	NSLog(@"applicationDidFinishLaunching done!");
+	//NSLog(@"applicationDidFinishLaunching done!");
 	currentPreset = "";
 	launched = TRUE;
 }
@@ -440,6 +440,16 @@ void clientCallback(RemoteUICallBackArg a){
 		Item* t = widgets[key];
 		[t enableChanges];
 	}
+}
+
+
+-(IBAction)userWantsRestoreXML:(id)sender;{
+	client->restoreAllParamsToInitialXML();
+}
+
+
+-(IBAction)userWantsRestoreDefaults:(id)sender;{
+	client->restoreAllParamsToDefaultValues();
 }
 
 

@@ -32,19 +32,20 @@
 #define	OFX_REMOTEUI_SERVER_LOAD_FROM_XML()				( ofxRemoteUIServer::instance()->loadFromXML(OFX_REMOTEUI_SETTINGS_FILENAME) )
 
 
-#ifndef OF_VERSION_MINOR //if OF is not there, redefine ofColor to myColor
+#ifndef OF_VERSION_MINOR //if OF is not available, redefine ofColor to myColor
 	#define ofColor myColor
 	struct myColor{
+
 		myColor(){}
+
 		myColor(int rr, int gg, int bb, int aa){
 			r = rr;	g = gg;	b = bb; a = aa;
 		}
+
 		myColor(int bright){
 			r = g = b = bright; a = 255;
 		}
 
-		float sum(){return r+g+b;}
-		
 		bool operator==(const myColor& c){
 			return r == c.r && g == c.g && b == c.b && a == c.a;
 		}	
@@ -54,9 +55,7 @@
 		}
 
 		union  {
-			struct {
-				unsigned char r, g, b, a;
-			};
+			struct { unsigned char r, g, b, a; };
 			unsigned char v[4];
 		};
 	};
@@ -88,6 +87,9 @@ public:
 
 private:
 
+	void restoreAllParamsToInitialXML();
+	void restoreAllParamsToDefaultValues();
+
 	void connect(string address, int port);
 
 	ofxRemoteUIServer(); // use ofxRemoteUIServer::instance() instead!
@@ -101,6 +103,9 @@ private:
 	bool colorSet; //if user called setParamColor()
 	ofColor paramColor;
 	string upcomingGroup;
+
+	bool loadedFromXML; //we start with loadedFromXML=false; once loadXML is called, this becomes true
+
 };
 
 #endif

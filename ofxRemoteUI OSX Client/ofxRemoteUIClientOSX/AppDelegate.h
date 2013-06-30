@@ -75,6 +75,9 @@ struct LayoutConfig{
 -(IBAction)userAddPreset:(id)sender;
 -(IBAction)userDeletePreset:(id)sender;
 
+-(IBAction)userWantsRestoreXML:(id)sender;
+-(IBAction)userWantsRestoreDefaults:(id)sender;
+
 -(IBAction)pasteSpecial:(id)sender;
 -(IBAction)copySpecial:(id)sender;
 

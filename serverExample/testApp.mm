@@ -10,7 +10,7 @@ void testApp::setup(){
 	//set some default values
 	drawOutlines = false;
 	currentSentence = "unInited";
-	x = y = 0;
+	x = y = 66;
 	numCircles = 30;
 	menu = MENU_OPTION_1;
 

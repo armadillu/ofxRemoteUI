@@ -36,7 +36,9 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	waitingForReply = false;
 	colorSet = false;
 	upcomingGroup = DEFAULT_PARAM_GROUP;
-
+	verbose = false;
+	loadedFromXML = false;
+	
 	//add random colors to table
 	colorTableIndex = 0;
 	int a = 64;
@@ -205,6 +207,7 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 							*params[paramName].floatValAddr = val;
 							params[paramName].floatVal = val;
 							*params[paramName].floatValAddr = ofClamp(*params[paramName].floatValAddr, params[paramName].minFloat, params[paramName].maxFloat);
+							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
 							cout << "ofxRemoteUIServer loading a FLOAT '" << paramName <<"' (" << ofToString( *params[paramName].floatValAddr, 3) << ") from XML" << endl;
 						}else{
 							cout << "ofxRemoteUIServer ERROR at loading FLOAT (" << paramName << ")" << endl;
@@ -224,6 +227,7 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 							*params[paramName].intValAddr = val;
 							params[paramName].intVal = val;
 							*params[paramName].intValAddr = ofClamp(*params[paramName].intValAddr, params[paramName].minInt, params[paramName].maxInt);
+							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
 							cout << "ofxRemoteUIServer loading an INT '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" << endl;
 						}else{
 							cout << "ofxRemoteUIServer ERROR at loading INT (" << paramName << ")" << endl;
@@ -252,6 +256,7 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 							params[paramName].blueVal = b;
 							*(params[paramName].redValAddr+3) = a;
 							params[paramName].alphaVal = a;
+							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
 							cout << "ofxRemoteUIServer loading a COLOR '" << paramName <<"' (" << (int)*params[paramName].redValAddr << " " << (int)*(params[paramName].redValAddr+1) << " " << (int)*(params[paramName].redValAddr+2) << " " << (int)*(params[paramName].redValAddr+3)  << ") from XML" << endl;
 						}else{
 							cout << "ofxRemoteUIServer ERROR at loading COLOR (" << paramName << ")" << endl;
@@ -272,6 +277,7 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 							*params[paramName].intValAddr = val;
 							params[paramName].intVal = val;
 							*params[paramName].intValAddr = ofClamp(*params[paramName].intValAddr, params[paramName].minInt, params[paramName].maxInt);
+							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
 							cout << "ofxRemoteUIServer loading an ENUM '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" << endl;
 						}else{
 							cout << "ofxRemoteUIServer ERROR at loading ENUM (" << paramName << ")" << endl;
@@ -292,6 +298,7 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 						if(params[paramName].boolValAddr != NULL){
 							*params[paramName].boolValAddr = val;
 							params[paramName].boolVal = val;
+							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
 							cout << "ofxRemoteUIServer loading a BOOL '" << paramName <<"' (" << (bool) *params[paramName].boolValAddr << ") from XML" << endl;
 						}else{
 							cout << "ofxRemoteUIServer ERROR at loading BOOL (" << paramName << ")" << endl;
@@ -311,13 +318,31 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 						if(params[paramName].stringValAddr != NULL){
 							params[paramName].stringVal = val;
 							*params[paramName].stringValAddr = val;
+							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
+							cout << "ofxRemoteUIServer loading a STRING '" << paramName <<"' (" << (string) *params[paramName].stringValAddr << ") from XML" << endl;
 						}
 						else cout << "ofxRemoteUIServer ERROR at loading STRING (" << paramName << ")" << endl;
-						cout << "ofxRemoteUIServer loading a STRING '" << paramName <<"' (" << (string) *params[paramName].stringValAddr << ") from XML" << endl;
 					}
 				}
 			}
 		}
+	}
+	loadedFromXML = true;
+}
+
+void ofxRemoteUIServer::restoreAllParamsToInitialXML(){
+	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+		string key = (*ii).first;
+		params[key] = paramsFromXML[key];
+		syncPointerToParam(key);
+	}	
+}
+
+void ofxRemoteUIServer::restoreAllParamsToDefaultValues(){
+	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+		string key = (*ii).first;
+		params[key] = paramsFromCode[key];
+		syncPointerToParam(key);
 	}
 }
 
@@ -333,14 +358,14 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	oscReceiver.setup(port);
 }
 
-void ofxRemoteUIServer::update(float dt){
 
+void ofxRemoteUIServer::update(float dt){
 	time += dt;
 	timeSinceLastReply  += dt;
 	if(readyToSend){
 		if (time > updateInterval){
 			time = 0.0f;
-			vector<string> changes = scanForUpdatedParamsAndSync(); //sends changed params to client
+			//vector<string> changes = scanForUpdatedParamsAndSync(); //sends changed params to client
 			//cout << "ofxRemoteUIServer: sent " << ofToString(changes.size()) << " updates to client" << endl;
 			//sendUpdateForParamsInList(changes);
 		}
@@ -361,32 +386,33 @@ void ofxRemoteUIServer::update(float dt){
 
 			case HELO_ACTION: //if client says hi, say hi back
 				sendHELLO();
-				//cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " says HELLO!"  << endl;
+				if(verbose) cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " says HELLO!"  << endl;
 				break;
 
 			case REQUEST_ACTION:{ //send all params to client
-				//cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " sends REQU!"  << endl;
+				if(verbose) cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " sends REQU!"  << endl;
 				vector<string>paramsList = getAllParamNamesList();
+				syncAllParamsToPointers();
 				sendUpdateForParamsInList(paramsList);
 				sendREQU(true); //once all send, confirm to close the REQU
 			}
 				break;
 
 			case SEND_PARAM_ACTION:{ //client is sending us an updated val
-				//cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " sends SEND!"  << endl;
+				if(verbose) cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " sends SEND!"  << endl;
 				updateParamFromDecodedMessage(m, dm);
 			}
 				break;
 
 			case CIAO_ACTION:
-				//cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " says CIAO!" << endl;
+				if(verbose) cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " says CIAO!" << endl;
 				sendCIAO();
 				readyToSend = false;
 				break;
 
 			case TEST_ACTION: // we got a request from client, lets bounce back asap.
 				sendTEST();
-				//cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " says TEST!" << endl;
+				//if(verbose)cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " says TEST!" << endl;
 				break;
 
 			case PRESET_LIST_ACTION: //client wants us to send a list of all available presets
@@ -401,23 +427,35 @@ void ofxRemoteUIServer::update(float dt){
 				//presetNames = getAvailablePresets();
 				string presetName = m.getArgAsString(0);
 				loadFromXML(string(OFX_REMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
-				cout << "ofxRemoteUIServer: setting preset: " << presetName << endl;
+				if(verbose) cout << "ofxRemoteUIServer: setting preset: " << presetName << endl;
 				sendSETP("");
 				}break;
 
 			case SAVE_PRESET_ACTION:{ //client wants to save current xml as a new preset
 				string presetName = m.getArgAsString(0);
-				cout << "ofxRemoteUIServer: saving NEW preset: " << presetName << endl;
+				if(verbose) cout << "ofxRemoteUIServer: saving NEW preset: " << presetName << endl;
 				saveToXML(string(OFX_REMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
 				sendSAVP("");
 				}break;
 
 			case DELETE_PRESET_ACTION:{
 				string presetName = m.getArgAsString(0);
-				cout << "ofxRemoteUIServer: DELETE preset: " << presetName << endl;
+				if(verbose) cout << "ofxRemoteUIServer: DELETE preset: " << presetName << endl;
 				deletePreset(presetName);
 				sendDELP("");
 				}break;
+
+			case RESET_TO_XML_ACTION:{
+				if(verbose) cout << "ofxRemoteUIServer: RESET TO XML: " << endl;
+				restoreAllParamsToInitialXML();
+				sendRESX(true);
+			}break;
+
+			case RESET_TO_DEFAULTS_ACTION:{
+				if(verbose) cout << "ofxRemoteUIServer: RESET TO DEFAULTS: " << endl;
+				restoreAllParamsToDefaultValues();
+				sendRESD(true);
+			}break;
 
 			default: cout << "ofxRemoteUIServer::update >> ERR!" <<endl; break;
 		}
@@ -489,7 +527,6 @@ void ofxRemoteUIServer::shareParam(string paramName, float* param, float min, fl
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_FLOAT;
 	p.floatValAddr = param;
-	p.floatVal = *param;
 	p.maxFloat = max;
 	p.minFloat = min;
 	p.floatVal = *param = ofClamp(*param, min, max);
@@ -516,7 +553,6 @@ void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int ma
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_INT;
 	p.intValAddr = param;
-	p.intVal = *param;
 	p.maxInt = max;
 	p.minInt = min;
 	p.group = upcomingGroup;
@@ -530,7 +566,6 @@ void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int ma
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_ENUM;
 	p.intValAddr = param;
-	p.intVal = *param;
 	p.maxInt = max;
 	p.minInt = min;
 	p.enumList = names;

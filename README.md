@@ -1,29 +1,33 @@
 # ofxRemoteUI
 
 
-OF addon allows you to serve any variables you want (bool, float, int, enum, string, ofColor) on the network, so that you can modify them remotely. Uses server client architecture, where your app is the server. It communicates both ways; you can modify your project's variables from the client, but you can also pull your app's variable values from the client; this way you can track values that evolve programatically.
+OF addon allows you to serve any variables you want (bool, float, int, enum, string, ofColor) on the network, so that you can modify them remotely. Uses server client architecture, where your app is the server. It communicates both ways; you can modify your project's variables from the client, but you can also pull your app's variable values from the client; this way you can track values that evolve programatically. 
+
+Watch the [demo video](http://www.youtube.com/watch?v=EHS3bd0beKQ).
 
 ![OSX Client](http://farm4.staticflickr.com/3760/9167922622_dc7f64f4e1_o.png "OSX Client")
 
+---
+
 ## Features
 
-* Edit & Track variables remotelly thorugh UDP/OSC (bool, int, float, string, Enum, ofColor)
+* Edit & Track variables remotely thorugh UDP/OSC (bool, int, float, string, Enum, ofColor)
 * Native OSX interface
 * Allows to save/load variables
 * Allows creation of Presets
 * Can be used outisde OF too
-* Easily create parameter Groups, and quick access through kb shortcuts
+* Easily create parameter Groups, and quick access through keyboard shortcuts
 * Colorize your variables for easy reading
-* Can be used otuisde OF, and in Processing thx to @kritzikratzi
+* Restore paramters to previous launch ones or to Default values
+* Can be used outside OF, and in Processing thx to @kritzikratzi
 * Easy to use macros
 
-## Demo Video
-Watch the [demo video](http://www.youtube.com/watch?v=EHS3bd0beKQ).
+
 
 ## Compatibility
 Works in OpenFrameworks, but also in plain C++ projects.
 
-There's also a feature limited version of the server for Processing, made by @kritzikratzi! See <a href=http://superduper.org/processing/remoteUI/">here</a>.
+There's also a feature limited version of the Server for Processing, made by @kritzikratzi! See <a href=http://superduper.org/processing/remoteUI/">here</a>.
 
 ## Why?
 
@@ -41,10 +45,16 @@ It uses Macros + the singleton pattern to make it very easy to share any variabl
 
 Also, the OSX client allows to copy all params as plain text. You can also paste them back after editing them! Thx to @kritzikratzi for this!
 
-To use it outisde of OpenFrameworks, you can see how the noOF_Example is setup.
+**"Restore to initial XML Values"** sets alls params to whatever values they had at server app launch.  
+**"Restore to Default Values"** sets alls params to whatever values the shared variable had before sharing it with OFX_REMOTEUI_SERVER_SHARE_PARAM().
+
+To use it outisde of OpenFrameworks, you can see how the noOF_Example is setup.   
 
 
-### How to use
+-----
+
+
+## How To Use
 
 	float x;
 	int y;
@@ -73,16 +83,11 @@ To use it outisde of OpenFrameworks, you can see how the noOF_Example is setup.
 And use the supplied OSX Client to view and edit them.
 
 
-
-to use ofxOsc in your project, which ofxRemoteUI requires, you will need to add all this paths to your project's header search paths:
-
-    ../../../addons/ofxOsc/libs ../../../addons/ofxOsc/libs/oscpack ../../../addons/ofxOsc/libs/oscpack/src ../../../addons/ofxOsc/libs/oscpack/src/ip ../../../addons/ofxOsc/libs/oscpack/src/ip/posix ../../../addons/ofxOsc/libs/oscpack/src/ip/win32 ../../../addons/ofxOsc/libs/oscpack/src/osc ../../../addons/ofxOsc/src
-
 ## Notes
 
-Right now, enums need to be consecutive, so that each enum item is +1 the previous one.
+Enums need to be consecutive, so that each enum item is +1 the previous one.
 
 
-## TODO
+## To Do
 
 - make a multiplatform client, maybe based on ofxUI?

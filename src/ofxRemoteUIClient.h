@@ -30,6 +30,9 @@ public:
 
 	void requestCompleteUpdate(); //ask the server to send us all params and presets
 
+	void restoreAllParamsToInitialXML();
+	void restoreAllParamsToDefaultValues();
+
 	//work with presets
 	void setPreset(string preset); //tell server to choose a preset
 	void savePresetWithName(string presetName); //take current params and make a preset with them

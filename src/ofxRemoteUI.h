@@ -68,12 +68,22 @@ using namespace std;
  SERVER:	DELP OK								//server says ok
  CLIENT:	PREL								//Client requests full list of presets
  SERVER:	PREL PRESET_NAME_LIST(n)			//server sends all preset names
-
- // closing connection ////////
+ ...
+ CLIENT:	RESX								//client wants to delete load all params from the 1st loaded xml (last saved settings)
+ SERVER:	RESX OK								//server says ok
+ CLIENT:	REQU								//client wants ALL values
+ SERVER:	SEND *****							//server sends all params
+ ...
+ CLIENT:	RESD								//client wants to delete load all params from the code defaults
+ SERVER:	RESD OK								//server says ok
+ CLIENT:	REQU								//client wants ALL values
+ SERVER:	SEND *****							//server sends all params
+ ...
  CLIENT:	CIAO								//client disconnects
  SERVER:	CIAO								//server disconnects
 
- 
+
+ // closing connection ////////
 
  // SERVER API ////////////////////////////////////////
 
@@ -114,8 +124,12 @@ public:
 	string getValuesAsString();
 	void setValuesFromString( string values );	
 
+	virtual void restoreAllParamsToInitialXML() = 0;	//call this on client to request server to do so
+	virtual void restoreAllParamsToDefaultValues() = 0;
+
 	bool ready();
 	float connectionLag();
+	void setVerbose(bool b);
 
 	virtual void sendUntrackedParamUpdate(RemoteUIParam p, string paramName){};
 
@@ -131,7 +145,10 @@ protected:
 	bool hasParamChanged(RemoteUIParam p);	
 
 	void updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage dm);
+	void syncAllParamsToPointers();
+	void syncAllPointersToParams();
 	void syncParamToPointer(string paramName);
+	void syncPointerToParam(string paramName);
 	void addParamToDB(RemoteUIParam p, string paramName);
 
 	void sendREQU(bool confirm = false); //a request for a complete list of server params
@@ -142,7 +159,10 @@ protected:
 	void sendSAVP(string presetName);
 	void sendSETP(string presetName);
 	void sendDELP(string presetName);
+	void sendRESX(bool confirm = false); //send a "restore fom first loaded XML" msg
+	void sendRESD(bool confirm = false); //send a "restore fom code defaults" msg
 
+	bool							verbose;
 	bool							readyToSend;
 	ofxOscSender					oscSender;
 	ofxOscReceiver					oscReceiver;
@@ -155,11 +175,17 @@ protected:
 	float							updateInterval;
 	int								port;
 
+
+
 	map<string, RemoteUIParam>		params;
 	map<int, string>				orderedKeys; // used to keep the order in which the params were added
 	vector<string>					presetNames;
 
 	set<string>						paramsChangedSinceLastCheck;
+
+	map<string, RemoteUIParam>		paramsFromCode;
+	map<string, RemoteUIParam>		paramsFromXML;
+
 
 private:
 

@@ -16,6 +16,10 @@ bool ofxRemoteUI::ready(){
 	return readyToSend;
 }
 
+void ofxRemoteUI::setVerbose(bool b){
+	verbose = b;
+}
+
 
 float ofxRemoteUI::connectionLag(){
 	return avgTimeSinceLastReply;
@@ -31,9 +35,10 @@ void ofxRemoteUI::addParamToDB(RemoteUIParam p, string paramName){
 	//see if we already had it, if we didnt, set its add order #
 	map<string,RemoteUIParam>::iterator it = params.find(paramName);
 	if ( it == params.end() ){	//not found!
-		//cout << "adding key: " << paramName <<endl;
+		cout << "adding key: " << paramName <<endl;
 		params[paramName] = p;
 		orderedKeys[ (int)orderedKeys.size() ] = paramName;
+		paramsFromCode[paramName] = p; //cos this didnt exist before, we store it as "from code"
 	}else{
 		params[paramName] = p;
 		cout << "already have a Param with that name on the DB : " << paramName <<"!!" << endl;
@@ -75,6 +80,11 @@ DecodedMessage ofxRemoteUI::decode(ofxOscMessage m){
 									if (action == "SAVP") dm.action = SAVE_PRESET_ACTION;
 									else
 										if (action == "SETP") dm.action = SET_PRESET_ACTION;
+										else
+											if (action == "RESX") dm.action = RESET_TO_XML_ACTION;
+											else
+												if (action == "RESD") dm.action = RESET_TO_DEFAULTS_ACTION;
+
 
 	}
 
@@ -129,7 +139,7 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
  			p.floatVal = m.getArgAsFloat(arg); arg++;
 			p.minFloat = m.getArgAsFloat(arg); arg++;
 			p.maxFloat = m.getArgAsFloat(arg); arg++;
-			//cout << "updated " << dm.paramName << "to a new value: " << p.floatVal << endl;
+			//if(verbose)cout << "updateParamFromDecodedMessage: " << dm.paramName << " to a new value: " << p.floatVal << endl;
 			if (p.floatValAddr){
 				*p.floatValAddr = p.floatVal;
 			}break;
@@ -139,7 +149,7 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 			p.intVal = m.getArgAsInt32(arg); arg++;
 			p.minInt = m.getArgAsInt32(arg); arg++;
 			p.maxInt = m.getArgAsInt32(arg); arg++;
-			//cout << "updated " << dm.paramName << "to a new value: " << p.intVal << endl;
+			//if(verbose)cout << "updateParamFromDecodedMessage: " << dm.paramName << " to a new value: " << p.intVal << endl;
 			if (p.intValAddr){
 				*p.intValAddr = p.intVal;
 			}break;
@@ -150,7 +160,7 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 			p.greenVal = (int)m.getArgAsInt32(arg); arg++;
 			p.blueVal = (int)m.getArgAsInt32(arg); arg++;
 			p.alphaVal = (int)m.getArgAsInt32(arg); arg++;
-			//cout << "updated " << dm.paramName << " to a new value: " <<(int)p.redVal<<" "<<(int)p.greenVal<<" "<<(int)p.blueVal<<" "<<(int)p.alphaVal << endl;
+			//if(verbose)cout << "updateParamFromDecodedMessage: " << dm.paramName << " to a new value: " <<(int)p.redVal<<" "<<(int)p.greenVal<<" "<<(int)p.blueVal<<" "<<(int)p.alphaVal << endl;
 			if (p.redValAddr){
 				*p.redValAddr = p.redVal;
 				*(p.redValAddr+1) = p.greenVal;
@@ -163,7 +173,7 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 			p.intVal = m.getArgAsInt32(arg); arg++;
 			p.minInt = m.getArgAsInt32(arg); arg++;
 			p.maxInt = m.getArgAsInt32(arg); arg++;
-			//cout << "updated " << dm.paramName << "to a new value: " << p.intVal << endl;
+			//if(verbose)cout << "updateParamFromDecodedMessage: " << dm.paramName << " to a new value: " << p.intVal << endl;
 			if (p.intValAddr){
 				*p.intValAddr = p.intVal;
 			}
@@ -178,7 +188,7 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 		case BOL_ARG:
 			p.type = REMOTEUI_PARAM_BOOL;
 			p.boolVal = m.getArgAsInt32(arg) == 0 ? false : true; arg++;
-			//cout << "updated " << dm.paramName << "to a new value: " << p.boolVal << endl;
+			//if(verbose)cout << "updateParamFromDecodedMessage: " << dm.paramName << " to a new value: " << p.boolVal << endl;
 			if (p.boolValAddr){
 				*p.boolValAddr = p.boolVal;
 			}break;
@@ -186,7 +196,7 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 		case STR_ARG:
 			p.type = REMOTEUI_PARAM_STRING;
 			p.stringVal = m.getArgAsString(arg); arg++;
-			//cout << "updated " << dm.paramName << "to a new value: " << (p.stringVal) << endl;
+			//if(verbose)cout << "updateParamFromDecodedMessage: " << dm.paramName << " to a new value: " << (p.stringVal) << endl;
 			if (p.stringValAddr){
 				*p.stringValAddr = p.stringVal;
 			}break;
@@ -251,12 +261,60 @@ void ofxRemoteUI::sendUpdateForParamsInList(vector<string>list){
 
 	for(int i = 0; i < list.size(); i++){
 		RemoteUIParam p = params[list[i]];
-		//cout << "ofxRemoteUIServer: sending updated param " + list[i] << endl;
-		//p.print();
+		//cout << "ofxRemoteUIServer: sending updated param " + list[i]; p.print();
 		sendParam(list[i], p);
 	}
 }
 
+void ofxRemoteUI::syncAllParamsToPointers(){
+	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+		syncParamToPointer( (*ii).first );
+	}
+}
+
+void ofxRemoteUI::syncAllPointersToParams(){
+	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+		syncPointerToParam( (*ii).first );
+	}
+}
+
+void ofxRemoteUI::syncPointerToParam(string paramName){
+
+	RemoteUIParam p = params[paramName];
+
+	switch (p.type) {
+		case REMOTEUI_PARAM_FLOAT:
+			if (p.floatValAddr){
+				*p.floatValAddr = p.floatVal;
+			}break;
+
+		case REMOTEUI_PARAM_ENUM:
+		case REMOTEUI_PARAM_INT:
+			if (p.intValAddr){
+				*p.intValAddr = p.intVal;
+			}break;
+
+		case REMOTEUI_PARAM_COLOR:
+			if (p.redValAddr){
+				*p.redValAddr = p.redVal ;
+				*(p.redValAddr+1) = p.greenVal;
+				*(p.redValAddr+2) = p.blueVal;
+				*(p.redValAddr+3) = p.alphaVal;
+			}break;
+
+		case REMOTEUI_PARAM_BOOL:
+			if (p.boolValAddr){
+				*p.boolValAddr = p.boolVal;
+			}break;
+
+		case REMOTEUI_PARAM_STRING:
+			if (p.stringValAddr){
+				*p.stringValAddr = p.stringVal;
+			}break;
+	}
+
+	params[paramName] = p;
+}
 
 
 void ofxRemoteUI::syncParamToPointer(string paramName){
@@ -281,8 +339,6 @@ void ofxRemoteUI::syncParamToPointer(string paramName){
 				p.greenVal = *(p.redValAddr+1);
 				p.blueVal = *(p.redValAddr+2);
 				p.alphaVal = *(p.redValAddr+3);
-				//cout << "synch!!!!!!<" << endl;
-				//p.print();
 			}break;
 
 		case REMOTEUI_PARAM_BOOL:
@@ -442,8 +498,7 @@ void ofxRemoteUI::setValuesFromString( string values ){
 
 void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
 	ofxOscMessage m;
-	//printf("sending >> %s ", paramName.c_str());
-	//p.print();
+	if(verbose){ printf("sending >> %s ", paramName.c_str()); p.print(); }
 	m.setAddress("SEND " + stringForParamType(p.type) + " " + paramName);
 	switch (p.type) {
 		case REMOTEUI_PARAM_FLOAT: m.addFloatArg(p.floatVal); m.addFloatArg(p.minFloat); m.addFloatArg(p.maxFloat); break;
@@ -467,6 +522,7 @@ void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
 //if used by server, confirmation == YES
 //else, NO
 void ofxRemoteUI::sendREQU(bool confirmation){
+	if(verbose) cout << "sendREQU()" << endl;
 	ofxOscMessage m;
 	m.setAddress("REQU");
 	if (confirmation) m.addStringArg("OK");
@@ -474,8 +530,24 @@ void ofxRemoteUI::sendREQU(bool confirmation){
 }
 
 
+void ofxRemoteUI::sendRESX(bool confirm){
+	if(verbose) cout << "sendRESX()" << endl;
+	ofxOscMessage m;
+	m.setAddress("RESX");
+	if (confirm) m.addStringArg("OK");
+	oscSender.sendMessage(m);
+}
+
+void ofxRemoteUI::sendRESD(bool confirm){
+	if(verbose) cout << "sendRESD()" << endl;
+	ofxOscMessage m;
+	m.setAddress("RESD");
+	if (confirm) m.addStringArg("OK");
+	oscSender.sendMessage(m);
+}
+
 void ofxRemoteUI::sendTEST(){
-	//cout << "sendTEST()" << endl;
+	if(verbose) cout << "sendTEST()" << endl;
 	waitingForReply = true;
 	timeSinceLastReply = 0.0f;
 	ofxOscMessage m;
@@ -486,7 +558,7 @@ void ofxRemoteUI::sendTEST(){
 //on client call, presetNames should be empty vector (request ing the list)
 //on server call, presetNames should have all the presetNames
 void ofxRemoteUI::sendPREL( vector<string> presetNames_ ){
-	//cout << "sendPRES()" << endl;
+	if(verbose) cout << "sendPRES()" << endl;
 	ofxOscMessage m;
 	m.setAddress("PREL");
 	if (presetNames_.size() == 0){ // if we are the client requesting a preset list, delete our current list
@@ -502,7 +574,7 @@ void ofxRemoteUI::sendPREL( vector<string> presetNames_ ){
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
 void ofxRemoteUI::sendSAVP(string presetName){
-	//cout << "sendSAVP()" << endl;
+	if(verbose) cout << "sendSAVP()" << endl;
 	ofxOscMessage m;
 	m.setAddress("SAVP");
 	if (presetName.size() > 0){
@@ -516,7 +588,7 @@ void ofxRemoteUI::sendSAVP(string presetName){
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
 void ofxRemoteUI::sendSETP(string presetName){
-	//cout << "sendSETP()" << endl;
+	if(verbose) cout << "sendSETP()" << endl;
 	ofxOscMessage m;
 	m.setAddress("SETP");
 	if (presetName.size() > 0){
@@ -528,7 +600,7 @@ void ofxRemoteUI::sendSETP(string presetName){
 }
 
 void ofxRemoteUI::sendDELP(string presetName){
-	//cout << "sendDELP()" << endl;
+	if(verbose) cout << "sendDELP()" << endl;
 	ofxOscMessage m;
 	m.setAddress("DELP");
 	if (presetName.size() > 0){
