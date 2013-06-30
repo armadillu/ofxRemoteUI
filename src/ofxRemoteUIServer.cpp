@@ -41,9 +41,17 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	colorTableIndex = 0;
 	int a = 64;
 	#if ( OF_VERSION_MINOR > 0 )
+	ofColor prevColor = ofColor(255,0,0);
 	for(int i = 0; i < 20; i++){
-		ofColor c = ofColor::fromHsb((int)ofRandom(1,255), 255, 255, 32);
+		ofColor c;
+		float diff;
+		do  {
+			c = ofColor::fromHsb((int)ofRandom(1,255), 255, 255, 32);
+			diff = fabs(c.getHue() - prevColor.getHue());
+		}while (diff < 50 || diff > 150);
+
 		colorTables.push_back( c );
+		prevColor = c;
 	}
 	#else
 	colorTables.push_back(ofColor(194,144,221,a) );
