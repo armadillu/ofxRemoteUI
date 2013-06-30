@@ -1,2 +1,4 @@
--add restore feature
+-add restore feature - two restore states, defined from code, lastXML load
 -add "more info" string on a param, to show on "hover"
+-show untouched params when loading an old preset
+-when editing a preset, dont go back to "no preset" so quickly, remember whicj preset we "come from" and mark it as edited
