@@ -24,6 +24,7 @@
 #define OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color,...)	( ofxRemoteUIServer::instance()->shareParam( #color, (unsigned char*)&color.v[0], ##__VA_ARGS__ ) )
 #define OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_COLOR(c)	( ofxRemoteUIServer::instance()->setParamColor( c ) )
 #define OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP(g)	( ofxRemoteUIServer::instance()->setParamGroup( g ) )
+#define OFX_REMOTEUI_SERVER_SET_NEW_COLOR()				( ofxRemoteUIServer::instance()->setNewParamColor() )
 #define OFX_REMOTEUI_SERVER_SETUP(port, ...)			( ofxRemoteUIServer::instance()->setup(port, ##__VA_ARGS__) )
 #define OFX_REMOTEUI_SERVER_UPDATE(deltaTime)			( ofxRemoteUIServer::instance()->update(deltaTime) )
 #define OFX_REMOTEUI_SERVER_CLOSE()						( ofxRemoteUIServer::instance()->close() )
@@ -42,6 +43,8 @@
 			r = g = b = bright; a = 255;
 		}
 
+		float sum(){return r+g+b;}
+		
 		bool operator==(const myColor& c){
 			return r == c.r && g == c.g && b == c.b && a == c.a;
 		}	
@@ -79,6 +82,8 @@ public:
 	void shareParam(string paramName, int* param, int min, int max, vector<string> names, ofColor c = ofColor(0,0,0,0)); //enum!
 	void shareParam(string paramName, unsigned char* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 );	//ofColor
 	void setParamColor( ofColor c );
+	void setNewParamColor();
+	void unsetParamColor();
 	void setParamGroup(string g);
 
 private:
@@ -91,6 +96,8 @@ private:
 	vector<string> getAvailablePresets();
 	void deletePreset(string name);
 
+	vector<ofColor> colorTables;
+	int colorTableIndex;
 	bool colorSet; //if user called setParamColor()
 	ofColor paramColor;
 	string upcomingGroup;

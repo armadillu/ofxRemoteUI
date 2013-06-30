@@ -56,6 +56,7 @@
 		73002CDE140ABCF60035299A /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		73002CDF140ABCF60035299A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		BB395E95173E6326002FA815 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
+		BB4B54F0177FAD5D004838E4 /* ToDo.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ToDo.txt; sourceTree = "<group>"; };
 		BB5CC5BE177E483400B595F8 /* ofxRemoteUIServer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUIServer.cpp; sourceTree = "<group>"; };
 		BB5CC5BF177E483400B595F8 /* ofxRemoteUIServer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUIServer.h; sourceTree = "<group>"; };
 		BB5CC5D7177E49D500B595F8 /* ofStolenUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofStolenUtils.h; sourceTree = "<group>"; };
@@ -146,6 +147,7 @@
 		73002CCB140ABCF60035299A = {
 			isa = PBXGroup;
 			children = (
+				BB4B54F0177FAD5D004838E4 /* ToDo.txt */,
 				BB5CC5D6177E49D500B595F8 /* noOFLibs */,
 				BBDCBE2716A063A400F1C5EC /* ReadMe.txt */,
 				BB65837A16A315B2000B45F0 /* icon.icns */,
@@ -573,7 +575,7 @@
 					../noOFLibs/ofxOsc/libs/oscpack/src/osc,
 					../noOFLibs/ofxOsc/src,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
@@ -603,7 +605,7 @@
 					../noOFLibs/ofxOsc/libs/oscpack/src/osc,
 					../noOFLibs/ofxOsc/src,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -611,11 +613,15 @@
 		73002CF5140ABCF60035299A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_LINK_OBJC_RUNTIME = NO;
+				CLANG_WARN__ARC_BRIDGE_CAST_NONARC = NO;
 				DEAD_CODE_STRIPPING = YES;
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "$(SRCROOT)/ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = ofxRemoteUIClientOSX;
@@ -628,11 +634,15 @@
 		73002CF6140ABCF60035299A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_LINK_OBJC_RUNTIME = NO;
+				CLANG_WARN__ARC_BRIDGE_CAST_NONARC = NO;
 				DEAD_CODE_STRIPPING = YES;
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "$(SRCROOT)/ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = ofxRemoteUIClientOSX;

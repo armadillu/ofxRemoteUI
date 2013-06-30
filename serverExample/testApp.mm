@@ -17,17 +17,18 @@ void testApp::setup(){
 	OFX_REMOTEUI_SERVER_SETUP(10000); 	//start server
 
 	//expose vars to the server. Always do so after setting up the server.
-	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_COLOR( ofColor(255,0,0,64) ); // set a bg color for the upcoming params
+	OFX_REMOTEUI_SERVER_SET_NEW_COLOR(); // set a bg color for the upcoming params
 	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP("position"); //make a new group
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(x, 0, ofGetWidth() ); //add an "x" float param to this group.
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(y, 0, ofGetHeight());
 
 	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP("style"); //make a new group
-	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_COLOR( ofColor(0,255,0,64) ); // set a new color for this group
+	OFX_REMOTEUI_SERVER_SET_NEW_COLOR(); // set a bg color for the upcoming params
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawOutlines);		//add a bool param
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(numCircles, 0, 30);	//add an int param
 
 	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP("whatever"); //make a new group
+	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_COLOR( ofColor(255,0,0,64) ); // you can set a custom upcoming color too
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentSentence, ofColor(0,0,255,64));	// you can also set a color on a per-param basis
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentMouseX, 0, ofGetWidth(), ofColor(255,64));
 

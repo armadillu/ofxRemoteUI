@@ -25,9 +25,11 @@ int main(int argc, const char * argv[]){
 	std::cout << "Hello, World!\n";
 
 	OFX_REMOTEUI_SERVER_SETUP(10000); 	//start server
+	OFX_REMOTEUI_SERVER_SET_NEW_COLOR();
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(myParam, 0, 100); // share my param
+	OFX_REMOTEUI_SERVER_SET_NEW_COLOR();
 	OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color);
-
+	OFX_REMOTEUI_SERVER_SET_NEW_COLOR();
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(quitButton);
 
 	OFX_REMOTEUI_SERVER_LOAD_FROM_XML(); //load from XML

@@ -168,7 +168,7 @@
 							<object class="NSTextField" id="771456133">
 								<reference key="NSNextResponder" ref="34091846"/>
 								<int key="NSvFlags">269</int>
-								<string key="NSFrame">{{71, 2}, {88, 11}}</string>
+								<string key="NSFrame">{{71, 3}, {88, 11}}</string>
 								<reference key="NSSuperview" ref="34091846"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="216794602"/>
@@ -741,6 +741,7 @@
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="updateBool:">id</string>
 						<string key="updateColor:">id</string>
+						<string key="updateEnum:">id</string>
 						<string key="updateFloat:">id</string>
 						<string key="updateInt:">id</string>
 						<string key="updateString:">id</string>
@@ -752,6 +753,10 @@
 						</object>
 						<object class="IBActionInfo" key="updateColor:">
 							<string key="name">updateColor:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="updateEnum:">
+							<string key="name">updateEnum:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="updateFloat:">

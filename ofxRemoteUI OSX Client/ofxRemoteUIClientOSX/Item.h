@@ -4,6 +4,8 @@
 #include <string>
 #import "ColorView.h"
 
+
+
 @interface Item : NSObject{
 
 	@public
@@ -40,6 +42,7 @@
 -(void)enableChanges;
 -(void)remapSlider;
 
+-(NSString*)formatedFloat:(float) f;
 
 
 -(IBAction)updateFloat:(id)sender;

@@ -13,7 +13,11 @@
 #include <string.h>
 #include "dirent.h"
 #include <sys/stat.h>
-
+#include <time.h>
+#include <unistd.h>
+#ifndef TARGET_WIN32
+	#include <sys/time.h>
+#endif
 ofxRemoteUIServer* ofxRemoteUIServer::singleton = NULL;
 
 
@@ -32,6 +36,29 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	waitingForReply = false;
 	colorSet = false;
 	upcomingGroup = DEFAULT_PARAM_GROUP;
+
+	//add random colors to table
+	colorTableIndex = 0;
+	int a = 64;
+	#if ( OF_VERSION_MINOR > 0 )
+	for(int i = 0; i < 20; i++){
+		ofColor c = ofColor::fromHsb((int)ofRandom(1,255), 255, 255, 32);
+		colorTables.push_back( c );
+	}
+	#else
+	colorTables.push_back(ofColor(194,144,221,a) );
+	colorTables.push_back(ofColor(202,246,70,a)  );
+	colorTables.push_back(ofColor(74,236,173,a)  );
+	colorTables.push_back(ofColor(253,144,150,a) );
+	colorTables.push_back(ofColor(41,176,238,a)  );
+	colorTables.push_back(ofColor(180,155,45,a)  );
+	colorTables.push_back(ofColor(63,216,92,a)   );
+	colorTables.push_back(ofColor(226,246,139,a) );
+	colorTables.push_back(ofColor(239,209,46,a)  );
+	colorTables.push_back(ofColor(234,127,169,a) );
+	colorTables.push_back(ofColor(227,184,233,a) );
+	colorTables.push_back(ofColor(165,154,206,a) );
+	#endif
 
 	#if ( OF_VERSION_MINOR > 0 ) 
 	ofDirectory d;
@@ -57,9 +84,24 @@ void ofxRemoteUIServer::setParamGroup(string g){
 	upcomingGroup = g;
 }
 
+void ofxRemoteUIServer::unsetParamColor(){
+	colorSet = false;
+}
+
 void ofxRemoteUIServer::setParamColor( ofColor c ){
 	colorSet = true;
 	paramColor = c;
+}
+
+void ofxRemoteUIServer::setNewParamColor(){
+
+	ofColor c = colorTables[colorTableIndex];
+	colorSet = true;
+	paramColor = c;
+	colorTableIndex++;
+	if(colorTableIndex>= colorTables.size()){
+		colorTableIndex = 0;
+	}
 }
 
 

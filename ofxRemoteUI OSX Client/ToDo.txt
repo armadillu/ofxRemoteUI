@@ -1,0 +1,2 @@
+-add restore feature
+-add "more info" string on a param, to show on "hover"

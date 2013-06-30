@@ -25,7 +25,6 @@ using namespace std;
 #define DEFAULT_PARAM_GROUP					"defaultGroup"
 #define OFX_REMOTEUI_PRESET_DIR				"ofxRemoteUIPresets"
 #define OFX_REMOTEUI_NO_PRESETS				"NO_PRESETS"
-
 #include "RemoteParam.h"
 
 
