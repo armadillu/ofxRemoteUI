@@ -20,6 +20,7 @@
 	IBOutlet NSTextField *textView;
 	IBOutlet NSButton *button;
 	IBOutlet NSTextField *paramLabel;
+	IBOutlet NSTextField *paramGroup;
 	IBOutlet NSTextField *sliderVal;
 	IBOutlet NSTextField *sliderMin;
 	IBOutlet NSTextField *sliderMax;

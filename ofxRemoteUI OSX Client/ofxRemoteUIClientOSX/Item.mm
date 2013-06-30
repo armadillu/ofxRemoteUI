@@ -103,6 +103,8 @@
 		case REMOTEUI_PARAM_FLOAT:
 			widget = slider;
 			[widget setAction:@selector(updateFloat:)];
+			[sliderVal setAction:@selector(updateFloatManually:)];
+			[sliderVal setTarget:self];
 			[slider setMaxValue:param.maxFloat];
 			[slider setMinValue:param.minFloat];
 			[button removeFromSuperview];
@@ -116,6 +118,8 @@
 			widget = slider;
 			[slider setMaxValue:param.maxInt];
 			[slider setMinValue:param.minInt];
+			[sliderVal setAction:@selector(updateIntManually:)];
+			[sliderVal setTarget:self];
 			[slider setAllowsTickMarkValuesOnly:true];
 			[widget setAction:@selector(updateInt:)];
 			[button removeFromSuperview];
@@ -180,6 +184,7 @@
 			break;
 	}
 	paramLabel.stringValue = [self stringFromString:paramName];
+	paramGroup.stringValue = [self stringFromString:param.group];
 	[widget setTarget:self];
 }
 
@@ -269,6 +274,22 @@
 	return formattedNumber;
 }
 
+-(IBAction)updateIntManually:(id)sender{
+	param.intVal = [sender intValue];
+	[slider setIntValue:param.intVal];
+	if ([[NSApp delegate] respondsToSelector:@selector(userChangedParam:paramName:)]){
+		[[NSApp delegate] userChangedParam: param paramName: paramName];  //blindly send message to App Delegate (TODO!)
+	}
+}
+
+-(IBAction)updateFloatManually:(id)sender{
+	param.floatVal = [sender floatValue];
+	[slider setFloatValue:param.floatVal];
+	if ([[NSApp delegate] respondsToSelector:@selector(userChangedParam:paramName:)]){
+		[[NSApp delegate] userChangedParam: param paramName: paramName];  //blindly send message to App Delegate (TODO!)
+	}
+	[[NSApp mainWindow] makeFirstResponder:nil];
+}
 
 -(IBAction)updateFloat:(id)sender{
 	param.floatVal = [sender floatValue];
