@@ -183,8 +183,8 @@ protected:
 
 	set<string>						paramsChangedSinceLastCheck;
 
-	map<string, RemoteUIParam>		paramsFromCode;
-	map<string, RemoteUIParam>		paramsFromXML;
+	map<string, RemoteUIParam>		paramsFromCode; //this will hold a copy of all the params as they where when shared first
+	map<string, RemoteUIParam>		paramsFromXML; //this will hold a copy of all the params as they where when first loaded from XML
 
 
 private:

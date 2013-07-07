@@ -43,15 +43,10 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	colorTableIndex = 0;
 	int a = 64;
 	#if ( OF_VERSION_MINOR > 0 )
-	ofColor prevColor = ofColor(255,0,0);
-	for(int i = 0; i < 20; i++){
-		ofColor c;
-		float diff;
-		do  {
-			c = ofColor::fromHsb((int)ofRandom(1,255), 255, 255, 32);
-			diff = fabs(c.getHue() - prevColor.getHue());
-		}while (diff < 50 || diff > 150);
-
+	ofColor prevColor = ofColor::fromHsb((int)ofRandom(0,150), 255, 255, 32);
+	for(int i = 0; i < 30; i++){
+		ofColor c = prevColor;
+		c.setHue(  ((int) (prevColor.getHue() + ofRandom(40,55) )) % 255 );
 		colorTables.push_back( c );
 		prevColor = c;
 	}
@@ -136,13 +131,13 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 		RemoteUIParam t = params[key];
 		switch (t.type) {
 			case REMOTEUI_PARAM_FLOAT:
-				cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.floatValAddr <<") to XML" << endl;
+				if(verbose) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.floatValAddr <<") to XML" << endl;
 				s.setValue("REMOTEUI_PARAM_FLOAT", (double)*t.floatValAddr, numFloats);
 				s.setAttribute("REMOTEUI_PARAM_FLOAT", "paramName", key, numFloats);
 				numFloats++;
 				break;
 			case REMOTEUI_PARAM_INT:
-				cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.intValAddr <<") to XML" << endl;
+				if(verbose) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.intValAddr <<") to XML" << endl;
 				s.setValue("REMOTEUI_PARAM_INT", (int)*t.intValAddr, numInts);
 				s.setAttribute("REMOTEUI_PARAM_INT", "paramName", key, numInts);
 				numInts++;
@@ -151,7 +146,7 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 				s.addTag("REMOTEUI_PARAM_COLOR");
 				s.setAttribute("REMOTEUI_PARAM_COLOR", "paramName", key, numColors);
 				s.pushTag("REMOTEUI_PARAM_COLOR", numColors);
-				cout << "ofxRemoteUIServer saving '" << key << "' (" << (int)*t.redValAddr << " " << (int)*(t.redValAddr+1) << " " << (int)*(t.redValAddr+2) << " " << (int)*(t.redValAddr+3) << ") to XML" << endl;
+				if(verbose) cout << "ofxRemoteUIServer saving '" << key << "' (" << (int)*t.redValAddr << " " << (int)*(t.redValAddr+1) << " " << (int)*(t.redValAddr+2) << " " << (int)*(t.redValAddr+3) << ") to XML" << endl;
 				s.setValue("R", (int)*t.redValAddr);
 				s.setValue("G", (int)*(t.redValAddr+1));
 				s.setValue("B", (int)*(t.redValAddr+2));
@@ -160,19 +155,19 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 				numColors++;
 				break;
 			case REMOTEUI_PARAM_ENUM:
-				cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.intValAddr <<") to XML" << endl;
+				if(verbose) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.intValAddr <<") to XML" << endl;
 				s.setValue("REMOTEUI_PARAM_ENUM", (int)*t.intValAddr, numEnums);
 				s.setAttribute("REMOTEUI_PARAM_ENUM", "paramName", key, numEnums);
 				numEnums++;
 				break;
 			case REMOTEUI_PARAM_BOOL:
-				cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.boolValAddr <<") to XML" << endl;
+				if(verbose) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.boolValAddr <<") to XML" << endl;
 				s.setValue("REMOTEUI_PARAM_BOOL", (bool)*t.boolValAddr, numBools);
 				s.setAttribute("REMOTEUI_PARAM_BOOL", "paramName", key, numBools);
 				numBools++;
 				break;
 			case REMOTEUI_PARAM_STRING:
-				cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.stringValAddr <<") to XML" << endl;
+				if(verbose) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.stringValAddr <<") to XML" << endl;
 				s.setValue("REMOTEUI_PARAM_STRING", (string)*t.stringValAddr, numStrings);
 				s.setAttribute("REMOTEUI_PARAM_STRING", "paramName", key, numStrings);
 				numStrings++;
@@ -208,7 +203,7 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 							params[paramName].floatVal = val;
 							*params[paramName].floatValAddr = ofClamp(*params[paramName].floatValAddr, params[paramName].minFloat, params[paramName].maxFloat);
 							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-							cout << "ofxRemoteUIServer loading a FLOAT '" << paramName <<"' (" << ofToString( *params[paramName].floatValAddr, 3) << ") from XML" << endl;
+							if(verbose) cout << "ofxRemoteUIServer loading a FLOAT '" << paramName <<"' (" << ofToString( *params[paramName].floatValAddr, 3) << ") from XML" << endl;
 						}else{
 							cout << "ofxRemoteUIServer ERROR at loading FLOAT (" << paramName << ")" << endl;
 						}
@@ -228,7 +223,7 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 							params[paramName].intVal = val;
 							*params[paramName].intValAddr = ofClamp(*params[paramName].intValAddr, params[paramName].minInt, params[paramName].maxInt);
 							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-							cout << "ofxRemoteUIServer loading an INT '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" << endl;
+							if(verbose) cout << "ofxRemoteUIServer loading an INT '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" << endl;
 						}else{
 							cout << "ofxRemoteUIServer ERROR at loading INT (" << paramName << ")" << endl;
 						}
@@ -257,7 +252,7 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 							*(params[paramName].redValAddr+3) = a;
 							params[paramName].alphaVal = a;
 							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-							cout << "ofxRemoteUIServer loading a COLOR '" << paramName <<"' (" << (int)*params[paramName].redValAddr << " " << (int)*(params[paramName].redValAddr+1) << " " << (int)*(params[paramName].redValAddr+2) << " " << (int)*(params[paramName].redValAddr+3)  << ") from XML" << endl;
+							if(verbose) cout << "ofxRemoteUIServer loading a COLOR '" << paramName <<"' (" << (int)*params[paramName].redValAddr << " " << (int)*(params[paramName].redValAddr+1) << " " << (int)*(params[paramName].redValAddr+2) << " " << (int)*(params[paramName].redValAddr+3)  << ") from XML" << endl;
 						}else{
 							cout << "ofxRemoteUIServer ERROR at loading COLOR (" << paramName << ")" << endl;
 						}
@@ -278,7 +273,7 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 							params[paramName].intVal = val;
 							*params[paramName].intValAddr = ofClamp(*params[paramName].intValAddr, params[paramName].minInt, params[paramName].maxInt);
 							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-							cout << "ofxRemoteUIServer loading an ENUM '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" << endl;
+							if(verbose) cout << "ofxRemoteUIServer loading an ENUM '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" << endl;
 						}else{
 							cout << "ofxRemoteUIServer ERROR at loading ENUM (" << paramName << ")" << endl;
 						}
@@ -299,7 +294,7 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 							*params[paramName].boolValAddr = val;
 							params[paramName].boolVal = val;
 							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-							cout << "ofxRemoteUIServer loading a BOOL '" << paramName <<"' (" << (bool) *params[paramName].boolValAddr << ") from XML" << endl;
+							if(verbose) cout << "ofxRemoteUIServer loading a BOOL '" << paramName <<"' (" << (bool) *params[paramName].boolValAddr << ") from XML" << endl;
 						}else{
 							cout << "ofxRemoteUIServer ERROR at loading BOOL (" << paramName << ")" << endl;
 						}
@@ -319,7 +314,7 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 							params[paramName].stringVal = val;
 							*params[paramName].stringValAddr = val;
 							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-							cout << "ofxRemoteUIServer loading a STRING '" << paramName <<"' (" << (string) *params[paramName].stringValAddr << ") from XML" << endl;
+							if(verbose) cout << "ofxRemoteUIServer loading a STRING '" << paramName <<"' (" << (string) *params[paramName].stringValAddr << ") from XML" << endl;
 						}
 						else cout << "ofxRemoteUIServer ERROR at loading STRING (" << paramName << ")" << endl;
 					}

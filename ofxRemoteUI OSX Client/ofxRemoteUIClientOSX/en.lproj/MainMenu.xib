@@ -1684,7 +1684,6 @@
 				<string key="NSMinSize">{350, 272}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<string key="NSFrameAutosaveName">mainwin</string>
-				<int key="NSWindowCollectionBehavior">18</int>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
 			<object class="NSCustomObject" id="976324537">
