@@ -112,7 +112,7 @@ void ofxRemoteUIServer::setNewParamColor(){
 
 void ofxRemoteUIServer::saveToXML(string fileName){
 
-	cout << "saving to xml: " << fileName <<endl;
+	cout << "ofxRemoteUIServer: saving to xml '" << fileName << "'" << endl;
 	ofxXmlSettings s;
 	s.loadFile(fileName);
 	s.clear();
