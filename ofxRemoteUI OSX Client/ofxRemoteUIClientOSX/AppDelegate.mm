@@ -6,7 +6,7 @@
 //  Copyright 2011 uri.cat. All rights reserved.
 //
 
-#import "Item.h"
+#import "ParamUI.h"
 #import "AppDelegate.h"
 
 //ofxRemoteUIClient callback entry point
@@ -216,9 +216,9 @@ void clientCallback(RemoteUICallBackArg a){
 		[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, p.maxPerCol * ROW_HEIGHT + off)];
 	}
 	
-	for( map<string,Item*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
+	for( map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
 		string key = (*ii).first;
-		Item* t = widgets[key];
+		ParamUI* t = widgets[key];
 		[t remapSlider];
 	}
 }
@@ -265,9 +265,9 @@ void clientCallback(RemoteUICallBackArg a){
 			string paramName = paramList[i];
 			RemoteUIParam p = client->getParamForName(paramName);
 
-			map<string,Item*>::iterator it = widgets.find(paramName);
+			map<string,ParamUI*>::iterator it = widgets.find(paramName);
 			if ( it == widgets.end() ){	//not found, this is a new param... lets make an UI item for it
-				Item * row = [[Item alloc] initWithParam: p paramName: paramName ID: c];
+				ParamUI * row = [[ParamUI alloc] initWithParam: p paramName: paramName ID: c];
 				c++;
 				orderedKeys.push_back(paramName);
 				widgets[paramName] = row;
@@ -286,19 +286,19 @@ void clientCallback(RemoteUICallBackArg a){
 
 		string paramName = paramList[i];
 
-		map<string,Item*>::iterator it = widgets.find(paramName);
+		map<string,ParamUI*>::iterator it = widgets.find(paramName);
 		if ( it == widgets.end() ){	//not found, this is a new param... lets make an UI item for it
 			NSLog(@"uh?");
 		}else{
-			Item * item = widgets[paramName];
+			ParamUI * item = widgets[paramName];
 			RemoteUIParam p = client->getParamForName(paramName);
 			[item updateParam:p];
 			[item updateUI];
 		}
 	}
-//	for( map<string,Item*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
+//	for( map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
 //		string key = (*ii).first;
-//		Item* t = widgets[key];
+//		ParamUI* t = widgets[key];
 //		[t disableChanges];
 //	}
 
@@ -374,7 +374,7 @@ void clientCallback(RemoteUICallBackArg a){
 
 	for(int i = 0; i < numParams; i++){
 		string key = orderedKeys[i];
-		Item * item = widgets[key];
+		ParamUI * item = widgets[key];
 		RemoteUIParam p = item->param;
 		if (p.group == group){
 			paramsInGroup.push_back(key);
@@ -392,7 +392,7 @@ void clientCallback(RemoteUICallBackArg a){
 
 	for(int i = 0; i < numParams; i++){
 		string key = orderedKeys[i];
-		Item * item = widgets[key];
+		ParamUI * item = widgets[key];
 		RemoteUIParam p = item->param;
 		if (std::find(v.begin(), v.end(), p.group) == v.end()){
 			v.push_back(p.group);
@@ -421,7 +421,7 @@ void clientCallback(RemoteUICallBackArg a){
 
 	for(int i = 0; i < numParams; i++){
 		string key = paramsInGroup[i];
-		Item * item = widgets[key];
+		ParamUI * item = widgets[key];
 		NSRect r = item->ui.frame;
 
 		item->ui.frame = NSMakeRect( colIndex * p.rowW, (numParams - 1) * ROW_HEIGHT - h , p.rowW, r.size.height);
@@ -458,18 +458,18 @@ void clientCallback(RemoteUICallBackArg a){
 
 
 -(void)disableAllWidgets{
-	for( map<string,Item*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
+	for( map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
 		string key = (*ii).first;
-		Item* t = widgets[key];
+		ParamUI* t = widgets[key];
 		[t disableChanges];
 	}
 }
 
 
 -(void)enableAllWidgets{
-	for( map<string,Item*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
+	for( map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
 		string key = (*ii).first;
-		Item* t = widgets[key];
+		ParamUI* t = widgets[key];
 		[t enableChanges];
 	}
 }
@@ -619,9 +619,9 @@ void clientCallback(RemoteUICallBackArg a){
 -(IBAction)filterType:(id)sender{
 	NSString * filter = [sender stringValue];
 
-	for( map<string,Item*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
+	for( map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
 		string key = (*ii).first;
-		Item* t = widgets[key];
+		ParamUI* t = widgets[key];
 		NSString * paramName = [NSString stringWithFormat:@"%s", t->paramName.c_str()];
 		if ([paramName rangeOfString:filter options:NSCaseInsensitiveSearch].location != NSNotFound || [filter length] == 0){
 			[t fadeIn];
@@ -704,9 +704,9 @@ void clientCallback(RemoteUICallBackArg a){
 
 
 -(void)cleanUpGUIParams{
-	for( map<string,Item*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
+	for( map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
 		string key = (*ii).first;
-		Item* t = widgets[key];
+		ParamUI* t = widgets[key];
 		[t release];
 	}
 	widgets.clear();

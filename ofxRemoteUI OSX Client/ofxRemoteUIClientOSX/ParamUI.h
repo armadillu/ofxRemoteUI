@@ -6,7 +6,7 @@
 
 
 
-@interface Item : NSObject{
+@interface ParamUI : NSObject{
 
 	@public
 	RemoteUIParam param;

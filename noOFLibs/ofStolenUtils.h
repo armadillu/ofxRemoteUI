@@ -6,6 +6,11 @@
 //
 //
 
+/*
+ THIS IS A SHAMEFUL RIP OF A FEW OPENFRAMEWORKS METHODS
+ the whole point is for ofxRemoteUI to work also outside OF if required
+ */
+
 #pragma once
 #ifndef ofxRemoteUIClientOSX_ofStolenUtils_h
 #define ofxRemoteUIClientOSX_ofStolenUtils_h
@@ -16,11 +21,6 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
-
-/*
- THIS IS A SHAMEFUL RIP OF A FEW OF METHODS
- the whole point is for ofxRemoteUI to work also outside OF if required
-*/
 
 int ofToInt(const std::string& intString) ;
 float ofToFloat(const std::string& floatString);

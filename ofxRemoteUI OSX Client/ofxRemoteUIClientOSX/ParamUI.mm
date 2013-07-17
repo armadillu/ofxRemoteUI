@@ -1,13 +1,11 @@
 
-#import "Item.h"
+#import "ParamUI.h"
 #include "ofxRemoteUI.h"
 
 
-@implementation Item
+@implementation ParamUI
 
 -(void)dealloc{
-
-	//NSLog(@"dealloc Item %s ", paramName.c_str());
 	[ui removeFromSuperview];
 	[ui release];
 	[super dealloc];

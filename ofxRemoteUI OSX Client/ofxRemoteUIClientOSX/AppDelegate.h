@@ -8,7 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #include "ofxRemoteUIClient.h"
-#import "Item.h"
+#import "ParamUI.h"
 #import "MyScrollView.h"
 #import <Growl/Growl.h>
 
@@ -46,7 +46,7 @@ struct LayoutConfig{
 
 	bool updateContinuosly;
 
-	map<string, Item*> widgets;
+	map<string, ParamUI*> widgets;
 	vector<string> orderedKeys; // used to keep the order in which the items were added
 
 	ofxRemoteUIClient * client;
