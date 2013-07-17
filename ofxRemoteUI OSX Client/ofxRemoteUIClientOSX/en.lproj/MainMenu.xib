@@ -219,6 +219,15 @@
 								<object class="NSMenuItem" id="184929971">
 									<reference key="NSMenu" ref="720053764"/>
 									<string key="NSTitle">Sync</string>
+									<string key="NSKeyEquiv">f</string>
+									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="35465992"/>
+									<reference key="NSMixedImage" ref="502551668"/>
+								</object>
+								<object class="NSMenuItem" id="183047624">
+									<reference key="NSMenu" ref="720053764"/>
+									<string key="NSTitle">Save Current Params to Default XML</string>
 									<string key="NSKeyEquiv">s</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -704,7 +713,7 @@
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSMenuItem" id="432541014">
 									<reference key="NSMenu" ref="778044810"/>
-									<string key="NSTitle">Restore to initial XML Values</string>
+									<string key="NSTitle">Restore to Server-Launch XML Values</string>
 									<string key="NSKeyEquiv">r</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -713,7 +722,7 @@
 								</object>
 								<object class="NSMenuItem" id="383428036">
 									<reference key="NSMenu" ref="778044810"/>
-									<string key="NSTitle">Restore to Default Values</string>
+									<string key="NSTitle">Restore to Default Values (Source Code)</string>
 									<string key="NSKeyEquiv">R</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1210,6 +1219,7 @@
 									<string key="NSFrame">{{276, 10}, {58, 18}}</string>
 									<reference key="NSSuperview" ref="297290460"/>
 									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView"/>
 									<string key="NSReuseIdentifierKey">_NS:9</string>
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSButtonCell" key="NSCell" id="624985738">
@@ -1263,7 +1273,7 @@
 											<string key="NSFrameSize">{350, 238}</string>
 											<reference key="NSSuperview" ref="217020381"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="102414226"/>
+											<reference key="NSNextKeyView" ref="297290460"/>
 											<string key="NSReuseIdentifierKey">_NS:13</string>
 										</object>
 									</object>
@@ -1315,7 +1325,7 @@
 							<string key="NSFrame">{{0, 62}, {350, 238}}</string>
 							<reference key="NSSuperview" ref="439893737"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="217020381"/>
+							<reference key="NSNextKeyView" ref="102414226"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<int key="NSsFlags">133648</int>
 							<reference key="NSVScroller" ref="102414226"/>
@@ -2291,6 +2301,14 @@
 					</object>
 					<int key="connectionID">898</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">userPressedSave:</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="183047624"/>
+					</object>
+					<int key="connectionID">901</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -2381,6 +2399,7 @@
 							<reference ref="425164168"/>
 							<reference ref="664783130"/>
 							<reference ref="184929971"/>
+							<reference ref="183047624"/>
 						</object>
 						<reference key="parent" ref="379814623"/>
 					</object>
@@ -3291,6 +3310,11 @@
 						<reference key="object" ref="383428036"/>
 						<reference key="parent" ref="778044810"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">899</int>
+						<reference key="object" ref="183047624"/>
+						<reference key="parent" ref="720053764"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -3442,6 +3466,7 @@
 					<string>894.IBPluginDependency</string>
 					<string>895.IBPluginDependency</string>
 					<string>896.IBPluginDependency</string>
+					<string>899.IBPluginDependency</string>
 					<string>92.IBPluginDependency</string>
 				</object>
 				<object class="NSArray" key="dict.values">
@@ -3613,6 +3638,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="unlocalizedProperties">
@@ -3627,7 +3653,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">898</int>
+			<int key="maxID">901</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -3649,11 +3675,13 @@
 							<string>userChoseGroup:</string>
 							<string>userChosePreset:</string>
 							<string>userDeletePreset:</string>
+							<string>userPressedSave:</string>
 							<string>userWantsRestoreDefaults:</string>
 							<string>userWantsRestoreXML:</string>
 						</object>
 						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -3682,6 +3710,7 @@
 							<string>userChoseGroup:</string>
 							<string>userChosePreset:</string>
 							<string>userDeletePreset:</string>
+							<string>userPressedSave:</string>
 							<string>userWantsRestoreDefaults:</string>
 							<string>userWantsRestoreXML:</string>
 						</object>
@@ -3725,6 +3754,10 @@
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">userDeletePreset:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">userPressedSave:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">

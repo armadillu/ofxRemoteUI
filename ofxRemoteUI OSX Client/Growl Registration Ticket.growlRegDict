@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AllNotifications</key>
+	<array>
+		<string>CurrentParamsSavedToDefaultXML</string>
+		<string>ServerDisconnected</string>
+		<string>ConnectedToServer</string>
+		<string>ServerDeletedPreset</string>
+		<string>ServerSavedPreset</string>
+		<string>ServerDidResetToXML</string>
+		<string>ServerDidResetToDefault</string>
+		<string>CurrentParamsSavedToDefaultXML</string>
+		<string>ServerDidSetPreset</string>
+	</array>
+	<key>TicketVersion</key>
+	<integer>2</integer>
+</dict>
+</plist>

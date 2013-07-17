@@ -10,6 +10,7 @@
 #include "ofxRemoteUIClient.h"
 #import "Item.h"
 #import "MyScrollView.h"
+#import <Growl/Growl.h>
 
 #define REFRESH_RATE			1.0f/15.0f
 #define STATUS_REFRESH_RATE		0.333f
@@ -75,6 +76,8 @@ struct LayoutConfig{
 -(IBAction)userAddPreset:(id)sender;
 -(IBAction)userDeletePreset:(id)sender;
 
+-(IBAction)userPressedSave:(id)sender;
+
 -(IBAction)userWantsRestoreXML:(id)sender;
 -(IBAction)userWantsRestoreDefaults:(id)sender;
 
@@ -82,7 +85,6 @@ struct LayoutConfig{
 -(IBAction)copySpecial:(id)sender;
 
 -(void)connect;
-
 -(void)update;
 
 -(void)fullParamsUpdate;
@@ -90,7 +92,13 @@ struct LayoutConfig{
 
 -(void)userChangedParam:(RemoteUIParam)p paramName:(string)name; //this is a delegate method, items will call this on widgetChange
 
+-(void)updateGroupPopup;
+-(void)updatePresetsPopup;
+
 -(vector<string>)getParamsInGroup:(string)group;
 -(vector<string>)getAllGroupsInParams;
+
+//growl
+-(void)showNotificationWithTitle:(NSString*)title description:(NSString*)desc ID:(NSString*)key priority:(int)p;
 
 @end

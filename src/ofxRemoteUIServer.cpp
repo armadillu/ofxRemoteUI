@@ -440,6 +440,12 @@ void ofxRemoteUIServer::update(float dt){
 				sendDELP("");
 				}break;
 
+			case SAVE_CURRENT_STATE_ACTION:{
+				if(verbose) cout << "ofxRemoteUIServer: SAVE CURRENT PARAMS TO DEFAULT XML: " << endl;
+				saveToXML(OFX_REMOTEUI_SETTINGS_FILENAME);
+				sendSAVE(true);
+			}break;
+
 			case RESET_TO_XML_ACTION:{
 				if(verbose) cout << "ofxRemoteUIServer: RESET TO XML: " << endl;
 				restoreAllParamsToInitialXML();

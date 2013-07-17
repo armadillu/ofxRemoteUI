@@ -35,6 +35,9 @@
 		BBB1F6FB1749003B00992119 /* connected.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB1F6F91749003B00992119 /* connected.png */; };
 		BBB1F6FC1749003B00992119 /* connected@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB1F6FA1749003B00992119 /* connected@2x.png */; };
 		BBB1F6FE174900D100992119 /* offline@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB1F6FD174900D100992119 /* offline@2x.png */; };
+		BBC38584179736CB007E2DD1 /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBC38583179736CB007E2DD1 /* Growl.framework */; };
+		BBC385861797377C007E2DD1 /* Growl Registration Ticket.growlRegDict in Resources */ = {isa = PBXBuildFile; fileRef = BBC385851797377C007E2DD1 /* Growl Registration Ticket.growlRegDict */; };
+		BBC385881797385C007E2DD1 /* Growl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBC38583179736CB007E2DD1 /* Growl.framework */; };
 		BBC75889177EFA1E009C7F74 /* ofxRemoteUIServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5BE177E483400B595F8 /* ofxRemoteUIServer.cpp */; };
 		BBCC327B16A59D5D005D9CFC /* HighWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = BBCC327A16A59D5D005D9CFC /* HighWindow.m */; };
 		BBD3270F173BFFF200D59359 /* ofxRemoteUIClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */; };
@@ -48,6 +51,19 @@
 		BBDCBE2816A063A400F1C5EC /* ReadMe.txt in Resources */ = {isa = PBXBuildFile; fileRef = BBDCBE2716A063A400F1C5EC /* ReadMe.txt */; };
 		BBE6075A16A466A7002F1707 /* offline.png in Resources */ = {isa = PBXBuildFile; fileRef = BBE6075716A466A7002F1707 /* offline.png */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BBC3858717973857007E2DD1 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				BBC385881797385C007E2DD1 /* Growl.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		73002CD6140ABCF60035299A /* ofxRemoteUIClientOSX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ofxRemoteUIClientOSX.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -112,6 +128,8 @@
 		BBB1F6F91749003B00992119 /* connected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = connected.png; path = ofxRemoteUIClientOSX/connected.png; sourceTree = SOURCE_ROOT; };
 		BBB1F6FA1749003B00992119 /* connected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "connected@2x.png"; path = "ofxRemoteUIClientOSX/connected@2x.png"; sourceTree = SOURCE_ROOT; };
 		BBB1F6FD174900D100992119 /* offline@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "offline@2x.png"; path = "ofxRemoteUIClientOSX/offline@2x.png"; sourceTree = SOURCE_ROOT; };
+		BBC38583179736CB007E2DD1 /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Growl.framework; sourceTree = "<group>"; };
+		BBC385851797377C007E2DD1 /* Growl Registration Ticket.growlRegDict */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "Growl Registration Ticket.growlRegDict"; sourceTree = SOURCE_ROOT; };
 		BBCC327916A59D5D005D9CFC /* HighWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HighWindow.h; sourceTree = "<group>"; };
 		BBCC327A16A59D5D005D9CFC /* HighWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HighWindow.m; sourceTree = "<group>"; };
 		BBDCBDDF16A0512300F1C5EC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = Credits.rtf; sourceTree = "<group>"; };
@@ -138,6 +156,7 @@
 			files = (
 				BB395E96173E6326002FA815 /* QuartzCore.framework in Frameworks */,
 				73002CDB140ABCF60035299A /* Cocoa.framework in Frameworks */,
+				BBC38584179736CB007E2DD1 /* Growl.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -170,6 +189,7 @@
 		73002CD9140ABCF60035299A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BBC38583179736CB007E2DD1 /* Growl.framework */,
 				BB395E95173E6326002FA815 /* QuartzCore.framework */,
 				73002CDA140ABCF60035299A /* Cocoa.framework */,
 				73002CDC140ABCF60035299A /* Other Frameworks */,
@@ -195,6 +215,7 @@
 				BBE6075716A466A7002F1707 /* offline.png */,
 				BBB1F6FD174900D100992119 /* offline@2x.png */,
 				73002CE1140ABCF60035299A /* Supporting Files */,
+				BBC385851797377C007E2DD1 /* Growl Registration Ticket.growlRegDict */,
 			);
 			name = other;
 			path = LionTableViewTesting;
@@ -419,6 +440,7 @@
 				73002CD2140ABCF60035299A /* Sources */,
 				73002CD3140ABCF60035299A /* Frameworks */,
 				73002CD4140ABCF60035299A /* Resources */,
+				BBC3858717973857007E2DD1 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -468,6 +490,7 @@
 				BBB1F6FE174900D100992119 /* offline@2x.png in Resources */,
 				BB5CC615177E49D500B595F8 /* ofxOsc Readme.txt in Resources */,
 				BB5CC61D177E49D500B595F8 /* ReadMe.txt in Resources */,
+				BBC385861797377C007E2DD1 /* Growl Registration Ticket.growlRegDict in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -618,6 +641,10 @@
 				CLANG_LINK_OBJC_RUNTIME = NO;
 				CLANG_WARN__ARC_BRIDGE_CAST_NONARC = NO;
 				DEAD_CODE_STRIPPING = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch";
@@ -639,6 +666,10 @@
 				CLANG_LINK_OBJC_RUNTIME = NO;
 				CLANG_WARN__ARC_BRIDGE_CAST_NONARC = NO;
 				DEAD_CODE_STRIPPING = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch";

@@ -14,6 +14,23 @@ void clientCallback(RemoteUICallBackArg a){
 
 	AppDelegate * me = [NSApp delegate];
 	switch (a) {
+
+		case SERVER_CONNECTED:{
+			[me showNotificationWithTitle:@"Connected to Server" description:@"" ID:@"ConnectedToServer" priority:-1];
+		}break;
+
+		case SERVER_DELETED_PRESET:{
+			[me showNotificationWithTitle:@"Server Deleted Preset OK" description:@"" ID:@"ServerDeletedPreset" priority:2];
+		}break;
+
+		case SERVER_SAVED_PRESET:{
+			[me showNotificationWithTitle:@"Server Saved Preset OK" description:@"" ID:@"ServerSavedPreset" priority:2];
+		}break;
+
+		case SERVER_DID_SET_PRESET:{
+			[me showNotificationWithTitle:@"Server Did Set Preset OK" description:@"" ID:@"ServerDidSetPreset" priority:-1];
+		}break;
+
 		case PARAMS_UPDATED:
 			//NSLog(@"## Callback: PARAMS_UPDATED");
 			if(me->needFullParamsUpdate){ //a bit ugly here...
@@ -35,6 +52,19 @@ void clientCallback(RemoteUICallBackArg a){
 		case SERVER_DISCONNECTED:{
 			//NSLog(@"## Callback: SERVER_DISCONNECTED");
 			[me connect];
+			[me showNotificationWithTitle:@"Server Exited" description:@"Disconnected!" ID:@"ServerDisconnected" priority:-1];
+		}break;
+
+		case SERVER_CONFIRMED_SAVE:{
+			[me showNotificationWithTitle:@"Server Saved OK" description:@"Default XML now holds the current param values" ID:@"CurrentParamsSavedToDefaultXML" priority:2];
+		}break;
+
+		case SERVER_DID_RESET_TO_XML:{
+			[me showNotificationWithTitle:@"Server Did Reset To XML OK" description:@"Params are reset to Server-Launch XML values" ID:@"ServerDidResetToXML" priority:1];
+		}break;
+
+		case SERVER_DID_RESET_TO_DEFAULTS:{
+			[me showNotificationWithTitle:@"Server Did Reset To Default OK" description:@"Params are reset to its Share-Time values (Source Code Defaults)" ID:@"ServerDidResetToDefault" priority:1];
 		}break;
 
 		default:
@@ -43,6 +73,8 @@ void clientCallback(RemoteUICallBackArg a){
 }
 
 @implementation AppDelegate
+
+
 
 
 -(ofxRemoteUIClient *)getClient;{
@@ -452,6 +484,9 @@ void clientCallback(RemoteUICallBackArg a){
 	client->restoreAllParamsToDefaultValues();
 }
 
+-(IBAction)userPressedSave:(id)sender;{
+	client->saveCurrentStateToDefaultXML();
+}
 
 -(IBAction)pressedSync:(id)sender;{
 	client->requestCompleteUpdate(); //both params and presets
@@ -767,6 +802,17 @@ void clientCallback(RemoteUICallBackArg a){
 		//NSAssert1(NO, @"Invalid input dialog button %d", button);
 		return nil;
 	}
+}
+
+-(void)showNotificationWithTitle:(NSString*)title description:(NSString*)desc ID:(NSString*)key priority:(int)p{
+	[GrowlApplicationBridge notifyWithTitle:title
+								description:desc
+						   notificationName:key
+								   iconData:nil
+								   priority:p
+								   isSticky:NO
+							   clickContext:nil];
+
 }
 
 @end

@@ -79,6 +79,9 @@ using namespace std;
  CLIENT:	REQU								//client wants ALL values
  SERVER:	SEND *****							//server sends all params
  ...
+ CLIENT:	SAVE								//client wants to save current state of params to default xml
+ SERVER:	SAVE OK
+ ...
  CLIENT:	CIAO								//client disconnects
  SERVER:	CIAO								//server disconnects
 
@@ -161,6 +164,7 @@ protected:
 	void sendDELP(string presetName);
 	void sendRESX(bool confirm = false); //send a "restore fom first loaded XML" msg
 	void sendRESD(bool confirm = false); //send a "restore fom code defaults" msg
+	void sendSAVE(bool confirm = false); 
 
 	bool							verbose;
 	bool							readyToSend;

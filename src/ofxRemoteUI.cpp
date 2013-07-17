@@ -84,7 +84,8 @@ DecodedMessage ofxRemoteUI::decode(ofxOscMessage m){
 											if (action == "RESX") dm.action = RESET_TO_XML_ACTION;
 											else
 												if (action == "RESD") dm.action = RESET_TO_DEFAULTS_ACTION;
-
+												else
+													if (action == "SAVE") dm.action = SAVE_CURRENT_STATE_ACTION;
 
 	}
 
@@ -545,6 +546,15 @@ void ofxRemoteUI::sendRESD(bool confirm){
 	if (confirm) m.addStringArg("OK");
 	oscSender.sendMessage(m);
 }
+
+void ofxRemoteUI::sendSAVE(bool confirm){
+	if(verbose) cout << "sendSAVE()" << endl;
+	ofxOscMessage m;
+	m.setAddress("SAVE");
+	if (confirm) m.addStringArg("OK");
+	oscSender.sendMessage(m);
+}
+
 
 void ofxRemoteUI::sendTEST(){
 	if(verbose) cout << "sendTEST()" << endl;

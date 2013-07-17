@@ -35,12 +35,16 @@ void ofxRemoteUIClient::setup(string address, int port_){
 	cout << "ofxRemoteUIClient listening at port " << port + 1 << " ... " << endl;
 	oscReceiver.setup(port + 1);
 
-	cout << "ofxRemoteUIClient connecting to " << address << endl;
+	if(verbose) cout << "ofxRemoteUIClient connecting to " << address << endl;
 	oscSender.setup(address, port);
 }
 
 void ofxRemoteUIClient::disconnect(){
 	readyToSend = false;
+}
+
+void ofxRemoteUIClient::saveCurrentStateToDefaultXML(){
+	sendSAVE();
 }
 
 void ofxRemoteUIClient::restoreAllParamsToInitialXML(){
@@ -55,7 +59,7 @@ void ofxRemoteUIClient::update(float dt){
 
 	if (!readyToSend){ // if not connected, connect
 
-		cout << "ofxRemoteUIClient: sending HELLO!" << endl;
+		if(verbose) cout << "ofxRemoteUIClient: sending HELLO!" << endl;
 		sendHELLO();	//on first connect, send HI!
 		sendTEST();		//and a lag test
 		readyToSend = true;
@@ -91,9 +95,10 @@ void ofxRemoteUIClient::update(float dt){
 
 			case HELO_ACTION:{ //server says hi back, we ask for a big update
 				requestCompleteUpdate();
+				if(callBack!=NULL) callBack(SERVER_CONNECTED);
 				}break;
 
-			case REQUEST_ACTION: //should not happen, server doesnt request
+			case REQUEST_ACTION: //should not happen, server doesnt request << IS THIS BS?
 				if(verbose) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says REQUEST_ACTION!" << endl;
 				if(callBack!=NULL) callBack(PARAMS_UPDATED);
 				break;
@@ -133,30 +138,39 @@ void ofxRemoteUIClient::update(float dt){
 			case SET_PRESET_ACTION: // server confirms that it has set the preset, request a full update
 				if(verbose) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SET_PRESET_ACTION!" << endl;
 				requestCompleteUpdate();
-				if(callBack != NULL) callBack(PRESETS_UPDATED);
+				if(callBack != NULL) callBack(SERVER_DID_SET_PRESET);
 				break;
 
 			case SAVE_PRESET_ACTION:{ // server confirms that it has save the preset,
 				if(verbose) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SAVE_PRESET_ACTION!" << endl;
 				vector<string> a;
 				sendPREL(a); //request preset list to server, send empty vector
+				if(callBack != NULL) callBack(SERVER_SAVED_PRESET);
 				}break;
 
 			case DELETE_PRESET_ACTION:{ // server confirms that it has deleted preset
 				if(verbose) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says DELETE_PRESET_ACTION!" << endl;
 				vector<string> a;
 				sendPREL(a); //request preset list to server, send empty vector
+				if(callBack != NULL) callBack(SERVER_DELETED_PRESET);
 				}break;
 
 			case RESET_TO_XML_ACTION:{ // server confrims
 				if(verbose) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says RESET_TO_XML_ACTION!" << endl;
 				requestCompleteUpdate();
+				if(callBack != NULL) callBack(SERVER_DID_RESET_TO_XML);
 			}break;
 
 			case RESET_TO_DEFAULTS_ACTION:{ // server confrims
 				if(verbose) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says RESET_TO_DEFAULTS_ACTION!" << endl;
 				requestCompleteUpdate();
+				if(callBack != NULL) callBack(SERVER_DID_RESET_TO_DEFAULTS);
 			}break;
+
+			case SAVE_CURRENT_STATE_ACTION: // server confirms that it has saved
+				if(verbose) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SAVE_CURRENT_STATE_ACTION!" << endl;
+				if(callBack != NULL) callBack(SERVER_CONFIRMED_SAVE);
+				break;
 
 			default: cout << "ofxRemoteUIClient::update >> ERR!" <<endl; break;
 		}

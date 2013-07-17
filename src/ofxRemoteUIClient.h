@@ -32,6 +32,7 @@ public:
 
 	void restoreAllParamsToInitialXML();
 	void restoreAllParamsToDefaultValues();
+	void saveCurrentStateToDefaultXML();
 
 	//work with presets
 	void setPreset(string preset); //tell server to choose a preset
