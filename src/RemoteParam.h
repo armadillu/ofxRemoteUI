@@ -11,11 +11,18 @@
 
 #include <stdio.h>
 
-enum RemoteUICallBackArg{
+enum RemoteUICallAction{
 	SERVER_CONNECTED, PARAMS_UPDATED, PRESETS_UPDATED, SERVER_DISCONNECTED,
 	SERVER_CONFIRMED_SAVE, SERVER_DID_RESET_TO_DEFAULTS, SERVER_DELETED_PRESET,
 	SERVER_SAVED_PRESET, SERVER_DID_RESET_TO_XML, SERVER_DID_SET_PRESET
 };
+
+struct RemoteUICallBackArg{
+	RemoteUICallAction action;
+	string msg; //sort of a wildcard; usually its the preset name
+	string host;
+};
+
 
 enum RemoteUIParamType{
 	REMOTEUI_PARAM_FLOAT = 100,

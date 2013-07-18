@@ -423,21 +423,21 @@ void ofxRemoteUIServer::update(float dt){
 				string presetName = m.getArgAsString(0);
 				loadFromXML(string(OFX_REMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
 				if(verbose) cout << "ofxRemoteUIServer: setting preset: " << presetName << endl;
-				sendSETP("");
+				sendSETP(presetName);
 				}break;
 
 			case SAVE_PRESET_ACTION:{ //client wants to save current xml as a new preset
 				string presetName = m.getArgAsString(0);
 				if(verbose) cout << "ofxRemoteUIServer: saving NEW preset: " << presetName << endl;
 				saveToXML(string(OFX_REMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
-				sendSAVP("");
+				sendSAVP(presetName);
 				}break;
 
 			case DELETE_PRESET_ACTION:{
 				string presetName = m.getArgAsString(0);
 				if(verbose) cout << "ofxRemoteUIServer: DELETE preset: " << presetName << endl;
 				deletePreset(presetName);
-				sendDELP("");
+				sendDELP(presetName);
 				}break;
 
 			case SAVE_CURRENT_STATE_ACTION:{

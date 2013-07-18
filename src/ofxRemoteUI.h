@@ -53,19 +53,18 @@ using namespace std;
  SERVER:	TEST								//server replies
  ...
  CLIENT:	SETP PRESET_NAME					//Set Preset - client wants to change all params according to preset "X"
- SERVER:	SETP OK								//server says ok
+ SERVER:	SETP PRESET_NAME OK					//server says ok
  CLIENT:	REQU								//client wants values for that preset
  SERVER:	SEND *****							//server sends all params
  SERVER:	REQU OK
  ...
- CLIENT:    SAVP PRESET_NAME					//Save Preset - client wants to save current params as a preset named PRESET_NAME
-												//overwrites if already exists
- SERVER:	SAVP OK								//server replies OK
+ CLIENT:    SAVP PRESET_NAME					//Save Preset - client wants to save current params as a preset named PRESET_NAME, overwrites if already exists
+ SERVER:	SAVP PRESET_NAME OK					//server replies OK
  CLIENT:	PREL								//Client requests full list of presets
  SERVER:	PREL PRESET_NAME_LIST(n)			//server sends all preset names
  ...
  CLIENT:	DELP PRESET_NAME					//client wants to delete preset named PRESET_NAME
- SERVER:	DELP OK								//server says ok
+ SERVER:	DELP PRESET_NAME OK					//server says ok
  CLIENT:	PREL								//Client requests full list of presets
  SERVER:	PREL PRESET_NAME_LIST(n)			//server sends all preset names
  ...
@@ -159,9 +158,9 @@ protected:
 	void sendCIAO();
 	void sendTEST();
 	void sendPREL(vector<string> presetNames);
-	void sendSAVP(string presetName);
-	void sendSETP(string presetName);
-	void sendDELP(string presetName);
+	void sendSAVP(string presetName, bool confirm = false);
+	void sendSETP(string presetName, bool confirm = false);
+	void sendDELP(string presetName, bool confirm = false);
 	void sendRESX(bool confirm = false); //send a "restore fom first loaded XML" msg
 	void sendRESD(bool confirm = false); //send a "restore fom code defaults" msg
 	void sendSAVE(bool confirm = false); 

@@ -13,22 +13,24 @@
 void clientCallback(RemoteUICallBackArg a){
 
 	AppDelegate * me = [NSApp delegate];
-	switch (a) {
+	NSString * remoteIP = [NSString stringWithFormat:@"%s", a.host.c_str()];
+	
+	switch (a.action) {
 
 		case SERVER_CONNECTED:{
-			[me showNotificationWithTitle:@"Connected to Server" description:@"" ID:@"ConnectedToServer" priority:-1];
+			[me showNotificationWithTitle:@"Connected to Server" description:remoteIP ID:@"ConnectedToServer" priority:-1];
 		}break;
 
 		case SERVER_DELETED_PRESET:{
-			[me showNotificationWithTitle:@"Server Deleted Preset OK" description:@"" ID:@"ServerDeletedPreset" priority:2];
+			[me showNotificationWithTitle:@"Server Deleted Preset OK" description:[NSString stringWithFormat:@"%@ deleted preset named '%s'", remoteIP, a.msg.c_str()] ID:@"ServerDeletedPreset" priority:2];
 		}break;
 
 		case SERVER_SAVED_PRESET:{
-			[me showNotificationWithTitle:@"Server Saved Preset OK" description:@"" ID:@"ServerSavedPreset" priority:2];
+			[me showNotificationWithTitle:@"Server Saved Preset OK" description:[NSString stringWithFormat:@"%@ saved preset named '%s'", remoteIP, a.msg.c_str()] ID:@"ServerSavedPreset" priority:2];
 		}break;
 
 		case SERVER_DID_SET_PRESET:{
-			[me showNotificationWithTitle:@"Server Did Set Preset OK" description:@"" ID:@"ServerDidSetPreset" priority:-1];
+			[me showNotificationWithTitle:@"Server Did Set Preset OK" description:[NSString stringWithFormat:@"%@ did set preset named '%s'", remoteIP, a.msg.c_str()] ID:@"ServerDidSetPreset" priority:-1];
 		}break;
 
 		case PARAMS_UPDATED:
@@ -52,30 +54,64 @@ void clientCallback(RemoteUICallBackArg a){
 		case SERVER_DISCONNECTED:{
 			//NSLog(@"## Callback: SERVER_DISCONNECTED");
 			[me connect];
-			[me showNotificationWithTitle:@"Server Exited" description:@"Disconnected!" ID:@"ServerDisconnected" priority:-1];
+			[me showNotificationWithTitle:@"Server Exited, Disconnected!" description:remoteIP ID:@"ServerDisconnected" priority:-1];
 		}break;
 
 		case SERVER_CONFIRMED_SAVE:{
-			[me showNotificationWithTitle:@"Server Saved OK" description:@"Default XML now holds the current param values" ID:@"CurrentParamsSavedToDefaultXML" priority:2];
+			NSString * s = [NSString stringWithFormat:@"%@ - Default XML now holds the current param values", remoteIP];
+			[me showNotificationWithTitle:@"Server Saved OK" description:s ID:@"CurrentParamsSavedToDefaultXML" priority:2];
 		}break;
 
 		case SERVER_DID_RESET_TO_XML:{
-			[me showNotificationWithTitle:@"Server Did Reset To XML OK" description:@"Params are reset to Server-Launch XML values" ID:@"ServerDidResetToXML" priority:1];
+			NSString * s = [NSString stringWithFormat:@"%@ - Params are reset to Server-Launch XML values", remoteIP];
+			[me showNotificationWithTitle:@"Server Did Reset To XML OK" description:s ID:@"ServerDidResetToXML" priority:1];
 		}break;
 
 		case SERVER_DID_RESET_TO_DEFAULTS:{
-			[me showNotificationWithTitle:@"Server Did Reset To Default OK" description:@"Params are reset to its Share-Time values (Source Code Defaults)" ID:@"ServerDidResetToDefault" priority:1];
+			NSString * s = [NSString stringWithFormat:@"%@ - Params are reset to its Share-Time values (Source Code Defaults)", remoteIP];
+			[me showNotificationWithTitle:@"Server Did Reset To Default OK" description:s ID:@"ServerDidResetToDefault" priority:1];
 		}break;
 
 		default:
 			break;
 	}
+
+	[me log:a];
 }
 
 @implementation AppDelegate
 
+-(void)log:(RemoteUICallBackArg) arg{
+
+	if ( arg.action == PARAMS_UPDATED || arg.action == PRESETS_UPDATED) return; //this stuff is not worth logging
+	
+	NSString * action = @"";
+	switch (arg.action) {
+		case SERVER_CONNECTED: action = @"Connected To Server!";  break;
+		case SERVER_DELETED_PRESET: action = [NSString stringWithFormat:@"Server Deleted Preset named '%s'", arg.msg.c_str()]; break;
+		case SERVER_SAVED_PRESET:  action = [NSString stringWithFormat:@"Server Saved Preset named '%s'", arg.msg.c_str()]; break;
+		case SERVER_DID_SET_PRESET: action = [NSString stringWithFormat:@"Server did set Preset named '%s'", arg.msg.c_str()]; break;
+		case SERVER_DISCONNECTED: action = @"Server Disconnected!"; break;
+		case SERVER_CONFIRMED_SAVE: action = @"Server Did Save to Default XML"; break;
+		case SERVER_DID_RESET_TO_XML: action = @"Server Did Reset Params to Server-Launch Default XML"; break;
+		case SERVER_DID_RESET_TO_DEFAULTS: action = @"Server Did Reset Params to Share-Time (Source Code)"; break;
+		default:break;
+	}
+
+	NSString * date = [[NSDate date] descriptionWithCalendarFormat:@"%H:%M:%S" timeZone:nil locale:nil];
+	NSString * logLine = [NSString stringWithFormat:@"[%@@%s] %@\n", date, arg.host.c_str(), action ];
+
+	[[logView textStorage] beginEditing];
+    [[[logView textStorage] mutableString] appendString:logLine];
+    [[logView textStorage] endEditing];
+}
 
 
+-(IBAction)clearLog:(id)sender;{
+	[[logView textStorage] beginEditing];
+    [[[logView textStorage] mutableString] setString:@""];
+    [[logView textStorage] endEditing];
+}
 
 -(ofxRemoteUIClient *)getClient;{
 	return client;
@@ -541,7 +577,10 @@ void clientCallback(RemoteUICallBackArg a){
 
 -(IBAction)userDeletePreset:(id)sender{
 	int index = [presetsMenu indexOfSelectedItem];
-	if (index == 0) return; //empty preset does nothing, cant be deleted
+	if (index == 0) {
+		NSBeep();
+		return; //empty preset does nothing, cant be deleted
+	}
 
 	NSString * preset = [[presetsMenu itemAtIndex:index] title];
 	//NSLog(@"user delete preset: %@", preset );

@@ -60,8 +60,8 @@ public:
 	void setCallback( void (*callb)(RemoteUICallBackArg) );
 	//if you want to get notified when stuff happens, implement a callback method like this:
 	//
-	//	void clientCallback(RemoteUICallBackArg msg){
-	//		switch (msg) {
+	//	void clientCallback(RemoteUICallBackArg arg){
+	//		switch (arg.action) {
 	//			case PARAMS_UPDATED:break;
 	//			case PRESETS_UPDATED:break;
 	//			case SERVER_DISCONNECTED:break;

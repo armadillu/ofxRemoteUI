@@ -59,9 +59,9 @@ DecodedMessage ofxRemoteUI::decode(ofxOscMessage m){
 	string action = msgAddress.substr(0, 4);
 
 	//cout <<"Decode: "<< msgAddress << " action >> " << action << endl;
-
 	DecodedMessage dm;
 
+	//this is the lazynes maximus!
 	if (msgAddress.length() >= 3) {
 		if (action == "HELO") dm.action = HELO_ACTION;
 		else
@@ -583,13 +583,12 @@ void ofxRemoteUI::sendPREL( vector<string> presetNames_ ){
 
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
-void ofxRemoteUI::sendSAVP(string presetName){
+void ofxRemoteUI::sendSAVP(string presetName, bool confirm){
 	if(verbose) cout << "sendSAVP()" << endl;
 	ofxOscMessage m;
 	m.setAddress("SAVP");
-	if (presetName.size() > 0){
-		m.addStringArg(presetName);
-	}else{
+	m.addStringArg(presetName);
+	if (confirm){
 		m.addStringArg("OK");
 	}
 	oscSender.sendMessage(m);
@@ -597,25 +596,23 @@ void ofxRemoteUI::sendSAVP(string presetName){
 
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
-void ofxRemoteUI::sendSETP(string presetName){
+void ofxRemoteUI::sendSETP(string presetName, bool confirm){
 	if(verbose) cout << "sendSETP()" << endl;
 	ofxOscMessage m;
 	m.setAddress("SETP");
-	if (presetName.size() > 0){
-		m.addStringArg(presetName);
-	}else{
+	m.addStringArg(presetName);
+	if (confirm){
 		m.addStringArg("OK");
 	}
 	oscSender.sendMessage(m);
 }
 
-void ofxRemoteUI::sendDELP(string presetName){
+void ofxRemoteUI::sendDELP(string presetName, bool confirm){
 	if(verbose) cout << "sendDELP()" << endl;
 	ofxOscMessage m;
 	m.setAddress("DELP");
-	if (presetName.size() > 0){
-		m.addStringArg(presetName);
-	}else{
+	m.addStringArg(presetName);
+	if (confirm){
 		m.addStringArg("OK");
 	}
 	oscSender.sendMessage(m);

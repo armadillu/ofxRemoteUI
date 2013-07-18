@@ -44,6 +44,8 @@ struct LayoutConfig{
 	IBOutlet NSPopUpButton * presetsMenu;
 	IBOutlet NSMenu * groupsMenuBar;
 
+	IBOutlet NSTextView * logView;
+
 	bool updateContinuosly;
 
 	map<string, ParamUI*> widgets;
@@ -83,6 +85,9 @@ struct LayoutConfig{
 
 -(IBAction)pasteSpecial:(id)sender;
 -(IBAction)copySpecial:(id)sender;
+
+-(void)log:(RemoteUICallBackArg) arg;
+-(IBAction)clearLog:(id)sender;
 
 -(void)connect;
 -(void)update;

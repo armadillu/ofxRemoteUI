@@ -90,17 +90,20 @@ void ofxRemoteUIClient::update(float dt){
 		oscReceiver.getNextMessage(&m);
 
 		DecodedMessage dm = decode(m);
-
+		RemoteUICallBackArg cbArg; // to notify our "delegate"
+		cbArg.host = m.getRemoteIp();
 		switch (dm.action) {
 
 			case HELO_ACTION:{ //server says hi back, we ask for a big update
 				requestCompleteUpdate();
-				if(callBack!=NULL) callBack(SERVER_CONNECTED);
+				cbArg.action = SERVER_CONNECTED;
+				if(callBack!=NULL) callBack(cbArg);
 				}break;
 
 			case REQUEST_ACTION: //should not happen, server doesnt request << IS THIS BS?
 				if(verbose) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says REQUEST_ACTION!" << endl;
-				if(callBack!=NULL) callBack(PARAMS_UPDATED);
+				cbArg.action = PARAMS_UPDATED;
+				if(callBack!=NULL) callBack(cbArg);
 				break;
 
 			case SEND_PARAM_ACTION:{ //server is sending us an updated val
@@ -112,7 +115,8 @@ void ofxRemoteUIClient::update(float dt){
 
 			case CIAO_ACTION:
 				if(verbose) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says CIAO!" << endl;
-				if(callBack!=NULL) callBack(SERVER_DISCONNECTED);
+				cbArg.action = SERVER_DISCONNECTED;
+				if(callBack!=NULL) callBack(cbArg);
 				sendCIAO();
 				params.clear();
 				orderedKeys.clear();
@@ -132,44 +136,54 @@ void ofxRemoteUIClient::update(float dt){
 			case PRESET_LIST_ACTION: //server sends us the list of current presets
 				if(verbose) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says PRESET_LIST_ACTION!" << endl;
 				fillPresetListFromMessage(m);
-				if(callBack != NULL) callBack(PRESETS_UPDATED);
+				cbArg.action = PRESETS_UPDATED;
+				if(callBack!=NULL) callBack(cbArg);
 				break;
 
 			case SET_PRESET_ACTION: // server confirms that it has set the preset, request a full update
 				if(verbose) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SET_PRESET_ACTION!" << endl;
 				requestCompleteUpdate();
-				if(callBack != NULL) callBack(SERVER_DID_SET_PRESET);
+				cbArg.action = SERVER_DID_SET_PRESET;
+				cbArg.msg = m.getArgAsString(0);
+				if(callBack!=NULL) callBack(cbArg);
 				break;
 
 			case SAVE_PRESET_ACTION:{ // server confirms that it has save the preset,
 				if(verbose) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SAVE_PRESET_ACTION!" << endl;
 				vector<string> a;
 				sendPREL(a); //request preset list to server, send empty vector
-				if(callBack != NULL) callBack(SERVER_SAVED_PRESET);
+				cbArg.action = SERVER_SAVED_PRESET;
+				cbArg.msg = m.getArgAsString(0);
+				if(callBack!=NULL) callBack(cbArg);
 				}break;
 
 			case DELETE_PRESET_ACTION:{ // server confirms that it has deleted preset
 				if(verbose) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says DELETE_PRESET_ACTION!" << endl;
 				vector<string> a;
 				sendPREL(a); //request preset list to server, send empty vector
-				if(callBack != NULL) callBack(SERVER_DELETED_PRESET);
+				cbArg.action = SERVER_DELETED_PRESET;
+				cbArg.msg = m.getArgAsString(0);
+				if(callBack!=NULL) callBack(cbArg);
 				}break;
 
 			case RESET_TO_XML_ACTION:{ // server confrims
 				if(verbose) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says RESET_TO_XML_ACTION!" << endl;
 				requestCompleteUpdate();
-				if(callBack != NULL) callBack(SERVER_DID_RESET_TO_XML);
+				cbArg.action = SERVER_DID_RESET_TO_XML;
+				if(callBack!=NULL) callBack(cbArg);
 			}break;
 
 			case RESET_TO_DEFAULTS_ACTION:{ // server confrims
 				if(verbose) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says RESET_TO_DEFAULTS_ACTION!" << endl;
 				requestCompleteUpdate();
-				if(callBack != NULL) callBack(SERVER_DID_RESET_TO_DEFAULTS);
+				cbArg.action = SERVER_DID_RESET_TO_DEFAULTS;
+				if(callBack!=NULL) callBack(cbArg);
 			}break;
 
 			case SAVE_CURRENT_STATE_ACTION: // server confirms that it has saved
 				if(verbose) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SAVE_CURRENT_STATE_ACTION!" << endl;
-				if(callBack != NULL) callBack(SERVER_CONFIRMED_SAVE);
+				cbArg.action = SERVER_CONFIRMED_SAVE;
+				if(callBack!=NULL) callBack(cbArg);
 				break;
 
 			default: cout << "ofxRemoteUIClient::update >> ERR!" <<endl; break;
