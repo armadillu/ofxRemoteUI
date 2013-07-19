@@ -18,7 +18,6 @@
 		BB5CC612177E49D500B595F8 /* OscPrintReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5F0177E49D500B595F8 /* OscPrintReceivedElements.cpp */; };
 		BB5CC613177E49D500B595F8 /* OscReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5F2177E49D500B595F8 /* OscReceivedElements.cpp */; };
 		BB5CC614177E49D500B595F8 /* OscTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5F4177E49D500B595F8 /* OscTypes.cpp */; };
-		BB5CC615177E49D500B595F8 /* ofxOsc Readme.txt in Resources */ = {isa = PBXBuildFile; fileRef = BB5CC5F6177E49D500B595F8 /* ofxOsc Readme.txt */; };
 		BB5CC616177E49D500B595F8 /* ofxOscBundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5FA177E49D500B595F8 /* ofxOscBundle.cpp */; };
 		BB5CC617177E49D500B595F8 /* ofxOscMessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5FC177E49D500B595F8 /* ofxOscMessage.cpp */; };
 		BB5CC618177E49D500B595F8 /* ofxOscReceiver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5FE177E49D500B595F8 /* ofxOscReceiver.cpp */; };
@@ -26,7 +25,6 @@
 		BB5CC61A177E49D500B595F8 /* tinyxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC604177E49D500B595F8 /* tinyxml.cpp */; };
 		BB5CC61B177E49D500B595F8 /* tinyxmlerror.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC606177E49D500B595F8 /* tinyxmlerror.cpp */; };
 		BB5CC61C177E49D500B595F8 /* tinyxmlparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC607177E49D500B595F8 /* tinyxmlparser.cpp */; };
-		BB5CC61D177E49D500B595F8 /* ReadMe.txt in Resources */ = {isa = PBXBuildFile; fileRef = BB5CC608177E49D500B595F8 /* ReadMe.txt */; };
 		BB5CC61E177E49D500B595F8 /* ofxXmlSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC60A177E49D500B595F8 /* ofxXmlSettings.cpp */; };
 		BB65837B16A315B2000B45F0 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = BB65837A16A315B2000B45F0 /* icon.icns */; };
 		BB6CC35D174698DE0043F523 /* MyScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = BB6CC35C174698DE0043F523 /* MyScrollView.m */; };
@@ -47,7 +45,6 @@
 		BBDCBDF816A0523200F1C5EC /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBDCBDE816A0513D00F1C5EC /* AppDelegate.mm */; };
 		BBDCBDF916A0523500F1C5EC /* ParamUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBDCBDEA16A0513D00F1C5EC /* ParamUI.mm */; };
 		BBDCBDFB16A0523A00F1C5EC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = BBDCBDED16A0513D00F1C5EC /* main.m */; };
-		BBDCBE2816A063A400F1C5EC /* ReadMe.txt in Resources */ = {isa = PBXBuildFile; fileRef = BBDCBE2716A063A400F1C5EC /* ReadMe.txt */; };
 		BBE6075A16A466A7002F1707 /* offline.png in Resources */ = {isa = PBXBuildFile; fileRef = BBE6075716A466A7002F1707 /* offline.png */; };
 /* End PBXBuildFile section */
 
@@ -476,15 +473,12 @@
 				BBDCBDE416A0512300F1C5EC /* Credits.rtf in Resources */,
 				BBDCBDE516A0512300F1C5EC /* InfoPlist.strings in Resources */,
 				BBDCBDE616A0512300F1C5EC /* MainMenu.xib in Resources */,
-				BBDCBE2816A063A400F1C5EC /* ReadMe.txt in Resources */,
 				BB65837B16A315B2000B45F0 /* icon.icns in Resources */,
 				BBE6075A16A466A7002F1707 /* offline.png in Resources */,
 				BB94E57F17464E1800A7A3CC /* View.xib in Resources */,
 				BBB1F6FB1749003B00992119 /* connected.png in Resources */,
 				BBB1F6FC1749003B00992119 /* connected@2x.png in Resources */,
 				BBB1F6FE174900D100992119 /* offline@2x.png in Resources */,
-				BB5CC615177E49D500B595F8 /* ofxOsc Readme.txt in Resources */,
-				BB5CC61D177E49D500B595F8 /* ReadMe.txt in Resources */,
 				BBC385861797377C007E2DD1 /* Growl Registration Ticket.growlRegDict in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

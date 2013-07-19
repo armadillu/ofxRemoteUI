@@ -1,7 +1,7 @@
 
 #import "ParamUI.h"
 #include "ofxRemoteUI.h"
-
+#include "AppDelegate.h"
 
 @implementation ParamUI
 
@@ -17,6 +17,10 @@
 	param = p;
 	paramName = name;
 	BOOL didLoad = [NSBundle loadNibNamed:@"View" owner:self];
+	if(!didLoad){
+		NSLog(@"can0t load Nib for Parameter View!");
+		return nil;
+	}
 
 	[ui setWantsLayer:NO];
 	CALayer *viewLayer = [CALayer layer];
@@ -79,18 +83,18 @@
 
 
 -(void)remapSlider;{
-	
 	if ([widget isKindOfClass: [NSSlider class]]){
-		float w = [widget frame].size.width;
+		NSSlider * s = (NSSlider*)widget;
+		float w = [s frame].size.width;
 		int numTicks = w / 7;
 
-		if ([widget allowsTickMarkValuesOnly]){ // for int sliders, lets make sure there arent more marks than possible values
-			int range = 1 + [widget maxValue] - [widget minValue];
+		if ([s allowsTickMarkValuesOnly]){ // for int sliders, lets make sure there arent more marks than possible values
+			int range = 1 + [s maxValue] - [s minValue];
 			if (numTicks > range){
 				numTicks = range;
 			}
 		}
-		[widget setNumberOfTickMarks: numTicks];
+		[s setNumberOfTickMarks: numTicks];
 	}
 }
 
@@ -249,7 +253,7 @@
 	//NSString*	myColorSpace = [col colorSpaceName];
 	col = [col colorUsingColorSpaceName: NSCalibratedRGBColorSpace device:[[NSApp mainWindow] deviceDescription]];
 	//[sender setColor:col];
-	NSColor * col2 = [col colorUsingColorSpace:[NSColorSpace sRGBColorSpace] ];
+	//NSColor * col2 = [col colorUsingColorSpace:[NSColorSpace sRGBColorSpace] ];
 	//[sender performSelector:@selector(setColor:) withObject:col2 afterDelay:1];
 
 	//NSLog(@"colorSP2: %@", [col colorSpaceName]);
@@ -302,7 +306,7 @@
 }
 
 -(IBAction)updateEnum:(id)sender{
-	int index = [sender indexOfSelectedItem];
+	int index = (int)[sender indexOfSelectedItem];
 	param.intVal = param.minInt + index;
 	if ([[NSApp delegate] respondsToSelector:@selector(userChangedParam:paramName:)]){
 		[[NSApp delegate] userChangedParam: param paramName: paramName];  //blindly send message to App Delegate (TODO!)

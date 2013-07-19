@@ -37,7 +37,7 @@ void ofxRemoteUI::addParamToDB(RemoteUIParam p, string paramName){
 	if ( it == params.end() ){	//not found!
 		//cout << "adding key: " << paramName <<endl;
 		params[paramName] = p;
-		orderedKeys[ (int)orderedKeys.size() ] = paramName;
+		orderedKeys[ (int)(int)orderedKeys.size() ] = paramName;
 		paramsFromCode[paramName] = p; //cos this didnt exist before, we store it as "from code"
 	}else{
 		params[paramName] = p;

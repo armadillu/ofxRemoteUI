@@ -26,6 +26,8 @@ struct LayoutConfig{
 	float rowW;
 };
 
+//declare callback method 
+void clientCallback(RemoteUICallBackArg a);
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>{
 

@@ -11,9 +11,12 @@
 @implementation ColorView
 
 
+-(void)dealloc{
+	[background release];
+	[super dealloc];
+}
 
 -(void)awakeFromNib{
-
 	background = [[NSColor clearColor] retain];
 }
 
@@ -33,8 +36,6 @@
 }
 
 - (void)drawRect:(NSRect)dirtyRect{
-//	[background set];
-//    NSRectFill([self bounds]);
 	[background set];
     NSRectFillUsingOperation(dirtyRect, NSCompositeSourceOver);
 }

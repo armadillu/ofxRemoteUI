@@ -27,7 +27,7 @@ void ofxRemoteUIClient::setCallback( void (*callb)(RemoteUICallBackArg) ){
 void ofxRemoteUIClient::setup(string address, int port_){
 
 //	if (params.size() > 0) params.clear();
-//	if (orderedKeys.size() > 0) orderedKeys.clear();
+//	if ((int)orderedKeys.size() > 0) orderedKeys.clear();
 	port = port_;
 	avgTimeSinceLastReply = timeSinceLastReply = time = 0.0f;
 	waitingForReply = false;

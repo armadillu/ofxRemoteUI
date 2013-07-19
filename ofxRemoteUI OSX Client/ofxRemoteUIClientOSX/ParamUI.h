@@ -5,7 +5,6 @@
 #import "ColorView.h"
 
 
-
 @interface ParamUI : NSObject{
 
 	@public
@@ -33,7 +32,7 @@
 
 -(void)dealloc;
 
--(id)initWithParam: (RemoteUIParam)p paramName:(string)name;
+-(id)initWithParam: (RemoteUIParam)p paramName:(string)name ID:(int)n;
 -(void)updateParam:(RemoteUIParam)p;
 -(void)updateUI;
 

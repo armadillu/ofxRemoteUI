@@ -55,6 +55,8 @@ void clientCallback(RemoteUICallBackArg a){
 			//NSLog(@"## Callback: SERVER_DISCONNECTED");
 			[me connect];
 			[me showNotificationWithTitle:@"Server Exited, Disconnected!" description:remoteIP ID:@"ServerDisconnected" priority:-1];
+			[me updateGroupPopup];
+			[me updatePresetsPopup];
 		}break;
 
 		case SERVER_CONFIRMED_SAVE:{
@@ -344,7 +346,7 @@ void clientCallback(RemoteUICallBackArg a){
 -(void)adjustScrollView{
 
 	vector<string> paramsInGroup = [self getParamsInGroup:currentGroup];
-	int totalH = ROW_HEIGHT * (paramsInGroup.size() );
+	int totalH = ROW_HEIGHT * ((int)paramsInGroup.size() );
 	[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, totalH)];
 }
 
@@ -357,7 +359,7 @@ void clientCallback(RemoteUICallBackArg a){
 
 	vector<string> paramsInGroup = [self getParamsInGroup:currentGroup];
 
-	int numParams = paramsInGroup.size();
+	int numParams = (int)paramsInGroup.size();
 	int howManyPerCol = floor( scrollH / ROW_HEIGHT );
 	int colIndex = 0;
 	int numUsedColumns = ceil((float)numParams / (float)howManyPerCol);
@@ -406,7 +408,7 @@ void clientCallback(RemoteUICallBackArg a){
 	}
 	vector<string>paramsInGroup;
 
-	int numParams = orderedKeys.size();
+	int numParams = (int)orderedKeys.size();
 
 	for(int i = 0; i < numParams; i++){
 		string key = orderedKeys[i];
@@ -424,7 +426,7 @@ void clientCallback(RemoteUICallBackArg a){
 
 	vector<string> v; //all groups
 
-	int numParams = orderedKeys.size();
+	int numParams = (int)orderedKeys.size();
 
 	for(int i = 0; i < numParams; i++){
 		string key = orderedKeys[i];
@@ -441,7 +443,7 @@ void clientCallback(RemoteUICallBackArg a){
 
 	//remove all views, start over
 	NSArray * subviews = [listContainer subviews];
-	for( int i = [subviews count]-1 ; i >= 0 ; i-- ){
+	for( int i = (int)[subviews count] - 1 ; i >= 0 ; i-- ){
 		[[subviews objectAtIndex:i] removeFromSuperview];
 		//[[subviews objectAtIndex:i] release];
 	}
@@ -449,7 +451,7 @@ void clientCallback(RemoteUICallBackArg a){
 
 
 	vector<string> paramsInGroup = [self getParamsInGroup:currentGroup];
-	int numParams = paramsInGroup.size();
+	int numParams = (int)paramsInGroup.size();
 
 	int h = 0;
 	int howManyThisCol = 0;
@@ -533,7 +535,7 @@ void clientCallback(RemoteUICallBackArg a){
 
 	NSString * groupName ;
 	if( [sender class] == [NSPopUpButton class] ){
-		int index = [sender indexOfSelectedItem];
+		int index = (int)[sender indexOfSelectedItem];
 		groupName = [[sender itemAtIndex:index] title];
 	}else{
 		groupName = [sender title];
@@ -545,14 +547,13 @@ void clientCallback(RemoteUICallBackArg a){
 	}else{
 		currentGroup = [groupName UTF8String];
 	}
-	NSLog(@"user chose group: _%s_",currentGroup.c_str());
+	//NSLog(@"user chose group: _%s_",currentGroup.c_str());
 	[self layoutWidgetsWithConfig: [self calcLayoutParams]];
-
 }
 
 
 -(IBAction)userChosePreset:(id)sender{
-	int index = [sender indexOfSelectedItem];
+	int index = (int)[sender indexOfSelectedItem];
 	if (index == 0) {
 		return; //empty preset does nothing
 		currentPreset = "";
@@ -576,7 +577,7 @@ void clientCallback(RemoteUICallBackArg a){
 
 
 -(IBAction)userDeletePreset:(id)sender{
-	int index = [presetsMenu indexOfSelectedItem];
+	int index = (int)[presetsMenu indexOfSelectedItem];
 	if (index == 0) {
 		NSBeep();
 		return; //empty preset does nothing, cant be deleted
@@ -594,6 +595,7 @@ void clientCallback(RemoteUICallBackArg a){
 	NSMutableArray *menuItemNameArray = [NSMutableArray arrayWithCapacity:4];
 	[menuItemNameArray addObject: ALL_PARAMS_GROUP ];
 	vector<string> allGroupNames = [self getAllGroupsInParams];
+	if (allGroupNames.size() == 1 ) allGroupNames.clear(); //if only default group found, dont show it
 	for(int i = 0 ; i < allGroupNames.size(); i++){
 		[menuItemNameArray addObject: [NSString stringWithFormat:@"%s",allGroupNames[i].c_str()] ];
 	}
@@ -608,6 +610,7 @@ void clientCallback(RemoteUICallBackArg a){
 	 ];
 	[m setAction:@selector(userChoseGroup:)];
 	[m setTag:0];
+
 	for(int i = 0 ; i < allGroupNames.size(); i++){
 		m = [groupsMenuBar addItemWithTitle:[menuItemNameArray objectAtIndex:i+1]
 								 action:@selector(userChoseGroup:)
@@ -754,7 +757,7 @@ void clientCallback(RemoteUICallBackArg a){
 	//also remove the spacer bars. Dont ask me why, but dynamic array walking crashes! :?
 	//that why this ghetto walk is here
 	NSArray * subviews = [listContainer subviews];
-	for( int i = [subviews count]-1 ; i >= 0 ; i-- ){
+	for( int i = (int)[subviews count]-1 ; i >= 0 ; i-- ){
 		[[subviews objectAtIndex:i] removeFromSuperview];
 		//[[subviews objectAtIndex:i] release];
 	}
