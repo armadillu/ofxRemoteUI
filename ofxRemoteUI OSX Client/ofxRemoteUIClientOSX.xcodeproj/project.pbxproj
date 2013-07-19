@@ -166,7 +166,7 @@
 				BB65837A16A315B2000B45F0 /* icon.icns */,
 				BBDCBDF216A051A900F1C5EC /* ofxRemoteUI */,
 				BB4E4413169F291B00A94935 /* src */,
-				73002CE0140ABCF60035299A /* other */,
+				BB089AC11799C437009C4BC7 /* Resources */,
 				73002CD9140ABCF60035299A /* Frameworks */,
 				73002CD7140ABCF60035299A /* Products */,
 			);
@@ -201,28 +201,36 @@
 			name = "Other Frameworks";
 			sourceTree = "<group>";
 		};
-		73002CE0140ABCF60035299A /* other */ = {
+		73002CE1140ABCF60035299A /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				BBDCBDFD16A0526C00F1C5EC /* ofxRemoteUIClientOSX-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			path = LionTableViewTesting;
+			sourceTree = "<group>";
+		};
+		BB089AC11799C437009C4BC7 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				BBDCBDDD16A0512300F1C5EC /* en.lproj */,
+				BBC385851797377C007E2DD1 /* Growl Registration Ticket.growlRegDict */,
+				BBDCBDFC16A0526C00F1C5EC /* ofxRemoteUIClientOSX-Info.plist */,
+				BB089AC21799C45C009C4BC7 /* Images */,
+				73002CE1140ABCF60035299A /* Supporting Files */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		BB089AC21799C45C009C4BC7 /* Images */ = {
 			isa = PBXGroup;
 			children = (
 				BBB1F6F91749003B00992119 /* connected.png */,
 				BBB1F6FA1749003B00992119 /* connected@2x.png */,
 				BBE6075716A466A7002F1707 /* offline.png */,
 				BBB1F6FD174900D100992119 /* offline@2x.png */,
-				73002CE1140ABCF60035299A /* Supporting Files */,
-				BBC385851797377C007E2DD1 /* Growl Registration Ticket.growlRegDict */,
 			);
-			name = other;
-			path = LionTableViewTesting;
-			sourceTree = "<group>";
-		};
-		73002CE1140ABCF60035299A /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				BBDCBDFC16A0526C00F1C5EC /* ofxRemoteUIClientOSX-Info.plist */,
-				BBDCBDFD16A0526C00F1C5EC /* ofxRemoteUIClientOSX-Prefix.pch */,
-				BBDCBDDD16A0512300F1C5EC /* en.lproj */,
-			);
-			name = "Supporting Files";
+			name = Images;
 			sourceTree = "<group>";
 		};
 		BB4E4413169F291B00A94935 /* src */ = {

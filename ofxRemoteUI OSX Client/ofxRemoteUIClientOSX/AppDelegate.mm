@@ -847,13 +847,15 @@ void clientCallback(RemoteUICallBackArg a){
 }
 
 -(void)showNotificationWithTitle:(NSString*)title description:(NSString*)desc ID:(NSString*)key priority:(int)p{
-	[GrowlApplicationBridge notifyWithTitle:title
-								description:desc
-						   notificationName:key
-								   iconData:nil
-								   priority:p
-								   isSticky:NO
-							   clickContext:nil];
+	if ([GrowlApplicationBridge isGrowlRunning]){
+		[GrowlApplicationBridge notifyWithTitle:title
+									description:desc
+							   notificationName:key
+									   iconData:nil
+									   priority:p
+									   isSticky:NO
+								   clickContext:nil];
+	}
 
 }
 
