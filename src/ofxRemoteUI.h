@@ -113,6 +113,8 @@ using namespace std;
 
  */
 
+const char *get_filename_ext(const char *filename) ;
+
 
 class ofxRemoteUI{
 

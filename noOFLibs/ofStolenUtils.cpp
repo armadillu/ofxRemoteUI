@@ -21,8 +21,3 @@ float ofClamp(float value, float min, float max) {
 	return value < min ? min : value > max ? max : value;
 }
 
-const char *get_filename_ext(const char *filename) {
-    const char *dot = strrchr(filename, '.');
-    if(!dot || dot == filename) return "";
-    return dot + 1;
-}

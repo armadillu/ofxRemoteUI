@@ -12,6 +12,7 @@
 #include "uriencode.h"
 #include <sstream>
 
+
 bool ofxRemoteUI::ready(){
 	return readyToSend;
 }
@@ -631,3 +632,9 @@ void ofxRemoteUI::sendCIAO(){
 	oscSender.sendMessage(m);
 }
 
+
+const char *get_filename_ext(const char *filename) {
+    const char *dot = strrchr(filename, '.');
+    if(!dot || dot == filename) return "";
+    return dot + 1;
+}

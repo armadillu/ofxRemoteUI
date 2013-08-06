@@ -59,6 +59,5 @@ std::string ofToString(const T& value, int precision, int width, char fill ){
 }
 
 
-const char *get_filename_ext(const char *filename) ;
 
 #endif
