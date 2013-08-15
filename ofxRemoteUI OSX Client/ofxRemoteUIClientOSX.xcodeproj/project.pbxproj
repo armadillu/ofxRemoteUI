@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		73002CDB140ABCF60035299A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73002CDA140ABCF60035299A /* Cocoa.framework */; };
 		BB395E96173E6326002FA815 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB395E95173E6326002FA815 /* QuartzCore.framework */; };
+		BB3AACC417BD647300401E86 /* ColoredNSWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = BB3AACC317BD647300401E86 /* ColoredNSWindow.m */; };
 		BB5CC60C177E49D500B595F8 /* IpEndpointName.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5DD177E49D500B595F8 /* IpEndpointName.cpp */; };
 		BB5CC60D177E49D500B595F8 /* NetworkingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5E2177E49D500B595F8 /* NetworkingUtils.cpp */; };
 		BB5CC60E177E49D500B595F8 /* UdpSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5E3177E49D500B595F8 /* UdpSocket.cpp */; };
@@ -68,6 +69,8 @@
 		73002CDE140ABCF60035299A /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		73002CDF140ABCF60035299A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		BB395E95173E6326002FA815 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
+		BB3AACC217BD647300401E86 /* ColoredNSWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ColoredNSWindow.h; sourceTree = "<group>"; };
+		BB3AACC317BD647300401E86 /* ColoredNSWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ColoredNSWindow.m; sourceTree = "<group>"; };
 		BB4B54F0177FAD5D004838E4 /* ToDo.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ToDo.txt; sourceTree = "<group>"; };
 		BB5CC5BE177E483400B595F8 /* ofxRemoteUIServer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUIServer.cpp; sourceTree = "<group>"; };
 		BB5CC5BF177E483400B595F8 /* ofxRemoteUIServer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUIServer.h; sourceTree = "<group>"; };
@@ -245,6 +248,8 @@
 				BB94E5AD17468EAE00A7A3CC /* ColorView.m */,
 				BB6CC35B174698DE0043F523 /* MyScrollView.h */,
 				BB6CC35C174698DE0043F523 /* MyScrollView.m */,
+				BB3AACC217BD647300401E86 /* ColoredNSWindow.h */,
+				BB3AACC317BD647300401E86 /* ColoredNSWindow.m */,
 			);
 			name = src;
 			sourceTree = "<group>";
@@ -523,6 +528,7 @@
 				BB5CC61B177E49D500B595F8 /* tinyxmlerror.cpp in Sources */,
 				BB5CC61C177E49D500B595F8 /* tinyxmlparser.cpp in Sources */,
 				BB5CC61E177E49D500B595F8 /* ofxXmlSettings.cpp in Sources */,
+				BB3AACC417BD647300401E86 /* ColoredNSWindow.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
