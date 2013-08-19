@@ -11,10 +11,14 @@
 #include <algorithm>
 #include <string>
 #include <string.h>
-#include "dirent.h"
+#ifdef __APPLE__
+	#include "dirent.h"
+#elif _WIN32 || _WIN64
+	#include "dirent_vs.h"
+#endif
 #include <sys/stat.h>
 #include <time.h>
-#include <unistd.h>
+//#include <unistd.h>
 #ifndef TARGET_WIN32
 	#include <sys/time.h>
 #endif
