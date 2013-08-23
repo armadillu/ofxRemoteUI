@@ -25,11 +25,11 @@ NSColor * myColor;
 
 -(void)awakeFromNib{
 
-	NSLog(@"awake!");
+	//NSLog(@"awake!");
 
 	// Get window's frame view class
 	id class = [[[self contentView] superview] class];
-	NSLog(@"class=%@", class);
+	//NSLog(@"class=%@", class);
 
 
 	// Exchange draw rect
