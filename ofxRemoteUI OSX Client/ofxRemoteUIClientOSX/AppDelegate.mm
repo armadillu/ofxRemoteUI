@@ -813,7 +813,7 @@ void clientCallback(RemoteUICallBackArg a){
 
 -(IBAction)applyPrefs:(id)sender{
 
-	int onTop = [alwaysOnTopCheckbox state];
+	int onTop = (int)[alwaysOnTopCheckbox state];
 	if (onTop > 0) [window setLevel:NSScreenSaverWindowLevel];
 	else [window setLevel:NSNormalWindowLevel];
 

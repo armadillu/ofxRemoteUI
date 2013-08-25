@@ -28,7 +28,7 @@
 {
     CGFloat components[10];    // doubt any color spaces need more than 10 components
     NSArray *componentStrings = [string componentsSeparatedByString:@" "];
-    int count = [componentStrings count];
+    int count = (int)[componentStrings count];
     NSColor *color = nil;
     if (count <= 10) {
         for (int i = 0; i < count; i++) {
