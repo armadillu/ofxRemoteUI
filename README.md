@@ -27,7 +27,7 @@ Watch the [demo video](http://www.youtube.com/watch?v=EHS3bd0beKQ).
 ## Compatibility
 Works in OpenFrameworks, but also in plain C++ projects.
 
-There's also a feature limited version of the Server for Processing, made by @kritzikratzi! See <a href=http://superduper.org/processing/remoteUI/">here</a>.
+There's also a feature limited version of the Server for Processing, made by @kritzikratzi! See <a href="http://superduper.org/processing/remoteUI">here</a>.
 
 ## Why?
 
