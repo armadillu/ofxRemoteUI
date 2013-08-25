@@ -35,21 +35,20 @@ I know there's tons of very good UI's already, but one thing that bothers me abo
 
 ## Details
 
-It's OSC based, and it includes a native OSX Client. The Native OSX Client allows param colorization for better clarity, and live param filtering. It also supports grouping the params into categories, to filter them by category in the OSX Client.
+It's OSC based, and it includes a native OSX Client. The Native OSX Client allows param colorization for better clarity, and live param filtering. It also supports grouping the params into categories, to filter them by category in the OSX Client. There's automatic keyboard shortcuts to do so.
 
-It can also be set to store the current values when quitting the app (or whenever its convenient), so that you can carry on where you left off last time you used it. It uses ofxXmlSettings to store the settings. 
+It can also be set to store the current values when quitting the app (or whenever its convenient), so that you can carry on where you left off last time you used it. It does so by saving a file called "ofxRemoteUISettings.xml" in your data folder. It uses ofxXmlSettings to store everything. 
 
-You can also create and delete presets. Presets are stored with your OF app, inside a "ofxRemoteUIPresets" folder, inside your data folder. Whenever you like the current config, you can make a preset to keep it around. You can also delete presets.
+You can also create and delete presets, which are parameter states for your app. Presets are stored with your OF app, inside an "ofxRemoteUIPresets" folder, in your data folder. Whenever you like the current config, you can make a preset to keep it around. You can also delete presets.
 
-It uses Macros + the singleton pattern to make it very easy to share any variable you want to edit remotely, in any class of your project. 
+It uses Macros + the singleton pattern to make it very easy to share any variable you want to edit remotely, from any class of your project. 
 
-Also, the OSX client allows to copy all params as plain text. You can also paste them back after editing them! Thx to @kritzikratzi for this!
+The OSX client allows to copy all params as plain text. You can also paste them back after editing them! Thx to @kritzikratzi for this idea!
 
 **"Restore to initial XML Values"** sets alls params to whatever values they had at server app launch.  
 **"Restore to Default Values"** sets alls params to whatever values the shared variable had before sharing it with OFX_REMOTEUI_SERVER_SHARE_PARAM().
 
 To use it outisde of OpenFrameworks, you can see how the noOF_Example is setup.   
-
 
 -----
 
@@ -64,11 +63,15 @@ To use it outisde of OpenFrameworks, you can see how the noOF_Example is setup.
 	
 		OFX_REMOTEUI_SERVER_SETUP(); //start server
 		
-		OFX_REMOTEUI_SERVER_SHARE_PARAM(x, 0, ofGetWidth());  //Expose vars to the server, set a range
+		//Expose x and y vars to the  server, set a valid slider range 
+		OFX_REMOTEUI_SERVER_SHARE_PARAM(x, 0, ofGetWidth()); 
 		OFX_REMOTEUI_SERVER_SHARE_PARAM(y, 0, ofGetHeight());
-		OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color);         //share our color var
-
-		OFX_REMOTEUI_SERVER_LOAD_FROM_XML(); //load values from XML, as they were last saved
+		
+		//share the color var
+		OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color);
+		
+		//load values from XML, as they were last saved (if they were)
+		OFX_REMOTEUI_SERVER_LOAD_FROM_XML(); 
 	}
 	
 	void update(){
@@ -77,15 +80,15 @@ To use it outisde of OpenFrameworks, you can see how the noOF_Example is setup.
 	
 	void exit(){
 		OFX_REMOTEUI_SERVER_CLOSE();		//stop the server
-		OFX_REMOTEUI_SERVER_SAVE_TO_XML();	//save values to XML
+		OFX_REMOTEUI_SERVER_SAVE_TO_XML();	//save current values to XML
 	}
 
-And use the supplied OSX Client to view and edit them.
+Use the supplied OSX Client to view and edit your shared parameters.
 
 
 ## Notes
 
-Enums need to be consecutive, so that each enum item is +1 the previous one.
+Enums must be consecutive, so that each enum item is +1 the previous one for them to work.
 
 
 ## To Do
