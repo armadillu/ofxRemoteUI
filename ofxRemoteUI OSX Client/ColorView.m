@@ -25,7 +25,6 @@
 	return NO;
 }
 
-
 -(void)setBackgroundColor:(NSColor *)aColor{
 
     if([background isEqual:aColor]) return;

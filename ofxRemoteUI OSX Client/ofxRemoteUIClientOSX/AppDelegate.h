@@ -10,6 +10,7 @@
 #include "ofxRemoteUIClient.h"
 #import "ParamUI.h"
 #import "MyScrollView.h"
+#import "ColoredNSWindow.h"
 #import <Growl/Growl.h>
 
 #define REFRESH_RATE			1.0f/15.0f
@@ -31,42 +32,46 @@ void clientCallback(RemoteUICallBackArg a);
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>{
 
-	IBOutlet NSWindow *window;
-	IBOutlet NSButton *updateFromServerButton;
-	IBOutlet NSButton *updateContinuouslyCheckbox;
-	IBOutlet NSButton *connectButton;
-	IBOutlet NSSearchField *addressField; //NSSearchField
-	IBOutlet NSTextField *portField;
-	IBOutlet NSImageView *statusImage;
-	IBOutlet NSProgressIndicator *progress;
-	IBOutlet NSTextField *lagField;
-	IBOutlet NSView *listContainer;
-	IBOutlet MyScrollView * scroll;
-	IBOutlet NSPopUpButton * groupsMenu;
-	IBOutlet NSPopUpButton * presetsMenu;
-	IBOutlet NSMenu * groupsMenuBar;
+	IBOutlet ColoredNSWindow *		window;
+	IBOutlet NSButton *				updateFromServerButton;
+	IBOutlet NSButton *				updateContinuouslyCheckbox;
+	IBOutlet NSButton *				connectButton;
+	IBOutlet NSSearchField *		addressField; //NSSearchField
+	IBOutlet NSTextField *			portField;
+	IBOutlet NSImageView *			statusImage;
+	IBOutlet NSProgressIndicator *	progress;
+	IBOutlet NSTextField *			lagField;
+	IBOutlet NSView *				listContainer;
+	IBOutlet MyScrollView *			scroll;
+	IBOutlet NSPopUpButton *		groupsMenu;
+	IBOutlet NSPopUpButton *		presetsMenu;
+	IBOutlet NSMenu *				groupsMenuBar;
 
-	IBOutlet NSTextView * logView;
+	IBOutlet NSColorWell *			colorWell;
+	IBOutlet NSButton *				alwaysOnTopCheckbox;
 
-	bool updateContinuosly;
+	IBOutlet NSTextView *			logView;
 
-	map<string, ParamUI*> widgets;
-	vector<string> orderedKeys; // used to keep the order in which the items were added
+	bool							updateContinuosly;
 
-	ofxRemoteUIClient * client;
+	map<string, ParamUI*>			widgets;
+	vector<string>					orderedKeys; // used to keep the order in which the items were added
 
-	NSTimer * timer;
-	NSTimer * statusTimer;
-	LayoutConfig lastLayout;
+	ofxRemoteUIClient *				client;
 
-	string currentGroup;
-	string currentPreset;
+	NSTimer *						timer;
+	NSTimer *						statusTimer;
+	LayoutConfig					lastLayout;
 
-	BOOL launched;
+	string							currentGroup;
+	string							currentPreset;
+
+	BOOL							launched;
+	BOOL							alwaysOnTop;
 
 @public
 
-	bool needFullParamsUpdate;
+	bool							needFullParamsUpdate;
 }
 
 -(ofxRemoteUIClient *)getClient;
@@ -87,6 +92,7 @@ void clientCallback(RemoteUICallBackArg a);
 
 -(IBAction)pasteSpecial:(id)sender;
 -(IBAction)copySpecial:(id)sender;
+-(IBAction)applyPrefs:(id)sender;
 
 -(void)log:(RemoteUICallBackArg) arg;
 -(IBAction)clearLog:(id)sender;

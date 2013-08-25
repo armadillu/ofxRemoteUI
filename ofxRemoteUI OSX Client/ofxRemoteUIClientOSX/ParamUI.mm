@@ -42,7 +42,7 @@
 
 -(void)fadeOut{
 	[ui setWantsLayer:YES];
-	[ui layer].opacity = 0.2;
+	[ui layer].opacity = 0.25;
 }
 
 

@@ -8,7 +8,10 @@
 
 #import <Cocoa/Cocoa.h>
 
+
 @interface ColoredNSWindow : NSWindow{
 }
+
+-(void)setColor:(NSColor*)c;
 
 @end

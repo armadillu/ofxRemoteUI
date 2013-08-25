@@ -29,6 +29,7 @@
 		BB5CC61E177E49D500B595F8 /* ofxXmlSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC60A177E49D500B595F8 /* ofxXmlSettings.cpp */; };
 		BB65837B16A315B2000B45F0 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = BB65837A16A315B2000B45F0 /* icon.icns */; };
 		BB6CC35D174698DE0043F523 /* MyScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = BB6CC35C174698DE0043F523 /* MyScrollView.m */; };
+		BB8776E917C99B3700CC74B8 /* NSColorStringExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = BB8776E817C99B3700CC74B8 /* NSColorStringExtension.m */; };
 		BB94E57F17464E1800A7A3CC /* View.xib in Resources */ = {isa = PBXBuildFile; fileRef = BB94E57D17464E1800A7A3CC /* View.xib */; };
 		BB94E5AE17468EAE00A7A3CC /* ColorView.m in Sources */ = {isa = PBXBuildFile; fileRef = BB94E5AD17468EAE00A7A3CC /* ColorView.m */; };
 		BBB1F6FB1749003B00992119 /* connected.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB1F6F91749003B00992119 /* connected.png */; };
@@ -119,6 +120,8 @@
 		BB65837A16A315B2000B45F0 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = icon.icns; sourceTree = "<group>"; };
 		BB6CC35B174698DE0043F523 /* MyScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyScrollView.h; sourceTree = "<group>"; };
 		BB6CC35C174698DE0043F523 /* MyScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyScrollView.m; sourceTree = "<group>"; };
+		BB8776E717C99B3700CC74B8 /* NSColorStringExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSColorStringExtension.h; sourceTree = "<group>"; };
+		BB8776E817C99B3700CC74B8 /* NSColorStringExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSColorStringExtension.m; sourceTree = "<group>"; };
 		BB94E57E17464E1800A7A3CC /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = View.xib; sourceTree = "<group>"; };
 		BB94E5AC17468EAE00A7A3CC /* ColorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ColorView.h; sourceTree = "<group>"; };
 		BB94E5AD17468EAE00A7A3CC /* ColorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ColorView.m; sourceTree = "<group>"; };
@@ -248,8 +251,7 @@
 				BB94E5AD17468EAE00A7A3CC /* ColorView.m */,
 				BB6CC35B174698DE0043F523 /* MyScrollView.h */,
 				BB6CC35C174698DE0043F523 /* MyScrollView.m */,
-				BB3AACC217BD647300401E86 /* ColoredNSWindow.h */,
-				BB3AACC317BD647300401E86 /* ColoredNSWindow.m */,
+				BB8776ED17C9A39100CC74B8 /* ColoredWindow */,
 			);
 			name = src;
 			sourceTree = "<group>";
@@ -399,6 +401,17 @@
 			path = src;
 			sourceTree = "<group>";
 		};
+		BB8776ED17C9A39100CC74B8 /* ColoredWindow */ = {
+			isa = PBXGroup;
+			children = (
+				BB8776E717C99B3700CC74B8 /* NSColorStringExtension.h */,
+				BB8776E817C99B3700CC74B8 /* NSColorStringExtension.m */,
+				BB3AACC217BD647300401E86 /* ColoredNSWindow.h */,
+				BB3AACC317BD647300401E86 /* ColoredNSWindow.m */,
+			);
+			name = ColoredWindow;
+			sourceTree = "<group>";
+		};
 		BBDCBDDD16A0512300F1C5EC /* en.lproj */ = {
 			isa = PBXGroup;
 			children = (
@@ -529,6 +542,7 @@
 				BB5CC61C177E49D500B595F8 /* tinyxmlparser.cpp in Sources */,
 				BB5CC61E177E49D500B595F8 /* ofxXmlSettings.cpp in Sources */,
 				BB3AACC417BD647300401E86 /* ColoredNSWindow.m in Sources */,
+				BB8776E917C99B3700CC74B8 /* NSColorStringExtension.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

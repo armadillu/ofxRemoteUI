@@ -9,6 +9,7 @@
 #import "ColoredNSWindow.h"
 #import <objc/runtime.h>
 
+
 @interface ColoredNSWindow(ShutUpXcode)
 - (float)roundedCornerRadius;
 - (void)drawRectOriginal:(NSRect)rect;
@@ -18,18 +19,30 @@
 
 // mostly from http://parmanoir.com/Custom_NSThemeFrame
 
-NSColor * myColor;
-
 @implementation ColoredNSWindow
+
+
+NSColor * myWinColor = nil;
+NSMutableArray * coloredWindows = nil;
+
+
+-(void)setColor:(NSColor*)c;{
+	[myWinColor release];
+	myWinColor = [c retain];
+	[self display];
+}
 
 
 -(void)awakeFromNib{
 
-	//NSLog(@"awake!");
+	//store all NSThemeFrame containers for NSWindows who want this (are an instance of ColoredNSWindow)
+	if ([self class] == [ColoredNSWindow class]){
+		if (coloredWindows == nil) coloredWindows = [[NSMutableArray alloc] init];
+		[coloredWindows addObject:[[self contentView] superview]];
+	}
 
 	// Get window's frame view class
 	id class = [[[self contentView] superview] class];
-	//NSLog(@"class=%@", class);
 
 
 	// Exchange draw rect
@@ -41,32 +54,27 @@ NSColor * myColor;
 
 	method_exchangeImplementations(m1, m2);
 
-	//choose a random color
-	struct timeval tv;
-	gettimeofday(&tv, 0);
-	long int n = (tv.tv_sec ^ tv.tv_usec) ^ getpid();
-	srand(n);
-
-	float r = rand()%1000 / 1000.;
-	float g = rand()%1000 / 1000.;
-	float b = rand()%1000 / 1000.;
-	myColor = [[NSColor colorWithCalibratedRed:r green:g blue:b alpha:0.500] retain];
+	NSLog(@"awake %@", self);
+	if(myWinColor == nil) myWinColor = [[NSColor whiteColor] retain];
 }
 
 - (void)drawRect:(NSRect)rect{
 
-	// Call original drawing method
 	[self drawRectOriginal:rect];
 
+	if ( [coloredWindows containsObject:self] ){
+		//if im one of the selected ones
+		// Call original drawing method
 
-	//
-	// Draw a background color on top of everything
-	//
-	CGContextRef context = [[NSGraphicsContext currentContext] graphicsPort];
-	CGContextSetBlendMode(context, kCGBlendModeColor);
+		//
+		// Draw a background color on top of everything
+		//
+		CGContextRef context = [[NSGraphicsContext currentContext] graphicsPort];
+		CGContextSetBlendMode(context, kCGBlendModeColor);
 
-	[myColor set];
-	[[NSBezierPath bezierPathWithRect:rect] fill];
+		[myWinColor set];
+		[[NSBezierPath bezierPathWithRect:rect] fill];
+	}
 }
 @end
 

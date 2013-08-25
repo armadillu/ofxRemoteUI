@@ -8,6 +8,7 @@
 
 #import "ParamUI.h"
 #import "AppDelegate.h"
+#import "NSColorStringExtension.h"
 
 //ofxRemoteUIClient callback entry point
 void clientCallback(RemoteUICallBackArg a){
@@ -194,6 +195,7 @@ void clientCallback(RemoteUICallBackArg a){
 	//[viewLayer setBackgroundColor:CGColorCreateGenericRGB(0,0,0,0.1)];
 	[listContainer setWantsLayer:YES]; // view's backing store is using a Core Animation Layer
 	[listContainer setLayer:viewLayer];
+
 	//disable implicit CAAnims
 	NSMutableDictionary *newActions = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
 									   [NSNull null], @"onOrderIn",
@@ -218,7 +220,10 @@ void clientCallback(RemoteUICallBackArg a){
 
 	//NSLog(@"applicationDidFinishLaunching done!");
 	currentPreset = "";
+
+	[self loadPrefs];
 	launched = TRUE;
+
 }
 
 
@@ -237,6 +242,9 @@ void clientCallback(RemoteUICallBackArg a){
 	}
 }
 
+- (void)applicationWillTerminate:(NSNotification *)notification;{
+	[self savePrefs:self];
+}
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender{
     return YES;
@@ -476,6 +484,7 @@ void clientCallback(RemoteUICallBackArg a){
 	}
 	int off = ((int)[scroll.contentView frame].size.height ) % ((int)(ROW_HEIGHT));
 
+	//draw grid
 	for (int i = 1; i < colIndex + 1; i++) {
 		NSBox * box;
 		box = [[NSBox alloc] initWithFrame: NSMakeRect( i *  p.rowW, -ROW_HEIGHT, 1, 3 * ROW_HEIGHT + ROW_HEIGHT * numParams )];
@@ -781,6 +790,42 @@ void clientCallback(RemoteUICallBackArg a){
 			}
 		}
 	}
+}
+
+-(void)loadPrefs{
+
+	NSUserDefaults * d = [NSUserDefaults standardUserDefaults];
+	int onTop = (int)[d integerForKey:@"alwaysOnTop"] ;
+	if (onTop > 0) [window setLevel:NSScreenSaverWindowLevel];
+	else [window setLevel:NSNormalWindowLevel];
+
+	NSString * winColor = [d stringForKey:@"windowColor"];
+	NSColor * col;
+	if (winColor == nil) {
+		col = [NSColor colorWithCalibratedWhite:1 alpha:0.5 ];
+	}else{
+		col = [NSColor colorFromString:winColor forColorSpace:[NSColorSpace deviceRGBColorSpace]];
+	}
+
+	[colorWell setColor:col];
+	[window setColor:col];
+}
+
+-(IBAction)applyPrefs:(id)sender{
+
+	int onTop = [alwaysOnTopCheckbox state];
+	if (onTop > 0) [window setLevel:NSScreenSaverWindowLevel];
+	else [window setLevel:NSNormalWindowLevel];
+
+	[window setColor:[colorWell color]];
+}
+
+
+-(void)savePrefs:(id)sender{
+	NSUserDefaults * d = [NSUserDefaults standardUserDefaults];
+	[d setValue:[[colorWell color] stringRepresentation] forKey:@"windowColor"];
+	[d setInteger: ([window level] == NSScreenSaverWindowLevel) ? 1 : 0   forKey:@"alwaysOnTop"];
+	[d synchronize];
 }
 
 

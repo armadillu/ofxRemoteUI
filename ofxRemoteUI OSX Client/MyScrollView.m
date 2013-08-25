@@ -11,7 +11,7 @@
 @implementation MyScrollView
 
 -(BOOL)isOpaque{
-	return NO;
+	return YES;
 }
 
 @end
