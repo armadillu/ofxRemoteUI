@@ -1723,7 +1723,7 @@
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
 				<object class="NSView" key="NSWindowView" id="875705082">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1742,7 +1742,7 @@
 											<int key="NSvFlags">2322</int>
 											<string key="NSFrameSize">{276, 357}</string>
 											<reference key="NSSuperview" ref="734318056"/>
-											<reference key="NSNextKeyView" ref="500431530"/>
+											<reference key="NSNextKeyView" ref="867051807"/>
 											<string key="NSReuseIdentifierKey">_NS:13</string>
 											<object class="NSTextContainer" key="NSTextContainer" id="20823262">
 												<object class="NSLayoutManager" key="NSLayoutManager">
@@ -1881,7 +1881,7 @@
 							</object>
 							<string key="NSFrame">{{-1, 20}, {278, 359}}</string>
 							<reference key="NSSuperview" ref="875705082"/>
-							<reference key="NSNextKeyView" ref="867051807"/>
+							<reference key="NSNextKeyView" ref="734318056"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<int key="NSsFlags">133650</int>
 							<reference key="NSVScroller" ref="500431530"/>
@@ -1896,7 +1896,6 @@
 							<int key="NSvFlags">289</int>
 							<string key="NSFrame">{{233, 0}, {42, 19}}</string>
 							<reference key="NSSuperview" ref="875705082"/>
-							<reference key="NSNextKeyView"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="622339782">
@@ -1917,7 +1916,6 @@
 						</object>
 					</object>
 					<string key="NSFrameSize">{276, 378}</string>
-					<reference key="NSSuperview"/>
 					<reference key="NSNextKeyView" ref="816416708"/>
 					<string key="NSReuseIdentifierKey">_NS:21</string>
 				</object>
@@ -2016,7 +2014,7 @@
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="85242603">
-												<int key="NSCellFlags">-2080374784</int>
+												<int key="NSCellFlags">67108864</int>
 												<int key="NSCellFlags2">268435456</int>
 												<string key="NSContents">Always on Top</string>
 												<reference key="NSSupport" ref="276318512"/>
