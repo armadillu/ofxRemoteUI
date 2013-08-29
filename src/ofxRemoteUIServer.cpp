@@ -196,132 +196,120 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 			s.pushTag(OFX_REMOTEUI_XML_TAG, 0);
 
 			int numFloats = s.getNumTags("REMOTEUI_PARAM_FLOAT");
-			if(numFloats > 0){
-				for (int i=0; i< numFloats; i++){
-					string paramName = s.getAttribute("REMOTEUI_PARAM_FLOAT", "paramName", "", i);
-					float val = s.getValue("REMOTEUI_PARAM_FLOAT", 0.0, i);
-					map<string,RemoteUIParam>::iterator it = params.find(paramName);
-					if ( it != params.end() ){	// found!
-						if(params[paramName].floatValAddr != NULL){
-							*params[paramName].floatValAddr = val;
-							params[paramName].floatVal = val;
-							*params[paramName].floatValAddr = ofClamp(*params[paramName].floatValAddr, params[paramName].minFloat, params[paramName].maxFloat);
-							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-							if(verbose) cout << "ofxRemoteUIServer loading a FLOAT '" << paramName <<"' (" << ofToString( *params[paramName].floatValAddr, 3) << ") from XML" << endl;
-						}else{
-							cout << "ofxRemoteUIServer ERROR at loading FLOAT (" << paramName << ")" << endl;
-						}
+			for (int i=0; i< numFloats; i++){
+				string paramName = s.getAttribute("REMOTEUI_PARAM_FLOAT", "paramName", "", i);
+				float val = s.getValue("REMOTEUI_PARAM_FLOAT", 0.0, i);
+				map<string,RemoteUIParam>::iterator it = params.find(paramName);
+				if ( it != params.end() ){	// found!
+					if(params[paramName].floatValAddr != NULL){
+						*params[paramName].floatValAddr = val;
+						params[paramName].floatVal = val;
+						*params[paramName].floatValAddr = ofClamp(*params[paramName].floatValAddr, params[paramName].minFloat, params[paramName].maxFloat);
+						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
+						if(verbose) cout << "ofxRemoteUIServer loading a FLOAT '" << paramName <<"' (" << ofToString( *params[paramName].floatValAddr, 3) << ") from XML" << endl;
+					}else{
+						cout << "ofxRemoteUIServer ERROR at loading FLOAT (" << paramName << ")" << endl;
 					}
 				}
 			}
 
 			int numInts = s.getNumTags("REMOTEUI_PARAM_INT");
-			if(numInts > 0){
-				for (int i=0; i< numInts; i++){
-					string paramName = s.getAttribute("REMOTEUI_PARAM_INT", "paramName", "", i);
-					float val = s.getValue("REMOTEUI_PARAM_INT", 0, i);
-					map<string,RemoteUIParam>::iterator it = params.find(paramName);
-					if ( it != params.end() ){	// found!
-						if(params[paramName].intValAddr != NULL){
-							*params[paramName].intValAddr = val;
-							params[paramName].intVal = val;
-							*params[paramName].intValAddr = ofClamp(*params[paramName].intValAddr, params[paramName].minInt, params[paramName].maxInt);
-							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-							if(verbose) cout << "ofxRemoteUIServer loading an INT '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" << endl;
-						}else{
-							cout << "ofxRemoteUIServer ERROR at loading INT (" << paramName << ")" << endl;
-						}
+			for (int i=0; i< numInts; i++){
+				string paramName = s.getAttribute("REMOTEUI_PARAM_INT", "paramName", "", i);
+				float val = s.getValue("REMOTEUI_PARAM_INT", 0, i);
+				map<string,RemoteUIParam>::iterator it = params.find(paramName);
+				if ( it != params.end() ){	// found!
+					if(params[paramName].intValAddr != NULL){
+						*params[paramName].intValAddr = val;
+						params[paramName].intVal = val;
+						*params[paramName].intValAddr = ofClamp(*params[paramName].intValAddr, params[paramName].minInt, params[paramName].maxInt);
+						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
+						if(verbose) cout << "ofxRemoteUIServer loading an INT '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" << endl;
+					}else{
+						cout << "ofxRemoteUIServer ERROR at loading INT (" << paramName << ")" << endl;
 					}
 				}
 			}
 
 			int numColors = s.getNumTags("REMOTEUI_PARAM_COLOR");
-			if(numColors > 0){
-				for (int i=0; i< numColors; i++){
-					string paramName = s.getAttribute("REMOTEUI_PARAM_COLOR", "paramName", "", i);
-					s.pushTag("REMOTEUI_PARAM_COLOR", i);
-					int r = s.getValue("R", 0);
-					int g = s.getValue("G", 0);
-					int b = s.getValue("B", 0);
-					int a = s.getValue("A", 0);
-					map<string,RemoteUIParam>::iterator it = params.find(paramName);
-					if ( it != params.end() ){	// found!
-						if(params[paramName].redValAddr != NULL){
-							*params[paramName].redValAddr = r;
-							params[paramName].redVal = r;
-							*(params[paramName].redValAddr+1) = g;
-							params[paramName].greenVal = g;
-							*(params[paramName].redValAddr+2) = b;
-							params[paramName].blueVal = b;
-							*(params[paramName].redValAddr+3) = a;
-							params[paramName].alphaVal = a;
-							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-							if(verbose) cout << "ofxRemoteUIServer loading a COLOR '" << paramName <<"' (" << (int)*params[paramName].redValAddr << " " << (int)*(params[paramName].redValAddr+1) << " " << (int)*(params[paramName].redValAddr+2) << " " << (int)*(params[paramName].redValAddr+3)  << ") from XML" << endl;
-						}else{
-							cout << "ofxRemoteUIServer ERROR at loading COLOR (" << paramName << ")" << endl;
-						}
+			for (int i=0; i< numColors; i++){
+				string paramName = s.getAttribute("REMOTEUI_PARAM_COLOR", "paramName", "", i);
+				s.pushTag("REMOTEUI_PARAM_COLOR", i);
+				int r = s.getValue("R", 0);
+				int g = s.getValue("G", 0);
+				int b = s.getValue("B", 0);
+				int a = s.getValue("A", 0);
+				map<string,RemoteUIParam>::iterator it = params.find(paramName);
+				if ( it != params.end() ){	// found!
+					if(params[paramName].redValAddr != NULL){
+						*params[paramName].redValAddr = r;
+						params[paramName].redVal = r;
+						*(params[paramName].redValAddr+1) = g;
+						params[paramName].greenVal = g;
+						*(params[paramName].redValAddr+2) = b;
+						params[paramName].blueVal = b;
+						*(params[paramName].redValAddr+3) = a;
+						params[paramName].alphaVal = a;
+						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
+						if(verbose) cout << "ofxRemoteUIServer loading a COLOR '" << paramName <<"' (" << (int)*params[paramName].redValAddr << " " << (int)*(params[paramName].redValAddr+1) << " " << (int)*(params[paramName].redValAddr+2) << " " << (int)*(params[paramName].redValAddr+3)  << ") from XML" << endl;
+					}else{
+						cout << "ofxRemoteUIServer ERROR at loading COLOR (" << paramName << ")" << endl;
 					}
-					s.popTag();
 				}
+				s.popTag();
 			}
 
 			int numEnums = s.getNumTags("REMOTEUI_PARAM_ENUM");
-			if(numEnums > 0){
-				for (int i=0; i< numEnums; i++){
-					string paramName = s.getAttribute("REMOTEUI_PARAM_ENUM", "paramName", "", i);
-					float val = s.getValue("REMOTEUI_PARAM_ENUM", 0, i);
-					map<string,RemoteUIParam>::iterator it = params.find(paramName);
-					if ( it != params.end() ){	// found!
-						if(params[paramName].intValAddr != NULL){
-							*params[paramName].intValAddr = val;
-							params[paramName].intVal = val;
-							*params[paramName].intValAddr = ofClamp(*params[paramName].intValAddr, params[paramName].minInt, params[paramName].maxInt);
-							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-							if(verbose) cout << "ofxRemoteUIServer loading an ENUM '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" << endl;
-						}else{
-							cout << "ofxRemoteUIServer ERROR at loading ENUM (" << paramName << ")" << endl;
-						}
+			for (int i=0; i< numEnums; i++){
+				string paramName = s.getAttribute("REMOTEUI_PARAM_ENUM", "paramName", "", i);
+				float val = s.getValue("REMOTEUI_PARAM_ENUM", 0, i);
+				map<string,RemoteUIParam>::iterator it = params.find(paramName);
+				if ( it != params.end() ){	// found!
+					if(params[paramName].intValAddr != NULL){
+						*params[paramName].intValAddr = val;
+						params[paramName].intVal = val;
+						*params[paramName].intValAddr = ofClamp(*params[paramName].intValAddr, params[paramName].minInt, params[paramName].maxInt);
+						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
+						if(verbose) cout << "ofxRemoteUIServer loading an ENUM '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" << endl;
+					}else{
+						cout << "ofxRemoteUIServer ERROR at loading ENUM (" << paramName << ")" << endl;
 					}
 				}
 			}
 
 
 			int numBools = s.getNumTags("REMOTEUI_PARAM_BOOL");
-			if(numBools > 0){
-				for (int i=0; i< numBools; i++){
-					string paramName = s.getAttribute("REMOTEUI_PARAM_BOOL", "paramName", "", i);
-					float val = s.getValue("REMOTEUI_PARAM_BOOL", false, i);
+			for (int i=0; i< numBools; i++){
+				string paramName = s.getAttribute("REMOTEUI_PARAM_BOOL", "paramName", "", i);
+				float val = s.getValue("REMOTEUI_PARAM_BOOL", false, i);
 
-					map<string,RemoteUIParam>::iterator it = params.find(paramName);
-					if ( it != params.end() ){	// found!
-						if(params[paramName].boolValAddr != NULL){
-							*params[paramName].boolValAddr = val;
-							params[paramName].boolVal = val;
-							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-							if(verbose) cout << "ofxRemoteUIServer loading a BOOL '" << paramName <<"' (" << (bool) *params[paramName].boolValAddr << ") from XML" << endl;
-						}else{
-							cout << "ofxRemoteUIServer ERROR at loading BOOL (" << paramName << ")" << endl;
-						}
+				map<string,RemoteUIParam>::iterator it = params.find(paramName);
+				if ( it != params.end() ){	// found!
+					if(params[paramName].boolValAddr != NULL){
+						*params[paramName].boolValAddr = val;
+						params[paramName].boolVal = val;
+						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
+						if(verbose) cout << "ofxRemoteUIServer loading a BOOL '" << paramName <<"' (" << (bool) *params[paramName].boolValAddr << ") from XML" << endl;
+					}else{
+						cout << "ofxRemoteUIServer ERROR at loading BOOL (" << paramName << ")" << endl;
 					}
 				}
 			}
 
 			int numStrings = s.getNumTags("REMOTEUI_PARAM_STRING");
-			if(numStrings > 0){
-				for (int i=0; i< numStrings; i++){
-					string paramName = s.getAttribute("REMOTEUI_PARAM_STRING", "paramName", "", i);
-					string val = s.getValue("REMOTEUI_PARAM_STRING", "NULL STRING", i);
+			for (int i=0; i< numStrings; i++){
+				string paramName = s.getAttribute("REMOTEUI_PARAM_STRING", "paramName", "", i);
+				string val = s.getValue("REMOTEUI_PARAM_STRING", "NULL STRING", i);
 
-					map<string,RemoteUIParam>::iterator it = params.find(paramName);
-					if ( it != params.end() ){	// found!
-						if(params[paramName].stringValAddr != NULL){
-							params[paramName].stringVal = val;
-							*params[paramName].stringValAddr = val;
-							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-							if(verbose) cout << "ofxRemoteUIServer loading a STRING '" << paramName <<"' (" << (string) *params[paramName].stringValAddr << ") from XML" << endl;
-						}
-						else cout << "ofxRemoteUIServer ERROR at loading STRING (" << paramName << ")" << endl;
+				map<string,RemoteUIParam>::iterator it = params.find(paramName);
+				if ( it != params.end() ){	// found!
+					if(params[paramName].stringValAddr != NULL){
+						params[paramName].stringVal = val;
+						*params[paramName].stringValAddr = val;
+						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
+						if(verbose) cout << "ofxRemoteUIServer loading a STRING '" << paramName <<"' (" << (string) *params[paramName].stringValAddr << ") from XML" << endl;
 					}
+					else cout << "ofxRemoteUIServer ERROR at loading STRING (" << paramName << ")" << endl;
 				}
 			}
 		}
