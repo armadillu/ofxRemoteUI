@@ -798,7 +798,8 @@ void clientCallback(RemoteUICallBackArg a){
 	int onTop = (int)[d integerForKey:@"alwaysOnTop"] ;
 	if (onTop > 0) [window setLevel:NSScreenSaverWindowLevel];
 	else [window setLevel:NSNormalWindowLevel];
-
+	[alwaysOnTopCheckbox setState:onTop];
+	
 	NSString * winColor = [d stringForKey:@"windowColor"];
 	NSColor * col;
 	if (winColor == nil) {
