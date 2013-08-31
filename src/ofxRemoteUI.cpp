@@ -18,7 +18,7 @@ bool ofxRemoteUI::ready(){
 }
 
 void ofxRemoteUI::setVerbose(bool b){
-	verbose = b;
+	verbose_ = b;
 }
 
 
@@ -500,7 +500,7 @@ void ofxRemoteUI::setValuesFromString( string values ){
 
 void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
 	ofxOscMessage m;
-	if(verbose){ printf("sending >> %s ", paramName.c_str()); p.print(); }
+	if(verbose_){ printf("sending >> %s ", paramName.c_str()); p.print(); }
 	m.setAddress("SEND " + stringForParamType(p.type) + " " + paramName);
 	switch (p.type) {
 		case REMOTEUI_PARAM_FLOAT: m.addFloatArg(p.floatVal); m.addFloatArg(p.minFloat); m.addFloatArg(p.maxFloat); break;
@@ -524,7 +524,7 @@ void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
 //if used by server, confirmation == YES
 //else, NO
 void ofxRemoteUI::sendREQU(bool confirmation){
-	if(verbose) cout << "sendREQU()" << endl;
+	if(verbose_) cout << "sendREQU()" << endl;
 	ofxOscMessage m;
 	m.setAddress("REQU");
 	if (confirmation) m.addStringArg("OK");
@@ -533,7 +533,7 @@ void ofxRemoteUI::sendREQU(bool confirmation){
 
 
 void ofxRemoteUI::sendRESX(bool confirm){
-	if(verbose) cout << "sendRESX()" << endl;
+	if(verbose_) cout << "sendRESX()" << endl;
 	ofxOscMessage m;
 	m.setAddress("RESX");
 	if (confirm) m.addStringArg("OK");
@@ -541,7 +541,7 @@ void ofxRemoteUI::sendRESX(bool confirm){
 }
 
 void ofxRemoteUI::sendRESD(bool confirm){
-	if(verbose) cout << "sendRESD()" << endl;
+	if(verbose_) cout << "sendRESD()" << endl;
 	ofxOscMessage m;
 	m.setAddress("RESD");
 	if (confirm) m.addStringArg("OK");
@@ -549,7 +549,7 @@ void ofxRemoteUI::sendRESD(bool confirm){
 }
 
 void ofxRemoteUI::sendSAVE(bool confirm){
-	if(verbose) cout << "sendSAVE()" << endl;
+	if(verbose_) cout << "sendSAVE()" << endl;
 	ofxOscMessage m;
 	m.setAddress("SAVE");
 	if (confirm) m.addStringArg("OK");
@@ -558,7 +558,7 @@ void ofxRemoteUI::sendSAVE(bool confirm){
 
 
 void ofxRemoteUI::sendTEST(){
-	if(verbose) cout << "sendTEST()" << endl;
+	if(verbose_) cout << "sendTEST()" << endl;
 	waitingForReply = true;
 	timeSinceLastReply = 0.0f;
 	ofxOscMessage m;
@@ -569,7 +569,7 @@ void ofxRemoteUI::sendTEST(){
 //on client call, presetNames should be empty vector (request ing the list)
 //on server call, presetNames should have all the presetNames
 void ofxRemoteUI::sendPREL( vector<string> presetNames_ ){
-	if(verbose) cout << "sendPRES()" << endl;
+	if(verbose_) cout << "sendPRES()" << endl;
 	ofxOscMessage m;
 	m.setAddress("PREL");
 	if (presetNames_.size() == 0){ // if we are the client requesting a preset list, delete our current list
@@ -585,7 +585,7 @@ void ofxRemoteUI::sendPREL( vector<string> presetNames_ ){
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
 void ofxRemoteUI::sendSAVP(string presetName, bool confirm){
-	if(verbose) cout << "sendSAVP()" << endl;
+	if(verbose_) cout << "sendSAVP()" << endl;
 	ofxOscMessage m;
 	m.setAddress("SAVP");
 	m.addStringArg(presetName);
@@ -598,7 +598,7 @@ void ofxRemoteUI::sendSAVP(string presetName, bool confirm){
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
 void ofxRemoteUI::sendSETP(string presetName, bool confirm){
-	if(verbose) cout << "sendSETP()" << endl;
+	if(verbose_) cout << "sendSETP()" << endl;
 	ofxOscMessage m;
 	m.setAddress("SETP");
 	m.addStringArg(presetName);
@@ -609,7 +609,7 @@ void ofxRemoteUI::sendSETP(string presetName, bool confirm){
 }
 
 void ofxRemoteUI::sendDELP(string presetName, bool confirm){
-	if(verbose) cout << "sendDELP()" << endl;
+	if(verbose_) cout << "sendDELP()" << endl;
 	ofxOscMessage m;
 	m.setAddress("DELP");
 	m.addStringArg(presetName);

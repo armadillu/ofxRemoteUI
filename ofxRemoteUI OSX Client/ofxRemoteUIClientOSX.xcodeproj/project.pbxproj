@@ -38,7 +38,6 @@
 		BBC38584179736CB007E2DD1 /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBC38583179736CB007E2DD1 /* Growl.framework */; };
 		BBC385861797377C007E2DD1 /* Growl Registration Ticket.growlRegDict in Resources */ = {isa = PBXBuildFile; fileRef = BBC385851797377C007E2DD1 /* Growl Registration Ticket.growlRegDict */; };
 		BBC385881797385C007E2DD1 /* Growl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBC38583179736CB007E2DD1 /* Growl.framework */; };
-		BBC75889177EFA1E009C7F74 /* ofxRemoteUIServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5BE177E483400B595F8 /* ofxRemoteUIServer.cpp */; };
 		BBD3270F173BFFF200D59359 /* ofxRemoteUIClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */; };
 		BBDCBDE416A0512300F1C5EC /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = BBDCBDDE16A0512300F1C5EC /* Credits.rtf */; };
 		BBDCBDE516A0512300F1C5EC /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = BBDCBDE016A0512300F1C5EC /* InfoPlist.strings */; };
@@ -73,8 +72,6 @@
 		BB3AACC217BD647300401E86 /* ColoredNSWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ColoredNSWindow.h; sourceTree = "<group>"; };
 		BB3AACC317BD647300401E86 /* ColoredNSWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ColoredNSWindow.m; sourceTree = "<group>"; };
 		BB4B54F0177FAD5D004838E4 /* ToDo.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ToDo.txt; sourceTree = "<group>"; };
-		BB5CC5BE177E483400B595F8 /* ofxRemoteUIServer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUIServer.cpp; sourceTree = "<group>"; };
-		BB5CC5BF177E483400B595F8 /* ofxRemoteUIServer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUIServer.h; sourceTree = "<group>"; };
 		BB5CC5D7177E49D500B595F8 /* ofStolenUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofStolenUtils.h; sourceTree = "<group>"; };
 		BB5CC5DD177E49D500B595F8 /* IpEndpointName.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IpEndpointName.cpp; sourceTree = "<group>"; };
 		BB5CC5DE177E49D500B595F8 /* IpEndpointName.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IpEndpointName.h; sourceTree = "<group>"; };
@@ -441,8 +438,6 @@
 				BBDCBDF616A051B000F1C5EC /* ofxRemoteUI.h */,
 				BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */,
 				BBAAAFA8173BF54B00FE94C4 /* ofxRemoteUIClient.h */,
-				BB5CC5BE177E483400B595F8 /* ofxRemoteUIServer.cpp */,
-				BB5CC5BF177E483400B595F8 /* ofxRemoteUIServer.h */,
 			);
 			name = src;
 			path = ../src;
@@ -521,7 +516,6 @@
 				BBD3270F173BFFF200D59359 /* ofxRemoteUIClient.cpp in Sources */,
 				BBDCBDF916A0523500F1C5EC /* ParamUI.mm in Sources */,
 				BBDCBDFB16A0523A00F1C5EC /* main.m in Sources */,
-				BBC75889177EFA1E009C7F74 /* ofxRemoteUIServer.cpp in Sources */,
 				BB94E5AE17468EAE00A7A3CC /* ColorView.m in Sources */,
 				BB6CC35D174698DE0043F523 /* MyScrollView.m in Sources */,
 				BB5CC60C177E49D500B595F8 /* IpEndpointName.cpp in Sources */,

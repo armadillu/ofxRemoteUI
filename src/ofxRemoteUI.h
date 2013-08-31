@@ -167,7 +167,7 @@ protected:
 	void sendRESD(bool confirm = false); //send a "restore fom code defaults" msg
 	void sendSAVE(bool confirm = false); 
 
-	bool							verbose;
+	bool							verbose_;
 	bool							readyToSend;
 	ofxOscSender					oscSender;
 	ofxOscReceiver					oscReceiver;

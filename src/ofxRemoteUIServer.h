@@ -30,7 +30,7 @@
 #define OFX_REMOTEUI_SERVER_CLOSE()						( ofxRemoteUIServer::instance()->close() )
 #define	OFX_REMOTEUI_SERVER_SAVE_TO_XML()				( ofxRemoteUIServer::instance()->saveToXML(OFX_REMOTEUI_SETTINGS_FILENAME) )
 #define	OFX_REMOTEUI_SERVER_LOAD_FROM_XML()				( ofxRemoteUIServer::instance()->loadFromXML(OFX_REMOTEUI_SETTINGS_FILENAME) )
-
+#define OFX_REMOTEUI_SERVER_START_THREADED()			( ofxRemoteUIServer::instance()->startInBackgroundThread() )
 
 #ifndef OF_VERSION_MINOR //if OF is not available, redefine ofColor to myColor
 	#define ofColor myColor
@@ -62,13 +62,18 @@
 #endif
 
 
-class ofxRemoteUIServer: public ofxRemoteUI{ 
+class ofxRemoteUIServer: public ofxRemoteUI, ofThread {
 
 public:
 
 	static ofxRemoteUIServer* instance();
 
 	void setup(int port = OFXREMOTEUI_PORT, float updateInterval = 0.1/*sec*/);
+	void startInBackgroundThread(); //calling this means you don't need to call update
+									//all param changes will run in a separate thread
+									//this might cause issues with your app
+									//as parameters can be changed at any time!
+									//so be aware, especially with strings you might get crashes!
 	void update(float dt);
 	void close();
 	void loadFromXML(string fileName);
@@ -106,6 +111,9 @@ private:
 
 	bool loadedFromXML; //we start with loadedFromXML=false; once loadXML is called, this becomes true
 
+	bool threadedUpdate;
+	void threadedFunction();
+	void updateServer(float dt);
 };
 
 #endif

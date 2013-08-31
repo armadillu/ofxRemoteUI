@@ -43,6 +43,7 @@ void testApp::setup(){
 	OFX_REMOTEUI_SERVER_LOAD_FROM_XML();	//load values from XML, if you want to do so
 											//this will result on the UI showing the params
 											//as they were when last saved (on quit in this case)
+	OFX_REMOTEUI_SERVER_START_THREADED();
 }
 
 //--------------------------------------------------------------
