@@ -45,7 +45,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	loadedFromXML = false;
 	//add random colors to table
 	colorTableIndex = 0;
-	int a = 64;
+	int a = 80;
 	#if ( OF_VERSION_MINOR > 0 )
 	ofColor prevColor = ofColor::fromHsb((int)ofRandom(0,150), 255, 255, 32);
 	for(int i = 0; i < 30; i++){
