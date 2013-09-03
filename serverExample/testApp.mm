@@ -98,8 +98,6 @@ void testApp::draw(){
 }
 
 void testApp::exit(){
-
-	OFX_REMOTEUI_SERVER_CLOSE();		//setop the server
-	OFX_REMOTEUI_SERVER_SAVE_TO_XML();	//save values to XML
-
+	OFX_REMOTEUI_SERVER_CLOSE();		//stop the server
+	OFX_REMOTEUI_SERVER_SAVE_TO_XML();	//save values to XML (if you want to!)
 }

@@ -41,7 +41,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	colorSet = false;
 	upcomingGroup = DEFAULT_PARAM_GROUP;
 	verbose_ = false;
-	threadedUpdate = true;
+	threadedUpdate = false;
 	loadedFromXML = false;
 	//add random colors to table
 	colorTableIndex = 0;
@@ -82,10 +82,18 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	#endif
 }
 
+ofxRemoteUIServer::~ofxRemoteUIServer(){
+	cout << "~ofxRemoteUIServer()" << endl;	
+}
 
 void ofxRemoteUIServer::close(){
 	if(readyToSend)
 		sendCIAO();
+	if(threadedUpdate){
+		stopThread();
+		cout << "ofxRemoteUIServer closing; waiting for update thread to end..." << endl;
+		waitForThread();
+	}
 }
 
 

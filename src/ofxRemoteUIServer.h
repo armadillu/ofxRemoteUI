@@ -98,6 +98,7 @@ private:
 	void connect(string address, int port);
 
 	ofxRemoteUIServer(); // use ofxRemoteUIServer::instance() instead!
+	~ofxRemoteUIServer();
 	static ofxRemoteUIServer* singleton;
 	void setColorForParam(RemoteUIParam &p, ofColor c);
 	vector<string> getAvailablePresets();
