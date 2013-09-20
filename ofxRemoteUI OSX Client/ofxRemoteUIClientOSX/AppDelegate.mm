@@ -864,12 +864,15 @@ void clientCallback(RemoteUICallBackArg a){
 
 
 -(NSString *)showAlertWithInput: (NSString *)prompt defaultValue: (NSString *)defaultValue {
+
+	int level = [window level];
+	[window setLevel:NSNormalWindowLevel];
+	[[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 	NSAlert *alert = [NSAlert alertWithMessageText: prompt
 									 defaultButton:@"Add Preset"
 								   alternateButton:@"Cancel"
 									   otherButton:nil
 						 informativeTextWithFormat:@"Type a new for the new preset"];
-
 	NSTextField *input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 170, 24)];
 	[input setStringValue:defaultValue];
 	[input autorelease];
@@ -880,6 +883,7 @@ void clientCallback(RemoteUICallBackArg a){
 	//	NSRect fr = [[alert accessoryView] frame];
 	//	fr.origin.y += 10;
 	//	[[alert accessoryView] setFrame: fr];
+
 	NSInteger button = [alert runModal];
 	if (button == NSAlertDefaultReturn) {
 		[input validateEditing];
@@ -890,6 +894,7 @@ void clientCallback(RemoteUICallBackArg a){
 		//NSAssert1(NO, @"Invalid input dialog button %d", button);
 		return nil;
 	}
+	[window setLevel:level];
 }
 
 -(void)showNotificationWithTitle:(NSString*)title description:(NSString*)desc ID:(NSString*)key priority:(int)p{
