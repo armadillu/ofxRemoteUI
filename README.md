@@ -11,16 +11,16 @@ Watch the [demo video](http://www.youtube.com/watch?v=EHS3bd0beKQ).
 
 ## Features
 
-* Edit & Track variables remotely thorugh UDP/OSC (bool, int, float, string, Enum, ofColor)
+* Edit & Track variables remotely thorugh OSC (bool, int, float, string, Enum, ofColor)
 * Native OSX interface
-* Allows to save/load variables
+* Allows to save / load variable states between app runs
 * Allows creation of Presets
-* Can be used outisde OF too
-* Easily create parameter Groups, and quick access through keyboard shortcuts
-* Colorize your variables for easy reading
-* Restore paramters to previous launch ones or to Default values
-* Can be used outside OF, and in Processing thx to @kritzikratzi
-* Easy to use macros
+* Easily create variable Groups, and quick access through keyboard shortcuts
+* Easily get notified when a variable is modified (optional)
+* Colorize your variables for easy reading / grouping
+* Restore paramters to launch ones or to Default values
+* Can be used outside OpenFrameworks, and in Processing thx to @kritzikratzi
+* Easy to use Macros allow sharing variables from any class in your project
 
 
 
