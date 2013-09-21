@@ -113,7 +113,7 @@
 			isa = PBXGroup;
 			children = (
 				BB5CC661177E4C1C00B595F8 /* noOFLibs */,
-				BB5CC61F177E4A3A00B595F8 /* ofRemoteUI */,
+				BB5CC61F177E4A3A00B595F8 /* ofxRemoteUI */,
 				BB5CC5CB177E495400B595F8 /* noOF_Example */,
 				BB5CC5CA177E495400B595F8 /* Products */,
 			);
@@ -135,7 +135,7 @@
 			path = noOF_Example;
 			sourceTree = "<group>";
 		};
-		BB5CC61F177E4A3A00B595F8 /* ofRemoteUI */ = {
+		BB5CC61F177E4A3A00B595F8 /* ofxRemoteUI */ = {
 			isa = PBXGroup;
 			children = (
 				BB5CC620177E4A4700B595F8 /* ofxRemoteUI.cpp */,
@@ -147,7 +147,7 @@
 				BB5CC626177E4A4700B595F8 /* RemoteParam.h */,
 				BB5CC627177E4A4700B595F8 /* uriencode.h */,
 			);
-			name = ofRemoteUI;
+			name = ofxRemoteUI;
 			sourceTree = "<group>";
 		};
 		BB5CC661177E4C1C00B595F8 /* noOFLibs */ = {

@@ -47,8 +47,9 @@
 
 
 -(void)fadeIn{
-	[ui setWantsLayer:NO];
 	[ui layer].opacity = 1;
+	[ui setWantsLayer:NO];
+
 }
 
 

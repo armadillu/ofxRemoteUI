@@ -18,12 +18,11 @@
 #endif
 #include <sys/stat.h>
 #include <time.h>
-//#include <unistd.h>
+
 #ifndef TARGET_WIN32
 	#include <sys/time.h>
 #endif
 ofxRemoteUIServer* ofxRemoteUIServer::singleton = NULL;
-
 
 ofxRemoteUIServer* ofxRemoteUIServer::instance(){
 	if (!singleton){   // Only allow one instance of class to be generated.
@@ -39,6 +38,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	avgTimeSinceLastReply = 0;
 	waitingForReply = false;
 	colorSet = false;
+	callBack = NULL;
 	upcomingGroup = DEFAULT_PARAM_GROUP;
 	verbose_ = false;
 	threadedUpdate = false;
@@ -46,14 +46,18 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	//add random colors to table
 	colorTableIndex = 0;
 	int a = 80;
-	#if ( OF_VERSION_MINOR > 0 )
-	ofColor prevColor = ofColor::fromHsb((int)ofRandom(0,150), 255, 255, 32);
+	#ifdef OF_AVAILABLE
+	ofColor prevColor = ofColor::fromHsb((int)ofRandom(0,255), 255, 255, 35);
 	for(int i = 0; i < 30; i++){
 		ofColor c = prevColor;
-		c.setHue(  ((int) (prevColor.getHue() + ofRandom(40,55) )) % 255 );
+		c.setHue(  ((int) (prevColor.getHue() + ofRandom(25, 30) )) % 255 );
+		//c.setSaturation(prevColor.getSaturation() + ofRandom(-0.1,0.1) );
 		colorTables.push_back( c );
 		prevColor = c;
 	}
+	//shuffle
+	std::random_shuffle ( colorTables.begin(), colorTables.end() );
+
 	#else
 	colorTables.push_back(ofColor(194,144,221,a) );
 	colorTables.push_back(ofColor(202,246,70,a)  );
@@ -69,7 +73,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	colorTables.push_back(ofColor(165,154,206,a) );
 	#endif
 
-	#if ( OF_VERSION_MINOR > 0 ) 
+	#ifdef OF_AVAILABLE
 	ofDirectory d;
 	d.open(OFX_REMOTEUI_PRESET_DIR);
 	d.create(true);
@@ -86,13 +90,20 @@ ofxRemoteUIServer::~ofxRemoteUIServer(){
 	cout << "~ofxRemoteUIServer()" << endl;	
 }
 
+void ofxRemoteUIServer::setCallback( void (*callb)(RemoteUIServerCallBackArg) ){
+	callBack = callb;
+}
+
+
 void ofxRemoteUIServer::close(){
 	if(readyToSend)
 		sendCIAO();
 	if(threadedUpdate){
+		#ifdef OF_AVAILABLE
 		stopThread();
 		cout << "ofxRemoteUIServer closing; waiting for update thread to end..." << endl;
 		waitForThread();
+		#endif
 	}
 }
 
@@ -352,11 +363,12 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	oscReceiver.setup(port);
 }
 
+#ifdef OF_AVAILABLE
 void ofxRemoteUIServer::startInBackgroundThread(){
-
 	threadedUpdate = true;
 	startThread();
 }
+#endif
 
 void ofxRemoteUIServer::update(float dt){
 
@@ -365,6 +377,7 @@ void ofxRemoteUIServer::update(float dt){
 	}
 }
 
+#ifdef OF_AVAILABLE
 void ofxRemoteUIServer::threadedFunction(){
 
 	while (threadRunning) {
@@ -373,6 +386,7 @@ void ofxRemoteUIServer::threadedFunction(){
 	}
 	if(verbose_) cout << "ofxRemoteUIServer threadedFunction() ending" << endl;
 }
+#endif
 
 void ofxRemoteUIServer::updateServer(float dt){
 	time += dt;
@@ -390,17 +404,21 @@ void ofxRemoteUIServer::updateServer(float dt){
 
 		ofxOscMessage m;
 		oscReceiver.getNextMessage(&m);
-
 		if (!readyToSend){ // if not connected, connect to our friend so we can talk back
 			connect(m.getRemoteIp(), port + 1);
 		}
 
 		DecodedMessage dm = decode(m);
-
+		RemoteUIServerCallBackArg cbArg; // to notify our "delegate"
+		cbArg.host = m.getRemoteIp();
 		switch (dm.action) {
 
 			case HELO_ACTION: //if client says hi, say hi back
 				sendHELLO();
+				if(callBack != NULL){
+					cbArg.action = CLIENT_CONNECTED;
+					callBack(cbArg);
+				}
 				if(verbose_) cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " says HELLO!"  << endl;
 				break;
 
@@ -416,14 +434,25 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case SEND_PARAM_ACTION:{ //client is sending us an updated val
 				if(verbose_) cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " sends SEND!"  << endl;
 				updateParamFromDecodedMessage(m, dm);
+				if(callBack != NULL){
+					cbArg.action = CLIENT_UPDATED_PARAM;
+					cbArg.paramName = dm.paramName;
+					cbArg.param = params[dm.paramName];  //copy the updated param to the callbakc arg
+					callBack(cbArg);
+				}
 			}
 				break;
 
-			case CIAO_ACTION:
+			case CIAO_ACTION:{
 				if(verbose_) cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " says CIAO!" << endl;
 				sendCIAO();
+				if(callBack != NULL){
+					cbArg.action = CLIENT_DISCONNECTED;
+					callBack(cbArg);
+				}
+				clearOscReceiverMsgQueue();
 				readyToSend = false;
-				break;
+				}break;
 
 			case TEST_ACTION: // we got a request from client, lets bounce back asap.
 				sendTEST();
@@ -444,6 +473,11 @@ void ofxRemoteUIServer::updateServer(float dt){
 				loadFromXML(string(OFX_REMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
 				if(verbose_) cout << "ofxRemoteUIServer: setting preset: " << presetName << endl;
 				sendSETP(presetName);
+				if(callBack != NULL){
+					cbArg.action = CLIENT_DID_SET_PRESET;
+					cbArg.msg = presetName;
+					callBack(cbArg);
+				}
 				}break;
 
 			case SAVE_PRESET_ACTION:{ //client wants to save current xml as a new preset
@@ -451,6 +485,11 @@ void ofxRemoteUIServer::updateServer(float dt){
 				if(verbose_) cout << "ofxRemoteUIServer: saving NEW preset: " << presetName << endl;
 				saveToXML(string(OFX_REMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
 				sendSAVP(presetName);
+				if(callBack != NULL){
+					cbArg.action = CLIENT_SAVED_PRESET;
+					cbArg.msg = presetName;
+					callBack(cbArg);
+				}
 				}break;
 
 			case DELETE_PRESET_ACTION:{
@@ -458,24 +497,41 @@ void ofxRemoteUIServer::updateServer(float dt){
 				if(verbose_) cout << "ofxRemoteUIServer: DELETE preset: " << presetName << endl;
 				deletePreset(presetName);
 				sendDELP(presetName);
+				if(callBack != NULL){
+					cbArg.action = CLIENT_DELETED_PRESET;
+					cbArg.msg = presetName;
+					callBack(cbArg);
+				}
 				}break;
 
 			case SAVE_CURRENT_STATE_ACTION:{
 				if(verbose_) cout << "ofxRemoteUIServer: SAVE CURRENT PARAMS TO DEFAULT XML: " << endl;
 				saveToXML(OFX_REMOTEUI_SETTINGS_FILENAME);
 				sendSAVE(true);
+				if(callBack != NULL){
+					cbArg.action = CLIENT_SAVED_STATE;
+					callBack(cbArg);
+				}
 			}break;
 
 			case RESET_TO_XML_ACTION:{
 				if(verbose_) cout << "ofxRemoteUIServer: RESET TO XML: " << endl;
 				restoreAllParamsToInitialXML();
 				sendRESX(true);
+				if(callBack != NULL){
+					cbArg.action = CLIENT_DID_RESET_TO_XML;
+					callBack(cbArg);
+				}
 			}break;
 
 			case RESET_TO_DEFAULTS_ACTION:{
 				if(verbose_) cout << "ofxRemoteUIServer: RESET TO DEFAULTS: " << endl;
 				restoreAllParamsToDefaultValues();
 				sendRESD(true);
+				if(callBack != NULL){
+					cbArg.action = CLIENT_DID_RESET_TO_DEFAULTS;
+					callBack(cbArg);
+				}
 			}break;
 
 			default: cout << "ofxRemoteUIServer::update >> ERR!" <<endl; break;
@@ -485,7 +541,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 
 void ofxRemoteUIServer::deletePreset(string name){
 
-	#if ( OF_VERSION_MINOR > 0 ) //TODO presets wont work outside OF
+	#ifdef OF_AVAILABLE //TODO presets wont work outside OF
 	ofDirectory dir;
 	dir.open(string(OFX_REMOTEUI_PRESET_DIR) + "/" + name + ".xml");
 	dir.remove(true);
@@ -499,7 +555,7 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(){
 
 	vector<string> presets;
 
-	#if ( OF_VERSION_MINOR > 0 ) //TODO presets wont work outside OF
+	#ifdef OF_AVAILABLE //TODO presets wont work outside OF
 	ofDirectory dir;
 	dir.listDir(ofToDataPath(OFX_REMOTEUI_PRESET_DIR));
 	vector<ofFile> files = dir.getFiles();

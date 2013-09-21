@@ -1,5 +1,24 @@
 #include "testApp.h"
 
+//define a callback method to get notifications of client actions
+void serverCallback(RemoteUIServerCallBackArg arg){
+
+	switch (arg.action) {
+		case CLIENT_CONNECTED: cout << "CLIENT_CONNECTED" << endl; break;
+		case CLIENT_DISCONNECTED: cout << "CLIENT_DISCONNECTED" << endl; break;
+		case CLIENT_UPDATED_PARAM: cout << "CLIENT_UPDATED_PARAM: "<< arg.paramName << ": ";
+			arg.param.print();
+			break;
+		case CLIENT_DID_SET_PRESET: cout << "CLIENT_DID_SET_PRESET" << endl; break;
+		case CLIENT_SAVED_PRESET: cout << "CLIENT_SAVED_PRESET" << endl; break;
+		case CLIENT_DELETED_PRESET: cout << "CLIENT_DELETED_PRESET" << endl; break;
+		case CLIENT_SAVED_STATE: cout << "CLIENT_SAVED_STATE" << endl; break;
+		case CLIENT_DID_RESET_TO_XML: cout << "CLIENT_DID_RESET_TO_XML" << endl; break;
+		case CLIENT_DID_RESET_TO_DEFAULTS: cout << "CLIENT_DID_RESET_TO_DEFAULTS" << endl; break;
+		default:break;
+	}
+}
+
 //--------------------------------------------------------------
 void testApp::setup(){
 
@@ -13,6 +32,9 @@ void testApp::setup(){
 	x = y = 66;
 	numCircles = 30;
 	menu = MENU_OPTION_1;
+
+	//setup our callback to get notified when client changes things
+	OFX_REMOTEUI_SERVER_GET_INSTANCE()->setCallback(serverCallback);
 
 	OFX_REMOTEUI_SERVER_SETUP(10000); 	//start server
 

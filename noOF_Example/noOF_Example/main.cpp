@@ -14,16 +14,27 @@ int myParam = 0;
 ofColor color;
 bool quitButton = false;
 
-int prevMyParam;
-ofColor prevColor;
-
-void update();
+//define a callback method to get notifications of client actions
+void serverCallback(RemoteUIServerCallBackArg arg){
+	switch (arg.action) {
+		case CLIENT_CONNECTED: cout << "CLIENT_CONNECTED" << endl; break;
+		case CLIENT_DISCONNECTED: cout << "CLIENT_DISCONNECTED" << endl; break;
+		case CLIENT_UPDATED_PARAM:
+			cout << "CLIENT_UPDATED_PARAM "<< arg.paramName << ": ";
+			arg.param.print();
+			break;
+		default:break;
+	}
+}
 
 int main(int argc, const char * argv[]){
 
-	// insert code here...
 	std::cout << "Hello, World!\n";
 
+	//setup our callback to get notified when client changes things
+	OFX_REMOTEUI_SERVER_GET_INSTANCE()->setCallback(serverCallback);
+
+	//OFX_REMOTEUI_SERVER_GET_INSTANCE()->setVerbose(true);
 	OFX_REMOTEUI_SERVER_SETUP(10000); 	//start server
 	OFX_REMOTEUI_SERVER_SET_NEW_COLOR();
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(myParam, 0, 100); // share my param
@@ -34,7 +45,7 @@ int main(int argc, const char * argv[]){
 
 	OFX_REMOTEUI_SERVER_LOAD_FROM_XML(); //load from XML
 	while (quitButton == false) {
-		update();
+		OFX_REMOTEUI_SERVER_UPDATE(0.01666);
 		usleep(100000 / 6.);
 	}
 
@@ -43,19 +54,3 @@ int main(int argc, const char * argv[]){
 	OFX_REMOTEUI_SERVER_CLOSE();
     return 0;
 }
-
-void update(){
-
-	OFX_REMOTEUI_SERVER_UPDATE(0.01666);
-	if (prevMyParam != myParam){
-		cout << "myParam is " << myParam << endl;
-	}
-
-	if(color != prevColor){
-		printf("color is %d %d %d %d\n", color.r, color.g, color.b, color.a);
-	}
-
-	prevMyParam = myParam;
-	prevColor = color;
-}
-

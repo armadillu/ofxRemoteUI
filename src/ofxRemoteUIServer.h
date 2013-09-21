@@ -18,7 +18,33 @@
 #include <set>
 #include <vector>
 
-//easy param sharing macro, share from from anywhere!
+#ifndef OF_VERSION_MINOR //if OF is not available, redefine ofColor to myColor
+#define ofColor myColor
+struct myColor{
+
+	myColor(){}
+	myColor(int rr, int gg, int bb, int aa){
+		r = rr;	g = gg;	b = bb; a = aa;
+	}
+	myColor(int bright){
+		r = g = b = bright; a = 255;
+	}
+	bool operator==(const myColor& c){
+		return r == c.r && g == c.g && b == c.b && a == c.a;
+	}
+	bool operator!=(const myColor& c){
+		return r != c.r || g != c.g || b != c.b || a != c.a;
+	}
+	union  {
+		struct { unsigned char r, g, b, a; };
+		unsigned char v[4];
+	};
+};
+#else
+#define OF_AVAILABLE 1 //
+#endif
+
+//easy param sharing macros, share from from anywhere!
 #define OFX_REMOTEUI_SERVER_SHARE_PARAM(val,...)		( ofxRemoteUIServer::instance()->shareParam( #val, &val, ##__VA_ARGS__ ) )
 #define OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM(val,enumMin,enumMax,menuList,...)	( ofxRemoteUIServer::instance()->shareParam( #val, (int*)&val,enumMin, enumMax,menuList, ##__VA_ARGS__ ) )
 #define OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color,...)	( ofxRemoteUIServer::instance()->shareParam( #color, (unsigned char*)&color.v[0], ##__VA_ARGS__ ) )
@@ -30,50 +56,32 @@
 #define OFX_REMOTEUI_SERVER_CLOSE()						( ofxRemoteUIServer::instance()->close() )
 #define	OFX_REMOTEUI_SERVER_SAVE_TO_XML()				( ofxRemoteUIServer::instance()->saveToXML(OFX_REMOTEUI_SETTINGS_FILENAME) )
 #define	OFX_REMOTEUI_SERVER_LOAD_FROM_XML()				( ofxRemoteUIServer::instance()->loadFromXML(OFX_REMOTEUI_SETTINGS_FILENAME) )
-#define OFX_REMOTEUI_SERVER_START_THREADED()			( ofxRemoteUIServer::instance()->startInBackgroundThread() )
+#define OFX_REMOTEUI_SERVER_GET_INSTANCE()				( ofxRemoteUIServer::instance() )
 
-#ifndef OF_VERSION_MINOR //if OF is not available, redefine ofColor to myColor
-	#define ofColor myColor
-	struct myColor{
-
-		myColor(){}
-
-		myColor(int rr, int gg, int bb, int aa){
-			r = rr;	g = gg;	b = bb; a = aa;
-		}
-
-		myColor(int bright){
-			r = g = b = bright; a = 255;
-		}
-
-		bool operator==(const myColor& c){
-			return r == c.r && g == c.g && b == c.b && a == c.a;
-		}	
-
-		bool operator!=(const myColor& c){
-			return r != c.r || g != c.g || b != c.b || a != c.a;
-		}
-
-		union  {
-			struct { unsigned char r, g, b, a; };
-			unsigned char v[4];
-		};
-	};
+#ifdef OF_AVAILABLE //threaded only works in OF
+	#define OFX_REMOTEUI_SERVER_START_THREADED()			( ofxRemoteUIServer::instance()->startInBackgroundThread() )
 #endif
 
 
-class ofxRemoteUIServer: public ofxRemoteUI, ofThread {
+
+class ofxRemoteUIServer: public ofxRemoteUI
+#ifdef OF_AVAILABLE
+, ofThread
+#endif
+{
 
 public:
 
 	static ofxRemoteUIServer* instance();
 
 	void setup(int port = OFXREMOTEUI_PORT, float updateInterval = 0.1/*sec*/);
+	#ifdef OF_AVAILABLE
 	void startInBackgroundThread(); //calling this means you don't need to call update
 									//all param changes will run in a separate thread
 									//this might cause issues with your app
 									//as parameters can be changed at any time!
 									//so be aware, especially with strings you might get crashes!
+	#endif
 	void update(float dt);
 	void close();
 	void loadFromXML(string fileName);
@@ -89,6 +97,23 @@ public:
 	void setNewParamColor();
 	void unsetParamColor();
 	void setParamGroup(string g);
+
+	//get notified when a client changes something remotelly
+	void setCallback( void (*callb)(RemoteUIServerCallBackArg) );
+	//if you want to get notified when a param changes, implement a callback method like this:
+	//
+	//	void serverCallback(RemoteUIServerCallBackArg arg){
+	//		switch (arg.action) {
+	//			case CLIENT_CONNECTED: break;
+	//			case CLIENT_DISCONNECTED: break;
+	//			case CLIENT_UPDATED_PARAM:
+	//				arg.param.print();
+	//				break;
+	//			...
+	//			default:break;
+	//		}
+	//	}
+
 
 private:
 
@@ -115,6 +140,8 @@ private:
 	bool threadedUpdate;
 	void threadedFunction();
 	void updateServer(float dt);
+
+	void (*callBack)(RemoteUIServerCallBackArg);
 };
 
 #endif

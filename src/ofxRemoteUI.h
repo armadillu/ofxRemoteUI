@@ -155,6 +155,8 @@ protected:
 	void syncPointerToParam(string paramName);
 	void addParamToDB(RemoteUIParam p, string paramName);
 
+	void clearOscReceiverMsgQueue();
+
 	void sendREQU(bool confirm = false); //a request for a complete list of server params
 	void sendHELLO();
 	void sendCIAO();
@@ -165,7 +167,7 @@ protected:
 	void sendDELP(string presetName, bool confirm = false);
 	void sendRESX(bool confirm = false); //send a "restore fom first loaded XML" msg
 	void sendRESD(bool confirm = false); //send a "restore fom code defaults" msg
-	void sendSAVE(bool confirm = false); 
+	void sendSAVE(bool confirm = false);
 
 	bool							verbose_;
 	bool							readyToSend;

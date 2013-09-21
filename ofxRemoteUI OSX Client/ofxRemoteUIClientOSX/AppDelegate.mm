@@ -11,7 +11,7 @@
 #import "NSColorStringExtension.h"
 
 //ofxRemoteUIClient callback entry point
-void clientCallback(RemoteUICallBackArg a){
+void clientCallback(RemoteUIClientCallBackArg a){
 
 	AppDelegate * me = [NSApp delegate];
 	NSString * remoteIP = [NSString stringWithFormat:@"%s", a.host.c_str()];
@@ -34,7 +34,7 @@ void clientCallback(RemoteUICallBackArg a){
 			[me showNotificationWithTitle:@"Server Did Set Preset OK" description:[NSString stringWithFormat:@"%@ did set preset named '%s'", remoteIP, a.msg.c_str()] ID:@"ServerDidSetPreset" priority:-1];
 		}break;
 
-		case PARAMS_UPDATED:
+		case SERVER_REQUESTED_ALL_PARAMS_UPDATE:
 			//NSLog(@"## Callback: PARAMS_UPDATED");
 			if(me->needFullParamsUpdate){ //a bit ugly here...
 				[me fullParamsUpdate];
@@ -44,7 +44,7 @@ void clientCallback(RemoteUICallBackArg a){
 			[me updateGroupPopup];
 			break;
 
-		case PRESETS_UPDATED:{
+		case SERVER_PRESETS_LIST_UPDATED:{
 			//NSLog(@"## Callback: PRESETS_UPDATED");
 			vector<string> list = [me getClient]->getPresetsList();
 			if ( list.size() > 0 ){
@@ -84,17 +84,19 @@ void clientCallback(RemoteUICallBackArg a){
 
 @implementation AppDelegate
 
--(void)log:(RemoteUICallBackArg) arg{
+-(void)log:(RemoteUIClientCallBackArg) arg{
 
-	if ( arg.action == PARAMS_UPDATED || arg.action == PRESETS_UPDATED) return; //this stuff is not worth logging
+	if ( arg.action == SERVER_REQUESTED_ALL_PARAMS_UPDATE || arg.action == SERVER_PRESETS_LIST_UPDATED) return; //this stuff is not worth logging
 	
 	NSString * action = @"";
 	switch (arg.action) {
 		case SERVER_CONNECTED: action = @"Connected To Server!";  break;
+		case SERVER_DISCONNECTED: action = @"Server Disconnected!"; break;
+		case SERVER_REQUESTED_ALL_PARAMS_UPDATE: action = @"Server Requested all Params Update!"; break;
+		case SERVER_PRESETS_LIST_UPDATED: action = @"Server Presets lists updated!"; break;
 		case SERVER_DELETED_PRESET: action = [NSString stringWithFormat:@"Server Deleted Preset named '%s'", arg.msg.c_str()]; break;
 		case SERVER_SAVED_PRESET:  action = [NSString stringWithFormat:@"Server Saved Preset named '%s'", arg.msg.c_str()]; break;
 		case SERVER_DID_SET_PRESET: action = [NSString stringWithFormat:@"Server did set Preset named '%s'", arg.msg.c_str()]; break;
-		case SERVER_DISCONNECTED: action = @"Server Disconnected!"; break;
 		case SERVER_CONFIRMED_SAVE: action = @"Server Did Save to Default XML"; break;
 		case SERVER_DID_RESET_TO_XML: action = @"Server Did Reset Params to Server-Launch Default XML"; break;
 		case SERVER_DID_RESET_TO_DEFAULTS: action = @"Server Did Reset Params to Share-Time (Source Code)"; break;
@@ -168,6 +170,7 @@ void clientCallback(RemoteUICallBackArg a){
 
 	client = new ofxRemoteUIClient();
 	client->setCallback(clientCallback);
+	//client->setVerbose(true);
 
 	timer = [NSTimer scheduledTimerWithTimeInterval:REFRESH_RATE target:self selector:@selector(update) userInfo:nil repeats:YES];
 	statusTimer = [NSTimer scheduledTimerWithTimeInterval:STATUS_REFRESH_RATE target:self selector:@selector(statusUpdate) userInfo:nil repeats:YES];
@@ -706,7 +709,6 @@ void clientCallback(RemoteUICallBackArg a){
 
 
 -(void) connect{
-	
 	//NSLog(@"connect!");
 	NSUserDefaults * df = [NSUserDefaults standardUserDefaults];
 	[df setObject: addressField.stringValue forKey:@"lastAddress"];
@@ -718,7 +720,7 @@ void clientCallback(RemoteUICallBackArg a){
 		[portField setEnabled:false];
 		connectButton.title = @"Disconnect";
 		connectButton.state = 1;
-		NSLog(@"ofxRemoteUIClientOSX Connecting to %@", addressField.stringValue);
+		printf("ofxRemoteUIClientOSX Connecting to %s\n", [addressField.stringValue UTF8String] );
 		int port = [portField.stringValue intValue];
 		if (port < OFXREMOTEUI_PORT - 1) {
 			port = OFXREMOTEUI_PORT - 1;
@@ -737,12 +739,14 @@ void clientCallback(RemoteUICallBackArg a){
 
 	}else{ // let's disconnect
 		//NSLog(@"disconnecting");
+		RemoteUIClientCallBackArg arg;
+		arg.action = SERVER_DISCONNECTED;
+		arg.host = "offline";
+		[self log:arg];
 		[presetsMenu removeAllItems];
 		[groupsMenu removeAllItems];
 		[addressField setEnabled:true];
 		[portField setEnabled:true];
-		connectButton.state = 0;
-		connectButton.title = @"Connect";
 		[updateFromServerButton setEnabled: false];
 		[updateContinuouslyCheckbox setEnabled:false];
 		[statusImage setImage:[NSImage imageNamed:@"offline"]];
@@ -750,6 +754,8 @@ void clientCallback(RemoteUICallBackArg a){
 		lagField.stringValue = @"";
 		[self cleanUpGUIParams];
 		client->disconnect();
+		connectButton.state = 0;
+		connectButton.title = @"Connect";
 	}
 }
 
@@ -793,6 +799,9 @@ void clientCallback(RemoteUICallBackArg a){
 }
 
 -(void)loadPrefs{
+
+	if([[NSUserDefaults standardUserDefaults] objectForKey: @"ApplePersistenceIgnoreState"] == nil)
+		[[NSUserDefaults standardUserDefaults] setBool: YES forKey:@"ApplePersistenceIgnoreState"];
 
 	NSUserDefaults * d = [NSUserDefaults standardUserDefaults];
 	int onTop = (int)[d integerForKey:@"alwaysOnTop"] ;
@@ -865,9 +874,11 @@ void clientCallback(RemoteUICallBackArg a){
 
 -(NSString *)showAlertWithInput: (NSString *)prompt defaultValue: (NSString *)defaultValue {
 
+	//set level to Normal to avoid blocking new preset alert window
 	int level = [window level];
 	[window setLevel:NSNormalWindowLevel];
 	[[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+
 	NSAlert *alert = [NSAlert alertWithMessageText: prompt
 									 defaultButton:@"Add Preset"
 								   alternateButton:@"Cancel"
@@ -894,6 +905,7 @@ void clientCallback(RemoteUICallBackArg a){
 		//NSAssert1(NO, @"Invalid input dialog button %d", button);
 		return nil;
 	}
+	//restore window level
 	[window setLevel:level];
 }
 

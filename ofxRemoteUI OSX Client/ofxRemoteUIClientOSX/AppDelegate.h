@@ -28,7 +28,7 @@ struct LayoutConfig{
 };
 
 //declare callback method 
-void clientCallback(RemoteUICallBackArg a);
+void clientCallback(RemoteUIClientCallBackArg a);
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>{
 
@@ -94,7 +94,7 @@ void clientCallback(RemoteUICallBackArg a);
 -(IBAction)copySpecial:(id)sender;
 -(IBAction)applyPrefs:(id)sender;
 
--(void)log:(RemoteUICallBackArg) arg;
+-(void)log:(RemoteUIClientCallBackArg) arg;
 -(IBAction)clearLog:(id)sender;
 
 -(void)connect;

@@ -1,5 +1,23 @@
 #include "testApp.h"
 
+//get notified when server tells us something
+void clientCallback(RemoteUIClientCallBackArg a){
+
+	switch (a.action) {
+		case SERVER_CONNECTED: cout << "SERVER_CONNECTED"; break;
+		case SERVER_DISCONNECTED: cout << "SERVER_DISCONNECTED"; break;
+		case SERVER_DELETED_PRESET: cout << "SERVER_DELETED_PRESET"; break;
+		case SERVER_SAVED_PRESET: cout << "SERVER_SAVED_PRESET"; break;
+		case SERVER_DID_SET_PRESET: cout << "SERVER_DID_SET_PRESET"; break;
+		case SERVER_REQUESTED_ALL_PARAMS_UPDATE: cout << "SERVER_REQUESTED_ALL_PARAMS_UPDATE"; break;
+		case SERVER_PRESETS_LIST_UPDATED: cout << "SERVER_PRESETS_LIST_UPDATED"; break;
+		case SERVER_CONFIRMED_SAVE: cout << "SERVER_CONFIRMED_SAVE"; break;
+		case SERVER_DID_RESET_TO_XML: cout << "SERVER_DID_RESET_TO_XML"; break;
+		case SERVER_DID_RESET_TO_DEFAULTS: cout << "SERVER_DID_RESET_TO_DEFAULTS"; break;
+		default: break;
+	}
+}
+
 
 void testApp::setup(){
 
@@ -8,14 +26,14 @@ void testApp::setup(){
 	ofSetVerticalSync(true);
 
 	//start client
-	client.setup("127.0.0.1", 10000);
+	client.setCallback(clientCallback);
+	client.setup("127.0.0.1", 10000/*port*/);
 
 	//we want the client to have acces to those values all the time, so we feed him their @
 	client.trackParam("drawOutlines", &drawOutlines);
 	client.trackParam("x", &x);
 	client.trackParam("y", &y);
 	client.trackParam("currentSentence", &currentSentence);
-
 	time = 0.0f;
 }
 
@@ -52,6 +70,7 @@ void testApp::draw(){
 								ofColor::black, ofColor::red
 								);
 
+	ofDrawBitmapStringHighlight("press SPACEBAR to send param updates", 20, ofGetHeight() - 15);
 }
 
 

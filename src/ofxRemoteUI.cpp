@@ -46,6 +46,16 @@ void ofxRemoteUI::addParamToDB(RemoteUIParam p, string paramName){
 	}
 }
 
+void ofxRemoteUI::clearOscReceiverMsgQueue(){
+	ofxOscMessage tempM;
+	int c = 0;
+	//delete all pending messages
+	while (oscReceiver.getNextMessage(&tempM)) {
+		cout << "clearOscReceiverMsgQueue " << c << endl;
+		c++;
+	}
+}
+
 
 vector<string> ofxRemoteUI::getChangedParamsList(){
 	std::vector<string> result (paramsChangedSinceLastCheck.begin(), paramsChangedSinceLastCheck.end());

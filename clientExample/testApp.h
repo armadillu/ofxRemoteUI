@@ -12,17 +12,13 @@ class testApp : public ofBaseApp{
 		void draw();
 		void keyPressed(int key);
 		void mousePressed( int x, int y, int button );
-		
-		
 
-		ofxRemoteUIClient client;
-
-		float x;
-		float y;
-		bool drawOutlines;
-		string currentSentence;
-
-		float time;
+		ofxRemoteUIClient	client;
+		float				x;
+		float				y;
+		bool				drawOutlines;
+		string				currentSentence;
+		float				time;
 };
 
 #endif

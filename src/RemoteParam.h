@@ -11,18 +11,16 @@
 
 #include <stdio.h>
 
-enum RemoteUICallAction{
-	SERVER_CONNECTED, PARAMS_UPDATED, PRESETS_UPDATED, SERVER_DISCONNECTED,
+enum RemoteUICallClientAction{
+	SERVER_CONNECTED, SERVER_DISCONNECTED, SERVER_REQUESTED_ALL_PARAMS_UPDATE, SERVER_PRESETS_LIST_UPDATED,
 	SERVER_CONFIRMED_SAVE, SERVER_DID_RESET_TO_DEFAULTS, SERVER_DELETED_PRESET,
 	SERVER_SAVED_PRESET, SERVER_DID_RESET_TO_XML, SERVER_DID_SET_PRESET
 };
 
-struct RemoteUICallBackArg{
-	RemoteUICallAction action;
-	string msg; //sort of a wildcard; usually its the preset name
-	string host;
+enum RemoteUICallServerAction{
+	CLIENT_CONNECTED, CLIENT_DISCONNECTED, CLIENT_UPDATED_PARAM, CLIENT_DID_SET_PRESET, CLIENT_SAVED_PRESET,
+	CLIENT_DELETED_PRESET, CLIENT_SAVED_STATE, CLIENT_DID_RESET_TO_XML, CLIENT_DID_RESET_TO_DEFAULTS
 };
-
 
 enum RemoteUIParamType{
 	REMOTEUI_PARAM_FLOAT = 100,
@@ -108,7 +106,7 @@ public:
 			case REMOTEUI_PARAM_INT: printf("int: %d [%d, %d]\n", intVal, minInt, maxInt); break;
 			case REMOTEUI_PARAM_COLOR: printf("color: %d %d %d %d\n", redVal, greenVal, blueVal, alphaVal); break;
 			case REMOTEUI_PARAM_ENUM: printf("enum: %d [%d, %d]\n", intVal, minInt, maxInt); break;
-			case REMOTEUI_PARAM_BOOL: printf("bool: %d\n", boolVal); break;
+			case REMOTEUI_PARAM_BOOL: printf("bool: %s\n", boolVal ? "TRUE" : "FALSE"); break;
 			case REMOTEUI_PARAM_STRING: printf("string: %s\n", stringVal.c_str()); break;
 			default: printf("weird RemoteUIParam at print()!\n"); break;
 		}
@@ -140,5 +138,22 @@ public:
 
 	unsigned char r,g,b,a; // color [0,255]
 };
+
+
+struct RemoteUIClientCallBackArg{
+	RemoteUICallClientAction action;
+	string msg; //sort of a wildcard; usually its the preset name
+	string host;
+};
+
+struct RemoteUIServerCallBackArg{
+	RemoteUICallServerAction action;
+	string paramName;
+	RemoteUIParam param; //get a copy o the new value of the param (only makes sense when action==SERVER_REQUESTED_ALL_PARAMS_UPDATE)
+	string msg; //sort of a wildcard; usually its the preset name
+	string host;
+};
+
+
 
 #endif

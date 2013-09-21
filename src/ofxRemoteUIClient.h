@@ -57,13 +57,13 @@ public:
 	void sendUntrackedParamUpdate(RemoteUIParam p, string paramName);
 
 	//get notified when server gets back to us
-	void setCallback( void (*callb)(RemoteUICallBackArg) );
+	void setCallback( void (*callb)(RemoteUIClientCallBackArg) );
 	//if you want to get notified when stuff happens, implement a callback method like this:
 	//
-	//	void clientCallback(RemoteUICallBackArg arg){
+	//	void clientCallback(RemoteUIClientCallBackArg arg){
 	//		switch (arg.action) {
-	//			case PARAMS_UPDATED:break;
-	//			case PRESETS_UPDATED:break;
+	//			case SERVER_REQUESTED_ALL_PARAMS_UPDATE:break;
+	//			case SERVER_PRESETS_LIST_UPDATED:break;
 	//			case SERVER_DISCONNECTED:break;
 	//			default:break;
 	//		}
@@ -82,7 +82,7 @@ private:
 	string					host;
 	bool					gotNewInfo;
 	int						pendingOperations;
-	void (*callBack)(RemoteUICallBackArg);
+	void (*callBack)(RemoteUIClientCallBackArg);
 
 };
 
