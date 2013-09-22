@@ -262,7 +262,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		//NSLog(@"layoutWidgetsWithConfig");
 	}else{
 		int off = ((int)[scroll.contentView frame].size.height ) % ((int)(ROW_HEIGHT));
-		[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, p.maxPerCol * ROW_HEIGHT + off)];
+		[listContainer setFrameSize: NSMakeSize( listContainer.frame.size.width, p.maxPerCol * ROW_HEIGHT + off)];
 	}
 	
 	for( map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
@@ -358,7 +358,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	vector<string> paramsInGroup = [self getParamsInGroup:currentGroup];
 	int totalH = ROW_HEIGHT * ((int)paramsInGroup.size() );
-	[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, totalH)];
+	[listContainer setFrameSize: NSMakeSize( listContainer.frame.size.width, totalH)];
 }
 
 
@@ -503,7 +503,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	}
 
 	lastLayout = p;
-	[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, p.maxPerCol * ROW_HEIGHT + off)];
+	[listContainer setFrameSize: NSMakeSize( listContainer.frame.size.width, p.maxPerCol * ROW_HEIGHT + off)];
 }
 
 
