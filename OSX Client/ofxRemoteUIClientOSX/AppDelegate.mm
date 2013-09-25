@@ -875,7 +875,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 -(NSString *)showAlertWithInput: (NSString *)prompt defaultValue: (NSString *)defaultValue {
 
 	//set level to Normal to avoid blocking new preset alert window
-	int level = [window level];
+	int level = (int)[window level];
 	[window setLevel:NSNormalWindowLevel];
 	[[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 
