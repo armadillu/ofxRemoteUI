@@ -208,6 +208,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 									   [NSNull null], @"bounds",
 									   nil];
 	viewLayer.actions = newActions;
+	[newActions release];
 
 	//make windows resize-snap to height of param
 	NSRect r = [window frame];
@@ -262,7 +263,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		//NSLog(@"layoutWidgetsWithConfig");
 	}else{
 		int off = ((int)[scroll.contentView frame].size.height ) % ((int)(ROW_HEIGHT));
-		[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, p.maxPerCol * ROW_HEIGHT + off)];
+		[listContainer setFrameSize: NSMakeSize( listContainer.frame.size.width, p.maxPerCol * ROW_HEIGHT + off)];
 	}
 	
 	for( map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
@@ -358,7 +359,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	vector<string> paramsInGroup = [self getParamsInGroup:currentGroup];
 	int totalH = ROW_HEIGHT * ((int)paramsInGroup.size() );
-	[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, totalH)];
+	[listContainer setFrameSize: NSMakeSize( listContainer.frame.size.width, totalH)];
 }
 
 
@@ -455,8 +456,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	//remove all views, start over
 	NSArray * subviews = [listContainer subviews];
 	for( int i = (int)[subviews count] - 1 ; i >= 0 ; i-- ){
+		if( [[subviews objectAtIndex:i] isKindOfClass:[NSBox class]]){
+			[[subviews objectAtIndex:i] release]; // release NSBox we allocated before
+		}
 		[[subviews objectAtIndex:i] removeFromSuperview];
-		//[[subviews objectAtIndex:i] release];
 	}
 	[self adjustScrollView];
 
@@ -503,7 +506,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	}
 
 	lastLayout = p;
-	[listContainer setFrameSize: CGSizeMake( listContainer.frame.size.width, p.maxPerCol * ROW_HEIGHT + off)];
+	[listContainer setFrameSize: NSMakeSize( listContainer.frame.size.width, p.maxPerCol * ROW_HEIGHT + off)];
 }
 
 
@@ -875,7 +878,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 -(NSString *)showAlertWithInput: (NSString *)prompt defaultValue: (NSString *)defaultValue {
 
 	//set level to Normal to avoid blocking new preset alert window
-	int level = [window level];
+	int level = (int)[window level];
 	[window setLevel:NSNormalWindowLevel];
 	[[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 

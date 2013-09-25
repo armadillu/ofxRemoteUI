@@ -11,16 +11,15 @@ Watch the [demo video](http://www.youtube.com/watch?v=EHS3bd0beKQ).
 
 ## Features
 
-* Edit & Track variables remotely thorugh OSC (bool, int, float, string, Enum, ofColor)
+* Edit & Track variables remotely thorugh UDP/OSC (bool, int, float, string, Enum, ofColor)
 * Native OSX interface
-* Allows to save / load variable states between app runs
-* Allows creation of Presets
-* Easily create variable Groups, and quick access through keyboard shortcuts
-* Easily get notified when a variable is modified (optional)
-* Colorize your variables for easy reading / grouping
-* Restore paramters to launch ones or to Default values
-* Can be used outside OpenFrameworks, and in Processing thx to @kritzikratzi
-* Easy to use Macros allow sharing variables from any class in your project
+* Allows to save/load your variable states across app launches
+* Allows creation of Presets, variable states that you can switch from and to quickly.
+* Easily create parameter Groups, and quickly access through keyboard shortcuts in the supplied OSX Client.
+* Colorize your variables for easy reading in the OSX client.
+* Restore paramters to previous launch ones or to Default values
+* ofxRemoteUI Can be used outside OF in any C++ project, and in Processing thx to @kritzikratzi
+* Easy to use macros hide complexity away.
 
 
 
@@ -35,20 +34,20 @@ I know there's tons of very good UI's already, but one thing that bothers me abo
 
 ## Details
 
-It's OSC based, and it includes a native OSX Client. The Native OSX Client allows param colorization for better clarity, and live param filtering. It also supports grouping the params into categories, to filter them by category in the OSX Client. There's automatic keyboard shortcuts to do so.
+It's OSC based, and it includes a native OSX Client. The Native OSX Client allows param colorization for better clarity, and live param filtering. It also supports the grouping of params into categories, for easy access. There's automatic keyboard shortcuts to do so.
 
 It can also be set to store the current values when quitting the app (or whenever its convenient), so that you can carry on where you left off last time you used it. It does so by saving a file called "ofxRemoteUISettings.xml" in your data folder. It uses ofxXmlSettings to store everything. 
 
-You can also create and delete presets, which are parameter states for your app. Presets are stored with your OF app, inside an "ofxRemoteUIPresets" folder, in your data folder. Whenever you like the current config, you can make a preset to keep it around. You can also delete presets.
+You can also create and delete presets, which are parameter states for your app. Presets are stored with your OF app, inside an "ofxRemoteUIPresets" folder, in your data folder. This makes it easy to check in your presets with your soruce code. Whenever you like the current config, you can make a preset to keep it around. You can also delete presets.
 
-It uses Macros + the singleton pattern to make it very easy to share any variable you want to edit remotely, from any class of your project. 
+ofxRemoteUI uses Macros + the singleton pattern to make it very easy to share any variable you decide to edit remotely, from any class of your project.
 
-The OSX client allows to copy all params as plain text. You can also paste them back after editing them! Thx to @kritzikratzi for this idea!
+The OSX client also allows to copy all the current params as plain text. You can also paste them back after editing them! Thx to @kritzikratzi for this idea!
 
 **"Restore to initial XML Values"** sets alls params to whatever values they had at server app launch.  
 **"Restore to Default Values"** sets alls params to whatever values the shared variable had before sharing it with OFX_REMOTEUI_SERVER_SHARE_PARAM().
 
-To use it outisde of OpenFrameworks, you can see how the noOF_Example is setup.   
+To use it outisde of OpenFrameworks, you can see how the example-noOF is setup.   
 
 -----
 
@@ -88,9 +87,9 @@ Use the supplied OSX Client to view and edit your shared parameters.
 
 ## Notes
 
-Enums must be consecutive, so that each enum item is +1 the previous one for them to work.
+Enums must be consecutive so that each enum item is +1 the previous one for them to work.
 
 
 ## To Do
 
-- make a multiplatform client, maybe based on ofxUI?
+- make a basic multiplatform client, maybe based on ofxUI?

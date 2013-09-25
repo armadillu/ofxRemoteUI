@@ -191,6 +191,7 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 			}
 			int n = m.getNumArgs() - 5 - 3; // 3 >> the int vals, 5 >> 4 colors + 1 group
 			int i = 0;
+			p.enumList.clear();
 			for (i = 0; i < n; i++) {
 				p.enumList.push_back( m.getArgAsString(arg + i) );
 			}
@@ -528,7 +529,11 @@ void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
 	m.addIntArg(p.r); m.addIntArg(p.g); m.addIntArg(p.b); m.addIntArg(p.a); // set bg color!
 	m.addStringArg(p.group);
 	if(timeSinceLastReply == 0.0f) timeSinceLastReply = 0.0;
+	try{
 	oscSender.sendMessage(m);
+	}catch(exception e){
+		cout << "exception" << endl;
+	}
 }
 
 //if used by server, confirmation == YES

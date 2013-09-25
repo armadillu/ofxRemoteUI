@@ -1,0 +1,1 @@
+Drag the contents of this folder into your project ONLY if you are NOT using OpenFrameowrks

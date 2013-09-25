@@ -469,6 +469,8 @@
 /* Begin PBXProject section */
 		73002CCD140ABCF60035299A /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+			};
 			buildConfigurationList = 73002CD0140ABCF60035299A /* Build configuration list for PBXProject "ofxRemoteUIClientOSX" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
@@ -646,7 +648,7 @@
 		73002CF5140ABCF60035299A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_LINK_OBJC_RUNTIME = NO;
 				CLANG_WARN__ARC_BRIDGE_CAST_NONARC = NO;
@@ -658,11 +660,11 @@
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_VERSION = "";
 				INFOPLIST_FILE = "$(SRCROOT)/ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = ofxRemoteUIClientOSX;
-				SDKROOT = macosx10.7;
+				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
 			};
@@ -671,7 +673,7 @@
 		73002CF6140ABCF60035299A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_LINK_OBJC_RUNTIME = NO;
 				CLANG_WARN__ARC_BRIDGE_CAST_NONARC = NO;
@@ -683,11 +685,11 @@
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch";
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_VERSION = "";
 				INFOPLIST_FILE = "$(SRCROOT)/ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = ofxRemoteUIClientOSX;
-				SDKROOT = macosx10.7;
+				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
 			};
