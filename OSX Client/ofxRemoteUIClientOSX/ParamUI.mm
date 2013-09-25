@@ -12,6 +12,7 @@
 }
 
 -(id)initWithParam: (RemoteUIParam)p paramName:(string)name ID:(int)n{
+	self = [super init];
 	numberID = n;
 	widget = nil;
 	param = p;

@@ -208,6 +208,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 									   [NSNull null], @"bounds",
 									   nil];
 	viewLayer.actions = newActions;
+	[newActions release];
 
 	//make windows resize-snap to height of param
 	NSRect r = [window frame];
@@ -455,8 +456,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	//remove all views, start over
 	NSArray * subviews = [listContainer subviews];
 	for( int i = (int)[subviews count] - 1 ; i >= 0 ; i-- ){
+		if( [[subviews objectAtIndex:i] isKindOfClass:[NSBox class]]){
+			[[subviews objectAtIndex:i] release]; // release NSBox we allocated before
+		}
 		[[subviews objectAtIndex:i] removeFromSuperview];
-		//[[subviews objectAtIndex:i] release];
 	}
 	[self adjustScrollView];
 
