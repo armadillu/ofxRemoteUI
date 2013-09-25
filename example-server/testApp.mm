@@ -58,7 +58,7 @@ void testApp::setup(){
 	vector<string> menuItems;
 	menuItems.push_back("MENU_OPTION_0");menuItems.push_back("MENU_OPTION_1");
 	menuItems.push_back("MENU_OPTION_2"); menuItems.push_back("MENU_OPTION_3");
-	OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM(menu,MENU_OPTION_0, MENU_OPTION_3, menuItems);
+	OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM(menu, MENU_OPTION_0, MENU_OPTION_3, menuItems);
 
 	OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color); //add a color param
 

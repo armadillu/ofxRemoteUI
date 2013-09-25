@@ -25,7 +25,6 @@ public:
 		ofColor color;
 		MenuItems menu;
 
-
 		string currentSentence; 
 		int currentMouseX;
 };
