@@ -77,11 +77,6 @@ To use it outisde of OpenFrameworks, you can see how the example-noOF is setup.
 		OFX_REMOTEUI_SERVER_UPDATE(0.016666f); //keep the server updated
 	}
 	
-	void exit(){
-		OFX_REMOTEUI_SERVER_CLOSE();		//stop the server
-		OFX_REMOTEUI_SERVER_SAVE_TO_XML();	//save current values to XML
-	}
-
 Use the supplied OSX Client to view and edit your shared parameters.
 
 
