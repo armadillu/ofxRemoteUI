@@ -62,7 +62,7 @@ To use it outisde of OpenFrameworks, you can see how the example-noOF is setup.
 	
 		OFX_REMOTEUI_SERVER_SETUP(); //start server
 		
-		//Expose x and y vars to the  server, set a valid slider range 
+		//Expose x and y vars to the server, providing a valid slider range
 		OFX_REMOTEUI_SERVER_SHARE_PARAM(x, 0, ofGetWidth()); 
 		OFX_REMOTEUI_SERVER_SHARE_PARAM(y, 0, ofGetHeight());
 		
