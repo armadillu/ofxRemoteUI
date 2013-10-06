@@ -5,7 +5,7 @@ OF addon allows you to serve any variables you want (bool, float, int, enum, str
 
 Watch the [demo video](http://www.youtube.com/watch?v=EHS3bd0beKQ).
 
-![OSX Client](http://farm4.staticflickr.com/3760/9167922622_dc7f64f4e1_o.png "OSX Client")
+![OSX Client](http://farm8.staticflickr.com/7418/10126260445_1eddc4c357_o.png "OSX Client")
 
 ---
 
