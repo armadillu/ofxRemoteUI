@@ -508,15 +508,15 @@
                             </searchField>
                         </subviews>
                     </customView>
-                    <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" scrollerKnobStyle="dark" id="735" customClass="MyScrollView">
+                    <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" scrollerKnobStyle="dark" findBarPosition="aboveHorizontalRuler" id="735" customClass="MyScrollView">
                         <rect key="frame" x="0.0" y="62" width="350" height="238"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" copiesOnScroll="NO" id="NO3-2h-0fa">
-                            <rect key="frame" x="0.0" y="0.0" width="350" height="238"/>
+                            <rect key="frame" x="0.0" y="0.0" width="339" height="238"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <view id="736">
-                                    <rect key="frame" x="0.0" y="0.0" width="350" height="238"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="339" height="238"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 </view>
                             </subviews>
@@ -526,8 +526,8 @@
                             <rect key="frame" x="-100" y="-100" width="339" height="11"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
-                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" controlSize="mini" id="738">
-                            <rect key="frame" x="-100" y="-100" width="11" height="271"/>
+                        <scroller key="verticalScroller" verticalHuggingPriority="750" controlSize="mini" id="738">
+                            <rect key="frame" x="339" y="0.0" width="11" height="238"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
@@ -541,12 +541,12 @@
                                 <popUpButton verticalHuggingPriority="750" id="751">
                                     <rect key="frame" x="11" y="10" width="80" height="22"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="752">
+                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="752">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="smallSystem"/>
                                         <menu key="menu" title="OtherViews" id="753">
                                             <items>
-                                                <menuItem title="Item 1" state="on" id="754"/>
+                                                <menuItem title="Item 1" id="754"/>
                                                 <menuItem title="Item 2" id="755"/>
                                                 <menuItem title="Item 3" id="756"/>
                                             </items>

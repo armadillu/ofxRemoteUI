@@ -32,6 +32,8 @@ void clientCallback(RemoteUIClientCallBackArg a);
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>{
 
+@public
+
 	IBOutlet ColoredNSWindow *		window;
 	IBOutlet NSButton *				updateFromServerButton;
 	IBOutlet NSButton *				updateContinuouslyCheckbox;
@@ -68,8 +70,6 @@ void clientCallback(RemoteUIClientCallBackArg a);
 
 	BOOL							launched;
 	BOOL							alwaysOnTop;
-
-@public
 
 	bool							needFullParamsUpdate;
 }

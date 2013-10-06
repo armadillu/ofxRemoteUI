@@ -97,6 +97,8 @@ DecodedMessage ofxRemoteUI::decode(ofxOscMessage m){
 												if (action == "RESD") dm.action = RESET_TO_DEFAULTS_ACTION;
 												else
 													if (action == "SAVE") dm.action = SAVE_CURRENT_STATE_ACTION;
+													else
+														if (action == "MISP") dm.action = GET_MISSING_PARAMS_IN_PRESET;
 
 	}
 
@@ -619,6 +621,17 @@ void ofxRemoteUI::sendSETP(string presetName, bool confirm){
 	m.addStringArg(presetName);
 	if (confirm){
 		m.addStringArg("OK");
+	}
+	oscSender.sendMessage(m);
+}
+
+void ofxRemoteUI::sendMISP(vector<string> missingParamsInPreset){
+	if (missingParamsInPreset.size() == 0) return; //do nothing if no params are missing
+	if(verbose_) cout << "sendMISP()" << endl;
+	ofxOscMessage m;
+	m.setAddress("MISP");
+	for(int i = 0; i < missingParamsInPreset.size(); i++){
+		m.addStringArg(missingParamsInPreset[i]);
 	}
 	oscSender.sendMessage(m);
 }

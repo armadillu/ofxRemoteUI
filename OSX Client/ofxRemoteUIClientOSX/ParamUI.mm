@@ -2,6 +2,7 @@
 #import "ParamUI.h"
 #include "ofxRemoteUI.h"
 #include "AppDelegate.h"
+#import <QuartzCore/QuartzCore.h>
 
 @implementation ParamUI
 
@@ -27,6 +28,13 @@
 	CALayer *viewLayer = [CALayer layer];
 	[ui setLayer:viewLayer];
 
+
+	CALayer * l = [CALayer layer];
+	[l setContents: (id)[[NSImage imageNamed:@"warning@2x"] CGImageForProposedRect:Nil context:[NSGraphicsContext currentContext] hints:nil]];
+	[warningSign setLayer:l];
+	[warningSign setWantsLayer:YES];
+	[warningSign layer].opacity = 0.0f;
+
 	//disable implicit caAnims
 	NSMutableDictionary *newActions = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
 									   [NSNull null], @"onOrderIn",
@@ -36,8 +44,8 @@
 									   [NSNull null], @"bounds",
 									   nil];
 	viewLayer.actions = newActions;
+	l.actions = newActions;
 	[newActions release];
-
 	return self;
 }
 
@@ -50,7 +58,49 @@
 -(void)fadeIn{
 	[ui layer].opacity = 1;
 	[ui setWantsLayer:NO];
+}
 
+-(void)fadeOutSlowly{
+
+	[warningSign layer].opacity = 1.0;
+	[CATransaction begin];
+	[CATransaction setAnimationDuration:10];
+	[CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
+	[CATransaction setCompletionBlock:^{
+	}];
+	[warningSign layer].opacity = 0.0;
+	[CATransaction commit];
+}
+
+
+-(void)flash:(NSNumber *) times{
+
+	__block int localTimes = (int)[times integerValue];
+
+	float duration = 0.3;
+	[CATransaction begin];
+	[CATransaction setAnimationDuration: duration];
+	[CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
+
+		[CATransaction setCompletionBlock:^{
+
+			[CATransaction begin];
+			[CATransaction setAnimationDuration:duration];
+			//[CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
+			[warningSign layer].opacity = 0.0;
+			[CATransaction setCompletionBlock:^{
+				localTimes--;
+				//NSLog(@"flash %d times", localTimes);
+				if(localTimes > 0){
+					[self performSelector:@selector(flash:) withObject:[NSNumber numberWithInt:localTimes] afterDelay:0.2f];
+				}else{ //last fadeout is really long
+					[self fadeOutSlowly];
+				}
+			}];
+			[CATransaction commit];
+		}];
+		[warningSign layer].opacity = 1.0;
+	[CATransaction commit];
 }
 
 

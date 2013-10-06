@@ -84,7 +84,7 @@ public:
 	#endif
 	void update(float dt);
 	void close();
-	void loadFromXML(string fileName);
+	vector<string> loadFromXML(string fileName); //returns list of param names in current setup but not set in XML
 	void saveToXML(string fileName);
 
 	void shareParam(string paramName, float* param, float min, float max, ofColor bgColor = ofColor(0,0,0,0) );

@@ -75,6 +75,14 @@ void clientCallback(RemoteUIClientCallBackArg a){
 			[me showNotificationWithTitle:@"Server Did Reset To Default OK" description:s ID:@"ServerDidResetToDefault" priority:1];
 		}break;
 
+		case SERVER_REPORTS_MISSING_PARAMS_IN_PRESET:{
+			printf("SERVER_REPORTS_MISSING_PARAMS_IN_PRESET\n");
+			for(int i = 0; i < a.paramList.size(); i++){
+				ParamUI* t = me->widgets[ a.paramList[i] ];
+				[t flash:[NSNumber numberWithInt:5]];
+			}
+		}
+			break;
 		default:
 			break;
 	}
@@ -224,6 +232,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	//NSLog(@"applicationDidFinishLaunching done!");
 	currentPreset = "";
+	//[scroll setScrollerStyle:NSScrollerStyleOverlay];
+	//[scroll setScrollerKnobStyle:NSScrollerKnobStyleDefault];
 
 	[self loadPrefs];
 	launched = TRUE;
@@ -284,7 +294,6 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	}
 	[self partialParamsUpdate];
 	[classes release];
-	//[self layoutWidgetsWithConfig: [self calcLayoutParams]];
 }
 
 -(IBAction)copySpecial:(id)sender{
@@ -359,14 +368,14 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	vector<string> paramsInGroup = [self getParamsInGroup:currentGroup];
 	int totalH = ROW_HEIGHT * ((int)paramsInGroup.size() );
-	[listContainer setFrameSize: NSMakeSize( listContainer.frame.size.width, totalH)];
+	[listContainer setFrameSize: NSMakeSize( [scroll documentVisibleRect].size.width , totalH)];
 }
 
 
 -(LayoutConfig)calcLayoutParams{
 
 	LayoutConfig p;
-	float scrollW = listContainer.frame.size.width;
+	float scrollW = [scroll documentVisibleRect].size.width;
 	float scrollH = scroll.frame.size.height;
 
 	vector<string> paramsInGroup = [self getParamsInGroup:currentGroup];
@@ -410,6 +419,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	p.rowW = rowW;
 	p.howManyPerCol = howManyPerCol;
 	p.maxPerCol = maxPerCol;
+	NSLog(@"colsRows.y: %d   colsRows.x: %d", (int)p.colsRows.y , (int)p.colsRows.x);
+	NSLog(@"howManyPerCol: %d   maxPerCol: %d", (int)p.howManyPerCol , (int)p.maxPerCol);
+	NSLog(@"#######################");
+
 	return p;
 }
 
@@ -490,7 +503,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	}
 	int off = ((int)[scroll.contentView frame].size.height ) % ((int)(ROW_HEIGHT));
 
-	//draw grid
+	// draw grid ///////////////////////////////////////////
+
 	for (int i = 1; i < colIndex + 1; i++) {
 		NSBox * box;
 		box = [[NSBox alloc] initWithFrame: NSMakeRect( i *  p.rowW, -ROW_HEIGHT, 1, 3 * ROW_HEIGHT + ROW_HEIGHT * numParams )];
@@ -506,6 +520,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	}
 
 	lastLayout = p;
+	int extra;
 	[listContainer setFrameSize: NSMakeSize( listContainer.frame.size.width, p.maxPerCol * ROW_HEIGHT + off)];
 }
 

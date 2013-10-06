@@ -54,6 +54,7 @@ using namespace std;
  ...
  CLIENT:	SETP PRESET_NAME					//Set Preset - client wants to change all params according to preset "X"
  SERVER:	SETP PRESET_NAME OK					//server says ok
+ SERVER:	MISP PRESET_NAME					//server reports missing params not set in this preset
  CLIENT:	REQU								//client wants values for that preset
  SERVER:	SEND *****							//server sends all params
  SERVER:	REQU OK
@@ -168,6 +169,7 @@ protected:
 	void sendRESX(bool confirm = false); //send a "restore fom first loaded XML" msg
 	void sendRESD(bool confirm = false); //send a "restore fom code defaults" msg
 	void sendSAVE(bool confirm = false);
+	void sendMISP(vector<string> missingParamsInPreset);
 
 	bool							verbose_;
 	bool							readyToSend;
@@ -181,7 +183,6 @@ protected:
 
 	float							updateInterval;
 	int								port;
-
 
 
 	map<string, RemoteUIParam>		params;

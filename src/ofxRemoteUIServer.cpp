@@ -47,17 +47,18 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	colorTableIndex = 0;
 	int a = 80;
 	#ifdef OF_AVAILABLE
-	ofColor prevColor = ofColor::fromHsb((int)ofRandom(0,255), 255, 255, 35);
+	ofSeedRandom(1979);
+	ofColor prevColor = ofColor::fromHsb(0, 255, 255, 30);
 	for(int i = 0; i < 30; i++){
 		ofColor c = prevColor;
-		c.setHue(  ((int) (prevColor.getHue() + ofRandom(25, 30) )) % 255 );
+		c.setHue(  ((int) (prevColor.getHue() + 15 )) % 255 );
 		//c.setSaturation(prevColor.getSaturation() + ofRandom(-0.1,0.1) );
 		colorTables.push_back( c );
 		prevColor = c;
 	}
 	//shuffle
 	std::random_shuffle ( colorTables.begin(), colorTables.end() );
-
+	ofSeedRandom();
 	#else
 	colorTables.push_back(ofColor(194,144,221,a) );
 	colorTables.push_back(ofColor(202,246,70,a)  );
@@ -204,7 +205,9 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 }
 
 
-void ofxRemoteUIServer::loadFromXML(string fileName){
+vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
+
+	vector<string> loadedParams;
 
 	ofxXmlSettings s;
 	bool exists = s.loadFile(fileName);
@@ -220,6 +223,7 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 				float val = s.getValue("REMOTEUI_PARAM_FLOAT", 0.0, i);
 				map<string,RemoteUIParam>::iterator it = params.find(paramName);
 				if ( it != params.end() ){	// found!
+					loadedParams.push_back(paramName);
 					if(params[paramName].floatValAddr != NULL){
 						*params[paramName].floatValAddr = val;
 						params[paramName].floatVal = val;
@@ -238,6 +242,7 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 				float val = s.getValue("REMOTEUI_PARAM_INT", 0, i);
 				map<string,RemoteUIParam>::iterator it = params.find(paramName);
 				if ( it != params.end() ){	// found!
+					loadedParams.push_back(paramName);
 					if(params[paramName].intValAddr != NULL){
 						*params[paramName].intValAddr = val;
 						params[paramName].intVal = val;
@@ -260,6 +265,7 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 				int a = s.getValue("A", 0);
 				map<string,RemoteUIParam>::iterator it = params.find(paramName);
 				if ( it != params.end() ){	// found!
+					loadedParams.push_back(paramName);
 					if(params[paramName].redValAddr != NULL){
 						*params[paramName].redValAddr = r;
 						params[paramName].redVal = r;
@@ -284,6 +290,7 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 				float val = s.getValue("REMOTEUI_PARAM_ENUM", 0, i);
 				map<string,RemoteUIParam>::iterator it = params.find(paramName);
 				if ( it != params.end() ){	// found!
+					loadedParams.push_back(paramName);
 					if(params[paramName].intValAddr != NULL){
 						*params[paramName].intValAddr = val;
 						params[paramName].intVal = val;
@@ -304,6 +311,7 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 
 				map<string,RemoteUIParam>::iterator it = params.find(paramName);
 				if ( it != params.end() ){	// found!
+					loadedParams.push_back(paramName);
 					if(params[paramName].boolValAddr != NULL){
 						*params[paramName].boolValAddr = val;
 						params[paramName].boolVal = val;
@@ -322,6 +330,7 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 
 				map<string,RemoteUIParam>::iterator it = params.find(paramName);
 				if ( it != params.end() ){	// found!
+					loadedParams.push_back(paramName);
 					if(params[paramName].stringValAddr != NULL){
 						params[paramName].stringVal = val;
 						*params[paramName].stringValAddr = val;
@@ -333,7 +342,21 @@ void ofxRemoteUIServer::loadFromXML(string fileName){
 			}
 		}
 	}
+
+	vector<string> paramsNotInXML;
+	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+
+		string paramName = (*ii).first;
+
+		//param name found in xml
+		if( find(loadedParams.begin(), loadedParams.end(), paramName) != loadedParams.end() ){
+
+		}else{ //param name not in xml
+			paramsNotInXML.push_back(paramName);
+		}
+	}
 	loadedFromXML = true;
+	return paramsNotInXML;
 }
 
 void ofxRemoteUIServer::restoreAllParamsToInitialXML(){
@@ -382,7 +405,7 @@ void ofxRemoteUIServer::threadedFunction(){
 
 	while (threadRunning) {
 		updateServer(1./30.); //30 fps timebase
-		ofSleepMillis(1000/30.);
+		ofSleepMillis(33);
 	}
 	if(verbose_) cout << "ofxRemoteUIServer threadedFunction() ending" << endl;
 }
@@ -470,9 +493,10 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case SET_PRESET_ACTION:{ // client wants to set a preset
 				//presetNames = getAvailablePresets();
 				string presetName = m.getArgAsString(0);
-				loadFromXML(string(OFX_REMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
+				vector<string> missingParams = loadFromXML(string(OFX_REMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
 				if(verbose_) cout << "ofxRemoteUIServer: setting preset: " << presetName << endl;
 				sendSETP(presetName);
+				sendMISP(missingParams);
 				if(callBack != NULL){
 					cbArg.action = CLIENT_DID_SET_PRESET;
 					cbArg.msg = presetName;

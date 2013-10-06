@@ -25,6 +25,7 @@
 	IBOutlet NSTextField *sliderMax;
 	IBOutlet NSPopUpButton * enumeratorMenu;
 	IBOutlet NSColorWell * colorWell;
+	IBOutlet NSImageView * warningSign;
 
 	int numberID; // to handle alternating rows in table draw
 	
@@ -38,6 +39,7 @@
 
 -(void)fadeOut;
 -(void)fadeIn;
+-(void)flash:(NSNumber *)times;
 -(void)disableChanges;
 -(void)enableChanges;
 -(void)remapSlider;
