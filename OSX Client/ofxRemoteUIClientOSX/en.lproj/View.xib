@@ -37,7 +37,7 @@
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                     <subviews>
                         <textField verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" id="3">
-                            <rect key="frame" x="2" y="5" width="152" height="17"/>
+                            <rect key="frame" x="2" y="8" width="152" height="17"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                             <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" selectable="YES" enabled="NO" allowsUndo="NO" sendsActionOnEndEditing="YES" title="Label" usesSingleLineMode="YES" id="19">
                                 <font key="font" metaFont="smallSystem"/>
@@ -65,12 +65,21 @@
                     <rect key="frame" x="0.0" y="-1" width="227" height="34"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     <subviews>
-                        <colorWell id="79">
+                        <textField focusRingType="none" verticalHuggingPriority="750" id="8" userLabel="Float-Int Param Value">
+                            <rect key="frame" x="73" y="0.0" width="88" height="13"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <textFieldCell key="cell" selectable="YES" editable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="0" id="15">
+                                <font key="font" size="8" name="LucidaGrande"/>
+                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            </textFieldCell>
+                        </textField>
+                        <colorWell id="79" userLabel="Color Param">
                             <rect key="frame" x="90" y="4" width="55" height="26"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <color key="color" red="1" green="0.5" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                         </colorWell>
-                        <popUpButton verticalHuggingPriority="750" id="72">
+                        <popUpButton verticalHuggingPriority="750" id="72" userLabel="Enum Param">
                             <rect key="frame" x="18" y="6" width="199" height="22"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="75" id="73">
@@ -85,39 +94,30 @@
                                 </menu>
                             </popUpButtonCell>
                         </popUpButton>
-                        <slider verticalHuggingPriority="750" id="10">
+                        <slider verticalHuggingPriority="750" id="10" userLabel="Parm Slider">
                             <rect key="frame" x="20" y="12" width="194" height="17"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                             <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="100" doubleValue="41.666666666666671" tickMarkPosition="below" numberOfTickMarks="21" sliderType="linear" id="13"/>
                         </slider>
-                        <textField verticalHuggingPriority="750" id="9">
-                            <rect key="frame" x="17" y="3" width="43" height="11"/>
+                        <textField verticalHuggingPriority="750" id="9" userLabel="Param RangeMin">
+                            <rect key="frame" x="17" y="0.0" width="43" height="11"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="14">
-                                <font key="font" size="8" name="LucidaGrande"/>
+                                <font key="font" size="7" name="LucidaGrande"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <textField focusRingType="none" verticalHuggingPriority="750" id="8">
-                            <rect key="frame" x="73" y="3" width="88" height="11"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            <textFieldCell key="cell" selectable="YES" editable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" title="0" id="15">
-                                <font key="font" size="8" name="LucidaGrande"/>
-                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                            </textFieldCell>
-                        </textField>
-                        <textField verticalHuggingPriority="750" id="6">
-                            <rect key="frame" x="174" y="3" width="43" height="11"/>
+                        <textField verticalHuggingPriority="750" id="6" userLabel="Param RangeMax">
+                            <rect key="frame" x="174" y="0.0" width="43" height="11"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Label" id="17">
-                                <font key="font" size="8" name="LucidaGrande"/>
+                                <font key="font" size="7" name="LucidaGrande"/>
                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <textField verticalHuggingPriority="750" id="7">
+                        <textField verticalHuggingPriority="750" id="7" userLabel="String Param">
                             <rect key="frame" x="20" y="7" width="194" height="22"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="ff" bezelStyle="round" id="16">
@@ -126,12 +126,12 @@
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
                         </textField>
-                        <button verticalHuggingPriority="750" id="11">
-                            <rect key="frame" x="85" y="8" width="67" height="19"/>
+                        <button verticalHuggingPriority="750" id="11" userLabel="Bool Param">
+                            <rect key="frame" x="90" y="6" width="55" height="25"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            <buttonCell key="cell" type="roundRect" title="OFF" bezelStyle="roundedRect" alignment="center" borderStyle="border" inset="2" id="12">
-                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                <font key="font" metaFont="cellTitle"/>
+                            <buttonCell key="cell" type="squareTextured" title="ON" bezelStyle="texturedSquare" alignment="center" state="on" borderStyle="border" inset="2" id="12">
+                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                <font key="font" metaFont="system"/>
                             </buttonCell>
                         </button>
                     </subviews>

@@ -31,6 +31,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		}break;
 
 		case SERVER_DID_SET_PRESET:{
+			[me hideAllWarnings];
 			[me showNotificationWithTitle:@"Server Did Set Preset OK" description:[NSString stringWithFormat:@"%@ did set preset named '%s'", remoteIP, a.msg.c_str()] ID:@"ServerDidSetPreset" priority:-1];
 		}break;
 
@@ -79,7 +80,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 			printf("SERVER_REPORTS_MISSING_PARAMS_IN_PRESET\n");
 			for(int i = 0; i < a.paramList.size(); i++){
 				ParamUI* t = me->widgets[ a.paramList[i] ];
-				[t flash:[NSNumber numberWithInt:5]];
+				[t flashWarning:[NSNumber numberWithInt:5]];
 			}
 		}
 			break;
@@ -419,10 +420,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	p.rowW = rowW;
 	p.howManyPerCol = howManyPerCol;
 	p.maxPerCol = maxPerCol;
-	NSLog(@"colsRows.y: %d   colsRows.x: %d", (int)p.colsRows.y , (int)p.colsRows.x);
-	NSLog(@"howManyPerCol: %d   maxPerCol: %d", (int)p.howManyPerCol , (int)p.maxPerCol);
-	NSLog(@"#######################");
-
+	//NSLog(@"colsRows.y: %d   colsRows.x: %d", (int)p.colsRows.y , (int)p.colsRows.x);
+	//NSLog(@"howManyPerCol: %d   maxPerCol: %d", (int)p.howManyPerCol , (int)p.maxPerCol);
+	//NSLog(@"#######################");
+	
 	return p;
 }
 
@@ -687,6 +688,14 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	}
 }
 
+
+-(void)hideAllWarnings{
+	for( map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
+		string key = (*ii).first;
+		ParamUI* t = widgets[key];
+		[t hideWarning];
+	}
+}
 
 -(IBAction)filterType:(id)sender{
 	NSString * filter = [sender stringValue];

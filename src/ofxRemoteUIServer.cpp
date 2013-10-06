@@ -34,6 +34,7 @@ ofxRemoteUIServer* ofxRemoteUIServer::instance(){
 
 ofxRemoteUIServer::ofxRemoteUIServer(){
 	readyToSend = false;
+	saveToXmlOnExit = true;
 	timeSinceLastReply = 0;
 	avgTimeSinceLastReply = 0;
 	waitingForReply = false;
@@ -90,6 +91,12 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 ofxRemoteUIServer::~ofxRemoteUIServer(){
 	cout << "~ofxRemoteUIServer()" << endl;	
 }
+
+
+void ofxRemoteUIServer::setSaveToXMLOnExit(bool save){
+	saveToXmlOnExit = save;
+}
+
 
 void ofxRemoteUIServer::setCallback( void (*callb)(RemoteUIServerCallBackArg) ){
 	callBack = callb;
@@ -384,7 +391,18 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	port = port_;
 	cout << "ofxRemoteUIClient listening at port " << port << " ... " << endl;
 	oscReceiver.setup(port);
+#ifdef OF_AVAILABLE
+	ofAddListener(ofEvents().exit, this, &ofxRemoteUIServer::_appExited);
+#endif
 }
+#ifdef OF_AVAILABLE
+void ofxRemoteUIServer::_appExited(ofEventArgs &e){
+	OFX_REMOTEUI_SERVER_CLOSE();		//stop the server
+	if(saveToXmlOnExit){
+		OFX_REMOTEUI_SERVER_SAVE_TO_XML();	//save values to XML
+	}
+}
+#endif
 
 #ifdef OF_AVAILABLE
 void ofxRemoteUIServer::startInBackgroundThread(){
@@ -565,7 +583,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 
 void ofxRemoteUIServer::deletePreset(string name){
 
-	#ifdef OF_AVAILABLE //TODO presets wont work outside OF
+	#ifdef OF_AVAILABLE
 	ofDirectory dir;
 	dir.open(string(OFX_REMOTEUI_PRESET_DIR) + "/" + name + ".xml");
 	dir.remove(true);
@@ -579,7 +597,7 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(){
 
 	vector<string> presets;
 
-	#ifdef OF_AVAILABLE //TODO presets wont work outside OF
+	#ifdef OF_AVAILABLE
 	ofDirectory dir;
 	dir.listDir(ofToDataPath(OFX_REMOTEUI_PRESET_DIR));
 	vector<ofFile> files = dir.getFiles();

@@ -56,6 +56,7 @@ struct myColor{
 #define OFX_REMOTEUI_SERVER_CLOSE()						( ofxRemoteUIServer::instance()->close() )
 #define	OFX_REMOTEUI_SERVER_SAVE_TO_XML()				( ofxRemoteUIServer::instance()->saveToXML(OFX_REMOTEUI_SETTINGS_FILENAME) )
 #define	OFX_REMOTEUI_SERVER_LOAD_FROM_XML()				( ofxRemoteUIServer::instance()->loadFromXML(OFX_REMOTEUI_SETTINGS_FILENAME) )
+#define	OFX_REMOTEUI_SERVER_SET_SAVES_ON_EXIT(save)		( ofxRemoteUIServer::instance()->setSaveToXMLOnExit(save) )
 #define OFX_REMOTEUI_SERVER_GET_INSTANCE()				( ofxRemoteUIServer::instance() )
 
 #ifdef OF_AVAILABLE //threaded only works in OF
@@ -114,6 +115,8 @@ public:
 	//		}
 	//	}
 
+	void setSaveToXMLOnExit(bool save);
+
 
 private:
 
@@ -136,12 +139,16 @@ private:
 	string upcomingGroup;
 
 	bool loadedFromXML; //we start with loadedFromXML=false; once loadXML is called, this becomes true
+	bool saveToXmlOnExit;
 
 	bool threadedUpdate;
 	void threadedFunction();
 	void updateServer(float dt);
 
 	void (*callBack)(RemoteUIServerCallBackArg);
+#ifdef OF_AVAILABLE
+	void _appExited(ofEventArgs &e);
+#endif
 };
 
 #endif

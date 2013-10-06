@@ -1,23 +1,5 @@
 #include "testApp.h"
 
-//define a callback method to get notifications of client actions
-void serverCallback(RemoteUIServerCallBackArg arg){
-
-	switch (arg.action) {
-		case CLIENT_CONNECTED: cout << "CLIENT_CONNECTED" << endl; break;
-		case CLIENT_DISCONNECTED: cout << "CLIENT_DISCONNECTED" << endl; break;
-		case CLIENT_UPDATED_PARAM: cout << "CLIENT_UPDATED_PARAM: "<< arg.paramName << ": ";
-			arg.param.print();
-			break;
-		case CLIENT_DID_SET_PRESET: cout << "CLIENT_DID_SET_PRESET" << endl; break;
-		case CLIENT_SAVED_PRESET: cout << "CLIENT_SAVED_PRESET" << endl; break;
-		case CLIENT_DELETED_PRESET: cout << "CLIENT_DELETED_PRESET" << endl; break;
-		case CLIENT_SAVED_STATE: cout << "CLIENT_SAVED_STATE" << endl; break;
-		case CLIENT_DID_RESET_TO_XML: cout << "CLIENT_DID_RESET_TO_XML" << endl; break;
-		case CLIENT_DID_RESET_TO_DEFAULTS: cout << "CLIENT_DID_RESET_TO_DEFAULTS" << endl; break;
-		default:break;
-	}
-}
 
 //--------------------------------------------------------------
 void testApp::setup(){
@@ -25,46 +7,61 @@ void testApp::setup(){
 	ofBackground(22);
 	ofSetFrameRate(60);
 	ofSetVerticalSync(true);
+	ofSetCircleResolution(32);
 
-	//set some default values
+	//set some default values for your params (optional)
 	drawOutlines = false;
 	currentSentence = "unInited";
 	x = y = 66;
 	numCircles = 30;
 	menu = MENU_OPTION_1;
 
-	//setup our callback to get notified when client changes things
-	OFX_REMOTEUI_SERVER_GET_INSTANCE()->setCallback(serverCallback);
+	// START THE SERVER ///////////////////////////////////////////
+	OFX_REMOTEUI_SERVER_SETUP(10000); 	//specify a port
 
-	OFX_REMOTEUI_SERVER_SETUP(10000); 	//start server
+	// SETUP A CALLBACK ///////////////////////////////////////////
+	OFX_REMOTEUI_SERVER_GET_INSTANCE()->setCallback(testApp::serverCallback); // (optional!)
 
-	//expose vars to the server. Always do so after setting up the server.
-	OFX_REMOTEUI_SERVER_SET_NEW_COLOR(); // set a bg color for the upcoming params
-	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP("position"); //make a new group
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(x, 0, ofGetWidth() ); //add an "x" float param to this group.
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(y, 0, ofGetHeight());
+	// SET PARAM GROUPS / COLORS //////////////////////////////////
+	OFX_REMOTEUI_SERVER_SET_NEW_COLOR(); // set a bg color for all the upcoming params (optional)
+	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP("position"); //make a new group (optional)
 
-	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP("style"); //make a new group
-	OFX_REMOTEUI_SERVER_SET_NEW_COLOR(); // set a bg color for the upcoming params
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawOutlines);		//add a bool param
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(numCircles, 0, 30);	//add an int param
+	// SHARE A FLOAT PARAM ////////////////////////////////////////
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(x, 0, ofGetWidth() ); //add an "x" float param to the current group ("position")
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(y, 0, ofGetHeight()); //provide a variable, a rangeMin and a rangeMax
+
+	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP("style"); //make a new group (optional)
+	OFX_REMOTEUI_SERVER_SET_NEW_COLOR(); // set a bg color for the upcoming params (optional)
+
+	// SHARE A BOOL PARAM ////////////////////////////////////////
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawOutlines);
+
+	// SHARE A FLOAT PARAM ////////////////////////////////////////
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(numCircles, 0, 30);	//variable, rangeMin, rangeMax
 
 	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP("whatever"); //make a new group
 	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_COLOR( ofColor(255,0,0,64) ); // you can set a custom upcoming color too
+
+	// SHARE AN STRING PARAM //////////////////////////////////////
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentSentence, ofColor(0,0,255,64));	// you can also set a color on a per-param basis
+
+	// SHARE A FLOAT //////////////////////////////////////
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentMouseX, 0, ofGetWidth(), ofColor(255,64));
 
-	//add a new Enum param, with several choices
+	// SHARE AN ENUM PARAM //////////////////////////////////////
 	vector<string> menuItems;
 	menuItems.push_back("MENU_OPTION_0");menuItems.push_back("MENU_OPTION_1");
 	menuItems.push_back("MENU_OPTION_2"); menuItems.push_back("MENU_OPTION_3");
 	OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM(menu, MENU_OPTION_0, MENU_OPTION_3, menuItems);
 
-	OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color); //add a color param
+	// SHARE A COLOR PARAM //////////////////////////////////////
+	OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color);
+
 
 	OFX_REMOTEUI_SERVER_LOAD_FROM_XML();	//load values from XML, if you want to do so
 											//this will result on the UI showing the params
 											//as they were when last saved (on quit in this case)
+
 
 	OFX_REMOTEUI_SERVER_START_THREADED();   //if you want all the communication to happen on a different
 											//thread, call this. This has implications though.
@@ -119,7 +116,21 @@ void testApp::draw(){
 
 }
 
-void testApp::exit(){
-	OFX_REMOTEUI_SERVER_CLOSE();		//stop the server
-	OFX_REMOTEUI_SERVER_SAVE_TO_XML();	//save values to XML (if you want to!)
+//define a callback method to get notifications of client actions
+void testApp::serverCallback(RemoteUIServerCallBackArg arg){
+
+	switch (arg.action) {
+		case CLIENT_CONNECTED: cout << "CLIENT_CONNECTED" << endl; break;
+		case CLIENT_DISCONNECTED: cout << "CLIENT_DISCONNECTED" << endl; break;
+		case CLIENT_UPDATED_PARAM: cout << "CLIENT_UPDATED_PARAM: "<< arg.paramName << ": ";
+			arg.param.print();
+			break;
+		case CLIENT_DID_SET_PRESET: cout << "CLIENT_DID_SET_PRESET" << endl; break;
+		case CLIENT_SAVED_PRESET: cout << "CLIENT_SAVED_PRESET" << endl; break;
+		case CLIENT_DELETED_PRESET: cout << "CLIENT_DELETED_PRESET" << endl; break;
+		case CLIENT_SAVED_STATE: cout << "CLIENT_SAVED_STATE" << endl; break;
+		case CLIENT_DID_RESET_TO_XML: cout << "CLIENT_DID_RESET_TO_XML" << endl; break;
+		case CLIENT_DID_RESET_TO_DEFAULTS: cout << "CLIENT_DID_RESET_TO_DEFAULTS" << endl; break;
+		default:break;
+	}
 }

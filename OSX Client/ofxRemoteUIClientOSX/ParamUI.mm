@@ -61,46 +61,51 @@
 }
 
 -(void)fadeOutSlowly{
-
-	[warningSign layer].opacity = 1.0;
 	[CATransaction begin];
-	[CATransaction setAnimationDuration:10];
+	[CATransaction setAnimationDuration:5];
 	[CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
-	[CATransaction setCompletionBlock:^{
-	}];
 	[warningSign layer].opacity = 0.0;
 	[CATransaction commit];
 }
 
+-(void)hideWarning{
+	//[CATransaction flush];
+	[warningSign layer].opacity = 0.0;
+}
 
--(void)flash:(NSNumber *) times{
+-(void)flashWarning:(NSNumber *) times{
 
 	__block int localTimes = (int)[times integerValue];
 
-	float duration = 0.3;
+	float duration = 0.2;
 	[CATransaction begin];
 	[CATransaction setAnimationDuration: duration];
 	[CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
-
 		[CATransaction setCompletionBlock:^{
 
 			[CATransaction begin];
 			[CATransaction setAnimationDuration:duration];
-			//[CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
-			[warningSign layer].opacity = 0.0;
+			[CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
 			[CATransaction setCompletionBlock:^{
 				localTimes--;
 				//NSLog(@"flash %d times", localTimes);
 				if(localTimes > 0){
-					[self performSelector:@selector(flash:) withObject:[NSNumber numberWithInt:localTimes] afterDelay:0.2f];
+					[self performSelector:@selector(flashWarning:) withObject:[NSNumber numberWithInt:localTimes] afterDelay:0.2f];
 				}else{ //last fadeout is really long
-					[self fadeOutSlowly];
+					[CATransaction begin];
+					[CATransaction setAnimationDuration: duration];
+					[warningSign layer].opacity = 1.0;
+					[CATransaction commit];
+					[self performSelector:@selector(fadeOutSlowly) withObject:nil afterDelay:5.0f];
+					//[self performSelectorOnMainThread:@selector(fadeOutSlowly) withObject:nil waitUntilDone:NO];
 				}
 			}];
+			[warningSign layer].opacity = 0.0;
 			[CATransaction commit];
 		}];
 		[warningSign layer].opacity = 1.0;
 	[CATransaction commit];
+	//[[NSRunLoop currentRunLoop] performSelector:@selector(commit) target:[CATransaction class] argument:nil order:0 modes:[NSArray arrayWithObjects:NSDefaultRunLoopMode, NSEventTrackingRunLoopMode, nil]];
 }
 
 

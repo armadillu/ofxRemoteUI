@@ -396,7 +396,7 @@
                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                         <font key="titleFont" metaFont="system"/>
                     </box>
-                    <customView id="655">
+                    <customView autoresizesSubviews="NO" id="655">
                         <rect key="frame" x="0.0" y="0.0" width="350" height="61"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
@@ -472,21 +472,21 @@
                                 <autoresizingMask key="autoresizingMask"/>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="offline" id="664"/>
                             </imageView>
-                            <textField verticalHuggingPriority="750" id="665">
+                            <textField canDrawConcurrently="YES" verticalHuggingPriority="750" id="665">
                                 <rect key="frame" x="162" y="10" width="44" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Status:" id="666">
                                     <font key="font" metaFont="cellTitle"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 </textFieldCell>
                             </textField>
                             <progressIndicator horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="668">
                                 <rect key="frame" x="206" y="9" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </progressIndicator>
-                            <textField toolTip="this will always be a multiple of delta time (update), so not accurate! " verticalHuggingPriority="750" id="693">
-                                <rect key="frame" x="212" y="10" width="35" height="11"/>
+                            <textField toolTip="this will always be a multiple of delta time (update), so not accurate! " canDrawConcurrently="YES" verticalHuggingPriority="750" id="693">
+                                <rect key="frame" x="208" y="10" width="39" height="11"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0ms" id="694">
                                     <font key="font" size="7" name="LucidaGrande"/>

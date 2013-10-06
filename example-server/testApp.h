@@ -14,7 +14,6 @@ public:
 		void setup();
 		void update();
 		void draw();
-		void exit();
 		void keyPressed( int key ){ ofToggleFullscreen();}
 
 		float x;
@@ -27,6 +26,7 @@ public:
 
 		string currentSentence; 
 		int currentMouseX;
+		static void serverCallback(RemoteUIServerCallBackArg arg);
 };
 
 #endif

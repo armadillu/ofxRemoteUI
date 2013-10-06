@@ -39,7 +39,8 @@
 
 -(void)fadeOut;
 -(void)fadeIn;
--(void)flash:(NSNumber *)times;
+-(void)flashWarning:(NSNumber *)times;
+-(void)hideWarning;
 -(void)disableChanges;
 -(void)enableChanges;
 -(void)remapSlider;

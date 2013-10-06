@@ -48,11 +48,11 @@ void ofxRemoteUI::addParamToDB(RemoteUIParam p, string paramName){
 
 void ofxRemoteUI::clearOscReceiverMsgQueue(){
 	ofxOscMessage tempM;
-	int c = 0;
+	//int c = 0;
 	//delete all pending messages
 	while (oscReceiver.getNextMessage(&tempM)) {
-		cout << "clearOscReceiverMsgQueue " << c << endl;
-		c++;
+		//cout << "clearOscReceiverMsgQueue " << c << endl;
+		//c++;
 	}
 }
 

@@ -62,18 +62,21 @@ NSMutableArray * coloredWindows = nil;
 
 	[self drawRectOriginal:rect];
 
+	//if im one of the selected ones, draw custom
 	if ( [coloredWindows containsObject:self] ){
-		//if im one of the selected ones
-		// Call original drawing method
 
-		//
-		// Draw a background color on top of everything
-		//
 		CGContextRef context = [[NSGraphicsContext currentContext] graphicsPort];
-		CGContextSetBlendMode(context, kCGBlendModeColor);
+		CGContextSetBlendMode(context, kCGBlendModeOverlay);
 
 		[myWinColor set];
-		[[NSBezierPath bezierPathWithRect:rect] fill];
+		float cornerRadius = 4.5;
+		NSBezierPath *path;
+		if(rect.size.width >= self.frame.size.width){ //sometimes we get drawn in smaller subregion rects
+			path = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:cornerRadius yRadius:cornerRadius];
+		}else{
+			path = [NSBezierPath bezierPathWithRect:rect];
+		}
+		[path fill];
 	}
 }
 @end
