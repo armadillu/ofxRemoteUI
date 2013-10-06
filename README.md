@@ -89,6 +89,8 @@ Use the supplied OSX Client to view and edit your shared parameters.
 
 Enums must be consecutive so that each enum item is +1 the previous one for them to work.
 
+When loading a preset, it might be that the preset doesnt specify values for all your current params. If so, the params whose values havent been modified by the preset will show a small warning sign for a few seconds.
+
 
 ## To Do
 
