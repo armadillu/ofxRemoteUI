@@ -71,12 +71,19 @@
 -(void)hideWarning{
 	//[CATransaction flush];
 	[warningSign layer].opacity = 0.0;
+	shouldBeFlashing = false;
 }
 
 -(void)flashWarning:(NSNumber *) times{
 
 	__block int localTimes = (int)[times integerValue];
-
+	if([times intValue] == NUM_FLASH_WARNING) shouldBeFlashing = true; //this is the 1st call, force flash
+	else{	//not first call, we've been flashing for a while!
+		if (shouldBeFlashing == false){
+			[self hideWarning];
+			return;
+		}
+	}
 	float duration = 0.2;
 	[CATransaction begin];
 	[CATransaction setAnimationDuration: duration];

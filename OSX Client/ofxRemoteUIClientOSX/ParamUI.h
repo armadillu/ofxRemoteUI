@@ -28,6 +28,7 @@
 	IBOutlet NSImageView * warningSign;
 
 	int numberID; // to handle alternating rows in table draw
+	bool shouldBeFlashing;
 	
 }
 

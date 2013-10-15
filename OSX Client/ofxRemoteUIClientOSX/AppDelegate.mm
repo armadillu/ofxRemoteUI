@@ -80,7 +80,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 			printf("SERVER_REPORTS_MISSING_PARAMS_IN_PRESET\n");
 			for(int i = 0; i < a.paramList.size(); i++){
 				ParamUI* t = me->widgets[ a.paramList[i] ];
-				[t flashWarning:[NSNumber numberWithInt:5]];
+				[t flashWarning:[NSNumber numberWithInt:NUM_FLASH_WARNING]];
 			}
 		}
 			break;

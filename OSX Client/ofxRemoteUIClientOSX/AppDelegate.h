@@ -19,6 +19,7 @@
 #define ROW_WIDTH				260.0f
 #define ALL_PARAMS_GROUP		@"*All Params"
 #define DIRTY_PRESET_NAME		@"*No Preset"
+#define NUM_FLASH_WARNING		5
 
 struct LayoutConfig{
 	NSPoint colsRows;
