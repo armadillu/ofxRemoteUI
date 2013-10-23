@@ -24,7 +24,7 @@
 		return nil;
 	}
 
-	[ui setWantsLayer:NO];
+	[ui setWantsLayer:YES];
 	CALayer *viewLayer = [CALayer layer];
 	[ui setLayer:viewLayer];
 
