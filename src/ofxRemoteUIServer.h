@@ -75,7 +75,7 @@ public:
 
 	static ofxRemoteUIServer* instance();
 
-	void setup(int port = OFXREMOTEUI_PORT, float updateInterval = 0.1/*sec*/);
+	void setup(int port = -1, float updateInterval = 0.1/*sec*/);
 	#ifdef OF_AVAILABLE
 	void startInBackgroundThread(); //calling this means you don't need to call update
 									//all param changes will run in a separate thread
@@ -133,10 +133,13 @@ private:
 	void deletePreset(string name);
 
 	vector<ofColor> colorTables;
-	int colorTableIndex;
-	bool colorSet; //if user called setParamColor()
-	ofColor paramColor;
-	string upcomingGroup;
+	int				colorTableIndex;
+	bool			colorSet; //if user called setParamColor()
+	ofColor			paramColor;
+	string			upcomingGroup;
+	ofxOscSender	broadcastSender;
+	float			broadcastTime;
+	string			computerName;
 
 	bool loadedFromXML; //we start with loadedFromXML=false; once loadXML is called, this becomes true
 	bool saveToXmlOnExit;
@@ -149,6 +152,8 @@ private:
 #ifdef OF_AVAILABLE
 	void _appExited(ofEventArgs &e);
 #endif
+
+
 };
 
 #endif

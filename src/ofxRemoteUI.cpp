@@ -12,6 +12,17 @@
 #include "uriencode.h"
 #include <sstream>
 
+ #ifdef __APPLE__ //TODO  i need to cover linux too
+#include <arpa/inet.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#endif
+
+#ifdef TARGET_WIN_32
+#include <windows.h>
+#include <iphlpapi.h>
+#pragma comment(lib, "iphlpapi.lib")
+#endif
 
 bool ofxRemoteUI::ready(){
 	return readyToSend;
@@ -131,6 +142,84 @@ DecodedMessage ofxRemoteUI::decode(ofxOscMessage m){
 	return dm;
 }
 
+
+string ofxRemoteUI::getMyIP(){
+
+	//from https://github.com/jvcleave/LocalAddressGrabber/blob/master/src/LocalAddressGrabber.h
+	//and http://stackoverflow.com/questions/17288908/get-network-interface-name-from-ipv4-address
+	string output = "NOT FOUND";
+#ifdef TARGET_OSX
+	struct ifaddrs *myaddrs;
+	struct ifaddrs *ifa;
+	struct sockaddr_in *s4;
+	int status;
+	char buf[64];
+
+	status = getifaddrs(&myaddrs);
+	if (status != 0){
+		perror("getifaddrs");
+	}
+
+	for (ifa = myaddrs; ifa != NULL; ifa = ifa->ifa_next){
+		if (ifa->ifa_addr == NULL) continue;
+		if ((ifa->ifa_flags & IFF_UP) == 0) continue;
+
+		if (ifa->ifa_addr->sa_family == AF_INET){
+			s4 = (struct sockaddr_in *)(ifa->ifa_addr);
+			if (inet_ntop(ifa->ifa_addr->sa_family, (void *)&(s4->sin_addr), buf, sizeof(buf)) == NULL){
+				printf("%s: inet_ntop failed!\n", ifa->ifa_name);
+			}else{
+				if(ofToString(ifa->ifa_name) == "en0"){ //TODO this returns only en0!
+					output = ofToString(buf);
+				}
+			}
+		}
+	}
+	freeifaddrs(myaddrs);
+#endif
+
+#ifdef TARGET_WIN32
+	ULONG buflen = sizeof(IP_ADAPTER_INFO);
+	IP_ADAPTER_INFO *pAdapterInfo = (IP_ADAPTER_INFO *)malloc(buflen);
+
+	if (GetAdaptersInfo(pAdapterInfo, &buflen) == ERROR_BUFFER_OVERFLOW) {
+		free(pAdapterInfo);
+		pAdapterInfo = (IP_ADAPTER_INFO *)malloc(buflen);
+	}
+
+	if (GetAdaptersInfo(pAdapterInfo, &buflen) == NO_ERROR) {
+		int c = 0;
+		//this is crappy, we get the first interface (no ida which order they come in) TODO!
+		for (IP_ADAPTER_INFO *pAdapter = pAdapterInfo; pAdapter; pAdapter = pAdapter->Next) {
+			printf("%s (%s)\n", pAdapter->IpAddressList.IpAddress.String, pAdapter->Description);
+			if(c==0) output = pAdapter->IpAddressList.IpAddress.String;
+			c++;
+		}
+	}
+	if (pAdapterInfo) free(pAdapterInfo);
+#endif
+	return output;
+}
+
+#ifdef TARGET_WIN32
+void GetHostName(std::string& host_name);
+void GetHostName(std::string& host_name){
+
+    WSAData wsa_data;
+    int ret_code;
+    char buf[MAX_PATH];
+
+    WSAStartup(MAKEWORD(1, 1), &wsa_data);
+    ret_code = gethostname(bufe, MAX_PATH);
+
+    if (ret_code == SOCKET_ERROR)
+    	host_name = "unknown"
+		else
+			host_name = host_name;
+
+    WSACleanup();
+}
+#endif
 
 void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage dm){
 

@@ -19,11 +19,12 @@
 #include <sys/stat.h>
 #include <time.h>
 
-#ifndef TARGET_WIN32
+#ifdef TARGET_WIN32
 	#include <sys/time.h>
+	#include <winsock2.h>
 #endif
-ofxRemoteUIServer* ofxRemoteUIServer::singleton = NULL;
 
+ofxRemoteUIServer* ofxRemoteUIServer::singleton = NULL;
 ofxRemoteUIServer* ofxRemoteUIServer::instance(){
 	if (!singleton){   // Only allow one instance of class to be generated.
 		singleton = new ofxRemoteUIServer();
@@ -31,14 +32,24 @@ ofxRemoteUIServer* ofxRemoteUIServer::instance(){
 	return singleton;
 }
 
+void split(vector<string> &tokens, const string &text, char separator) {
+	int start = 0, end = 0;
+	while ((end = text.find(separator, start)) != string::npos) {
+		tokens.push_back(text.substr(start, end - start));
+		start = end + 1;
+	}
+	tokens.push_back(text.substr(start));
+}
 
 ofxRemoteUIServer::ofxRemoteUIServer(){
+
+	cout << "serving at: " << getMyIP() << endl;
 	readyToSend = false;
 	saveToXmlOnExit = true;
-	timeSinceLastReply = 0;
-	avgTimeSinceLastReply = 0;
+	timeSinceLastReply = avgTimeSinceLastReply = broadcastTime = 0;
 	waitingForReply = false;
 	colorSet = false;
+	computerName = "";
 	callBack = NULL;
 	upcomingGroup = DEFAULT_PARAM_GROUP;
 	verbose_ = false;
@@ -86,6 +97,13 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 		mkdir(OFX_REMOTEUI_PRESET_DIR, 0777); 
 		#endif
 	#endif
+
+	string ip = getMyIP();
+	vector<string>comps;
+	split(comps, ip, '.');
+	string multicastIP = comps[0] + "." + comps[1] + "." + comps[2] + "." + "255";
+	broadcastSender.setup( multicastIP, OFX_REMOTE_UI_BROADCAST_PORT ); //multicast @
+	cout << "ofxRemoteUIServer: letting everyone know that I am at " << multicastIP << ":" << OFX_REMOTE_UI_BROADCAST_PORT << endl;
 }
 
 ofxRemoteUIServer::~ofxRemoteUIServer(){
@@ -384,6 +402,10 @@ void ofxRemoteUIServer::restoreAllParamsToDefaultValues(){
 
 
 void ofxRemoteUIServer::setup(int port_, float updateInterval_){
+	if(port_ == -1){
+		ofSeedRandom();
+		port_ = ofRandom(5000, 60000);
+	}
 	params.clear();
 	updateInterval = updateInterval_;
 	waitingForReply = false;
@@ -431,6 +453,7 @@ void ofxRemoteUIServer::threadedFunction(){
 
 void ofxRemoteUIServer::updateServer(float dt){
 	time += dt;
+	broadcastTime += dt;
 	timeSinceLastReply  += dt;
 	if(readyToSend){
 		if (time > updateInterval){
@@ -439,6 +462,24 @@ void ofxRemoteUIServer::updateServer(float dt){
 			//cout << "ofxRemoteUIServer: sent " << ofToString(changes.size()) << " updates to client" << endl;
 			//sendUpdateForParamsInList(changes);
 		}
+	}
+
+	//let everyone know I exist and which is my port, every now and then
+	if(broadcastTime > OFXREMOTEUI_BORADCAST_INTERVAL){
+		broadcastTime = 0.0f;
+		ofxOscMessage m;
+		m.addIntArg(port);
+		#ifdef TARGET_OSX
+		if (computerName.size() == 0){
+			computerName = ofSystem("hostname -s ");
+			computerName = computerName.substr(0, computerName.size()-2); //mmm this is weird, 10.8
+		}
+		#endif
+		#ifdef TARGET_WIN32
+		GetHostName(std::string& name);
+		#endif
+		m.addStringArg(computerName);
+		broadcastSender.sendMessage(m);
 	}
 
 	while( oscReceiver.hasWaitingMessages() ){// check for waiting messages from client

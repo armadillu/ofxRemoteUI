@@ -38,6 +38,11 @@ void ofxRemoteUIClient::setup(string address, int port_){
 
 	if(verbose_) cout << "ofxRemoteUIClient connecting to " << address << endl;
 	oscSender.setup(address, port);
+	broadcastReceiver.setup(OFX_REMOTE_UI_BROADCAST_PORT);
+}
+
+vector<Neighbor> ofxRemoteUIClient::getNeighbors(){
+	return closebyServers.getNeighbors();
 }
 
 void ofxRemoteUIClient::disconnect(){
@@ -58,6 +63,26 @@ void ofxRemoteUIClient::restoreAllParamsToDefaultValues(){
 }
 
 void ofxRemoteUIClient::update(float dt){
+
+	bool neigbhorChange = false;
+	//listen for broadcast from all servers in the broadcast channel OFX_REMOTE_UI_BROADCAST_PORT
+	while( broadcastReceiver.hasWaitingMessages() ){// check for waiting messages from client
+		ofxOscMessage m;
+		broadcastReceiver.getNextMessage(&m);
+		neigbhorChange |= closebyServers.gotPing(m.getRemoteIp(), m.getArgAsInt32(0), m.getArgAsString(1));
+		//cout << "got broadcast message from " << m.getRemoteIp() << ":" << m.getArgAsInt32(0) << endl;
+		//closebyServers.print();
+	}
+
+	neigbhorChange |= closebyServers.update(dt);
+
+	if(neigbhorChange){
+		if(callBack != NULL){
+			RemoteUIClientCallBackArg cbArg; // to notify our "delegate"
+			cbArg.action = NEIGHBORS_UPDATED;
+			callBack(cbArg);
+		}
+	}
 
 	if (!readyToSend){ // if not connected, connect
 

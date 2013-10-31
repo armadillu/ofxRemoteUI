@@ -17,7 +17,7 @@ void testApp::setup(){
 	menu = MENU_OPTION_1;
 
 	// START THE SERVER ///////////////////////////////////////////
-	OFX_REMOTEUI_SERVER_SETUP(10000); 	//specify a port
+	OFX_REMOTEUI_SERVER_SETUP(10000); 	//specify a port if you want a specific one
 
 	// SETUP A CALLBACK ///////////////////////////////////////////
 	OFX_REMOTEUI_SERVER_GET_INSTANCE()->setCallback(testApp::serverCallback); // (optional!)
@@ -63,7 +63,7 @@ void testApp::setup(){
 											//as they were when last saved (on quit in this case)
 
 
-	OFX_REMOTEUI_SERVER_START_THREADED();   //if you want all the communication to happen on a different
+	//OFX_REMOTEUI_SERVER_START_THREADED();   //if you want all the communication to happen on a different
 											//thread, call this. This has implications though.
 											//your params can be changed at anytime by the client,
 											//potentially leading to problems. String params are

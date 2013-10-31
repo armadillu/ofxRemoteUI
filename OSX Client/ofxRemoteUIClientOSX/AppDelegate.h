@@ -48,6 +48,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 	IBOutlet MyScrollView *			scroll;
 	IBOutlet NSPopUpButton *		groupsMenu;
 	IBOutlet NSPopUpButton *		presetsMenu;
+	IBOutlet NSPopUpButton *		neigbhorsMenu;
 	IBOutlet NSMenu *				groupsMenuBar;
 
 	IBOutlet NSColorWell *			colorWell;
@@ -56,6 +57,8 @@ void clientCallback(RemoteUIClientCallBackArg a);
 	IBOutlet NSTextView *			logView;
 
 	bool							updateContinuosly;
+
+	NSMutableArray*					currentNeighbors;
 
 	map<string, ParamUI*>			widgets;
 	vector<string>					orderedKeys; // used to keep the order in which the items were added
@@ -81,10 +84,13 @@ void clientCallback(RemoteUIClientCallBackArg a);
 -(IBAction)pressedContinuously:(id)sender;
 -(IBAction)pressedConnect:(id)sender;
 -(IBAction)filterType:(id)sender;
--(IBAction)userChoseGroup:(id)sender;
--(IBAction)userChosePreset:(id)sender;
 -(IBAction)userAddPreset:(id)sender;
 -(IBAction)userDeletePreset:(id)sender;
+
+-(IBAction)userChoseGroup:(id)sender;
+-(IBAction)userChosePreset:(id)sender;
+-(IBAction)userChoseNeighbor:(id)sender;
+
 
 -(IBAction)userPressedSave:(id)sender;
 
@@ -97,6 +103,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 
 -(void)log:(RemoteUIClientCallBackArg) arg;
 -(IBAction)clearLog:(id)sender;
+-(void)updateNeighbors;
 
 -(void)connect;
 -(void)update;

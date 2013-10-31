@@ -49,6 +49,7 @@
 		BBDCBDF916A0523500F1C5EC /* ParamUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBDCBDEA16A0513D00F1C5EC /* ParamUI.mm */; };
 		BBDCBDFB16A0523A00F1C5EC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = BBDCBDED16A0513D00F1C5EC /* main.m */; };
 		BBE6075A16A466A7002F1707 /* offline.png in Resources */ = {isa = PBXBuildFile; fileRef = BBE6075716A466A7002F1707 /* offline.png */; };
+		BBEE7856182302FF00D93161 /* ofxRemoteUINeigbors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBEE7854182302FF00D93161 /* ofxRemoteUINeigbors.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -147,6 +148,8 @@
 		BBDCBDFD16A0526C00F1C5EC /* ofxRemoteUIClientOSX-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "ofxRemoteUIClientOSX-Prefix.pch"; path = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch"; sourceTree = SOURCE_ROOT; };
 		BBDCBE2716A063A400F1C5EC /* ReadMe.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ReadMe.txt; sourceTree = "<group>"; };
 		BBE6075716A466A7002F1707 /* offline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = offline.png; path = ofxRemoteUIClientOSX/offline.png; sourceTree = SOURCE_ROOT; };
+		BBEE7854182302FF00D93161 /* ofxRemoteUINeigbors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUINeigbors.cpp; sourceTree = "<group>"; };
+		BBEE7855182302FF00D93161 /* ofxRemoteUINeigbors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUINeigbors.h; sourceTree = "<group>"; };
 		BBFB932A17785ECC00A5E741 /* RemoteParam.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RemoteParam.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -438,6 +441,8 @@
 		BBDCBDF416A051B000F1C5EC /* src */ = {
 			isa = PBXGroup;
 			children = (
+				BBEE7854182302FF00D93161 /* ofxRemoteUINeigbors.cpp */,
+				BBEE7855182302FF00D93161 /* ofxRemoteUINeigbors.h */,
 				BBFB932A17785ECC00A5E741 /* RemoteParam.h */,
 				BB5F5EB01769462600F1FA92 /* uriencode.h */,
 				BBDCBDF516A051B000F1C5EC /* ofxRemoteUI.cpp */,
@@ -547,6 +552,7 @@
 				BB5CC61E177E49D500B595F8 /* ofxXmlSettings.cpp in Sources */,
 				BB3AACC417BD647300401E86 /* ColoredNSWindow.m in Sources */,
 				BB8776E917C99B3700CC74B8 /* NSColorStringExtension.m in Sources */,
+				BBEE7856182302FF00D93161 /* ofxRemoteUINeigbors.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -83,6 +83,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 				[t flashWarning:[NSNumber numberWithInt:NUM_FLASH_WARNING]];
 			}
 		}
+
+		case NEIGHBORS_UPDATED:{
+			[me updateNeighbors];
+		}
 			break;
 		default:
 			break;
@@ -121,19 +125,54 @@ void clientCallback(RemoteUIClientCallBackArg a){
 }
 
 
+-(IBAction)userChoseNeighbor:(id)sender{
+
+	int index = (int)[sender indexOfSelectedItem];
+	if ([currentNeighbors count] > 0){
+		NSString * server_port = [currentNeighbors objectAtIndex:index];
+		NSArray * info = [server_port componentsSeparatedByString:@":"];
+		[portField setStringValue:info[1]];
+		[addressField setStringValue:info[0]];
+		if([[connectButton title] isEqualToString:@"Connect"]){ //connect to that dude if not connected
+			[self connect];
+		}else{
+			[self connect];
+			[self performSelector:@selector(connect) withObject:Nil afterDelay:0.1];
+		}
+	}
+}
+
+
+-(void)updateNeighbors{
+	NSLog(@"updateNeighbors");
+	vector<Neighbor> ns = client->getNeighbors();
+	[neigbhorsMenu removeAllItems];
+	NSMutableArray *arr = [NSMutableArray arrayWithCapacity:1];
+	[currentNeighbors removeAllObjects];
+	for(int i = 0; i < ns.size(); i++){
+		[currentNeighbors addObject:[NSString stringWithFormat:@"%s:%d",  ns[i].IP.c_str(), ns[i].port]];
+		[arr addObject:[NSString stringWithFormat:@"%s@%s:%d", ns[i].name.c_str(), ns[i].IP.c_str(), ns[i].port]];
+	}
+	[neigbhorsMenu addItemsWithTitles: arr];
+}
+
+
 -(IBAction)clearLog:(id)sender;{
 	[[logView textStorage] beginEditing];
     [[[logView textStorage] mutableString] setString:@""];
     [[logView textStorage] endEditing];
 }
 
+
 -(ofxRemoteUIClient *)getClient;{
 	return client;
 }
 
+
 - (void)applicationDidFinishLaunching:(NSNotification *)note {
 
 	launched = FALSE;
+	currentNeighbors = [[NSMutableArray alloc] initWithCapacity:1];
 
 	// setup recent connections ///////////////
 

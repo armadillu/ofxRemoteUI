@@ -17,7 +17,11 @@
 #include <vector>
 using namespace std;
 
-#define OFXREMOTEUI_PORT					10001
+#define OFXREMOTEUI_PORT					10000
+#define OFX_REMOTE_UI_BROADCAST_PORT		39356
+#define OFXREMOTEUI_BORADCAST_INTERVAL		1.0 /*secs*/
+#define OFXREMOTEUI_DEATH_BY_TIME			5.0 /*sec*/
+
 #define LATENCY_TEST_RATE					0.3333
 #define CONNECTION_TIMEOUT					5.0f
 #define OFX_REMOTEUI_SETTINGS_FILENAME		"ofxRemoteUISettings.xml"
@@ -171,10 +175,14 @@ protected:
 	void sendSAVE(bool confirm = false);
 	void sendMISP(vector<string> missingParamsInPreset);
 
+	string getMyIP();
+
 	bool							verbose_;
 	bool							readyToSend;
 	ofxOscSender					oscSender;
 	ofxOscReceiver					oscReceiver;
+
+
 
 	float							time;
 	float							timeSinceLastReply;

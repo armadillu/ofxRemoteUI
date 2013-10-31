@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4514" systemVersion="13A603" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4514" systemVersion="12F45" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment defaultVersion="1060" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="4514"/>
@@ -412,7 +412,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" id="627">
-                                <rect key="frame" x="165" y="32" width="82" height="18"/>
+                                <rect key="frame" x="174" y="9" width="80" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <buttonCell key="cell" type="squareTextured" title="Connect" bezelStyle="texturedSquare" alignment="center" controlSize="small" borderStyle="border" inset="2" id="628">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -423,16 +423,16 @@
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" id="645">
-                                <rect key="frame" x="14" y="33" width="35" height="16"/>
+                                <rect key="frame" x="11" y="34" width="35" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Host:" id="646">
-                                    <font key="font" metaFont="cellTitle"/>
+                                    <font key="font" size="11" name="LucidaGrande"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <button toolTip="Pulls the current param values from server app" verticalHuggingPriority="750" id="593">
-                                <rect key="frame" x="280" y="31" width="52" height="18"/>
+                                <rect key="frame" x="280" y="33" width="52" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <buttonCell key="cell" type="roundTextured" title="Sync" bezelStyle="texturedRounded" image="NSRefreshTemplate" imagePosition="left" alignment="center" controlSize="small" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="594">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -443,23 +443,23 @@
                                 </connections>
                             </button>
                             <box autoresizesSubviews="NO" horizontalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="654">
-                                <rect key="frame" x="261" y="6" width="5" height="46"/>
+                                <rect key="frame" x="264" y="9" width="5" height="45"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
                                 <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                 <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 <font key="titleFont" metaFont="system"/>
                             </box>
                             <textField verticalHuggingPriority="750" id="647">
-                                <rect key="frame" x="14" y="10" width="32" height="16"/>
+                                <rect key="frame" x="11" y="10" width="32" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Port:" id="648">
-                                    <font key="font" metaFont="cellTitle"/>
+                                    <font key="font" size="11" name="LucidaGrande"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <textField verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" id="642">
-                                <rect key="frame" x="53" y="7" width="73" height="19"/>
+                                <rect key="frame" x="46" y="9" width="67" height="19"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="10001" bezelStyle="round" id="643">
                                     <font key="font" metaFont="smallSystem"/>
@@ -468,34 +468,16 @@
                                 </textFieldCell>
                             </textField>
                             <imageView id="663">
-                                <rect key="frame" x="206" y="9" width="16" height="16"/>
+                                <rect key="frame" x="152" y="10" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="offline" id="664"/>
                             </imageView>
-                            <textField canDrawConcurrently="YES" verticalHuggingPriority="750" id="665">
-                                <rect key="frame" x="162" y="10" width="44" height="16"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES"/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Status:" id="666">
-                                    <font key="font" metaFont="cellTitle"/>
-                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                </textFieldCell>
-                            </textField>
                             <progressIndicator horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="668">
-                                <rect key="frame" x="206" y="9" width="16" height="16"/>
+                                <rect key="frame" x="152" y="10" width="16" height="16"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             </progressIndicator>
-                            <textField toolTip="this will always be a multiple of delta time (update), so not accurate! " canDrawConcurrently="YES" verticalHuggingPriority="750" id="693">
-                                <rect key="frame" x="208" y="10" width="39" height="11"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0ms" id="694">
-                                    <font key="font" size="7" name="LucidaGrande"/>
-                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
                             <searchField verticalHuggingPriority="750" id="699">
-                                <rect key="frame" x="53" y="31" width="104" height="19"/>
+                                <rect key="frame" x="46" y="33" width="122" height="19"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <searchFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" title="127.0.0.1" placeholderString="Server @" usesSingleLineMode="YES" bezelStyle="round" sendsWholeSearchString="YES" maximumRecents="10" recentsAutosaveName="address" id="700">
                                     <font key="font" metaFont="smallSystem"/>
@@ -506,17 +488,38 @@
                                     <action selector="pressedConnect:" target="494" id="706"/>
                                 </connections>
                             </searchField>
+                            <popUpButton verticalHuggingPriority="750" id="dvw-BD-lfZ">
+                                <rect key="frame" x="219" y="30" width="38" height="22"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="push" bezelStyle="rounded" image="5791E947-14D7-4730-9E31-55278914A3EA" imagePosition="only" alignment="center" controlSize="small" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" arrowPosition="arrowAtCenter" id="r8p-Gw-FJI">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystem"/>
+                                    <menu key="menu" title="OtherViews" id="hSn-jR-U3G"/>
+                                </popUpButtonCell>
+                                <connections>
+                                    <action selector="userChoseNeighbor:" target="494" id="fkZ-If-Oso"/>
+                                </connections>
+                            </popUpButton>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="7FO-s2-6sZ">
+                                <rect key="frame" x="173" y="35" width="45" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Nearby:" id="wUt-Qh-LaV">
+                                    <font key="font" size="11" name="LucidaGrande"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                     </customView>
                     <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" verticalScrollElasticity="none" scrollerKnobStyle="dark" findBarPosition="aboveHorizontalRuler" id="735" customClass="MyScrollView">
-                        <rect key="frame" x="0.0" y="62" width="350" height="238"/>
+                        <rect key="frame" x="0.0" y="61" width="350" height="239"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" copiesOnScroll="NO" id="NO3-2h-0fa">
-                            <rect key="frame" x="0.0" y="0.0" width="339" height="238"/>
+                            <rect key="frame" x="0.0" y="0.0" width="339" height="239"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <view id="736">
-                                    <rect key="frame" x="0.0" y="0.0" width="339" height="238"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="339" height="239"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 </view>
                             </subviews>
@@ -527,7 +530,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" verticalHuggingPriority="750" controlSize="mini" horizontal="NO" id="738">
-                            <rect key="frame" x="339" y="0.0" width="11" height="238"/>
+                            <rect key="frame" x="339" y="0.0" width="11" height="239"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
@@ -557,7 +560,7 @@
                                     </connections>
                                 </popUpButton>
                                 <searchField verticalHuggingPriority="750" id="745">
-                                    <rect key="frame" x="95.999999909787576" y="13" width="63" height="19"/>
+                                    <rect key="frame" x="96" y="13" width="63" height="19"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES"/>
                                     <searchFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" placeholderString="filter" usesSingleLineMode="YES" bezelStyle="round" id="746">
                                         <font key="font" metaFont="smallSystem"/>
@@ -689,9 +692,9 @@
                 <outlet property="groups" destination="751" id="757"/>
                 <outlet property="groupsMenu" destination="751" id="800"/>
                 <outlet property="groupsMenuBar" destination="813" id="890"/>
-                <outlet property="lagField" destination="693" id="695"/>
                 <outlet property="listContainer" destination="736" id="739"/>
                 <outlet property="logView" destination="905" id="908"/>
+                <outlet property="neigbhorsMenu" destination="dvw-BD-lfZ" id="ydp-OP-0vD"/>
                 <outlet property="portField" destination="642" id="644"/>
                 <outlet property="presets" destination="770" id="777"/>
                 <outlet property="presetsMenu" destination="770" id="799"/>
@@ -759,6 +762,57 @@
         </window>
     </objects>
     <resources>
+        <image name="5791E947-14D7-4730-9E31-55278914A3EA" width="1" height="1">
+            <mutableData key="keyedArchiveRepresentation">
+YnBsaXN0MDDUAQIDBAUGPj9YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
+GR4fIyQsLzI4O1UkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
+c1dOU0NvbG9ygAKADRIgwwAAgAOAC1Z7MSwgMX3SFQoWGFpOUy5vYmplY3RzoReABIAK0hUKGh2iGxyA
+BYAGgAkQANIgCiEiXxAUTlNUSUZGUmVwcmVzZW50YXRpb26AB4AITxEIcE1NACoAAAAKAAAADgEAAAMA
+AAABAAEAAAEBAAMAAAABAAEAAAECAAMAAAACAAgACAEDAAMAAAABAAEAAAEGAAMAAAABAAEAAAERAAQA
+AAABAAAACAESAAMAAAABAAEAAAEVAAMAAAABAAIAAAEWAAMAAAABAAEAAAEXAAQAAAABAAAAAgEcAAMA
+AAABAAEAAAFSAAMAAAABAAEAAAFTAAMAAAACAAEAAYdzAAcAAAe4AAAAuAAAAAAAAAe4YXBwbAIgAABt
+bnRyR1JBWVhZWiAH0AACAA4ADAAAAABhY3NwQVBQTAAAAABub25lAAAAAAAAAAAAAAAAAAAAAAAA9tYA
+AQAAAADTLWFwcGwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVk
+ZXNjAAAAwAAAAG9kc2NtAAABMAAABixjcHJ0AAAHXAAAADh3dHB0AAAHlAAAABRrVFJDAAAHqAAAAA5k
+ZXNjAAAAAAAAABVHZW5lcmljIEdyYXkgUHJvZmlsZQAAAAAAAAAAAAAAFUdlbmVyaWMgR3JheSBQcm9m
+aWxlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbWx1YwAAAAAA
+AAAeAAAADHNrU0sAAAAqAAABeGhySFIAAAA6AAABomNhRVMAAAAsAAAB3HB0QlIAAAAqAAACCHVrVUEA
+AAAsAAACMmZyRlUAAAAqAAACXnpoVFcAAAAQAAACiGl0SVQAAAAuAAACmG5iTk8AAAAsAAACxmtvS1IA
+AAAYAAAC8mNzQ1oAAAAkAAADCmhlSUwAAAAgAAADLmRlREUAAAA6AAADTmh1SFUAAAAuAAADiHN2U0UA
+AAAuAAADtnpoQ04AAAAQAAAD5GphSlAAAAAWAAAD9HJvUk8AAAAiAAAECmVsR1IAAAAkAAAELHB0UE8A
+AAA4AAAEUG5sTkwAAAAqAAAEiGVzRVMAAAAoAAAEsnRoVEgAAAAkAAAE2nRyVFIAAAAiAAAE/mZpRkkA
+AAAsAAAFIHBsUEwAAAA2AAAFTHJ1UlUAAAAmAAAFgmFyRUcAAAAoAAAFqGVuVVMAAAAoAAAF0GRhREsA
+AAA0AAAF+ABWAWEAZQBvAGIAZQBjAG4A/QAgAHMAaQB2AP0AIABwAHIAbwBmAGkAbABHAGUAbgBlAHIA
+aQENAGsAaQAgAHAAcgBvAGYAaQBsACAAcwBpAHYAaQBoACAAdABvAG4AbwB2AGEAUABlAHIAZgBpAGwA
+IABkAGUAIABnAHIAaQBzACAAZwBlAG4A6AByAGkAYwBQAGUAcgBmAGkAbAAgAEMAaQBuAHoAYQAgAEcA
+ZQBuAOkAcgBpAGMAbwQXBDAEMwQwBDsETAQ9BDgEOQAgBD8EQAQ+BEQEMAQ5BDsAIABHAHIAYQB5AFAA
+cgBvAGYAaQBsACAAZwDpAG4A6QByAGkAcQB1AGUAIABnAHIAaQBzkBp1KHBwlo6Ccl9pY8+P8ABQAHIA
+bwBmAGkAbABvACAAZwByAGkAZwBpAG8AIABnAGUAbgBlAHIAaQBjAG8ARwBlAG4AZQByAGkAcwBrACAA
+ZwByAOUAdABvAG4AZQBwAHIAbwBmAGkAbMd8vBgAIABHAHIAYQB5ACDVBLhc0wzHfABPAGIAZQBjAG4A
+/QAgAWEAZQBkAP0AIABwAHIAbwBmAGkAbAXkBegF1QXkBdkF3AAgAEcAcgBhAHkAIAXbBdwF3AXZAEEA
+bABsAGcAZQBtAGUAaQBuAGUAcwAgAEcAcgBhAHUAcwB0AHUAZgBlAG4ALQBQAHIAbwBmAGkAbADBAGwA
+dABhAGwA4QBuAG8AcwAgAHMAegD8AHIAawBlACAAcAByAG8AZgBpAGwARwBlAG4AZQByAGkAcwBrACAA
+ZwByAOUAcwBrAGEAbABlAHAAcgBvAGYAaQBsZm6QGnBwXqZjz4/wZYdO9k4AgiwwsDDsMKQw1zDtMNUw
+oTCkMOsAUAByAG8AZgBpAGwAIABnAHIAaQAgAGcAZQBuAGUAcgBpA5MDtQO9A7kDugPMACADwAPBA78D
+xgOvA7sAIAOzA7oDwQO5AFAAZQByAGYAaQBsACAAZwBlAG4A6QByAGkAYwBvACAAZABlACAAYwBpAG4A
+egBlAG4AdABvAHMAQQBsAGcAZQBtAGUAZQBuACAAZwByAGkAagBzAHAAcgBvAGYAaQBlAGwAUABlAHIA
+ZgBpAGwAIABnAHIAaQBzACAAZwBlAG4A6QByAGkAYwBvDkIOGw4jDkQOHw4lDkwOKg41DkAOFw4yDhcO
+MQ5IDicORA4bAEcAZQBuAGUAbAAgAEcAcgBpACAAUAByAG8AZgBpAGwAaQBZAGwAZQBpAG4AZQBuACAA
+aABhAHIAbQBhAGEAcAByAG8AZgBpAGkAbABpAFUAbgBpAHcAZQByAHMAYQBsAG4AeQAgAHAAcgBvAGYA
+aQBsACAAcwB6AGEAcgBvAVsAYwBpBB4EMQRJBDgEOQAgBEEENQRABEsEOQAgBD8EQAQ+BEQEOAQ7BEwG
+RQZEBkEAIAYqBjkGMQZKBkEAIABHAHIAYQB5ACAGJwZEBjkGJwZFAEcAZQBuAGUAcgBpAGMAIABHAHIA
+YQB5ACAAUAByAG8AZgBpAGwAZQBHAGUAbgBlAHIAZQBsACAAZwByAOUAdABvAG4AZQBiAGUAcwBrAHIA
+aQB2AGUAbABzAGV0ZXh0AAAAAENvcHlyaWdodCAyMDA3IEFwcGxlIEluYy4sIGFsbCByaWdodHMgcmVz
+ZXJ2ZWQuAFhZWiAAAAAAAADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AANIlJicoWiRjbGFzc25hbWVY
+JGNsYXNzZXNfEBBOU0JpdG1hcEltYWdlUmVwoykqK18QEE5TQml0bWFwSW1hZ2VSZXBaTlNJbWFnZVJl
+cFhOU09iamVjdNIlJi0uV05TQXJyYXmiLSvSJSYwMV5OU011dGFibGVBcnJheaMwLSvTMzQKNTY3V05T
+V2hpdGVcTlNDb2xvclNwYWNlRDAgMAAQA4AM0iUmOTpXTlNDb2xvcqI5K9IlJjw9V05TSW1hZ2WiPCtf
+EA9OU0tleWVkQXJjaGl2ZXLRQEFUcm9vdIABAAgAEQAaACMALQAyADcARgBMAFcAXgBlAHIAeQCBAIMA
+hQCKAIwAjgCVAJoApQCnAKkAqwCwALMAtQC3ALkAuwDAANcA2QDbCU8JVAlfCWgJewl/CZIJnQmmCasJ
+swm2CbsJygnOCdUJ3QnqCe8J8QnzCfgKAAoDCggKEAoTCiUKKAotAAAAAAAAAgEAAAAAAAAAQgAAAAAA
+AAAAAAAAAAAACi8
+</mutableData>
+        </image>
         <image name="NSRefreshTemplate" width="10" height="12"/>
         <image name="offline" width="17" height="17"/>
     </resources>

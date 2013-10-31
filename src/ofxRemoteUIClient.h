@@ -16,6 +16,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include "ofxRemoteUINeigbors.h"
 
 using namespace std;
 
@@ -72,6 +73,7 @@ public:
 	float getMinThresholdForParam(string paramMame); //only applies to int and float
 	float getMaxThresholdForParam(string paramMame); //only applies to int and float
 
+	vector<Neighbor> getNeighbors();
 	bool isReadyToSend();
 
 private:
@@ -82,6 +84,9 @@ private:
 	string					host;
 	bool					gotNewInfo;
 	int						pendingOperations;
+	ofxOscReceiver			broadcastReceiver;
+	ofxRemoteUINeigbors		closebyServers;
+
 	void (*callBack)(RemoteUIClientCallBackArg);
 
 };
