@@ -46,7 +46,8 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	cout << "serving at: " << getMyIP() << endl;
 	readyToSend = false;
 	saveToXmlOnExit = true;
-	timeSinceLastReply = avgTimeSinceLastReply = broadcastTime = 0;
+	timeSinceLastReply = avgTimeSinceLastReply = broadcastTime = connectedAnimationTimer = 0;
+	disconnectedAnimationTimer = 0;
 	waitingForReply = false;
 	colorSet = false;
 	computerName = "";
@@ -492,9 +493,23 @@ void ofxRemoteUIServer::threadedFunction(){
 void ofxRemoteUIServer::draw(int x, int y){
 #ifdef OF_AVAILABLE
 	if(savedAnimationTimer > 0){
-		ofDrawBitmapStringHighlight("ofxRemoteUIServer Saved config to " + saveAnimationfileName, x, y,
+		ofDrawBitmapStringHighlight("ofxRemoteUIServer: Client Saved config to '" + saveAnimationfileName + "'", x, y,
 									ofColor(0, 255 * ofClamp(savedAnimationTimer,0,1)),
 									ofColor(255,0,0, 255 * ofClamp(savedAnimationTimer,0,1))
+									);
+	}
+
+	if(connectedAnimationTimer > 0){
+		ofDrawBitmapStringHighlight("ofxRemoteUIServer: Client Connected!", x, y,
+									ofColor(0, 255 * ofClamp(connectedAnimationTimer,0,1)),
+									ofColor(255,0,0, 255 * ofClamp(connectedAnimationTimer,0,1))
+									);
+	}
+
+	if(disconnectedAnimationTimer > 0){
+		ofDrawBitmapStringHighlight("ofxRemoteUIServer: Client Disconnected!", x, y,
+									ofColor(0, 255 * ofClamp(disconnectedAnimationTimer,0,1)),
+									ofColor(255,0,0, 255 * ofClamp(disconnectedAnimationTimer,0,1))
 									);
 	}
 #endif
@@ -503,9 +518,12 @@ void ofxRemoteUIServer::draw(int x, int y){
 
 void ofxRemoteUIServer::updateServer(float dt){
 	savedAnimationTimer -= dt;
+	connectedAnimationTimer -= dt;
+	disconnectedAnimationTimer -= dt;
 	timeCounter += dt;
 	broadcastTime += dt;
 	timeSinceLastReply  += dt;
+
 	if(readyToSend){
 		if (timeCounter > updateInterval){
 			timeCounter = 0.0f;
@@ -555,6 +573,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 					callBack(cbArg);
 				}
 				if(verbose_) cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " says HELLO!"  << endl;
+				connectedAnimationTimer = OFXREMOTEUI_NOTIFICATION_SCREENTIME;
 				break;
 
 			case REQUEST_ACTION:{ //send all params to client
@@ -563,6 +582,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				syncAllParamsToPointers();
 				sendUpdateForParamsInList(paramsList);
 				sendREQU(true); //once all send, confirm to close the REQU
+				connectedAnimationTimer = OFXREMOTEUI_NOTIFICATION_SCREENTIME;
 			}
 				break;
 
@@ -581,6 +601,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case CIAO_ACTION:{
 				if(verbose_) cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " says CIAO!" << endl;
 				sendCIAO();
+				disconnectedAnimationTimer = OFXREMOTEUI_NOTIFICATION_SCREENTIME;
 				if(callBack != NULL){
 					cbArg.action = CLIENT_DISCONNECTED;
 					callBack(cbArg);

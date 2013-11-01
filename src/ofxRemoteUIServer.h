@@ -146,6 +146,10 @@ private:
 
 	float			savedAnimationTimer;
 	string			saveAnimationfileName;
+
+	float			connectedAnimationTimer;
+	float			disconnectedAnimationTimer;
+
 	bool			doBroadcast;
 
 	bool loadedFromXML; //we start with loadedFromXML=false; once loadXML is called, this becomes true

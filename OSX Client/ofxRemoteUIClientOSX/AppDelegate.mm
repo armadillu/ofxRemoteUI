@@ -138,7 +138,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		}else{
 			[self connect];
 			[self update];
-			[self performSelector:@selector(connect) withObject:Nil afterDelay:0.2];
+			[self performSelector:@selector(connect) withObject:Nil afterDelay:0.0];
 		}
 	}
 }
@@ -821,6 +821,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		lagField.stringValue = @"";
 		[self cleanUpGUIParams];
 		client->disconnect();
+		//client->update(REFRESH_RATE);
 		connectButton.state = 0;
 		connectButton.title = @"Connect";
 	}
