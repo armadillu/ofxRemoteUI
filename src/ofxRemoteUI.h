@@ -97,32 +97,35 @@ using namespace std;
 
  // SERVER API ////////////////////////////////////////
 
-	server->setup(refreshRate);
-	server->shareParam("paramName", &paramName, ... );
-	...
-	server->update(dt);
+ server->setup(refreshRate);
+ server->shareParam("paramName", &paramName, ... );
+ ...
+ server->update(dt);
 
  // CLIENT API ////////////////////////////////////////
- 
-	client.setup(ipAddress, refreshRate);
-	client.trackParam("paramName", &paramName);
-	...
-	client.update();
+
+ client.setup(ipAddress, refreshRate);
+ client.trackParam("paramName", &paramName);
+ ...
+ client.update();
 
 
-	float getMinThresholdForParam("paramMame"); //only applies to int and float
-	float getMaxThresholdForParam("paramMame"); //only applies to int and float
+ float getMinThresholdForParam("paramMame"); //only applies to int and float
+ float getMaxThresholdForParam("paramMame"); //only applies to int and float
 
-	//get a report of params that changed on the server side since last check
-	vector<string> updatedParamsList = client.getChangedParamsList();
- 
-	//push a param change to the server, will send the current value of the param to server
-	client.sendTrackedParamUpdate("paramName");
+ //get a report of params that changed on the server side since last check
+ vector<string> updatedParamsList = client.getChangedParamsList();
+
+ //push a param change to the server, will send the current value of the param to server
+ client.sendTrackedParamUpdate("paramName");
 
  */
 
 const char *get_filename_ext(const char *filename) ;
 
+#ifdef TARGET_WIN32
+void GetHostName(std::string& host_name);
+#endif
 
 class ofxRemoteUI{
 
@@ -132,9 +135,9 @@ public:
 	vector<string> getChangedParamsList(); //in user add order
 	RemoteUIParam getParamForName(string paramName);
 	vector<string> getPresetsList();
-	
+
 	string getValuesAsString();
-	void setValuesFromString( string values );	
+	void setValuesFromString( string values );
 
 	virtual void restoreAllParamsToInitialXML() = 0;	//call this on client to request server to do so
 	virtual void restoreAllParamsToDefaultValues() = 0;
@@ -154,7 +157,7 @@ protected:
 	vector<string> scanForUpdatedParamsAndSync();
 
 	void sendUpdateForParamsInList(vector<string>paramsPendingUpdate);
-	bool hasParamChanged(RemoteUIParam p);	
+	bool hasParamChanged(RemoteUIParam p);
 
 	void updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage dm);
 	void syncAllParamsToPointers();
@@ -209,7 +212,7 @@ protected:
 private:
 
 	string stringForParamType(RemoteUIParamType t);
-
+	
 };
 
 #endif

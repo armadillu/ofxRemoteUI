@@ -12,16 +12,16 @@
 #include <string>
 #include <string.h>
 #ifdef __APPLE__
-	#include "dirent.h"
+#include "dirent.h"
 #elif _WIN32 || _WIN64
-	#include "dirent_vs.h"
+#include "dirent_vs.h"
 #endif
 #include <sys/stat.h>
 #include <time.h>
 
 #ifdef TARGET_WIN32
-	#include <sys/time.h>
-	#include <winsock2.h>
+//	#include <sys/time.h>
+#include <winsock2.h>
 #endif
 
 ofxRemoteUIServer* ofxRemoteUIServer::singleton = NULL;
@@ -59,7 +59,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	//add random colors to table
 	colorTableIndex = 0;
 	int a = 80;
-	#ifdef OF_AVAILABLE
+#ifdef OF_AVAILABLE
 	ofSeedRandom(1979);
 	ofColor prevColor = ofColor::fromHsb(0, 255, 255, 30);
 	for(int i = 0; i < 30; i++){
@@ -72,7 +72,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	//shuffle
 	std::random_shuffle ( colorTables.begin(), colorTables.end() );
 	ofSeedRandom();
-	#else
+#else
 	colorTables.push_back(ofColor(194,144,221,a) );
 	colorTables.push_back(ofColor(202,246,70,a)  );
 	colorTables.push_back(ofColor(74,236,173,a)  );
@@ -85,19 +85,19 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	colorTables.push_back(ofColor(234,127,169,a) );
 	colorTables.push_back(ofColor(227,184,233,a) );
 	colorTables.push_back(ofColor(165,154,206,a) );
-	#endif
+#endif
 
-	#ifdef OF_AVAILABLE
+#ifdef OF_AVAILABLE
 	ofDirectory d;
 	d.open(OFXREMOTEUI_PRESET_DIR);
 	d.create(true);
-	#else
-		#if defined(_WIN32)
-		_mkdir(OFXREMOTEUI_PRESET_DIR);
-		#else
-		mkdir(OFXREMOTEUI_PRESET_DIR, 0777); 
-		#endif
-	#endif
+#else
+#if defined(_WIN32)
+	_mkdir(OFXREMOTEUI_PRESET_DIR);
+#else
+	mkdir(OFXREMOTEUI_PRESET_DIR, 0777);
+#endif
+#endif
 
 	string ip = getMyIP();
 	if (ip != "NOT FOUND"){
@@ -113,7 +113,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 }
 
 ofxRemoteUIServer::~ofxRemoteUIServer(){
-	cout << "~ofxRemoteUIServer()" << endl;	
+	cout << "~ofxRemoteUIServer()" << endl;
 }
 
 
@@ -131,11 +131,11 @@ void ofxRemoteUIServer::close(){
 	if(readyToSend)
 		sendCIAO();
 	if(threadedUpdate){
-		#ifdef OF_AVAILABLE
+#ifdef OF_AVAILABLE
 		stopThread();
 		cout << "ofxRemoteUIServer closing; waiting for update thread to end..." << endl;
 		waitForThread();
-		#endif
+#endif
 	}
 }
 
@@ -400,7 +400,7 @@ void ofxRemoteUIServer::restoreAllParamsToInitialXML(){
 		string key = (*ii).first;
 		params[key] = paramsFromXML[key];
 		syncPointerToParam(key);
-	}	
+	}
 }
 
 void ofxRemoteUIServer::restoreAllParamsToDefaultValues(){
@@ -429,13 +429,13 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 			portNeedsToBePicked = true;
 		}
 		if(portNeedsToBePicked){
-			#ifdef OF_AVAILABLE
+#ifdef OF_AVAILABLE
 			ofSeedRandom();
 			port_ = ofRandom(5000, 60000);
-			#else
+#else
 			srand (time(NULL));
 			port_ = 5000 + rand()%55000;
-			#endif
+#endif
 			ofxXmlSettings s2;
 			s2.loadFile(OFXREMOTEUI_SETTINGS_FILENAME);
 			s2.setValue(OFXREMOTEUI_XML_PORT, port_, 0);
@@ -538,15 +538,15 @@ void ofxRemoteUIServer::updateServer(float dt){
 		broadcastTime = 0.0f;
 		ofxOscMessage m;
 		m.addIntArg(port);
-		#ifdef TARGET_OSX
-		if (computerName.size() == 0){
+		m.addIntArg(port);if (computerName.size() == 0){
+#ifdef TARGET_OSX
 			computerName = ofSystem("hostname -s ");
 			computerName = computerName.substr(0, computerName.size()-2); //mmm this is weird, 10.8
+#endif
+#ifdef TARGET_WIN32
+			GetHostName(computerName);
+#endif
 		}
-		#endif
-		#ifdef TARGET_WIN32
-		GetHostName(std::string& name);
-		#endif
 		m.addStringArg(computerName);
 		if(doBroadcast){
 			broadcastSender.sendMessage(m);
@@ -608,7 +608,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				}
 				clearOscReceiverMsgQueue();
 				readyToSend = false;
-				}break;
+			}break;
 
 			case TEST_ACTION: // we got a request from client, lets bounce back asap.
 				sendTEST();
@@ -622,7 +622,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				}
 				sendPREL(presetNames);
 				break;
-				
+
 			case SET_PRESET_ACTION:{ // client wants to set a preset
 				//presetNames = getAvailablePresets();
 				string presetName = m.getArgAsString(0);
@@ -635,7 +635,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 					cbArg.msg = presetName;
 					callBack(cbArg);
 				}
-				}break;
+			}break;
 
 			case SAVE_PRESET_ACTION:{ //client wants to save current xml as a new preset
 				string presetName = m.getArgAsString(0);
@@ -649,7 +649,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 					cbArg.msg = presetName;
 					callBack(cbArg);
 				}
-				}break;
+			}break;
 
 			case DELETE_PRESET_ACTION:{
 				string presetName = m.getArgAsString(0);
@@ -661,7 +661,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 					cbArg.msg = presetName;
 					callBack(cbArg);
 				}
-				}break;
+			}break;
 
 			case SAVE_CURRENT_STATE_ACTION:{
 				if(verbose_) cout << "ofxRemoteUIServer: SAVE CURRENT PARAMS TO DEFAULT XML: " << endl;
@@ -702,21 +702,21 @@ void ofxRemoteUIServer::updateServer(float dt){
 
 void ofxRemoteUIServer::deletePreset(string name){
 
-	#ifdef OF_AVAILABLE
+#ifdef OF_AVAILABLE
 	ofDirectory dir;
 	dir.open(string(OFXREMOTEUI_PRESET_DIR) + "/" + name + ".xml");
 	dir.remove(true);
-	#else
-		string file = string(OFXREMOTEUI_PRESET_DIR) + "/" + name + ".xml";
-		remove( file.c_str() );
-	#endif
+#else
+	string file = string(OFXREMOTEUI_PRESET_DIR) + "/" + name + ".xml";
+	remove( file.c_str() );
+#endif
 }
 
 vector<string> ofxRemoteUIServer::getAvailablePresets(){
 
 	vector<string> presets;
 
-	#ifdef OF_AVAILABLE
+#ifdef OF_AVAILABLE
 	ofDirectory dir;
 	dir.listDir(ofToDataPath(OFXREMOTEUI_PRESET_DIR));
 	vector<ofFile> files = dir.getFiles();
@@ -730,7 +730,7 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(){
 			presets.push_back(presetName);
 		}
 	}
-	#else
+#else
 	DIR *dir;
 	struct dirent *ent;
 	if ((dir = opendir (OFXREMOTEUI_PRESET_DIR)) != NULL) {
@@ -743,7 +743,7 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(){
 		}
 		closedir (dir);
 	}
-	#endif
+#endif
 	return presets;
 }
 

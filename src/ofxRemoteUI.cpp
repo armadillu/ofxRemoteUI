@@ -18,9 +18,10 @@
 #include <ifaddrs.h>
 #endif
 
-#ifdef TARGET_WIN_32
+#ifdef TARGET_WIN32
 #include <windows.h>
 #include <iphlpapi.h>
+#include <WinSock2.h>
 #pragma comment(lib, "iphlpapi.lib")
 #endif
 
@@ -202,21 +203,17 @@ string ofxRemoteUI::getMyIP(){
 }
 
 #ifdef TARGET_WIN32
-void GetHostName(std::string& host_name);
 void GetHostName(std::string& host_name){
-
     WSAData wsa_data;
     int ret_code;
     char buf[MAX_PATH];
-
     WSAStartup(MAKEWORD(1, 1), &wsa_data);
-    ret_code = gethostname(bufe, MAX_PATH);
+    ret_code = gethostname(buf, MAX_PATH);
 
     if (ret_code == SOCKET_ERROR)
-    	host_name = "unknown"
-		else
-			host_name = host_name;
-
+    	host_name = "NOT_FOUND";
+	else
+		host_name = host_name;
     WSACleanup();
 }
 #endif
@@ -287,7 +284,7 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 				p.enumList.push_back( m.getArgAsString(arg + i) );
 			}
 			arg = arg + i;
-			}break;
+		}break;
 
 		case BOL_ARG:
 			p.type = REMOTEUI_PARAM_BOOL;
@@ -615,13 +612,13 @@ void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
 			for (int i = 0; i < p.enumList.size(); i++) {
 				m.addStringArg(p.enumList[i]);
 			}
-			}break;
+		}break;
 	}
 	m.addIntArg(p.r); m.addIntArg(p.g); m.addIntArg(p.b); m.addIntArg(p.a); // set bg color!
 	m.addStringArg(p.group);
 	if(timeSinceLastReply == 0.0f) timeSinceLastReply = 0.0;
 	try{
-	oscSender.sendMessage(m);
+		oscSender.sendMessage(m);
 	}catch(exception e){
 		cout << "exception" << endl;
 	}
