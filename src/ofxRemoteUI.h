@@ -187,7 +187,7 @@ protected:
 
 
 
-	float							time;
+	float							timeCounter;
 	float							timeSinceLastReply;
 	float							avgTimeSinceLastReply;
 	bool							waitingForReply;

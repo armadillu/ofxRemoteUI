@@ -137,7 +137,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 			[self connect];
 		}else{
 			[self connect];
-			[self performSelector:@selector(connect) withObject:Nil afterDelay:0.1];
+			[self update];
+			[self performSelector:@selector(connect) withObject:Nil afterDelay:0.2];
 		}
 	}
 }

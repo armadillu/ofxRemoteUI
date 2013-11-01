@@ -99,11 +99,16 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	#endif
 
 	string ip = getMyIP();
-	vector<string>comps;
-	split(comps, ip, '.');
-	string multicastIP = comps[0] + "." + comps[1] + "." + comps[2] + "." + "255";
-	broadcastSender.setup( multicastIP, OFXREMOTEUI_BROADCAST_PORT ); //multicast @
-	cout << "ofxRemoteUIServer: letting everyone know that I am at " << multicastIP << ":" << OFXREMOTEUI_BROADCAST_PORT << endl;
+	if (ip != "NOT FOUND"){
+		doBroadcast = true;
+		vector<string>comps;
+		split(comps, ip, '.');
+		string multicastIP = comps[0] + "." + comps[1] + "." + comps[2] + "." + "255";
+		broadcastSender.setup( multicastIP, OFXREMOTEUI_BROADCAST_PORT ); //multicast @
+		cout << "ofxRemoteUIServer: letting everyone know that I am at " << multicastIP << ":" << OFXREMOTEUI_BROADCAST_PORT << endl;
+	}else{
+		doBroadcast = false;
+	}
 }
 
 ofxRemoteUIServer::~ofxRemoteUIServer(){
@@ -423,8 +428,13 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 			portNeedsToBePicked = true;
 		}
 		if(portNeedsToBePicked){
+			#ifdef OF_AVAILABLE
 			ofSeedRandom();
 			port_ = ofRandom(5000, 60000);
+			#else
+			srand (time(NULL));
+			port_ = 5000 + rand()%55000;
+			#endif
 			ofxXmlSettings s2;
 			s2.loadFile(OFXREMOTEUI_SETTINGS_FILENAME);
 			s2.setValue(OFXREMOTEUI_XML_PORT, port_, 0);
@@ -436,7 +446,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	params.clear();
 	updateInterval = updateInterval_;
 	waitingForReply = false;
-	avgTimeSinceLastReply = timeSinceLastReply = time = 0.0f;
+	avgTimeSinceLastReply = timeSinceLastReply = timeCounter = 0.0f;
 	port = port_;
 	cout << "ofxRemoteUIServer listening at port " << port << " ... " << endl;
 	oscReceiver.setup(port);
@@ -480,23 +490,25 @@ void ofxRemoteUIServer::threadedFunction(){
 
 
 void ofxRemoteUIServer::draw(int x, int y){
+#ifdef OF_AVAILABLE
 	if(savedAnimationTimer > 0){
 		ofDrawBitmapStringHighlight("ofxRemoteUIServer Saved config to " + saveAnimationfileName, x, y,
 									ofColor(0, 255 * ofClamp(savedAnimationTimer,0,1)),
 									ofColor(255,0,0, 255 * ofClamp(savedAnimationTimer,0,1))
 									);
 	}
+#endif
 }
 
 
 void ofxRemoteUIServer::updateServer(float dt){
 	savedAnimationTimer -= dt;
-	time += dt;
+	timeCounter += dt;
 	broadcastTime += dt;
 	timeSinceLastReply  += dt;
 	if(readyToSend){
-		if (time > updateInterval){
-			time = 0.0f;
+		if (timeCounter > updateInterval){
+			timeCounter = 0.0f;
 			//vector<string> changes = scanForUpdatedParamsAndSync(); //sends changed params to client
 			//cout << "ofxRemoteUIServer: sent " << ofToString(changes.size()) << " updates to client" << endl;
 			//sendUpdateForParamsInList(changes);
@@ -518,7 +530,9 @@ void ofxRemoteUIServer::updateServer(float dt){
 		GetHostName(std::string& name);
 		#endif
 		m.addStringArg(computerName);
-		broadcastSender.sendMessage(m);
+		if(doBroadcast){
+			broadcastSender.sendMessage(m);
+		}
 	}
 
 	while( oscReceiver.hasWaitingMessages() ){// check for waiting messages from client
@@ -807,7 +821,7 @@ void ofxRemoteUIServer::shareParam(string paramName, unsigned char* param, ofCol
 
 
 void ofxRemoteUIServer::connect(string ipAddress, int port){
-	avgTimeSinceLastReply = timeSinceLastReply = time = 0.0f;
+	avgTimeSinceLastReply = timeSinceLastReply = timeCounter = 0.0f;
 	waitingForReply = false;
 	//params.clear();
 	oscSender.setup(ipAddress, port);

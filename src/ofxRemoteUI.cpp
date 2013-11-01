@@ -12,7 +12,7 @@
 #include "uriencode.h"
 #include <sstream>
 
- #ifdef __APPLE__ //TODO  i need to cover linux too
+#ifdef __APPLE__ //TODO  i need to cover linux too
 #include <arpa/inet.h>
 #include <net/if.h>
 #include <ifaddrs.h>
@@ -148,7 +148,7 @@ string ofxRemoteUI::getMyIP(){
 	//from https://github.com/jvcleave/LocalAddressGrabber/blob/master/src/LocalAddressGrabber.h
 	//and http://stackoverflow.com/questions/17288908/get-network-interface-name-from-ipv4-address
 	string output = "NOT FOUND";
-#ifdef TARGET_OSX
+#ifdef __APPLE__
 	struct ifaddrs *myaddrs;
 	struct ifaddrs *ifa;
 	struct sockaddr_in *s4;
@@ -169,8 +169,8 @@ string ofxRemoteUI::getMyIP(){
 			if (inet_ntop(ifa->ifa_addr->sa_family, (void *)&(s4->sin_addr), buf, sizeof(buf)) == NULL){
 				printf("%s: inet_ntop failed!\n", ifa->ifa_name);
 			}else{
-				if(ofToString(ifa->ifa_name) == "en0"){ //TODO this returns only en0!
-					output = ofToString(buf);
+				if(string(ifa->ifa_name) == "en0"){ //TODO this returns only en0!
+					output = string(buf);
 				}
 			}
 		}

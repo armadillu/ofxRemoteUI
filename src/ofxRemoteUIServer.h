@@ -146,6 +146,7 @@ private:
 
 	float			savedAnimationTimer;
 	string			saveAnimationfileName;
+	bool			doBroadcast;
 
 	bool loadedFromXML; //we start with loadedFromXML=false; once loadXML is called, this becomes true
 	bool saveToXmlOnExit;

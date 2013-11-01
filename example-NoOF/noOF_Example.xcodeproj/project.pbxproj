@@ -29,6 +29,7 @@
 		BB5CC6A6177E4C1D00B595F8 /* tinyxmlparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC692177E4C1D00B595F8 /* tinyxmlparser.cpp */; };
 		BB5CC6A7177E4C1D00B595F8 /* ofxXmlSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC695177E4C1D00B595F8 /* ofxXmlSettings.cpp */; };
 		BB5CC6A9177E4C3B00B595F8 /* ofStolenUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC6A8177E4C3B00B595F8 /* ofStolenUtils.cpp */; };
+		BBEE785A182335F800D93161 /* ofxRemoteUINeigbors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBEE7858182335F800D93161 /* ofxRemoteUINeigbors.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -96,6 +97,8 @@
 		BB5CC695177E4C1D00B595F8 /* ofxXmlSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxXmlSettings.cpp; sourceTree = "<group>"; };
 		BB5CC696177E4C1D00B595F8 /* ofxXmlSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxXmlSettings.h; sourceTree = "<group>"; };
 		BB5CC6A8177E4C3B00B595F8 /* ofStolenUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofStolenUtils.cpp; sourceTree = "<group>"; };
+		BBEE7858182335F800D93161 /* ofxRemoteUINeigbors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofxRemoteUINeigbors.cpp; path = ../src/ofxRemoteUINeigbors.cpp; sourceTree = "<group>"; };
+		BBEE7859182335F800D93161 /* ofxRemoteUINeigbors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxRemoteUINeigbors.h; path = ../src/ofxRemoteUINeigbors.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,6 +141,8 @@
 		BB5CC61F177E4A3A00B595F8 /* ofxRemoteUI */ = {
 			isa = PBXGroup;
 			children = (
+				BBEE7858182335F800D93161 /* ofxRemoteUINeigbors.cpp */,
+				BBEE7859182335F800D93161 /* ofxRemoteUINeigbors.h */,
 				BB5CC620177E4A4700B595F8 /* ofxRemoteUI.cpp */,
 				BB5CC621177E4A4700B595F8 /* ofxRemoteUI.h */,
 				BB5CC622177E4A4700B595F8 /* ofxRemoteUIClient.cpp */,
@@ -354,6 +359,7 @@
 				BB5CC697177E4C1D00B595F8 /* IpEndpointName.cpp in Sources */,
 				BB5CC698177E4C1D00B595F8 /* NetworkingUtils.cpp in Sources */,
 				BB5CC699177E4C1D00B595F8 /* UdpSocket.cpp in Sources */,
+				BBEE785A182335F800D93161 /* ofxRemoteUINeigbors.cpp in Sources */,
 				BB5CC69A177E4C1D00B595F8 /* NetworkingUtilsWin.cpp in Sources */,
 				BB5CC69B177E4C1D00B595F8 /* UdpSocketWin.cpp in Sources */,
 				BB5CC69C177E4C1D00B595F8 /* OscOutboundPacketStream.cpp in Sources */,

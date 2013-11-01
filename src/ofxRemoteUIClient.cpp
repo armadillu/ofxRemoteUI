@@ -26,10 +26,12 @@ void ofxRemoteUIClient::setCallback( void (*callb)(RemoteUIClientCallBackArg) ){
 
 void ofxRemoteUIClient::setup(string address, int port_){
 
-//	if (params.size() > 0) params.clear();
-//	if ((int)orderedKeys.size() > 0) orderedKeys.clear();
+	params.clear();
+	orderedKeys.clear();
+	presetNames.clear();
+
 	port = port_;
-	avgTimeSinceLastReply = timeSinceLastReply = time = 0.0f;
+	avgTimeSinceLastReply = timeSinceLastReply = timeCounter = 0.0f;
 	waitingForReply = false;
 	host = address;
 	cout << "ofxRemoteUIClient listening at port " << port + 1 << " ... " << endl;
@@ -93,15 +95,15 @@ void ofxRemoteUIClient::update(float dt){
 		
 	}else{
 
-		time += dt;
+		timeCounter += dt;
 		timeSinceLastReply += dt;
 		//printf("waiting for reply: %d\n", waitingForReply);
-		if (time > OFXREMOTEUI_LATENCY_TEST_RATE){
+		if (timeCounter > OFXREMOTEUI_LATENCY_TEST_RATE){
 			if (!waitingForReply){
-				time = 0.0f;
+				timeCounter = 0.0f;
 				sendTEST();
 			}else{
-				if (time > OFXREMOTEUI_CONNECTION_TIMEOUT){
+				if (timeCounter > OFXREMOTEUI_CONNECTION_TIMEOUT){
 					avgTimeSinceLastReply = -1;
 					readyToSend = false; // testing here
 					params.clear();
