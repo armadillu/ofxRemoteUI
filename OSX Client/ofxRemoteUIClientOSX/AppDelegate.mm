@@ -904,23 +904,25 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[d synchronize];
 }
 
-
+int weJustDisconnected = 0;
 -(void)update{
 
 	if ( connectButton.state == 1 ){ // if connected
 
 		client->update(REFRESH_RATE);
 
-
 		if(updateContinuosly){
 			client->requestCompleteUpdate();
 		}
 
-		if(!client->isReadyToSend()){	//if the other side disconnected, or error
+		if(!client->isReadyToSend() && weJustDisconnected <= 0){	//if the other side disconnected, or error
 			//NSLog(@"disconnect cos its NOT isReadyToSend");
 			[self connect]; //this disconnects if we were connectd
+			weJustDisconnected = 10;
 		}
 	}
+	weJustDisconnected--;
+	if(weJustDisconnected <= 0) weJustDisconnected = 0;
 }
 
 
