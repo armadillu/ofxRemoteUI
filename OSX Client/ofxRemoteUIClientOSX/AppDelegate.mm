@@ -145,7 +145,6 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 
 -(void)updateNeighbors{
-	NSLog(@"updateNeighbors");
 	vector<Neighbor> ns = client->getNeighbors();
 	[neigbhorsMenu removeAllItems];
 	NSMutableArray *arr = [NSMutableArray arrayWithCapacity:1];
