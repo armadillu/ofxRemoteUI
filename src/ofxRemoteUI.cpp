@@ -213,7 +213,7 @@ void GetHostName(std::string& host_name){
     if (ret_code == SOCKET_ERROR)
     	host_name = "NOT_FOUND";
 	else
-		host_name = host_name;
+		host_name = buf;
     WSACleanup();
 }
 #endif

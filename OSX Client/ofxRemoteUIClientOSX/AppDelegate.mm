@@ -131,8 +131,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	if ([currentNeighbors count] > 0){
 		NSString * server_port = [currentNeighbors objectAtIndex:index];
 		NSArray * info = [server_port componentsSeparatedByString:@":"];
-		[portField setStringValue:[info objectAtIndex:0]];
-		[addressField setStringValue:[info objectAtIndex:1]];
+		[portField setStringValue:[info objectAtIndex:1]];
+		[addressField setStringValue:[info objectAtIndex:0]];
 		if([[connectButton title] isEqualToString:@"Connect"]){ //connect to that dude if not connected
 			[self connect];
 		}else{

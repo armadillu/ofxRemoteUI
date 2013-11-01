@@ -535,20 +535,20 @@ void ofxRemoteUIServer::updateServer(float dt){
 
 	//let everyone know I exist and which is my port, every now and then
 	if(broadcastTime > OFXREMOTEUI_BORADCAST_INTERVAL){
-		broadcastTime = 0.0f;
-		ofxOscMessage m;
-		m.addIntArg(port);
-		m.addIntArg(port);if (computerName.size() == 0){
-#ifdef TARGET_OSX
-			computerName = ofSystem("hostname -s ");
-			computerName = computerName.substr(0, computerName.size()-2); //mmm this is weird, 10.8
-#endif
-#ifdef TARGET_WIN32
-			GetHostName(computerName);
-#endif
-		}
-		m.addStringArg(computerName);
 		if(doBroadcast){
+			broadcastTime = 0.0f;
+			if (computerName.size() == 0){
+				#ifdef TARGET_OSX
+				computerName = ofSystem("hostname -s ");
+				computerName = computerName.substr(0, computerName.size()-2); //mmm this is weird, 10.8
+				#endif
+				#ifdef TARGET_WIN32
+				GetHostName(computerName);
+				#endif
+			}
+			ofxOscMessage m;
+			m.addIntArg(port);
+			m.addStringArg(computerName);		
 			broadcastSender.sendMessage(m);
 		}
 	}
