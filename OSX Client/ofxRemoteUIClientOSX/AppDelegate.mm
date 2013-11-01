@@ -850,7 +850,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	if (connectButton.state == 1){
 		float lag = client->connectionLag();
 		//printf("lag: %f\n", lag);
-		if (lag > CONNECTION_TIMEOUT || lag < 0.0f){
+		if (lag > OFXREMOTEUI_CONNECTION_TIMEOUT || lag < 0.0f){
 			[self connect]; //force disconnect if lag is too large
 			[progress stopAnimation:self];
 			[statusImage setImage:[NSImage imageNamed:@"offline"]];

@@ -51,7 +51,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	colorSet = false;
 	computerName = "";
 	callBack = NULL;
-	upcomingGroup = DEFAULT_PARAM_GROUP;
+	upcomingGroup = OFXREMOTEUI_DEFAULT_PARAM_GROUP;
 	verbose_ = false;
 	threadedUpdate = false;
 	loadedFromXML = false;
@@ -102,8 +102,8 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	vector<string>comps;
 	split(comps, ip, '.');
 	string multicastIP = comps[0] + "." + comps[1] + "." + comps[2] + "." + "255";
-	broadcastSender.setup( multicastIP, OFXREMOTE_UI_BROADCAST_PORT ); //multicast @
-	cout << "ofxRemoteUIServer: letting everyone know that I am at " << multicastIP << ":" << OFXREMOTE_UI_BROADCAST_PORT << endl;
+	broadcastSender.setup( multicastIP, OFXREMOTEUI_BROADCAST_PORT ); //multicast @
+	cout << "ofxRemoteUIServer: letting everyone know that I am at " << multicastIP << ":" << OFXREMOTEUI_BROADCAST_PORT << endl;
 }
 
 ofxRemoteUIServer::~ofxRemoteUIServer(){
@@ -607,8 +607,8 @@ void ofxRemoteUIServer::updateServer(float dt){
 				if(verbose_) cout << "ofxRemoteUIServer: saving NEW preset: " << presetName << endl;
 				saveToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
 				sendSAVP(presetName);
-				savedAnimationTimer = 1.5;
-				saveAnimationfileName = presetName;
+				savedAnimationTimer = OFXREMOTEUI_NOTIFICATION_SCREENTIME;
+				saveAnimationfileName = string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml";
 				if(callBack != NULL){
 					cbArg.action = CLIENT_SAVED_PRESET;
 					cbArg.msg = presetName;
@@ -631,7 +631,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case SAVE_CURRENT_STATE_ACTION:{
 				if(verbose_) cout << "ofxRemoteUIServer: SAVE CURRENT PARAMS TO DEFAULT XML: " << endl;
 				saveToXML(OFXREMOTEUI_SETTINGS_FILENAME);
-				savedAnimationTimer = 1.5;
+				savedAnimationTimer = OFXREMOTEUI_NOTIFICATION_SCREENTIME;
 				saveAnimationfileName = OFXREMOTEUI_SETTINGS_FILENAME;
 				sendSAVE(true);
 				if(callBack != NULL){

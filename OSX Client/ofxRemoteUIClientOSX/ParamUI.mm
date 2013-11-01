@@ -250,7 +250,7 @@
 			break;
 	}
 	paramLabel.stringValue = [self stringFromString:paramName];
-	if (param.group!=DEFAULT_PARAM_GROUP){
+	if (param.group != OFXREMOTEUI_DEFAULT_PARAM_GROUP){
 		paramGroup.stringValue = [self stringFromString:param.group];
 	}else{
 		paramGroup.stringValue = @"";

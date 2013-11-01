@@ -67,7 +67,7 @@ public:
 		boolVal = false;
 		stringVal = "empty";
 		r = g = b = a = 0; //bg color
-		group = DEFAULT_PARAM_GROUP;
+		group = OFXREMOTEUI_DEFAULT_PARAM_GROUP;
 	};
 
 

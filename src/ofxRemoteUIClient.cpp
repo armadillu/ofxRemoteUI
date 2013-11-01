@@ -38,7 +38,7 @@ void ofxRemoteUIClient::setup(string address, int port_){
 
 	if(verbose_) cout << "ofxRemoteUIClient connecting to " << address << endl;
 	oscSender.setup(address, port);
-	broadcastReceiver.setup(OFXREMOTE_UI_BROADCAST_PORT);
+	broadcastReceiver.setup(OFXREMOTEUI_BROADCAST_PORT);
 }
 
 vector<Neighbor> ofxRemoteUIClient::getNeighbors(){
@@ -65,7 +65,7 @@ void ofxRemoteUIClient::restoreAllParamsToDefaultValues(){
 void ofxRemoteUIClient::update(float dt){
 
 	bool neigbhorChange = false;
-	//listen for broadcast from all servers in the broadcast channel OFXREMOTE_UI_BROADCAST_PORT
+	//listen for broadcast from all servers in the broadcast channel OFXREMOTEUI_BROADCAST_PORT
 	while( broadcastReceiver.hasWaitingMessages() ){// check for waiting messages from client
 		ofxOscMessage m;
 		broadcastReceiver.getNextMessage(&m);
@@ -96,12 +96,12 @@ void ofxRemoteUIClient::update(float dt){
 		time += dt;
 		timeSinceLastReply += dt;
 		//printf("waiting for reply: %d\n", waitingForReply);
-		if (time > LATENCY_TEST_RATE){
+		if (time > OFXREMOTEUI_LATENCY_TEST_RATE){
 			if (!waitingForReply){
 				time = 0.0f;
 				sendTEST();
 			}else{
-				if (time > CONNECTION_TIMEOUT){
+				if (time > OFXREMOTEUI_CONNECTION_TIMEOUT){
 					avgTimeSinceLastReply = -1;
 					readyToSend = false; // testing here
 					params.clear();

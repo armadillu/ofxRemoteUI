@@ -8,6 +8,7 @@ void testApp::setup(){
 	ofSetFrameRate(60);
 	ofSetVerticalSync(true);
 	ofSetCircleResolution(32);
+	ofEnableAlphaBlending();
 
 	//set some default values for your params (optional)
 	drawOutlines = false;
