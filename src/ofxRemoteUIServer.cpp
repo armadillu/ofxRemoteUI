@@ -402,9 +402,28 @@ void ofxRemoteUIServer::restoreAllParamsToDefaultValues(){
 
 
 void ofxRemoteUIServer::setup(int port_, float updateInterval_){
-	if(port_ == -1){
-		ofSeedRandom();
-		port_ = ofRandom(5000, 60000);
+
+	if(port_ == -1){ //if no port specified, pick a random one, but only the very first time we get launched!
+		ofxXmlSettings s;
+		bool exists = s.loadFile(OFX_REMOTEUI_SETTINGS_FILENAME);
+		bool portNeedsToBePicked = false;
+		if (exists){
+			if( s.getNumTags(OFX_REMOTEUI_XML_PORT) > 0 ){
+				port_ = s.getValue(OFX_REMOTEUI_XML_PORT, 10000);
+			}else{
+				portNeedsToBePicked = true;
+			}
+		}else{
+			portNeedsToBePicked = true;
+		}
+		if(portNeedsToBePicked){
+			ofSeedRandom();
+			port_ = ofRandom(5000, 60000);
+			ofxXmlSettings s2;
+			s2.loadFile(OFX_REMOTEUI_SETTINGS_FILENAME);
+			s2.setValue(OFX_REMOTEUI_XML_PORT, port_, 0);
+			s2.saveFile();
+		}
 	}
 	params.clear();
 	updateInterval = updateInterval_;

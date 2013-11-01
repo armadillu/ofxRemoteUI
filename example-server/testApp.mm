@@ -17,7 +17,7 @@ void testApp::setup(){
 	menu = MENU_OPTION_1;
 
 	// START THE SERVER ///////////////////////////////////////////
-	OFX_REMOTEUI_SERVER_SETUP(10000); 	//specify a port if you want a specific one
+	OFX_REMOTEUI_SERVER_SETUP(); 	//specify a port if you want a specific one
 
 	// SETUP A CALLBACK ///////////////////////////////////////////
 	OFX_REMOTEUI_SERVER_GET_INSTANCE()->setCallback(testApp::serverCallback); // (optional!)
