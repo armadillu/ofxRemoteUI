@@ -53,11 +53,12 @@ struct myColor{
 #define OFX_REMOTEUI_SERVER_SET_NEW_COLOR()				( ofxRemoteUIServer::instance()->setNewParamColor() )
 #define OFX_REMOTEUI_SERVER_SETUP(port, ...)			( ofxRemoteUIServer::instance()->setup(port, ##__VA_ARGS__) )
 #define OFX_REMOTEUI_SERVER_UPDATE(deltaTime)			( ofxRemoteUIServer::instance()->update(deltaTime) )
-#define OFX_REMOTEUI_SERVER_DRAW(x,y)					( ofxRemoteUIServer::instance()->draw(x,y) )
+#define OFX_REMOTEUI_SERVER_DRAW(x,y)					( ofxRemoteUIServer::instance()->draw(x,y) ) /*only call this if you disabled automatic notifications and still want to see them*/
 #define OFX_REMOTEUI_SERVER_CLOSE()						( ofxRemoteUIServer::instance()->close() )
 #define	OFX_REMOTEUI_SERVER_SAVE_TO_XML()				( ofxRemoteUIServer::instance()->saveToXML(OFXREMOTEUI_SETTINGS_FILENAME) )
 #define	OFX_REMOTEUI_SERVER_LOAD_FROM_XML()				( ofxRemoteUIServer::instance()->loadFromXML(OFXREMOTEUI_SETTINGS_FILENAME) )
 #define	OFX_REMOTEUI_SERVER_SET_SAVES_ON_EXIT(save)		( ofxRemoteUIServer::instance()->setSaveToXMLOnExit(save) )
+#define	OFX_REMOTEUI_SERVER_SET_DRAWS_NOTIF(draw)		( ofxRemoteUIServer::instance()->setDrawsNotificationsAutomaticallly(draw) )
 #define OFX_REMOTEUI_SERVER_GET_INSTANCE()				( ofxRemoteUIServer::instance() )
 
 #ifdef OF_AVAILABLE //threaded only works in OF
@@ -77,6 +78,7 @@ public:
 	static ofxRemoteUIServer* instance();
 
 	void setup(int port = -1, float updateInterval = 0.1/*sec*/);
+
 	#ifdef OF_AVAILABLE
 	void startInBackgroundThread(); //calling this means you don't need to call update
 									//all param changes will run in a separate thread
@@ -84,6 +86,7 @@ public:
 									//as parameters can be changed at any time!
 									//so be aware, especially with strings you might get crashes!
 	#endif
+
 	void update(float dt);
 	void draw(int x = 20, int y = 20); //draws important notifications on screen
 	void close();
@@ -118,6 +121,8 @@ public:
 	//	}
 
 	void setSaveToXMLOnExit(bool save);
+	void setDrawsNotificationsAutomaticallly(bool draw);
+
 
 
 private:
@@ -142,6 +147,7 @@ private:
 	ofxOscSender	broadcastSender;
 	float			broadcastTime;
 	string			computerName;
+	string			computerIP;
 	bool			portIsSet;
 
 	float			savedAnimationTimer;
@@ -149,21 +155,27 @@ private:
 
 	float			connectedAnimationTimer;
 	float			disconnectedAnimationTimer;
+	float			startupAnimationTimer;
 
 	bool			doBroadcast;
+	bool			drawNotifications;
 
-	bool loadedFromXML; //we start with loadedFromXML=false; once loadXML is called, this becomes true
-	bool saveToXmlOnExit;
+	bool			loadedFromXML; //we start with loadedFromXML=false; once loadXML is called, this becomes true
+	bool			saveToXmlOnExit;
 
-	bool threadedUpdate;
-	void threadedFunction();
-	void updateServer(float dt);
+	bool			threadedUpdate;
+	void			threadedFunction();
+	void			updateServer(float dt);
+
+	bool			showValuesOnScreen;
 
 	void (*callBack)(RemoteUIServerCallBackArg);
-#ifdef OF_AVAILABLE
-	void _appExited(ofEventArgs &e);
-#endif
 
+	#ifdef OF_AVAILABLE
+	void _appExited(ofEventArgs &e);
+	void _draw(ofEventArgs &d);
+	void _keyPressed(ofKeyEventArgs &e);
+	#endif
 
 };
 

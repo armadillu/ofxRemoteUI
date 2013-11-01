@@ -32,6 +32,10 @@ ofxRemoteUIServer* ofxRemoteUIServer::instance(){
 	return singleton;
 }
 
+void ofxRemoteUIServer::setDrawsNotificationsAutomaticallly(bool draw){
+	drawNotifications = draw;
+}
+
 void split(vector<string> &tokens, const string &text, char separator) {
 	int start = 0, end = 0;
 	while ((end = text.find(separator, start)) != string::npos) {
@@ -46,8 +50,10 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	cout << "serving at: " << getMyIP() << endl;
 	readyToSend = false;
 	saveToXmlOnExit = true;
-	timeSinceLastReply = avgTimeSinceLastReply = broadcastTime = connectedAnimationTimer = 0;
+	broadcastTime = OFXREMOTEUI_BORADCAST_INTERVAL + 0.05;
+	timeSinceLastReply = avgTimeSinceLastReply = connectedAnimationTimer = 0;
 	disconnectedAnimationTimer = 0;
+	startupAnimationTimer = OFXREMOTEUI_NOTIFICATION_SCREENTIME;
 	waitingForReply = false;
 	colorSet = false;
 	computerName = "";
@@ -55,6 +61,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	upcomingGroup = OFXREMOTEUI_DEFAULT_PARAM_GROUP;
 	verbose_ = false;
 	threadedUpdate = false;
+	drawNotifications = true;
 	loadedFromXML = false;
 	//add random colors to table
 	colorTableIndex = 0;
@@ -99,11 +106,11 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 #endif
 #endif
 
-	string ip = getMyIP();
-	if (ip != "NOT FOUND"){
+	computerIP = getMyIP();
+	if (computerIP != "NOT FOUND"){
 		doBroadcast = true;
 		vector<string>comps;
-		split(comps, ip, '.');
+		split(comps, computerIP, '.');
 		string multicastIP = comps[0] + "." + comps[1] + "." + comps[2] + "." + "255";
 		broadcastSender.setup( multicastIP, OFXREMOTEUI_BROADCAST_PORT ); //multicast @
 		cout << "ofxRemoteUIServer: letting everyone know that I am at " << multicastIP << ":" << OFXREMOTEUI_BROADCAST_PORT << endl;
@@ -453,8 +460,13 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	oscReceiver.setup(port);
 #ifdef OF_AVAILABLE
 	ofAddListener(ofEvents().exit, this, &ofxRemoteUIServer::_appExited);
+	ofAddListener(ofEvents().keyPressed, this, &ofxRemoteUIServer::_keyPressed);
+	if(drawNotifications){
+		ofAddListener(ofEvents().draw, this, &ofxRemoteUIServer::_draw);
+	}
 #endif
 }
+
 #ifdef OF_AVAILABLE
 void ofxRemoteUIServer::_appExited(ofEventArgs &e){
 	OFX_REMOTEUI_SERVER_CLOSE();		//stop the server
@@ -462,9 +474,18 @@ void ofxRemoteUIServer::_appExited(ofEventArgs &e){
 		OFX_REMOTEUI_SERVER_SAVE_TO_XML();	//save values to XML
 	}
 }
-#endif
 
-#ifdef OF_AVAILABLE
+void ofxRemoteUIServer::_draw(ofEventArgs &e){
+	ofSetupScreen(); //mmm this is a bit scary //TODO!
+	draw( 20, ofGetHeight() - 20);
+}
+
+void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
+	if(e.key == '\t'){
+		showValuesOnScreen = !showValuesOnScreen;
+	}
+}
+
 void ofxRemoteUIServer::startInBackgroundThread(){
 	threadedUpdate = true;
 	startThread();
@@ -491,32 +512,96 @@ void ofxRemoteUIServer::threadedFunction(){
 
 
 void ofxRemoteUIServer::draw(int x, int y){
-#ifdef OF_AVAILABLE
+
+	#ifdef OF_AVAILABLE
+
+	if(showValuesOnScreen){
+		int padding = 30;
+		int x = padding;
+		int y = padding * 2;
+		int colw = 320;
+		int valOffset = colw * 0.6;
+		int spacing = 24;
+
+		ofSetColor(11, 245);
+		ofRect(0,0, ofGetWidth(), ofGetHeight());
+		ofSetColor(44, 245);
+		ofRect(0,0, ofGetWidth(), padding + spacing * 0.5);
+
+		ofSetColor(255);
+		ofDrawBitmapString("ofxRemoteUIServer params list : press TAB to hide", padding,  padding - 3);
+
+		for(int i = 0; i < orderedKeys.size(); i++){
+			string key = orderedKeys[i];
+			RemoteUIParam p = params[key];
+			int chars = key.size();
+			int charw = 9;
+			int stringw = chars*charw;
+			if (chars*charw > valOffset){
+				key = key.substr(0, (valOffset) / charw );
+			}
+			ofSetColor(200);
+			ofDrawBitmapString(key, x,y);
+			switch (p.type) {
+				case REMOTEUI_PARAM_FLOAT:
+					ofDrawBitmapString(ofToString(p.floatVal), x + valOffset, y);
+					break;
+				case REMOTEUI_PARAM_ENUM:
+				case REMOTEUI_PARAM_INT:
+					ofDrawBitmapString(ofToString(p.intVal), x + valOffset, y);
+					break;
+				case REMOTEUI_PARAM_BOOL:
+					ofDrawBitmapString(p.boolVal ? "true" : "false", x + valOffset, y);
+					break;
+				case REMOTEUI_PARAM_STRING:
+					p.stringVal;
+					break;
+				case REMOTEUI_PARAM_COLOR:
+					ofSetColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal);
+					ofRect(x + valOffset, y - spacing * 0.6, 64, spacing * 0.85);
+					break;
+				default: printf("weird RemoteUIParam at isEqualTo()!\n"); break;
+			}
+			ofSetColor(32);
+			ofLine(x, y + spacing * 0.33, x + colw * 0.8, y + spacing * 0.33);
+			y += spacing;
+			if (y > ofGetHeight() - padding){
+				x += colw;
+				y = 2 * padding;
+			}
+		}
+	}
+	string msg = "";
+	float a = 0.0f;
+	if(startupAnimationTimer > 0){
+		a = ofClamp(startupAnimationTimer,0,1);
+		msg = "ofxRemoteUIServer started at " + computerIP  + ":" + ofToString(port) + " (" + computerName + ")";
+	}
 	if(savedAnimationTimer > 0){
-		ofDrawBitmapStringHighlight("ofxRemoteUIServer: Client Saved config to '" + saveAnimationfileName + "'", x, y,
-									ofColor(0, 255 * ofClamp(savedAnimationTimer,0,1)),
-									ofColor(255,0,0, 255 * ofClamp(savedAnimationTimer,0,1))
-									);
+		a = ofClamp(savedAnimationTimer,0,1);
+		msg = "ofxRemoteUIServer: Client Saved config to '" + saveAnimationfileName + "'";
 	}
-
 	if(connectedAnimationTimer > 0){
-		ofDrawBitmapStringHighlight("ofxRemoteUIServer: Client Connected!", x, y,
-									ofColor(0, 255 * ofClamp(connectedAnimationTimer,0,1)),
-									ofColor(255,0,0, 255 * ofClamp(connectedAnimationTimer,0,1))
-									);
+		a = ofClamp(connectedAnimationTimer,0,1);
+		msg = "ofxRemoteUIServer: Client Connected!";
 	}
-
 	if(disconnectedAnimationTimer > 0){
-		ofDrawBitmapStringHighlight("ofxRemoteUIServer: Client Disconnected!", x, y,
-									ofColor(0, 255 * ofClamp(disconnectedAnimationTimer,0,1)),
-									ofColor(255,0,0, 255 * ofClamp(disconnectedAnimationTimer,0,1))
-									);
+		a = ofClamp(disconnectedAnimationTimer,0,1);
+		msg = "ofxRemoteUIServer: Client Disconnected!";
 	}
-#endif
+	if (a > 0){
+		ofDrawBitmapStringHighlight(msg, x, y,
+									ofColor(0, 255 * ofClamp(a,0,1)),
+									ofColor(255,0,0, 255 * ofClamp(a,0,1)) );
+	}
+	#endif
 }
 
 
 void ofxRemoteUIServer::updateServer(float dt){
+
+	//timers //TODO fix this mess
+	startupAnimationTimer -= dt;
 	savedAnimationTimer -= dt;
 	connectedAnimationTimer -= dt;
 	disconnectedAnimationTimer -= dt;
@@ -538,17 +623,17 @@ void ofxRemoteUIServer::updateServer(float dt){
 		if(doBroadcast){
 			broadcastTime = 0.0f;
 			if (computerName.size() == 0){
-				#ifdef TARGET_OSX
+#ifdef TARGET_OSX
 				computerName = ofSystem("hostname -s ");
 				computerName = computerName.substr(0, computerName.size()-2); //mmm this is weird, 10.8
-				#endif
-				#ifdef TARGET_WIN32
+#endif
+#ifdef TARGET_WIN32
 				GetHostName(computerName);
-				#endif
+#endif
 			}
 			ofxOscMessage m;
 			m.addIntArg(port);
-			m.addStringArg(computerName);		
+			m.addStringArg(computerName);
 			broadcastSender.sendMessage(m);
 		}
 	}
