@@ -38,7 +38,7 @@ void ofxRemoteUIClient::setup(string address, int port_){
 
 	if(verbose_) cout << "ofxRemoteUIClient connecting to " << address << endl;
 	oscSender.setup(address, port);
-	broadcastReceiver.setup(OFX_REMOTE_UI_BROADCAST_PORT);
+	broadcastReceiver.setup(OFXREMOTE_UI_BROADCAST_PORT);
 }
 
 vector<Neighbor> ofxRemoteUIClient::getNeighbors(){
@@ -65,7 +65,7 @@ void ofxRemoteUIClient::restoreAllParamsToDefaultValues(){
 void ofxRemoteUIClient::update(float dt){
 
 	bool neigbhorChange = false;
-	//listen for broadcast from all servers in the broadcast channel OFX_REMOTE_UI_BROADCAST_PORT
+	//listen for broadcast from all servers in the broadcast channel OFXREMOTE_UI_BROADCAST_PORT
 	while( broadcastReceiver.hasWaitingMessages() ){// check for waiting messages from client
 		ofxOscMessage m;
 		broadcastReceiver.getNextMessage(&m);
@@ -271,7 +271,7 @@ void ofxRemoteUIClient::fillPresetListFromMessage(ofxOscMessage m){
 
 	//check if server has no presets at all
 	if (m.getNumArgs() == 1){
-		if(m.getArgAsString(0) == OFX_REMOTEUI_NO_PRESETS){ //if no prests, server sends only one with this value
+		if(m.getArgAsString(0) == OFXREMOTEUI_NO_PRESETS){ //if no prests, server sends only one with this value
 			//we know there's no presets
 		}
 	}

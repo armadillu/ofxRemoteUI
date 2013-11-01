@@ -88,13 +88,13 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 
 	#ifdef OF_AVAILABLE
 	ofDirectory d;
-	d.open(OFX_REMOTEUI_PRESET_DIR);
+	d.open(OFXREMOTEUI_PRESET_DIR);
 	d.create(true);
 	#else
 		#if defined(_WIN32)
-		_mkdir(OFX_REMOTEUI_PRESET_DIR);
+		_mkdir(OFXREMOTEUI_PRESET_DIR);
 		#else
-		mkdir(OFX_REMOTEUI_PRESET_DIR, 0777); 
+		mkdir(OFXREMOTEUI_PRESET_DIR, 0777); 
 		#endif
 	#endif
 
@@ -102,8 +102,8 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	vector<string>comps;
 	split(comps, ip, '.');
 	string multicastIP = comps[0] + "." + comps[1] + "." + comps[2] + "." + "255";
-	broadcastSender.setup( multicastIP, OFX_REMOTE_UI_BROADCAST_PORT ); //multicast @
-	cout << "ofxRemoteUIServer: letting everyone know that I am at " << multicastIP << ":" << OFX_REMOTE_UI_BROADCAST_PORT << endl;
+	broadcastSender.setup( multicastIP, OFXREMOTE_UI_BROADCAST_PORT ); //multicast @
+	cout << "ofxRemoteUIServer: letting everyone know that I am at " << multicastIP << ":" << OFXREMOTE_UI_BROADCAST_PORT << endl;
 }
 
 ofxRemoteUIServer::~ofxRemoteUIServer(){
@@ -165,8 +165,8 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 	ofxXmlSettings s;
 	s.loadFile(fileName);
 	s.clear();
-	s.addTag(OFX_REMOTEUI_XML_TAG);
-	s.pushTag(OFX_REMOTEUI_XML_TAG);
+	s.addTag(OFXREMOTEUI_XML_TAG);
+	s.pushTag(OFXREMOTEUI_XML_TAG);
 
 	int numFloats = 0;
 	int numInts = 0;
@@ -226,6 +226,11 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 				break;
 		}
 	}
+
+	if(!portIsSet){
+		s.popTag();
+		s.setValue(OFXREMOTEUI_XML_PORT, port, 0);
+	}
 	s.saveFile(fileName);
 }
 
@@ -239,8 +244,8 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 
 	if (exists){
 
-		if( s.getNumTags(OFX_REMOTEUI_XML_TAG) > 0 ){
-			s.pushTag(OFX_REMOTEUI_XML_TAG, 0);
+		if( s.getNumTags(OFXREMOTEUI_XML_TAG) > 0 ){
+			s.pushTag(OFXREMOTEUI_XML_TAG, 0);
 
 			int numFloats = s.getNumTags("REMOTEUI_PARAM_FLOAT");
 			for (int i=0; i< numFloats; i++){
@@ -404,12 +409,13 @@ void ofxRemoteUIServer::restoreAllParamsToDefaultValues(){
 void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 
 	if(port_ == -1){ //if no port specified, pick a random one, but only the very first time we get launched!
+		portIsSet = false;
 		ofxXmlSettings s;
-		bool exists = s.loadFile(OFX_REMOTEUI_SETTINGS_FILENAME);
+		bool exists = s.loadFile(OFXREMOTEUI_SETTINGS_FILENAME);
 		bool portNeedsToBePicked = false;
 		if (exists){
-			if( s.getNumTags(OFX_REMOTEUI_XML_PORT) > 0 ){
-				port_ = s.getValue(OFX_REMOTEUI_XML_PORT, 10000);
+			if( s.getNumTags(OFXREMOTEUI_XML_PORT) > 0 ){
+				port_ = s.getValue(OFXREMOTEUI_XML_PORT, 10000);
 			}else{
 				portNeedsToBePicked = true;
 			}
@@ -420,17 +426,19 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 			ofSeedRandom();
 			port_ = ofRandom(5000, 60000);
 			ofxXmlSettings s2;
-			s2.loadFile(OFX_REMOTEUI_SETTINGS_FILENAME);
-			s2.setValue(OFX_REMOTEUI_XML_PORT, port_, 0);
+			s2.loadFile(OFXREMOTEUI_SETTINGS_FILENAME);
+			s2.setValue(OFXREMOTEUI_XML_PORT, port_, 0);
 			s2.saveFile();
 		}
+	}else{
+		portIsSet = true;
 	}
 	params.clear();
 	updateInterval = updateInterval_;
 	waitingForReply = false;
 	avgTimeSinceLastReply = timeSinceLastReply = time = 0.0f;
 	port = port_;
-	cout << "ofxRemoteUIClient listening at port " << port << " ... " << endl;
+	cout << "ofxRemoteUIServer listening at port " << port << " ... " << endl;
 	oscReceiver.setup(port);
 #ifdef OF_AVAILABLE
 	ofAddListener(ofEvents().exit, this, &ofxRemoteUIServer::_appExited);
@@ -470,7 +478,19 @@ void ofxRemoteUIServer::threadedFunction(){
 }
 #endif
 
+
+void ofxRemoteUIServer::draw(int x, int y){
+	if(savedAnimationTimer > 0){
+		ofDrawBitmapStringHighlight("ofxRemoteUIServer Saved config to " + saveAnimationfileName, x, y,
+									ofColor(0, 255 * ofClamp(savedAnimationTimer,0,1)),
+									ofColor(255,0,0, 255 * ofClamp(savedAnimationTimer,0,1))
+									);
+	}
+}
+
+
 void ofxRemoteUIServer::updateServer(float dt){
+	savedAnimationTimer -= dt;
 	time += dt;
 	broadcastTime += dt;
 	timeSinceLastReply  += dt;
@@ -563,7 +583,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case PRESET_LIST_ACTION: //client wants us to send a list of all available presets
 				presetNames = getAvailablePresets();
 				if (presetNames.size() == 0){
-					presetNames.push_back(OFX_REMOTEUI_NO_PRESETS);
+					presetNames.push_back(OFXREMOTEUI_NO_PRESETS);
 				}
 				sendPREL(presetNames);
 				break;
@@ -571,7 +591,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case SET_PRESET_ACTION:{ // client wants to set a preset
 				//presetNames = getAvailablePresets();
 				string presetName = m.getArgAsString(0);
-				vector<string> missingParams = loadFromXML(string(OFX_REMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
+				vector<string> missingParams = loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
 				if(verbose_) cout << "ofxRemoteUIServer: setting preset: " << presetName << endl;
 				sendSETP(presetName);
 				sendMISP(missingParams);
@@ -585,8 +605,10 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case SAVE_PRESET_ACTION:{ //client wants to save current xml as a new preset
 				string presetName = m.getArgAsString(0);
 				if(verbose_) cout << "ofxRemoteUIServer: saving NEW preset: " << presetName << endl;
-				saveToXML(string(OFX_REMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
+				saveToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
 				sendSAVP(presetName);
+				savedAnimationTimer = 1.5;
+				saveAnimationfileName = presetName;
 				if(callBack != NULL){
 					cbArg.action = CLIENT_SAVED_PRESET;
 					cbArg.msg = presetName;
@@ -608,7 +630,9 @@ void ofxRemoteUIServer::updateServer(float dt){
 
 			case SAVE_CURRENT_STATE_ACTION:{
 				if(verbose_) cout << "ofxRemoteUIServer: SAVE CURRENT PARAMS TO DEFAULT XML: " << endl;
-				saveToXML(OFX_REMOTEUI_SETTINGS_FILENAME);
+				saveToXML(OFXREMOTEUI_SETTINGS_FILENAME);
+				savedAnimationTimer = 1.5;
+				saveAnimationfileName = OFXREMOTEUI_SETTINGS_FILENAME;
 				sendSAVE(true);
 				if(callBack != NULL){
 					cbArg.action = CLIENT_SAVED_STATE;
@@ -645,10 +669,10 @@ void ofxRemoteUIServer::deletePreset(string name){
 
 	#ifdef OF_AVAILABLE
 	ofDirectory dir;
-	dir.open(string(OFX_REMOTEUI_PRESET_DIR) + "/" + name + ".xml");
+	dir.open(string(OFXREMOTEUI_PRESET_DIR) + "/" + name + ".xml");
 	dir.remove(true);
 	#else
-		string file = string(OFX_REMOTEUI_PRESET_DIR) + "/" + name + ".xml";
+		string file = string(OFXREMOTEUI_PRESET_DIR) + "/" + name + ".xml";
 		remove( file.c_str() );
 	#endif
 }
@@ -659,7 +683,7 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(){
 
 	#ifdef OF_AVAILABLE
 	ofDirectory dir;
-	dir.listDir(ofToDataPath(OFX_REMOTEUI_PRESET_DIR));
+	dir.listDir(ofToDataPath(OFXREMOTEUI_PRESET_DIR));
 	vector<ofFile> files = dir.getFiles();
 	for(int i = 0; i < files.size(); i++){
 		string fileName = files[i].getFileName();
@@ -674,7 +698,7 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(){
 	#else
 	DIR *dir;
 	struct dirent *ent;
-	if ((dir = opendir (OFX_REMOTEUI_PRESET_DIR)) != NULL) {
+	if ((dir = opendir (OFXREMOTEUI_PRESET_DIR)) != NULL) {
 		while ((ent = readdir (dir)) != NULL) {
 			if ( strcmp( get_filename_ext(ent->d_name), "xml") == 0 ){
 				string fileName = string(ent->d_name);

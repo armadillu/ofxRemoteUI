@@ -114,6 +114,8 @@ void testApp::draw(){
 								ofColor::black, color
 								);
 
+	OFX_REMOTEUI_SERVER_DRAW(20, ofGetHeight() - 20);
+
 }
 
 //define a callback method to get notifications of client actions

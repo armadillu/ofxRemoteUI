@@ -53,9 +53,10 @@ struct myColor{
 #define OFX_REMOTEUI_SERVER_SET_NEW_COLOR()				( ofxRemoteUIServer::instance()->setNewParamColor() )
 #define OFX_REMOTEUI_SERVER_SETUP(port, ...)			( ofxRemoteUIServer::instance()->setup(port, ##__VA_ARGS__) )
 #define OFX_REMOTEUI_SERVER_UPDATE(deltaTime)			( ofxRemoteUIServer::instance()->update(deltaTime) )
+#define OFX_REMOTEUI_SERVER_DRAW(x,y)					( ofxRemoteUIServer::instance()->draw(x,y) )
 #define OFX_REMOTEUI_SERVER_CLOSE()						( ofxRemoteUIServer::instance()->close() )
-#define	OFX_REMOTEUI_SERVER_SAVE_TO_XML()				( ofxRemoteUIServer::instance()->saveToXML(OFX_REMOTEUI_SETTINGS_FILENAME) )
-#define	OFX_REMOTEUI_SERVER_LOAD_FROM_XML()				( ofxRemoteUIServer::instance()->loadFromXML(OFX_REMOTEUI_SETTINGS_FILENAME) )
+#define	OFX_REMOTEUI_SERVER_SAVE_TO_XML()				( ofxRemoteUIServer::instance()->saveToXML(OFXREMOTEUI_SETTINGS_FILENAME) )
+#define	OFX_REMOTEUI_SERVER_LOAD_FROM_XML()				( ofxRemoteUIServer::instance()->loadFromXML(OFXREMOTEUI_SETTINGS_FILENAME) )
 #define	OFX_REMOTEUI_SERVER_SET_SAVES_ON_EXIT(save)		( ofxRemoteUIServer::instance()->setSaveToXMLOnExit(save) )
 #define OFX_REMOTEUI_SERVER_GET_INSTANCE()				( ofxRemoteUIServer::instance() )
 
@@ -84,6 +85,7 @@ public:
 									//so be aware, especially with strings you might get crashes!
 	#endif
 	void update(float dt);
+	void draw(int x = 20, int y = 20); //draws important notifications on screen
 	void close();
 	vector<string> loadFromXML(string fileName); //returns list of param names in current setup but not set in XML
 	void saveToXML(string fileName);
@@ -140,6 +142,10 @@ private:
 	ofxOscSender	broadcastSender;
 	float			broadcastTime;
 	string			computerName;
+	bool			portIsSet;
+
+	float			savedAnimationTimer;
+	string			saveAnimationfileName;
 
 	bool loadedFromXML; //we start with loadedFromXML=false; once loadXML is called, this becomes true
 	bool saveToXmlOnExit;

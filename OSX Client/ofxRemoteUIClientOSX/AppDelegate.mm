@@ -711,7 +711,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	vector<string> presetsList = client->getPresetsList();
 	[menuItemNameArray addObject: DIRTY_PRESET_NAME ];
 	for(int i = 0 ; i < presetsList.size(); i++){
-		if ( presetsList[i] != OFX_REMOTEUI_NO_PRESETS ){
+		if ( presetsList[i] != OFXREMOTEUI_NO_PRESETS ){
 			[menuItemNameArray addObject: [NSString stringWithFormat:@"%s",presetsList[i].c_str()] ];
 		}
 	}
