@@ -85,6 +85,9 @@ public:
 									//this might cause issues with your app
 									//as parameters can be changed at any time!
 									//so be aware, especially with strings you might get crashes!
+									//but this can be useful in situation where your main thread is blocked for seconds
+									//bc using a background therad means you can still control your params
+									//as the main thread is blocked
 	#endif
 
 	void update(float dt);

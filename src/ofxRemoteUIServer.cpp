@@ -62,6 +62,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	verbose_ = false;
 	threadedUpdate = false;
 	drawNotifications = true;
+	showValuesOnScreen = false;
 	loadedFromXML = false;
 	//add random colors to table
 	colorTableIndex = 0;
