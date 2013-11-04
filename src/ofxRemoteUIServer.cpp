@@ -51,7 +51,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	readyToSend = false;
 	saveToXmlOnExit = true;
 	broadcastTime = OFXREMOTEUI_BORADCAST_INTERVAL + 0.05;
-	timeSinceLastReply = avgTimeSinceLastReply = connectedAnimationTimer = 0;
+	timeSinceLastReply = avgTimeSinceLastReply = connectedAnimationTimer = savedAnimationTimer = 0;
 	disconnectedAnimationTimer = 0;
 	startupAnimationTimer = OFXREMOTEUI_NOTIFICATION_SCREENTIME;
 	waitingForReply = false;
@@ -64,6 +64,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	drawNotifications = true;
 	showValuesOnScreen = false;
 	loadedFromXML = false;
+	lastDT = 1./60.;
 	//add random colors to table
 	colorTableIndex = 0;
 	int a = 80;
@@ -595,17 +596,19 @@ void ofxRemoteUIServer::draw(int x, int y){
 									ofColor(0, 255 * ofClamp(a,0,1)),
 									ofColor(255,0,0, 255 * ofClamp(a,0,1)) );
 	}
+
+	//timers //TODO fix this mess
+	startupAnimationTimer -= lastDT;
+	savedAnimationTimer -= lastDT;
+	connectedAnimationTimer -= lastDT;
+	disconnectedAnimationTimer -= lastDT;
 	#endif
 }
 
 
 void ofxRemoteUIServer::updateServer(float dt){
 
-	//timers //TODO fix this mess
-	startupAnimationTimer -= dt;
-	savedAnimationTimer -= dt;
-	connectedAnimationTimer -= dt;
-	disconnectedAnimationTimer -= dt;
+	lastDT = dt;
 	timeCounter += dt;
 	broadcastTime += dt;
 	timeSinceLastReply  += dt;

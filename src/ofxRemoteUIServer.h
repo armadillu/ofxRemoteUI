@@ -171,6 +171,7 @@ private:
 	void			updateServer(float dt);
 
 	bool			showValuesOnScreen;
+	float			lastDT;
 
 	void (*callBack)(RemoteUIServerCallBackArg);
 
