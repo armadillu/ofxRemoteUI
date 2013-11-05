@@ -170,8 +170,14 @@ string ofxRemoteUI::getMyIP(){
 			if (inet_ntop(ifa->ifa_addr->sa_family, (void *)&(s4->sin_addr), buf, sizeof(buf)) == NULL){
 				printf("%s: inet_ntop failed!\n", ifa->ifa_name);
 			}else{
-				if(string(ifa->ifa_name) == "en0"){ //TODO this returns only en0!
-					output = string(buf);
+				string interface = string(ifa->ifa_name);
+				cout << "ofxRemoteUI found interface: " << interface << endl;
+				if(interface.length() > 2){
+					if (interface[0] == 'e' && interface[1] == 'n'){
+					//if(string(ifa->ifa_name) == "en0" ){ //TODO this returns only en0!
+						output = string(buf);
+						break;
+					}
 				}
 			}
 		}
