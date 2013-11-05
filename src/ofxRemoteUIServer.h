@@ -150,6 +150,7 @@ private:
 	ofxOscSender	broadcastSender;
 	float			broadcastTime;
 	string			computerName;
+	string			binaryName;
 	string			computerIP;
 	bool			portIsSet;
 

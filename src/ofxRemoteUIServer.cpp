@@ -13,11 +13,18 @@
 #include <string.h>
 #ifdef __APPLE__
 #include "dirent.h"
+#include <mach-o/dyld.h>	/* _NSGetExecutablePath */
 #elif _WIN32 || _WIN64
 #include "dirent_vs.h"
 #endif
 #include <sys/stat.h>
 #include <time.h>
+
+#ifdef OF_AVAILABLE
+#include <Poco/Path.h>
+#include <Poco/Environment.h>
+#include <Poco/Process.h>
+#endif
 
 #ifdef TARGET_WIN32
 //	#include <sys/time.h>
@@ -56,7 +63,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	startupAnimationTimer = OFXREMOTEUI_NOTIFICATION_SCREENTIME;
 	waitingForReply = false;
 	colorSet = false;
-	computerName = "";
+	computerName = binaryName = "";
 	callBack = NULL;
 	upcomingGroup = OFXREMOTEUI_DEFAULT_PARAM_GROUP;
 	verbose_ = false;
@@ -627,17 +634,28 @@ void ofxRemoteUIServer::updateServer(float dt){
 		if(doBroadcast){
 			broadcastTime = 0.0f;
 			if (computerName.size() == 0){
-#ifdef TARGET_OSX
-				computerName = ofSystem("hostname -s ");
-				computerName = computerName.substr(0, computerName.size()-2); //mmm this is weird, 10.8
-#endif
-#ifdef TARGET_WIN32
-				GetHostName(computerName);
-#endif
+				#ifdef OF_AVAILABLE
+					Poco::Environment e;
+					computerName = e.nodeName();
+
+					char pathbuf[2048];
+					uint32_t  bufsize = sizeof(pathbuf);
+					#ifdef TARGET_OSX
+						_NSGetExecutablePath(pathbuf, &bufsize);
+						Poco::Path p = Poco::Path(pathbuf);
+						binaryName = p[p.depth()];
+					#endif
+					#ifdef TARGET_WIN32
+						GetModuleFileName( NULL, pathbuf, bufsize );
+						Poco::Path p = Poco::Path(pathbuf);
+						binaryName = p[p.depth()];
+					#endif
+				#endif
 			}
 			ofxOscMessage m;
-			m.addIntArg(port);
-			m.addStringArg(computerName);
+			m.addIntArg(port); //0
+			m.addStringArg(computerName); //1
+			m.addStringArg(binaryName);	//2
 			broadcastSender.sendMessage(m);
 		}
 	}
