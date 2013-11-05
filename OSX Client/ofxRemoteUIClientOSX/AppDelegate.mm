@@ -280,6 +280,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[[NSUserDefaults standardUserDefaults] setObject: [NSNumber numberWithInt: 1]
 											  forKey: @"NSInitialToolTipDelay"];
 	launched = TRUE;
+	NSLog(@"Launched ofxRemoteUI version %@", GIT_COMMIT_NUMBER);
 
 }
 

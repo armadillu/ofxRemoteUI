@@ -71,6 +71,7 @@
 		73002CDD140ABCF60035299A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		73002CDE140ABCF60035299A /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		73002CDF140ABCF60035299A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		BB0C16FC18292645008C7D8B /* GitCommitNumber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GitCommitNumber.h; sourceTree = "<group>"; };
 		BB395E95173E6326002FA815 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
 		BB3AACC217BD647300401E86 /* ColoredNSWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ColoredNSWindow.h; sourceTree = "<group>"; };
 		BB3AACC317BD647300401E86 /* ColoredNSWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ColoredNSWindow.m; sourceTree = "<group>"; };
@@ -433,6 +434,7 @@
 		BBDCBDF216A051A900F1C5EC /* ofxRemoteUI */ = {
 			isa = PBXGroup;
 			children = (
+				BB0C16FC18292645008C7D8B /* GitCommitNumber.h */,
 				BBDCBDF416A051B000F1C5EC /* src */,
 			);
 			name = ofxRemoteUI;
@@ -461,6 +463,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 73002CF4140ABCF60035299A /* Build configuration list for PBXNativeTarget "ofxRemoteUIClientOSX" */;
 			buildPhases = (
+				BB360A121829224100F956E4 /* ShellScript */,
 				73002CD2140ABCF60035299A /* Sources */,
 				73002CD3140ABCF60035299A /* Frameworks */,
 				73002CD4140ABCF60035299A /* Resources */,
@@ -520,6 +523,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		BB360A121829224100F956E4 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+				GitCommitNumber.h,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "gitCommitNum=$(git rev-list HEAD --count)\nsay \"$gitCommitNum\"\nif [ -z \"$gitCommitNum\" ]; then\n    gitCommitNum=\"Unknown Version\" \nfi\necho \"#define GIT_COMMIT_NUMBER @\\\"$gitCommitNum\\\"\" > $SRCROOT/GitCommitNumber.h\necho 'GIT_COMMIT_NUMBER is '$gitCommitNum\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		73002CD2140ABCF60035299A /* Sources */ = {

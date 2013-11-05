@@ -11,6 +11,7 @@
 #import "ParamUI.h"
 #import "MyScrollView.h"
 #import "ColoredNSWindow.h"
+#import "GitCommitNumber.h"
 #import <Growl/Growl.h>
 
 #define REFRESH_RATE			1.0f/15.0f
