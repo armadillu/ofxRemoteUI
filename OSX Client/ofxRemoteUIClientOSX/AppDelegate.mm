@@ -276,6 +276,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	//[scroll setScrollerKnobStyle:NSScrollerKnobStyleDefault];
 
 	[self loadPrefs];
+	[window setAllowsToolTipsWhenApplicationIsInactive:YES];
 	[[NSUserDefaults standardUserDefaults] setObject: [NSNumber numberWithInt: 1]
 											  forKey: @"NSInitialToolTipDelay"];
 	launched = TRUE;
