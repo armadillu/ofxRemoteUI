@@ -71,7 +71,7 @@ void ofxRemoteUIClient::update(float dt){
 	while( broadcastReceiver.hasWaitingMessages() ){// check for waiting messages from client
 		ofxOscMessage m;
 		broadcastReceiver.getNextMessage(&m);
-		neigbhorChange |= closebyServers.gotPing(m.getRemoteIp(), m.getArgAsInt32(0), m.getArgAsString(1));
+		neigbhorChange |= closebyServers.gotPing(m.getRemoteIp(), m.getArgAsInt32(0), m.getArgAsString(1), m.getArgAsString(2));
 		//cout << "got broadcast message from " << m.getRemoteIp() << ":" << m.getArgAsInt32(0) << endl;
 		//closebyServers.print();
 	}

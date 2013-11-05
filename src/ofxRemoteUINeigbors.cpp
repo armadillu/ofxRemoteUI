@@ -49,7 +49,7 @@ void ofxRemoteUINeigbors::print(){
 	cout << "###########################################" << endl;
 }
 
-bool ofxRemoteUINeigbors::gotPing(string ip, int port, string name){
+bool ofxRemoteUINeigbors::gotPing(string ip, int port, string name, string binaryName){
 
 	bool updated = false;
 	std::ostringstream oss;
@@ -58,7 +58,7 @@ bool ofxRemoteUINeigbors::gotPing(string ip, int port, string name){
 
 	if ( neigbhors.find(myID) == neigbhors.end() ){ //not found, add it
 		updated = true;
-		Neighbor n = Neighbor(ip, port, time, name);
+		Neighbor n = Neighbor(ip, port, time, name, binaryName);
 		neigbhors[myID] = n;
 	}else{ //found!
 		neigbhors[myID].timeLastSeen = time; //update time last seen for this dude

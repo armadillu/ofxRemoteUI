@@ -151,7 +151,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[currentNeighbors removeAllObjects];
 	for(int i = 0; i < ns.size(); i++){
 		[currentNeighbors addObject:[NSString stringWithFormat:@"%s:%d",  ns[i].IP.c_str(), ns[i].port]];
-		[arr addObject:[NSString stringWithFormat:@"%s@%s:%d", ns[i].name.c_str(), ns[i].IP.c_str(), ns[i].port]];
+		[arr addObject:[NSString stringWithFormat:@"%s @ %s (%s:%d)", ns[i].binary.c_str(), ns[i].name.c_str(), ns[i].IP.c_str(), ns[i].port]];
 	}
 	[neigbhorsMenu addItemsWithTitles: arr];
 }
