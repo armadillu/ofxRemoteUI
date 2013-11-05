@@ -276,6 +276,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	//[scroll setScrollerKnobStyle:NSScrollerKnobStyleDefault];
 
 	[self loadPrefs];
+	[[NSUserDefaults standardUserDefaults] setObject: [NSNumber numberWithInt: 1]
+											  forKey: @"NSInitialToolTipDelay"];
 	launched = TRUE;
 
 }
