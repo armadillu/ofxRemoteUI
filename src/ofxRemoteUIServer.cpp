@@ -7,6 +7,11 @@
 //
 
 #include "ofxRemoteUIServer.h"
+
+#ifdef TARGET_WIN32
+#include <winsock2.h>
+#endif
+
 #include <iostream>
 #include <algorithm>
 #include <string>
@@ -26,10 +31,6 @@
 #include <Poco/Process.h>
 #endif
 
-#ifdef TARGET_WIN32
-//	#include <sys/time.h>
-#include <winsock2.h>
-#endif
 
 ofxRemoteUIServer* ofxRemoteUIServer::singleton = NULL;
 ofxRemoteUIServer* ofxRemoteUIServer::instance(){
@@ -645,8 +646,8 @@ void ofxRemoteUIServer::updateServer(float dt){
 						Poco::Path p = Poco::Path(pathbuf);
 						binaryName = p[p.depth()];
 					#endif
-					#ifdef TARGET_WIN32
-						GetModuleFileName( NULL, pathbuf, bufsize );
+					#ifdef TARGET_WIN32						
+						GetModuleFileNameA( NULL, pathbuf, bufsize ); //no iea why, but GetModuleFileName() is not defined?
 						Poco::Path p = Poco::Path(pathbuf);
 						binaryName = p[p.depth()];
 					#endif
