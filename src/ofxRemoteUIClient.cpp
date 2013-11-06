@@ -64,7 +64,7 @@ void ofxRemoteUIClient::restoreAllParamsToDefaultValues(){
 	sendRESD();
 }
 
-void ofxRemoteUIClient::update(float dt){
+void ofxRemoteUIClient::updateAutoDiscovery(float dt){
 
 	bool neigbhorChange = false;
 	//listen for broadcast from all servers in the broadcast channel OFXREMOTEUI_BROADCAST_PORT
@@ -85,6 +85,10 @@ void ofxRemoteUIClient::update(float dt){
 			callBack(cbArg);
 		}
 	}
+}
+
+
+void ofxRemoteUIClient::update(float dt){
 
 	if (!readyToSend){ // if not connected, connect
 

@@ -910,7 +910,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 }
 
 int weJustDisconnected = 0;
+
 -(void)update{
+
+	client->updateAutoDiscovery(REFRESH_RATE);
 
 	if ( connectButton.state == 1 ){ // if connected
 
@@ -941,8 +944,6 @@ int weJustDisconnected = 0;
 		client->sendUntrackedParamUpdate(p, name);
 	}
 }
-
-
 
 
 -(NSString *)showAlertWithInput: (NSString *)prompt defaultValue: (NSString *)defaultValue {
