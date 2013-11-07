@@ -838,7 +838,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		[t release];
 	}
 	widgets.clear();
-	orderedKeys.clear();
+	orderedKeys.clear(); 
 
 	//also remove the spacer bars. Dont ask me why, but dynamic array walking crashes! :?
 	//that why this ghetto walk is here

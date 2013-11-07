@@ -6,6 +6,20 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		BBF2EB8A182B972B0030BCF1 /* Versioning */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = BBF2EB8B182B972C0030BCF1 /* Build configuration list for PBXAggregateTarget "Versioning" */;
+			buildPhases = (
+				BBF2EB90182B97720030BCF1 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = Versioning;
+			productName = Versioning;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		73002CDB140ABCF60035299A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73002CDA140ABCF60035299A /* Cocoa.framework */; };
 		BB395E96173E6326002FA815 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB395E95173E6326002FA815 /* QuartzCore.framework */; };
@@ -51,6 +65,16 @@
 		BBE6075A16A466A7002F1707 /* offline.png in Resources */ = {isa = PBXBuildFile; fileRef = BBE6075716A466A7002F1707 /* offline.png */; };
 		BBEE7856182302FF00D93161 /* ofxRemoteUINeigbors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBEE7854182302FF00D93161 /* ofxRemoteUINeigbors.cpp */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		BBF2EB8E182B975D0030BCF1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 73002CCD140ABCF60035299A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BBF2EB8A182B972B0030BCF1;
+			remoteInfo = Versioning;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		BBC3858717973857007E2DD1 /* CopyFiles */ = {
@@ -463,7 +487,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 73002CF4140ABCF60035299A /* Build configuration list for PBXNativeTarget "ofxRemoteUIClientOSX" */;
 			buildPhases = (
-				BB360A121829224100F956E4 /* ShellScript */,
 				73002CD2140ABCF60035299A /* Sources */,
 				73002CD3140ABCF60035299A /* Frameworks */,
 				73002CD4140ABCF60035299A /* Resources */,
@@ -472,6 +495,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				BBF2EB8F182B975D0030BCF1 /* PBXTargetDependency */,
 			);
 			name = ofxRemoteUIClientOSX;
 			productName = LionTableViewTesting;
@@ -497,6 +521,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				BBF2EB8A182B972B0030BCF1 /* Versioning */,
 				73002CD5140ABCF60035299A /* ofxRemoteUIClientOSX */,
 			);
 		};
@@ -525,7 +550,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		BB360A121829224100F956E4 /* ShellScript */ = {
+		BBF2EB90182B97720030BCF1 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -533,11 +558,10 @@
 			inputPaths = (
 			);
 			outputPaths = (
-				GitCommitNumber.h,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = "/bin/sh ";
-			shellScript = "gitCommitNum=$(git rev-list HEAD --count)\nif [ -z \"$gitCommitNum\" ]; then\n    gitCommitNum=\"Unknown Version\" \nfi\ndefaults write \"$SRCROOT/ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist\" \"CFBundleVersion\" $gitCommitNum\necho \"#define GIT_COMMIT_NUMBER @\\\"$gitCommitNum\\\"\" > $SRCROOT/GitCommitNumber.h\necho 'GIT_COMMIT_NUMBER is '$gitCommitNum\n";
+			shellPath = /bin/sh;
+			shellScript = "gitCommitNum=$(git rev-list HEAD --count)\nif [ -z \"$gitCommitNum\" ]; then\ngitCommitNum=\"Unknown Version\"\nfi\ndefaults write \"$SRCROOT/ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist\" \"CFBundleVersion\" $gitCommitNum\necho \"#define GIT_COMMIT_NUMBER @\\\"$gitCommitNum\\\"\" > $SRCROOT/GitCommitNumber.h\necho 'GIT_COMMIT_NUMBER is '$gitCommitNum\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -578,6 +602,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		BBF2EB8F182B975D0030BCF1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BBF2EB8A182B972B0030BCF1 /* Versioning */;
+			targetProxy = BBF2EB8E182B975D0030BCF1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		BB94E57D17464E1800A7A3CC /* View.xib */ = {
@@ -647,7 +679,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.8;
 			};
 			name = Debug;
 		};
@@ -676,7 +708,7 @@
 					../noOFLibs/ofxOsc/src,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.8;
 			};
 			name = Release;
 		};
@@ -699,7 +731,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = ofxRemoteUIClientOSX;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.7;
 				STRIP_INSTALLED_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
 			};
@@ -724,9 +756,23 @@
 				INFOPLIST_FILE = "$(SRCROOT)/ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = ofxRemoteUIClientOSX;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.7;
 				STRIP_INSTALLED_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		BBF2EB8C182B972C0030BCF1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		BBF2EB8D182B972C0030BCF1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -750,6 +796,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		BBF2EB8B182B972C0030BCF1 /* Build configuration list for PBXAggregateTarget "Versioning" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BBF2EB8C182B972C0030BCF1 /* Debug */,
+				BBF2EB8D182B972C0030BCF1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};
