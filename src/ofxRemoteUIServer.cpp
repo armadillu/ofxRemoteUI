@@ -525,6 +525,8 @@ void ofxRemoteUIServer::draw(int x, int y){
 
 	#ifdef OF_AVAILABLE
 
+	ofPushStyle();
+	ofFill();
 	if(showValuesOnScreen){
 		int padding = 30;
 		int x = padding;
@@ -610,6 +612,8 @@ void ofxRemoteUIServer::draw(int x, int y){
 	savedAnimationTimer -= lastDT;
 	connectedAnimationTimer -= lastDT;
 	disconnectedAnimationTimer -= lastDT;
+
+	ofPopStyle();
 	#endif
 }
 
