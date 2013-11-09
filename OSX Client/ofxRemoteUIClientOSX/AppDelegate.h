@@ -54,6 +54,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 
 	IBOutlet NSColorWell *			colorWell;
 	IBOutlet NSButton *				alwaysOnTopCheckbox;
+	IBOutlet NSButton *				showNotificationsCheckbox;
 
 	IBOutlet NSTextView *			logView;
 
@@ -75,6 +76,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 
 	BOOL							launched;
 	BOOL							alwaysOnTop;
+	BOOL							showNotifications;
 
 	bool							needFullParamsUpdate;
 }

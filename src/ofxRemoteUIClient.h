@@ -28,6 +28,8 @@ public:
 	void setup(string address, int port = OFXREMOTEUI_PORT);
 	void update(float dt);
 	void updateAutoDiscovery(float dt);
+
+	void connect();
 	void disconnect();
 
 	void requestCompleteUpdate(); //ask the server to send us all params and presets

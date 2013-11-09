@@ -55,7 +55,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 		case SERVER_DISCONNECTED:{
 			//NSLog(@"## Callback: SERVER_DISCONNECTED");
-			[me connect];
+			//[me connect];
+			me->client->disconnect();
 			[me showNotificationWithTitle:@"Server Exited, Disconnected!" description:remoteIP ID:@"ServerDisconnected" priority:-1];
 			[me updateGroupPopup];
 			[me updatePresetsPopup];
@@ -785,6 +786,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[df setObject: portField.stringValue forKey:@"lastPort"];
 
 	if ([[connectButton title] isEqualToString:@"Connect"]){ //we are not connected, let's connect
+
 		//NSLog(@"connecting");
 		[addressField setEnabled:false];
 		[portField setEnabled:false];
@@ -806,6 +808,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		[progress startAnimation:self];
 		lagField.stringValue = @"";
 		needFullParamsUpdate = YES;
+		client->connect();
 
 	}else{ // let's disconnect
 		//NSLog(@"disconnecting");
@@ -879,6 +882,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	if (onTop > 0) [window setLevel:NSScreenSaverWindowLevel];
 	else [window setLevel:NSNormalWindowLevel];
 	[alwaysOnTopCheckbox setState:onTop];
+
+	showNotifications = (int)[d integerForKey:@"showNotifications"];
+	[showNotificationsCheckbox setState:showNotifications];
+
 	
 	NSString * winColor = [d stringForKey:@"windowColor"];
 	NSColor * col;
@@ -898,6 +905,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	if (onTop > 0) [window setLevel:NSScreenSaverWindowLevel];
 	else [window setLevel:NSNormalWindowLevel];
 
+	showNotifications = (int)[showNotificationsCheckbox state];
+
 	[window setColor:[colorWell color]];
 }
 
@@ -906,6 +915,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	NSUserDefaults * d = [NSUserDefaults standardUserDefaults];
 	[d setValue:[[colorWell color] stringRepresentation] forKey:@"windowColor"];
 	[d setInteger: ([window level] == NSScreenSaverWindowLevel) ? 1 : 0   forKey:@"alwaysOnTop"];
+	[d setInteger: showNotifications  forKey:@"showNotifications"];
 	[d synchronize];
 }
 
@@ -914,10 +924,9 @@ int weJustDisconnected = 0;
 -(void)update{
 
 	client->updateAutoDiscovery(REFRESH_RATE);
+	client->update(REFRESH_RATE);
 
 	if ( connectButton.state == 1 ){ // if connected
-
-		client->update(REFRESH_RATE);
 
 		if(updateContinuosly){
 			client->requestCompleteUpdate();
@@ -984,14 +993,16 @@ int weJustDisconnected = 0;
 }
 
 -(void)showNotificationWithTitle:(NSString*)title description:(NSString*)desc ID:(NSString*)key priority:(int)p{
-	if ([GrowlApplicationBridge isGrowlRunning]){
-		[GrowlApplicationBridge notifyWithTitle:title
-									description:desc
-							   notificationName:key
-									   iconData:nil
-									   priority:p
-									   isSticky:NO
-								   clickContext:nil];
+	if(showNotifications){
+		if ([GrowlApplicationBridge isGrowlRunning]){
+			[GrowlApplicationBridge notifyWithTitle:title
+										description:desc
+								   notificationName:key
+										   iconData:nil
+										   priority:p
+										   isSticky:NO
+									   clickContext:nil];
+		}
 	}
 
 }

@@ -4,16 +4,17 @@
 void clientCallback(RemoteUIClientCallBackArg a){
 
 	switch (a.action) {
-		case SERVER_CONNECTED: cout << "SERVER_CONNECTED"; break;
-		case SERVER_DISCONNECTED: cout << "SERVER_DISCONNECTED"; break;
-		case SERVER_DELETED_PRESET: cout << "SERVER_DELETED_PRESET"; break;
-		case SERVER_SAVED_PRESET: cout << "SERVER_SAVED_PRESET"; break;
-		case SERVER_DID_SET_PRESET: cout << "SERVER_DID_SET_PRESET"; break;
-		case SERVER_REQUESTED_ALL_PARAMS_UPDATE: cout << "SERVER_REQUESTED_ALL_PARAMS_UPDATE"; break;
-		case SERVER_PRESETS_LIST_UPDATED: cout << "SERVER_PRESETS_LIST_UPDATED"; break;
-		case SERVER_CONFIRMED_SAVE: cout << "SERVER_CONFIRMED_SAVE"; break;
-		case SERVER_DID_RESET_TO_XML: cout << "SERVER_DID_RESET_TO_XML"; break;
-		case SERVER_DID_RESET_TO_DEFAULTS: cout << "SERVER_DID_RESET_TO_DEFAULTS"; break;
+		case SERVER_CONNECTED: cout << "SERVER_CONNECTED" << endl; break;
+		case SERVER_DISCONNECTED: cout << "SERVER_DISCONNECTED" << endl; break;
+		case SERVER_DELETED_PRESET: cout << "SERVER_DELETED_PRESET" << endl; break;
+		case SERVER_SAVED_PRESET: cout << "SERVER_SAVED_PRESET" << endl; break;
+		case SERVER_DID_SET_PRESET: cout << "SERVER_DID_SET_PRESET" << endl; break;
+		case SERVER_REQUESTED_ALL_PARAMS_UPDATE: cout << "SERVER_REQUESTED_ALL_PARAMS_UPDATE" << endl; break;
+		case SERVER_PRESETS_LIST_UPDATED: cout << "SERVER_PRESETS_LIST_UPDATED" << endl; break;
+		case SERVER_CONFIRMED_SAVE: cout << "SERVER_CONFIRMED_SAVE" << endl;; break;
+		case SERVER_DID_RESET_TO_XML: cout << "SERVER_DID_RESET_TO_XML" << endl; break;
+		case SERVER_DID_RESET_TO_DEFAULTS: cout << "SERVER_DID_RESET_TO_DEFAULTS" << endl; break;
+		case NEIGHBORS_UPDATED: cout << "NEIGHBORS_UPDATED" << endl; break;
 		default: break;
 	}
 }
@@ -26,8 +27,10 @@ void testApp::setup(){
 	ofSetVerticalSync(true);
 
 	//start client
+	client.setVerbose(true);
 	client.setCallback(clientCallback);
 	client.setup("127.0.0.1", 10000/*port*/);
+	client.connect();
 
 	//we want the client to have acces to those values all the time, so we feed him their @
 	client.trackParam("drawOutlines", &drawOutlines);
@@ -43,6 +46,7 @@ void testApp::update(){
 	float dt = 0.016666;
 	time += dt;
 	client.update(dt);
+	client.updateAutoDiscovery(dt);
 
 	if(time > 0.2f){
 		time = 0.0f;
