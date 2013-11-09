@@ -17,7 +17,7 @@ ofxRemoteUIClient::ofxRemoteUIClient(){
 	avgTimeSinceLastReply = 0;
 	waitingForReply = false;
 	callBack = NULL;
-	verbose_ = true;
+	verbose_ = false;
 }
 
 void ofxRemoteUIClient::setCallback( void (*callb)(RemoteUIClientCallBackArg) ){
