@@ -93,14 +93,21 @@ void clientCallback(RemoteUIClientCallBackArg a){
 			break;
 	}
 
-	[me log:a];
+	if( a.action != SERVER_DISCONNECTED ){ //server disconnection is logged from connect button press
+		[me log:a];
+	}
 }
 
 @implementation AppDelegate
 
 -(void)log:(RemoteUIClientCallBackArg) arg{
 
-	if ( arg.action == SERVER_REQUESTED_ALL_PARAMS_UPDATE || arg.action == SERVER_PRESETS_LIST_UPDATED) return; //this stuff is not worth logging
+	if (	arg.action == SERVER_REQUESTED_ALL_PARAMS_UPDATE ||
+			arg.action == SERVER_PRESETS_LIST_UPDATED ||
+		arg.action == NEIGHBORS_UPDATED ){
+
+		return; //this stuff is not worth logging
+	}
 	
 	NSString * action = @"";
 	switch (arg.action) {
@@ -114,7 +121,9 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		case SERVER_CONFIRMED_SAVE: action = @"Server Did Save to Default XML"; break;
 		case SERVER_DID_RESET_TO_XML: action = @"Server Did Reset Params to Server-Launch Default XML"; break;
 		case SERVER_DID_RESET_TO_DEFAULTS: action = @"Server Did Reset Params to Share-Time (Source Code)"; break;
-		default:break;
+		case NEIGHBORS_UPDATED: action = @"Server found nearby neighbors"; break;
+		case SERVER_REPORTS_MISSING_PARAMS_IN_PRESET: action = @"Server loaded preset, but some params are not specified in it (old preset)"; break;
+		default: NSLog(@"aaaaa");
 	}
 
 	NSString * date = [[NSDate date] descriptionWithCalendarFormat:@"%H:%M:%S" timeZone:nil locale:nil];
@@ -814,8 +823,9 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		//NSLog(@"disconnecting");
 		RemoteUIClientCallBackArg arg;
 		arg.action = SERVER_DISCONNECTED;
-		arg.host = "offline";
+		arg.host = [addressField.stringValue UTF8String];
 		[self log:arg];
+		arg.host = "offline";
 		[presetsMenu removeAllItems];
 		[groupsMenu removeAllItems];
 		[addressField setEnabled:true];
