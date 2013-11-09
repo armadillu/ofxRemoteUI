@@ -163,7 +163,9 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		[currentNeighbors addObject:[NSString stringWithFormat:@"%s:%d",  ns[i].IP.c_str(), ns[i].port]];
 		[arr addObject:[NSString stringWithFormat:@"%s @ %s (%s:%d)", ns[i].binary.c_str(), ns[i].name.c_str(), ns[i].IP.c_str(), ns[i].port]];
 	}
+	NSString * text = [NSString stringWithFormat:@"Nearby (%d):",[arr count] ];
 	[neigbhorsMenu addItemsWithTitles: arr];
+	[neigbhorsField setStringValue: text];
 }
 
 

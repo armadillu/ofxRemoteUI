@@ -50,6 +50,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 	IBOutlet NSPopUpButton *		groupsMenu;
 	IBOutlet NSPopUpButton *		presetsMenu;
 	IBOutlet NSPopUpButton *		neigbhorsMenu;
+	IBOutlet NSTextField *			neigbhorsField;
 	IBOutlet NSMenu *				groupsMenuBar;
 
 	IBOutlet NSColorWell *			colorWell;
