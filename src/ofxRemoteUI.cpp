@@ -622,7 +622,6 @@ void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
 	}
 	m.addIntArg(p.r); m.addIntArg(p.g); m.addIntArg(p.b); m.addIntArg(p.a); // set bg color!
 	m.addStringArg(p.group);
-	if(timeSinceLastReply == 0.0f) timeSinceLastReply = 0.0;
 	try{
 		oscSender.sendMessage(m);
 	}catch(exception e){

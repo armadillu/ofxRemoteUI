@@ -163,7 +163,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		[currentNeighbors addObject:[NSString stringWithFormat:@"%s:%d",  ns[i].IP.c_str(), ns[i].port]];
 		[arr addObject:[NSString stringWithFormat:@"%s @ %s (%s:%d)", ns[i].binary.c_str(), ns[i].name.c_str(), ns[i].IP.c_str(), ns[i].port]];
 	}
-	NSString * text = [NSString stringWithFormat:@"Nearby (%d):",[arr count] ];
+	NSString * text = [NSString stringWithFormat:@"(%d)",[arr count] ];
 	[neigbhorsMenu addItemsWithTitles: arr];
 	[neigbhorsField setStringValue: text];
 }
@@ -876,7 +876,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 			[statusImage setImage:[NSImage imageNamed:@"offline"]];
 		}else{
 			if (lag > 0.0f){
-				lagField.stringValue = [NSString stringWithFormat:@"%.1fms", lag];
+				lagField.stringValue = [NSString stringWithFormat:@"%.0fms", 1000 * lag];
 				[progress stopAnimation:self];
 				[statusImage setImage:[NSImage imageNamed:@"connected"]];
 			}

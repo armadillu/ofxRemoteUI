@@ -59,7 +59,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	readyToSend = false;
 	saveToXmlOnExit = true;
 	broadcastTime = OFXREMOTEUI_BORADCAST_INTERVAL + 0.05;
-	timeSinceLastReply = avgTimeSinceLastReply = connectedAnimationTimer = savedAnimationTimer = 0;
+	timeSinceLastReply = avgTimeSinceLastReply = connectedAnimationTimer = savedAnimationTimer = presetLoadAnimationTimer = 0;
 	disconnectedAnimationTimer = 0;
 	startupAnimationTimer = OFXREMOTEUI_NOTIFICATION_SCREENTIME;
 	waitingForReply = false;
@@ -589,18 +589,23 @@ void ofxRemoteUIServer::draw(int x, int y){
 		a = ofClamp(startupAnimationTimer,0,1);
 		msg = "ofxRemoteUIServer started at " + computerIP  + ":" + ofToString(port) + " (" + computerName + ")";
 	}
+	if(presetLoadAnimationTimer > 0){
+		a = ofClamp(presetLoadAnimationTimer,0,1);
+		msg = "ofxRemoteUIServer: Client Loaded Preset '" + saveAnimationfileName + "'";
+	}
 	if(savedAnimationTimer > 0){
 		a = ofClamp(savedAnimationTimer,0,1);
 		msg = "ofxRemoteUIServer: Client Saved config to '" + saveAnimationfileName + "'";
-	}
-	if(connectedAnimationTimer > 0){
-		a = ofClamp(connectedAnimationTimer,0,1);
-		msg = "ofxRemoteUIServer: Client Connected!";
 	}
 	if(disconnectedAnimationTimer > 0){
 		a = ofClamp(disconnectedAnimationTimer,0,1);
 		msg = "ofxRemoteUIServer: Client Disconnected!";
 	}
+	if(connectedAnimationTimer > 0){
+		a = ofClamp(connectedAnimationTimer,0,1);
+		msg = "ofxRemoteUIServer: Client Connected!";
+	}
+
 	if (a > 0){
 		ofDrawBitmapStringHighlight(msg, x, y,
 									ofColor(0, 255 * ofClamp(a,0,1)),
@@ -612,6 +617,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 	savedAnimationTimer -= lastDT;
 	connectedAnimationTimer -= lastDT;
 	disconnectedAnimationTimer -= lastDT;
+	presetLoadAnimationTimer -= lastDT;
 
 	ofPopStyle();
 	#endif
@@ -694,7 +700,6 @@ void ofxRemoteUIServer::updateServer(float dt){
 				syncAllParamsToPointers();
 				sendUpdateForParamsInList(paramsList);
 				sendREQU(true); //once all send, confirm to close the REQU
-				connectedAnimationTimer = OFXREMOTEUI_NOTIFICATION_SCREENTIME;
 			}
 				break;
 
@@ -747,6 +752,8 @@ void ofxRemoteUIServer::updateServer(float dt){
 					cbArg.msg = presetName;
 					callBack(cbArg);
 				}
+				presetLoadAnimationTimer = OFXREMOTEUI_NOTIFICATION_SCREENTIME;
+				saveAnimationfileName = string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml";
 			}break;
 
 			case SAVE_PRESET_ACTION:{ //client wants to save current xml as a new preset

@@ -155,11 +155,12 @@ private:
 	bool			portIsSet;
 
 	float			savedAnimationTimer;
-	string			saveAnimationfileName;
+	string			saveAnimationfileName; //also used for set preset
 
 	float			connectedAnimationTimer;
 	float			disconnectedAnimationTimer;
 	float			startupAnimationTimer;
+	float			presetLoadAnimationTimer;
 
 	bool			doBroadcast;
 	bool			drawNotifications;

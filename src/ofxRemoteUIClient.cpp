@@ -108,9 +108,7 @@ void ofxRemoteUIClient::updateAutoDiscovery(float dt){
 void ofxRemoteUIClient::update(float dt){
 	//cout << "ofxRemoteUIClient::update readyToSend = " << readyToSend << endl;
 
-	if (!readyToSend){ // if not connected, connect
-
-	}else{
+	if (readyToSend){ // if connected
 
 		timeCounter += dt;
 		timeSinceLastReply += dt;
