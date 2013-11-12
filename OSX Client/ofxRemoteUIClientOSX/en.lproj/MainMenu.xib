@@ -558,7 +558,7 @@
                                     </connections>
                                 </popUpButton>
                                 <searchField verticalHuggingPriority="750" id="745">
-                                    <rect key="frame" x="103.00000012675419" y="13" width="67" height="19"/>
+                                    <rect key="frame" x="103.0000000633771" y="13" width="67" height="19"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES"/>
                                     <searchFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" placeholderString="filter" usesSingleLineMode="YES" bezelStyle="round" id="746">
                                         <font key="font" metaFont="smallSystem"/>

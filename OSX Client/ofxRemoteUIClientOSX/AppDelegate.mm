@@ -324,14 +324,18 @@ void clientCallback(RemoteUIClientCallBackArg a){
 - (void)windowResized:(NSNotification *)notification;{
 
 	LayoutConfig p = [self calcLayoutParams];
+
 	if ( p.colsRows.x != lastLayout.colsRows.x || p.colsRows.y != lastLayout.colsRows.y ){
 		[self layoutWidgetsWithConfig:p];
 		//NSLog(@"layoutWidgetsWithConfig");
 	}else{
-		int off = ((int)[scroll.contentView frame].size.height ) % ((int)(ROW_HEIGHT));
-		[listContainer setFrameSize: NSMakeSize( listContainer.frame.size.width, p.maxPerCol * ROW_HEIGHT + off)];
+		int off = ((int)[scroll.contentView frame].size.height + 1 ) % ((int)(ROW_HEIGHT));
+		int totalCols = p.maxPerCol;
+		if (totalCols < p.howManyPerCol) totalCols = p.howManyPerCol;
+		[listContainer setFrameSize: NSMakeSize( listContainer.frame.size.width, totalCols * ROW_HEIGHT + off - 1)];
+		//NSLog(@"NO CONFIG");
 	}
-	
+
 	for( map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
 		string key = (*ii).first;
 		ParamUI* t = widgets[key];
@@ -425,6 +429,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	vector<string> paramsInGroup = [self getParamsInGroup:currentGroup];
 	int totalH = ROW_HEIGHT * ((int)paramsInGroup.size() );
 	[listContainer setFrameSize: NSMakeSize( [scroll documentVisibleRect].size.width , totalH)];
+
 }
 
 
@@ -437,9 +442,13 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	vector<string> paramsInGroup = [self getParamsInGroup:currentGroup];
 
 	int numParams = (int)paramsInGroup.size();
-	int howManyPerCol = floor( scrollH / ROW_HEIGHT );
+	//NSLog(@"numParams: %d", numParams);
+	//NSLog(@"scrollH: %f / %f)", scrollH, (scrollH + 1)/ ROW_HEIGHT);
+	int howManyPerCol = ( (scrollH + 1)/ ROW_HEIGHT );
+	//NSLog(@"howManyPerCol: %d", howManyPerCol);
 	int colIndex = 0;
-	int numUsedColumns = ceil((float)numParams / (float)howManyPerCol);
+	int numUsedColumns = ceil((float)numParams / (float)(howManyPerCol));
+	//NSLog(@"numUsedColumns: %d", numUsedColumns);
 	float rowW = scrollW / numUsedColumns;
 	bool didTweak = false;
 	while (rowW < ROW_WIDTH && numUsedColumns > 1) {
@@ -449,7 +458,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	}
 
 	if(didTweak){
+
 		howManyPerCol = numParams / (float)numUsedColumns;
+		//NSLog(@" -- TWEAK -- numUsedColumns: %d", numUsedColumns);
+		//NSLog(@" -- TWEAK -- howManyPerCol: %d", howManyPerCol);
 	}
 
 	int h = 0;
@@ -467,7 +479,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		}
 	}
 	if (maxPerCol == 0){
-		maxPerCol = scrollH / ROW_HEIGHT;
+		maxPerCol = (scrollH / ROW_HEIGHT);
 	}
 
 	p.colsRows.x = colIndex;
@@ -475,10 +487,11 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	p.rowW = rowW;
 	p.howManyPerCol = howManyPerCol;
 	p.maxPerCol = maxPerCol;
-	//NSLog(@"colsRows.y: %d   colsRows.x: %d", (int)p.colsRows.y , (int)p.colsRows.x);
-	//NSLog(@"howManyPerCol: %d   maxPerCol: %d", (int)p.howManyPerCol , (int)p.maxPerCol);
-	//NSLog(@"#######################");
-	
+//	NSLog(@"colsRows.y: %d   colsRows.x: %d", (int)p.colsRows.y , (int)p.colsRows.x);
+//	NSLog(@"howManyPerCol: %d   maxPerCol: %d", (int)p.howManyPerCol , (int)p.maxPerCol);
+//	NSLog(@"#######################");
+//	NSLog(@" ");
+
 	return p;
 }
 
@@ -539,6 +552,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	int h = 0;
 	int howManyThisCol = 0;
 	int colIndex = 0;
+	int maxInACol = 0;
 
 	for(int i = 0; i < numParams; i++){
 		string key = paramsInGroup[i];
@@ -548,6 +562,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		item->ui.frame = NSMakeRect( colIndex * p.rowW, (numParams - 1) * ROW_HEIGHT - h , p.rowW, r.size.height);
 		[listContainer addSubview: item->ui];
 		h += r.size.height;
+
 		howManyThisCol++;
 		if (howManyThisCol >= p.howManyPerCol ){ // next column
 			colIndex++;
@@ -556,8 +571,9 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		}
 		[item updateUI];
 		[item remapSlider];
+		if(howManyThisCol > maxInACol) maxInACol = howManyThisCol;
 	}
-	int off = ((int)[scroll.contentView frame].size.height ) % ((int)(ROW_HEIGHT));
+	int off = ((int)[scroll.contentView frame].size.height + 1) % ((int)(ROW_HEIGHT));
 
 	// draw grid ///////////////////////////////////////////
 
@@ -576,8 +592,11 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	}
 
 	lastLayout = p;
-	int extra;
-	[listContainer setFrameSize: NSMakeSize( listContainer.frame.size.width, p.maxPerCol * ROW_HEIGHT + off)];
+	int totalCols = p.maxPerCol;
+	if (totalCols < p.howManyPerCol) totalCols = p.howManyPerCol;
+	//NSLog(@"colIndex %d", colIndex);
+	//NSLog(@"totalCols %d", totalCols);
+	[listContainer setFrameSize: NSMakeSize( listContainer.frame.size.width, totalCols * ROW_HEIGHT + off - 1) ];
 }
 
 
