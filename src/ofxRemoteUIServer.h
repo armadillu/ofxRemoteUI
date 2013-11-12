@@ -175,11 +175,14 @@ private:
 	bool			showValuesOnScreen;
 	float			lastDT;
 
+	bool			updatedThisFrame;
+
 	void (*callBack)(RemoteUIServerCallBackArg);
 
 	#ifdef OF_AVAILABLE
 	void _appExited(ofEventArgs &e);
 	void _draw(ofEventArgs &d);
+	void _update(ofEventArgs &d);
 	void _keyPressed(ofKeyEventArgs &e);
 	#endif
 

@@ -3,22 +3,25 @@
 
 OF addon allows you to serve any variables you want (bool, float, int, enum, string, ofColor) on the network, so that you can modify them remotely. Uses server client architecture, where your app is the server. It communicates both ways; you can modify your project's variables from the client, but you can also pull your app's variable values from the client; this way you can track values that evolve programatically. 
 
-Watch the [demo video](http://www.youtube.com/watch?v=EHS3bd0beKQ).
+Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 
-![OSX Client](http://farm8.staticflickr.com/7418/10126260445_1eddc4c357_o.png "OSX Client")
+![OSX Client](http://farm4.staticflickr.com/3680/10821138976_d11125455d_o.png "OSX Client")
 
 ---
 
 ## Features
 
-* Edit & Track variables remotely thorugh UDP/OSC (bool, int, float, string, Enum, ofColor)
-* Native OSX interface
-* Allows to save/load your variable states across app launches
+* Edit & Track variables remotely thorugh UDP/OSC (bool, int, float, string, Enum, ofColor).
+* Native OSX interface.
+* Allows to save/load your variable states across app launches.
+* Parameter values are saved besides your app, in xml format.
 * Allows creation of Presets, variable states that you can switch from and to quickly.
-* Easily create parameter Groups, and quickly access through keyboard shortcuts in the supplied OSX Client.
-* Colorize your variables for easy reading in the OSX client.
-* Restore paramters to previous launch ones or to Default values
-* ofxRemoteUI Can be used outside OF in any C++ project, and in Processing thx to @kritzikratzi
+* Easily create Parameter Groups, and access them through keyboard shortcuts from the OSX Client.
+* Colorize your variables to visually group them in the OSX client.
+* Automatic discovery of servers in the network; easily control multiple apps from the OSX Client.
+* Notifications in both OSX client (through growl) and on your OF app.
+* Restore paramters to the "previous launch" ones or to the default values.
+* ofxRemoteUI Can be used outside OF in any C++ project, and in Processing thx to [@kritzikratzi](http://github.com/kirtzikratzi)
 * Easy to use macros hide complexity away.
 
 
@@ -26,7 +29,7 @@ Watch the [demo video](http://www.youtube.com/watch?v=EHS3bd0beKQ).
 ## Compatibility
 Works in OpenFrameworks, but also in plain C++ projects.
 
-There's also a feature limited version of the Server for Processing, made by @kritzikratzi! See <a href="http://superduper.org/processing/remoteUI">here</a>.
+There's also a feature limited version of the Server for Processing, made by [@kritzikratzi](http://github.com/kirtzikratzi)! See <a href="http://superduper.org/processing/remoteUI">here</a>.
 
 ## Why?
 
@@ -73,10 +76,6 @@ To use it outisde of OpenFrameworks, you can see how the example-noOF is setup.
 		OFX_REMOTEUI_SERVER_LOAD_FROM_XML(); 
 	}
 	
-	void update(){
-		OFX_REMOTEUI_SERVER_UPDATE(0.016666f); //keep the server updated
-	}
-	
 Use the supplied OSX Client to view and edit your shared parameters.
 
 
@@ -85,6 +84,10 @@ Use the supplied OSX Client to view and edit your shared parameters.
 Enums must be consecutive so that each enum item is +1 the previous one for them to work.
 
 When loading a preset, it might be that the preset doesnt specify values for all your current params. If so, the params whose values havent been modified by the preset will show a small warning sign for a few seconds.
+
+Automatic discovery relies on each server advertising itself (its hostname, app name and port) on port 25748.
+
+OFX_REMOTEUI_SERVER_SETUP() assigns a random port the first time the app is launched, and it uses that same port on successive launches. You can also manually specify a port by supplying it OFX_REMOTEUI_SERVER_SETUP(10000);
 
 
 ## To Do

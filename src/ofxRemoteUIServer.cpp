@@ -471,6 +471,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 #ifdef OF_AVAILABLE
 	ofAddListener(ofEvents().exit, this, &ofxRemoteUIServer::_appExited);
 	ofAddListener(ofEvents().keyPressed, this, &ofxRemoteUIServer::_keyPressed);
+	ofAddListener(ofEvents().update, this, &ofxRemoteUIServer::_update);
 	if(drawNotifications){
 		ofAddListener(ofEvents().draw, this, &ofxRemoteUIServer::_draw);
 	}
@@ -490,6 +491,10 @@ void ofxRemoteUIServer::_draw(ofEventArgs &e){
 	draw( 20, ofGetHeight() - 20);
 }
 
+void ofxRemoteUIServer::_update(ofEventArgs &e){
+	update(ofGetLastFrameTime());
+}
+
 void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 	if(e.key == '\t'){
 		showValuesOnScreen = !showValuesOnScreen;
@@ -504,9 +509,10 @@ void ofxRemoteUIServer::startInBackgroundThread(){
 
 void ofxRemoteUIServer::update(float dt){
 
-	if(!threadedUpdate){
+	if(!threadedUpdate && !updatedThisFrame){
 		updateServer(dt);
 	}
+	updatedThisFrame = true;
 }
 
 #ifdef OF_AVAILABLE
@@ -524,7 +530,6 @@ void ofxRemoteUIServer::threadedFunction(){
 void ofxRemoteUIServer::draw(int x, int y){
 
 	#ifdef OF_AVAILABLE
-
 	ofPushStyle();
 	ofFill();
 	if(showValuesOnScreen){
@@ -621,6 +626,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 
 	ofPopStyle();
 	#endif
+	updatedThisFrame = false;
 }
 
 
