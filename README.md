@@ -19,6 +19,7 @@ Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 * Easily create Parameter Groups, and access them through keyboard shortcuts from the OSX Client.
 * Colorize your variables to visually group them in the OSX client.
 * Automatic discovery of servers in the network; easily control multiple apps from the OSX Client.
+* Press "tab" on server app to quickly see all your params on screen
 * Notifications in both OSX client (through growl) and on your OF app.
 * Restore paramters to the "previous launch" ones or to the default values.
 * ofxRemoteUI Can be used outside OF in any C++ project, and in Processing thx to [@kritzikratzi](http://github.com/kirtzikratzi)
@@ -88,6 +89,8 @@ When loading a preset, it might be that the preset doesnt specify values for all
 Automatic discovery relies on each server advertising itself (its hostname, app name and port) on port 25748.
 
 OFX_REMOTEUI_SERVER_SETUP() assigns a random port the first time the app is launched, and it uses that same port on successive launches. You can also manually specify a port by supplying it OFX_REMOTEUI_SERVER_SETUP(10000);
+
+ofxRemoteUIServer listens for the keyDown event, and if "tab" is pressed, it displays all your parameters on screen.
 
 
 ## To Do
