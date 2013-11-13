@@ -857,6 +857,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		//client->update(REFRESH_RATE);
 		connectButton.state = 0;
 		connectButton.title = @"Connect";
+		[self layoutWidgetsWithConfig: [self calcLayoutParams]]; //update scrollbar
 	}
 }
 
