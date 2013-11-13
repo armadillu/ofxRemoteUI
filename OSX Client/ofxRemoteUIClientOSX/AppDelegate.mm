@@ -824,10 +824,6 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		connectButton.state = 1;
 		printf("ofxRemoteUIClientOSX Connecting to %s\n", [addressField.stringValue UTF8String] );
 		int port = [portField.stringValue intValue];
-		if (port < OFXREMOTEUI_PORT - 1) {
-			port = OFXREMOTEUI_PORT - 1;
-			portField.stringValue = [NSString stringWithFormat:@"%d", OFXREMOTEUI_PORT - 1];
-		}
 		client->setup([addressField.stringValue UTF8String], port);
 		[updateFromServerButton setEnabled: true];
 		[updateContinuouslyCheckbox setEnabled: true];
