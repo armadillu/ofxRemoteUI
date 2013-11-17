@@ -11,7 +11,7 @@ Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 
 ## Features
 
-* Edit & Track variables remotely thorugh UDP/OSC (bool, int, float, string, Enum, ofColor).
+* Edit & Track variables remotely through UDP/OSC (bool, int, float, string, Enum, ofColor).
 * Native OSX interface.
 * Allows to save/load your variable states across app launches.
 * Parameter values are saved besides your app, in xml format.
@@ -21,7 +21,7 @@ Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 * Automatic discovery of servers in the network; easily control multiple apps from the OSX Client.
 * Press "tab" on server app to quickly see all your params on screen
 * Notifications in both OSX client (through growl) and on your OF app.
-* Restore paramters to the "previous launch" ones or to the default values.
+* Restore parameters to the "previous launch" ones or to the default values.
 * ofxRemoteUI Can be used outside OF in any C++ project, and in Processing thx to [@kritzikratzi](http://github.com/kirtzikratzi)
 * Easy to use macros hide complexity away.
 
@@ -42,7 +42,7 @@ It's OSC based, and it includes a native OSX Client. The Native OSX Client allow
 
 It can also be set to store the current values when quitting the app (or whenever its convenient), so that you can carry on where you left off last time you used it. It does so by saving a file called "ofxRemoteUISettings.xml" in your data folder. It uses ofxXmlSettings to store everything. 
 
-You can also create and delete presets, which are parameter states for your app. Presets are stored with your OF app, inside an "ofxRemoteUIPresets" folder, in your data folder. This makes it easy to check in your presets with your soruce code. Whenever you like the current config, you can make a preset to keep it around. You can also delete presets.
+You can also create and delete presets, which are parameter states for your app. Presets are stored with your OF app, inside an "ofxRemoteUIPresets" folder, in your data folder. This makes it easy to check in your presets with your source code. Whenever you like the current config, you can make a preset to keep it around. You can also delete presets.
 
 ofxRemoteUI uses Macros + the singleton pattern to make it very easy to share any variable you decide to edit remotely, from any class of your project.
 
@@ -51,7 +51,7 @@ The OSX client also allows to copy all the current params as plain text. You can
 **"Restore to initial XML Values"** sets alls params to whatever values they had at server app launch.  
 **"Restore to Default Values"** sets alls params to whatever values the shared variable had before sharing it with OFX_REMOTEUI_SERVER_SHARE_PARAM().
 
-To use it outisde of OpenFrameworks, you can see how the example-noOF is setup.   
+To use it outside of OpenFrameworks, you can see how the example-noOF is setup.   
 
 -----
 
@@ -84,7 +84,7 @@ Use the supplied OSX Client to view and edit your shared parameters.
 
 Enums must be consecutive so that each enum item is +1 the previous one for them to work.
 
-When loading a preset, it might be that the preset doesnt specify values for all your current params. If so, the params whose values havent been modified by the preset will show a small warning sign for a few seconds.
+When loading a preset, it might be that the preset doesn't specify values for all your current params. If so, the params whose values haven't been modified by the preset will show a small warning sign for a few seconds.
 
 Automatic discovery relies on each server advertising itself (its hostname, app name and port) on port 25748.
 
