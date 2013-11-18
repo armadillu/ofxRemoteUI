@@ -17,6 +17,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include "ofxRemoteUISimpleNotifications.h"
 
 #ifndef OF_VERSION_MINOR //if OF is not available, redefine ofColor to myColor
 #define ofColor myColor
@@ -102,10 +103,12 @@ public:
 	void shareParam(string paramName, string* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
 	void shareParam(string paramName, int* param, int min, int max, vector<string> names, ofColor c = ofColor(0,0,0,0)); //enum!
 	void shareParam(string paramName, unsigned char* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 );	//ofColor
+
+	void setParamGroup(string g);		//set for all the upcoming params
 	void setParamColor( ofColor c );
-	void setNewParamColor();
-	void unsetParamColor();
-	void setParamGroup(string g);
+
+	void setNewParamColor(); //randomly sets a new param color for all upcoming params
+	void unsetParamColor();  //back to un-colored params (shows alternating rows on OSX client)
 
 	//get notified when a client changes something remotelly
 	void setCallback( void (*callb)(RemoteUIServerCallBackArg) );
@@ -130,17 +133,18 @@ public:
 
 private:
 
-	void restoreAllParamsToInitialXML();
-	void restoreAllParamsToDefaultValues();
-
-	void connect(string address, int port);
-
 	ofxRemoteUIServer(); // use ofxRemoteUIServer::instance() instead!
 	~ofxRemoteUIServer();
-	static ofxRemoteUIServer* singleton;
-	void setColorForParam(RemoteUIParam &p, ofColor c);
-	vector<string> getAvailablePresets();
-	void deletePreset(string name);
+
+	void			restoreAllParamsToInitialXML();
+	void			restoreAllParamsToDefaultValues();
+	void			connect(string address, int port);
+	void			setColorForParam(RemoteUIParam &p, ofColor c);
+	vector<string>	getAvailablePresets();
+	void			deletePreset(string name);
+	void			updateServer(float dt);
+	void			(*callBack)(RemoteUIServerCallBackArg);
+	void			threadedFunction();
 
 	vector<ofColor> colorTables;
 	int				colorTableIndex;
@@ -149,43 +153,31 @@ private:
 	string			upcomingGroup;
 	ofxOscSender	broadcastSender;
 	float			broadcastTime;
+	bool			portIsSet;
+
 	string			computerName;
 	string			binaryName;
 	string			computerIP;
-	bool			portIsSet;
 
-	float			savedAnimationTimer;
-	string			saveAnimationfileName; //also used for set preset
-
-	float			connectedAnimationTimer;
-	float			disconnectedAnimationTimer;
-	float			startupAnimationTimer;
-	float			presetLoadAnimationTimer;
-
-	bool			doBroadcast;
+	bool			doBroadcast; //controls if the server advertises itself
 	bool			drawNotifications;
 
 	bool			loadedFromXML; //we start with loadedFromXML=false; once loadXML is called, this becomes true
 	bool			saveToXmlOnExit;
 
 	bool			threadedUpdate;
-	void			threadedFunction();
-	void			updateServer(float dt);
-
-	bool			showValuesOnScreen;
-	float			lastDT;
-
+	bool			showValuesOnScreen; //displays all params on screen
 	bool			updatedThisFrame;
 
-	void (*callBack)(RemoteUIServerCallBackArg);
-
 	#ifdef OF_AVAILABLE
+	ofxRemoteUISimpleNotifications onScreenNotifications;
 	void _appExited(ofEventArgs &e);
 	void _draw(ofEventArgs &d);
 	void _update(ofEventArgs &d);
 	void _keyPressed(ofKeyEventArgs &e);
 	#endif
 
+	static ofxRemoteUIServer* singleton;
 };
 
 #endif

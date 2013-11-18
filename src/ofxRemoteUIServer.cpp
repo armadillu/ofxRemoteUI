@@ -59,9 +59,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	readyToSend = false;
 	saveToXmlOnExit = true;
 	broadcastTime = OFXREMOTEUI_BORADCAST_INTERVAL + 0.05;
-	timeSinceLastReply = avgTimeSinceLastReply = connectedAnimationTimer = savedAnimationTimer = presetLoadAnimationTimer = 0;
-	disconnectedAnimationTimer = 0;
-	startupAnimationTimer = OFXREMOTEUI_NOTIFICATION_SCREENTIME;
+	timeSinceLastReply = avgTimeSinceLastReply = 0;
 	waitingForReply = false;
 	colorSet = false;
 	computerName = binaryName = "";
@@ -72,7 +70,6 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	drawNotifications = true;
 	showValuesOnScreen = false;
 	loadedFromXML = false;
-	lastDT = 1./60.;
 	//add random colors to table
 	colorTableIndex = 0;
 	int a = 80;
@@ -511,6 +508,7 @@ void ofxRemoteUIServer::update(float dt){
 
 	if(!threadedUpdate && !updatedThisFrame){
 		updateServer(dt);
+		onScreenNotifications.update(dt);
 	}
 	updatedThisFrame = true;
 }
@@ -588,41 +586,8 @@ void ofxRemoteUIServer::draw(int x, int y){
 			}
 		}
 	}
-	string msg = "";
-	float a = 0.0f;
-	if(startupAnimationTimer > 0){
-		a = ofClamp(startupAnimationTimer,0,1);
-		msg = "ofxRemoteUIServer started at " + computerIP  + ":" + ofToString(port) + " (" + computerName + ")";
-	}
-	if(presetLoadAnimationTimer > 0){
-		a = ofClamp(presetLoadAnimationTimer,0,1);
-		msg = "ofxRemoteUIServer: Client Loaded Preset '" + saveAnimationfileName + "'";
-	}
-	if(savedAnimationTimer > 0){
-		a = ofClamp(savedAnimationTimer,0,1);
-		msg = "ofxRemoteUIServer: Client Saved config to '" + saveAnimationfileName + "'";
-	}
-	if(disconnectedAnimationTimer > 0){
-		a = ofClamp(disconnectedAnimationTimer,0,1);
-		msg = "ofxRemoteUIServer: Client Disconnected!";
-	}
-	if(connectedAnimationTimer > 0){
-		a = ofClamp(connectedAnimationTimer,0,1);
-		msg = "ofxRemoteUIServer: Client Connected!";
-	}
 
-	if (a > 0){
-		ofDrawBitmapStringHighlight(msg, x, y,
-									ofColor(0, 255 * ofClamp(a,0,1)),
-									ofColor(255,0,0, 255 * ofClamp(a,0,1)) );
-	}
-
-	//timers //TODO fix this mess
-	startupAnimationTimer -= lastDT;
-	savedAnimationTimer -= lastDT;
-	connectedAnimationTimer -= lastDT;
-	disconnectedAnimationTimer -= lastDT;
-	presetLoadAnimationTimer -= lastDT;
+	onScreenNotifications.draw(x, y);
 
 	ofPopStyle();
 	#endif
@@ -632,7 +597,6 @@ void ofxRemoteUIServer::draw(int x, int y){
 
 void ofxRemoteUIServer::updateServer(float dt){
 
-	lastDT = dt;
 	timeCounter += dt;
 	broadcastTime += dt;
 	timeSinceLastReply  += dt;
@@ -697,7 +661,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 					callBack(cbArg);
 				}
 				if(verbose_) cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " says HELLO!"  << endl;
-				connectedAnimationTimer = OFXREMOTEUI_NOTIFICATION_SCREENTIME;
+				onScreenNotifications.addNotification("CONNECTED (" + cbArg.host +  ")!");
 				break;
 
 			case REQUEST_ACTION:{ //send all params to client
@@ -724,7 +688,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case CIAO_ACTION:{
 				if(verbose_) cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " says CIAO!" << endl;
 				sendCIAO();
-				disconnectedAnimationTimer = OFXREMOTEUI_NOTIFICATION_SCREENTIME;
+				onScreenNotifications.addNotification("DISCONNECTED (" + cbArg.host +  ")!");
 				if(callBack != NULL){
 					cbArg.action = CLIENT_DISCONNECTED;
 					callBack(cbArg);
@@ -758,8 +722,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 					cbArg.msg = presetName;
 					callBack(cbArg);
 				}
-				presetLoadAnimationTimer = OFXREMOTEUI_NOTIFICATION_SCREENTIME;
-				saveAnimationfileName = string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml";
+				onScreenNotifications.addNotification("SET PRESET to '" + string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml'");
 			}break;
 
 			case SAVE_PRESET_ACTION:{ //client wants to save current xml as a new preset
@@ -767,8 +730,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				if(verbose_) cout << "ofxRemoteUIServer: saving NEW preset: " << presetName << endl;
 				saveToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
 				sendSAVP(presetName);
-				savedAnimationTimer = OFXREMOTEUI_NOTIFICATION_SCREENTIME;
-				saveAnimationfileName = string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml";
+				onScreenNotifications.addNotification("SAVED PRESET to '" + string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml'");
 				if(callBack != NULL){
 					cbArg.action = CLIENT_SAVED_PRESET;
 					cbArg.msg = presetName;
@@ -781,6 +743,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				if(verbose_) cout << "ofxRemoteUIServer: DELETE preset: " << presetName << endl;
 				deletePreset(presetName);
 				sendDELP(presetName);
+				onScreenNotifications.addNotification("DELETED PRESET '" + string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml'");
 				if(callBack != NULL){
 					cbArg.action = CLIENT_DELETED_PRESET;
 					cbArg.msg = presetName;
@@ -791,8 +754,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case SAVE_CURRENT_STATE_ACTION:{
 				if(verbose_) cout << "ofxRemoteUIServer: SAVE CURRENT PARAMS TO DEFAULT XML: " << endl;
 				saveToXML(OFXREMOTEUI_SETTINGS_FILENAME);
-				savedAnimationTimer = OFXREMOTEUI_NOTIFICATION_SCREENTIME;
-				saveAnimationfileName = OFXREMOTEUI_SETTINGS_FILENAME;
+				onScreenNotifications.addNotification("SAVED CONFIG to default XML");
 				sendSAVE(true);
 				if(callBack != NULL){
 					cbArg.action = CLIENT_SAVED_STATE;
@@ -804,6 +766,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				if(verbose_) cout << "ofxRemoteUIServer: RESET TO XML: " << endl;
 				restoreAllParamsToInitialXML();
 				sendRESX(true);
+				onScreenNotifications.addNotification("RESET CONFIG TO SERVER-LAUNCH XML values");
 				if(callBack != NULL){
 					cbArg.action = CLIENT_DID_RESET_TO_XML;
 					callBack(cbArg);
@@ -814,6 +777,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				if(verbose_) cout << "ofxRemoteUIServer: RESET TO DEFAULTS: " << endl;
 				restoreAllParamsToDefaultValues();
 				sendRESD(true);
+				onScreenNotifications.addNotification("RESET CONFIG TO DEFAULTS (source defined values)");
 				if(callBack != NULL){
 					cbArg.action = CLIENT_DID_RESET_TO_DEFAULTS;
 					callBack(cbArg);
