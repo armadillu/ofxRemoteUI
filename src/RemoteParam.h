@@ -12,7 +12,7 @@
 #include <stdio.h>
 
 enum RemoteUICallClientAction{
-	SERVER_CONNECTED, SERVER_DISCONNECTED, SERVER_REQUESTED_ALL_PARAMS_UPDATE, SERVER_PRESETS_LIST_UPDATED,
+	SERVER_CONNECTED, SERVER_DISCONNECTED, SERVER_SENT_FULL_PARAMS_UPDATE, SERVER_PRESETS_LIST_UPDATED,
 	SERVER_CONFIRMED_SAVE, SERVER_DID_RESET_TO_DEFAULTS, SERVER_DELETED_PRESET,
 	SERVER_SAVED_PRESET, SERVER_DID_RESET_TO_XML, SERVER_DID_SET_PRESET, SERVER_REPORTS_MISSING_PARAMS_IN_PRESET,
 	NEIGHBORS_UPDATED
@@ -24,6 +24,7 @@ enum RemoteUICallServerAction{
 };
 
 enum RemoteUIParamType{
+	REMOTEUI_PARAM_UNKNOWN = 0,
 	REMOTEUI_PARAM_FLOAT = 100,
 	REMOTEUI_PARAM_INT,
 	REMOTEUI_PARAM_BOOL,
@@ -56,6 +57,7 @@ class RemoteUIParam{ //I am lazy and I know it
 public:
 
 	RemoteUIParam(){
+		type = REMOTEUI_PARAM_UNKNOWN;
 		floatValAddr = NULL;
 		intValAddr = NULL;
 		boolValAddr = NULL;
@@ -151,7 +153,7 @@ struct RemoteUIClientCallBackArg{
 struct RemoteUIServerCallBackArg{
 	RemoteUICallServerAction action;
 	string paramName;
-	RemoteUIParam param; //get a copy o the new value of the param (only makes sense when action==SERVER_REQUESTED_ALL_PARAMS_UPDATE)
+	RemoteUIParam param; //get a copy o the new value of the param (only makes sense when action==SERVER_SENT_FULL_PARAMS_UPDATE)
 	string msg; //sort of a wildcard; usually its the preset name
 	string host;
 };

@@ -14,8 +14,8 @@ Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 * Edit & Track variables remotely through UDP/OSC (bool, int, float, string, Enum, ofColor).
 * Native OSX interface.
 * Allows to save/load your variable states across app launches.
-* Parameter values are saved besides your app, in xml format.
-* Allows creation of Presets, variable states that you can switch from and to quickly.
+* Parameter values are saved in your app's data folder, in xml format.
+* Allows creation/deletion of Presets, variable states that you can switch from and to quickly.
 * Easily create Parameter Groups, and access them through keyboard shortcuts from the OSX Client.
 * Colorize your variables to visually group them in the OSX client.
 * Automatic discovery of servers in the network; easily control multiple apps from the OSX Client.
@@ -86,13 +86,13 @@ Enums must be consecutive so that each enum item is +1 the previous one for them
 
 When loading a preset, it might be that the preset doesn't specify values for all your current params. If so, the params whose values haven't been modified by the preset will show a small warning sign for a few seconds.
 
-Automatic discovery relies on each server advertising itself (its hostname, app name and port) on port 25748.
+Automatic discovery relies on each server advertising itself (its hostname, app name and port) on port 25748 over OSC.
 
 OFX_REMOTEUI_SERVER_SETUP() assigns a random port the first time the app is launched, and it uses that same port on successive launches. You can also manually specify a port by supplying it OFX_REMOTEUI_SERVER_SETUP(10000);
 
 ofxRemoteUIServer listens for the keyDown event, and if "tab" is pressed, it displays all your parameters on screen.
 
 
-## To Do
+## WIP
 
-- make a basic multiplatform client, maybe based on ofxUI?
+- A basic multi-platform client (based in OF, so can target win/linux/ios/androd) based on ofxUI.

@@ -66,7 +66,7 @@ public:
 	//
 	//	void clientCallback(RemoteUIClientCallBackArg arg){
 	//		switch (arg.action) {
-	//			case SERVER_REQUESTED_ALL_PARAMS_UPDATE:break;
+	//			case SERVER_SENT_FULL_PARAMS_UPDATE:break;
 	//			case SERVER_PRESETS_LIST_UPDATED:break;
 	//			case SERVER_DISCONNECTED:break;
 	//			default:break;

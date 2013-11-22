@@ -230,7 +230,7 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 	RemoteUIParam original;
 	bool newParam = true;
 	map<string,RemoteUIParam>::iterator it = params.find(paramName);
-	if ( it != params.end() ){	//not found!
+	if ( it != params.end() ){	//found the param, we already had it
 		original = params[paramName];
 		newParam = false;
 	}

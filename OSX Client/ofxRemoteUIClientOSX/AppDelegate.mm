@@ -35,7 +35,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 			[me showNotificationWithTitle:@"Server Did Set Preset OK" description:[NSString stringWithFormat:@"%@ did set preset named '%s'", remoteIP, a.msg.c_str()] ID:@"ServerDidSetPreset" priority:-1];
 		}break;
 
-		case SERVER_REQUESTED_ALL_PARAMS_UPDATE:
+		case SERVER_SENT_FULL_PARAMS_UPDATE:
 			//NSLog(@"## Callback: PARAMS_UPDATED");
 			if(me->needFullParamsUpdate){ //a bit ugly here...
 				[me fullParamsUpdate];
@@ -102,7 +102,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 -(void)log:(RemoteUIClientCallBackArg) arg{
 
-	if (	arg.action == SERVER_REQUESTED_ALL_PARAMS_UPDATE ||
+	if (	arg.action == SERVER_SENT_FULL_PARAMS_UPDATE ||
 			arg.action == SERVER_PRESETS_LIST_UPDATED ||
 		arg.action == NEIGHBORS_UPDATED ){
 
@@ -113,7 +113,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	switch (arg.action) {
 		case SERVER_CONNECTED: action = @"Connected To Server!";  break;
 		case SERVER_DISCONNECTED: action = @"Server Disconnected!"; break;
-		case SERVER_REQUESTED_ALL_PARAMS_UPDATE: action = @"Server Requested all Params Update!"; break;
+		case SERVER_SENT_FULL_PARAMS_UPDATE: action = @"Server Requested all Params Update!"; break;
 		case SERVER_PRESETS_LIST_UPDATED: action = @"Server Presets lists updated!"; break;
 		case SERVER_DELETED_PRESET: action = [NSString stringWithFormat:@"Server Deleted Preset named '%s'", arg.msg.c_str()]; break;
 		case SERVER_SAVED_PRESET:  action = [NSString stringWithFormat:@"Server Saved Preset named '%s'", arg.msg.c_str()]; break;

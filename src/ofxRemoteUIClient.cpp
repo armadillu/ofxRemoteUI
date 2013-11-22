@@ -18,6 +18,8 @@ ofxRemoteUIClient::ofxRemoteUIClient(){
 	waitingForReply = false;
 	callBack = NULL;
 	verbose_ = false;
+	broadcastReceiver.setup(OFXREMOTEUI_BROADCAST_PORT);
+
 }
 
 void ofxRemoteUIClient::setCallback( void (*callb)(RemoteUIClientCallBackArg) ){
@@ -40,7 +42,6 @@ void ofxRemoteUIClient::setup(string address, int port_){
 
 	if(verbose_) cout << "ofxRemoteUIClient connecting to " << address << endl;
 	oscSender.setup(address, port);
-	broadcastReceiver.setup(OFXREMOTEUI_BROADCAST_PORT);
 }
 
 vector<Neighbor> ofxRemoteUIClient::getNeighbors(){
@@ -145,10 +146,10 @@ void ofxRemoteUIClient::update(float dt){
 					}
 				}break;
 
-				case REQUEST_ACTION: //should not happen, server doesnt request << IS THIS BS?
+				case REQUEST_ACTION: //server closed the REQU, so we should have all the params
 					if(verbose_) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says REQUEST_ACTION!" << endl;
 					if(callBack != NULL){
-						cbArg.action = SERVER_REQUESTED_ALL_PARAMS_UPDATE;
+						cbArg.action = SERVER_SENT_FULL_PARAMS_UPDATE;
 						callBack(cbArg);
 					}
 					break;
