@@ -5,8 +5,8 @@ OF addon allows you to serve any variables you want (bool, float, int, enum, str
 
 Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 
-![OSX Client](http://farm4.staticflickr.com/3680/10821138976_d11125455d_o.png "OSX Client")
-![MultiPlatform Client](http://farm4.staticflickr.com/3827/11024829803_7da98b3d3c_o.png "WIP MultiPlatform Client")
+
+![MultiPlatform Client](http://farm4.staticflickr.com/3756/11038662486_79c63c2950_o.png "WIP MultiPlatform Client") (OSX Client and multipatform client side by side.)
 
 
 ---
