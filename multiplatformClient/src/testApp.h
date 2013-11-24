@@ -4,9 +4,12 @@
 #include "ofxRemoteUIClient.h"
 #include "ofxUI.h"
 
-#define STATIC_UI_H		60
+#define STATIC_UI_H		110
 #define GROUP_SPACE_H	3
-#define EDGE_SPACE		20
+#define EDGE_SPACE		10
+#define WINDOW_WDITH	480
+
+#define GROUP_BG_COLOR	ofxUIColor(186, 0, 180)
 
 //declare callback method
 void clientCallback(RemoteUIClientCallBackArg a);
@@ -36,16 +39,22 @@ class testApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 
 
+	void savePresetConfirmed(string presetName);
 	void fullParamsUpdate();
 	void updateNeighbors();
+	void updatePresets();
 	void allocUI();
+	void prepareStaticUI();
+	void preparePresetUI();
 
 
 	ofxUIScrollableCanvas *gui;
 	ofxUICanvas * staticUI;
+	ofxUICanvas * presetNameUI;
 
 	void guiEvent(ofxUIEventArgs &e);
 	void staticGuiEvent(ofxUIEventArgs &e);
+	void presetGuiEvent(ofxUIEventArgs &e);
 
 
 	bool needFullParamUpdate;

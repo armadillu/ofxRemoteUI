@@ -21,9 +21,9 @@ Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 * Automatic discovery of servers in the network; easily control multiple apps from the OSX Client.
 * Press "tab" on server app to quickly see all your params on screen
 * Notifications in both OSX client (through growl) and on your OF app.
-* Restore parameters to the "previous launch" ones or to the default values.
+* Restore parameters to the "previous launch" state or to the default values.
 * ofxRemoteUI Can be used outside OF in any C++ project, and in Processing thx to [@kritzikratzi](http://github.com/kirtzikratzi)
-* Easy to use macros hide complexity away.
+* Easy to use macros hide complexity away, very easy to plug into any existing project.
 
 
 
