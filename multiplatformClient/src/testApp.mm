@@ -41,8 +41,6 @@ void testApp::setup(){
 	client->setCallback(clientCallback);
 	client->setVerbose(true);
 
-	//client->setup("192.168.1.24", 10000);
-	//client->connect();
 
     float xInit = OFX_UI_GLOBAL_WIDGET_SPACING;
     float dim = 32;
@@ -53,6 +51,8 @@ void testApp::setup(){
 	allocUI(); //dynamic
 	prepareStaticUI();
 
+//	client->setup("192.168.1.21", 10000);
+//	client->connect();
 }
 
 
@@ -64,13 +64,20 @@ void testApp::preparePresetUI(){
 
 	if(presetNameUI) delete presetNameUI;
 	presetNameUI = new ofxUICanvas( (ofGetWidth() - w )/2.0, ofGetHeight()/2 -h/2, w , h );
+
+	presetNameUI->setFont(FONT_FILE, true, false);
+
+	gui->setFontSize(OFX_UI_FONT_SMALL, FONT_SIZE_SMALL);
+	gui->setFontSize(OFX_UI_FONT_MEDIUM, FONT_SIZE_MEDIUM);
+	gui->setFontSize(OFX_UI_FONT_LARGE, FONT_SIZE_LARGE);
+
 	presetNameUI->setDrawOutline(true);
 	presetNameUI->setColorBack(ofxUIColor(64,128));
 	presetNameUI->setColorFill(ofxUIColor(255,128));
 
-	presetNameUI->addWidgetDown(new ofxUILabel("TYPE IN NEW PRESET NAME", OFX_UI_FONT_MEDIUM));
+	presetNameUI->addWidgetDown(new ofxUILabel("TYPE IN NEW PRESET NAME", OFX_UI_FONT_LARGE));
 	presetNameUI->setWidgetFontSize(OFX_UI_FONT_LARGE);
-	ofxUITextInput* ti = presetNameUI->addTextInput("TEXT INPUT", "myPreset", 0);
+	ofxUITextInput* ti = presetNameUI->addTextInput("TEXT INPUT", "myPreset", OFX_UI_FONT_MEDIUM);
 	ti->setDrawOutline(true);
 
 	presetNameUI->setWidgetFontSize(OFX_UI_FONT_SMALL);
@@ -88,24 +95,25 @@ void testApp::preparePresetUI(){
 
 void testApp::prepareStaticUI(){
 
-	// STATIC UI ///////////////////
-	staticUI = new ofxUICanvas( EDGE_SPACE, EDGE_SPACE, retinaScale * ( ofGetWidth() - 2 * EDGE_SPACE), STATIC_UI_H  - 2 * EDGE_SPACE);
+	staticUI = new ofxUICanvas( EDGE_SPACE, EDGE_SPACE, CANVAS_FULL_W , STATIC_UI_H );
 
-#ifdef TARGET_OF_IOS
-	staticUI->setRetinaResolution();
+	#ifdef TARGET_OF_IOS
 	if ( [[UIScreen mainScreen] scale] > 1 ){
+		staticUI->setRetinaResolution();
 		retinaScale = 2.0;
 	}
-#endif
+	#endif
 
+	staticUI->setFont(FONT_FILE, true, false);
+	staticUI->setPadding(PADDING);
+	staticUI->setWidgetSpacing(WIDGET_SPACING);
 
-	staticUI->setFontSize(OFX_UI_FONT_SMALL, retinaScale * 5);
-	staticUI->setFontSize(OFX_UI_FONT_MEDIUM, retinaScale * 5);
-	staticUI->setFontSize(OFX_UI_FONT_LARGE, retinaScale * 8);
-
+	staticUI->setFontSize(OFX_UI_FONT_SMALL, FONT_SIZE_SMALL);
+	staticUI->setFontSize(OFX_UI_FONT_MEDIUM, FONT_SIZE_MEDIUM);
+	staticUI->setFontSize(OFX_UI_FONT_LARGE, FONT_SIZE_LARGE);
 
 	//	staticUI->setDrawBack(true);
-	staticUI->setColorBack(ofxUIColor(0,33,128,128));
+	staticUI->setColorBack(STATIC_UI_BG_COLOR);
 	//
 	//	staticUI->setDrawFill(true);
 	staticUI->setColorFill(ofxUIColor(255,128));
@@ -126,32 +134,27 @@ void testApp::prepareStaticUI(){
 	//	staticUI->setColorOutlineHighlight(ofxUIColor(255,0,255));
 	//
 
-	//	staticUI->addLabel("host");
-	//	staticUI->addTextInput("hostField", "");
-	//	staticUI->addLabel("port");
-	//	staticUI->addTextInput("portField", "");
-
-
-	ofxUILabelButton * save = staticUI->addLabelButton("SAVE TO XML", false, retinaScale * 100.0, WIDGET_H);
+	ofxUILabelButton * save = staticUI->addLabelButton("SAVE TO XML", false, 0, WIDGET_H);
 	save->setColorBack(ofxUIColor(255,44,44,128));
 	staticUI->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-	staticUI->addLabelButton("SYNC", false, retinaScale *  50.0, WIDGET_H)->setColorBack(ofxUIColor(33,255,33,128));;
-	staticUI->addLabelButton("MAKE NEW PRESET", false, retinaScale * 120.0, WIDGET_H)->setColorBack(ofxUIColor(200,33,200,128));;
+	staticUI->addLabelButton("SYNC", false, 0, WIDGET_H)->setColorBack(ofxUIColor(33,255,33,128));;
+	staticUI->addLabelButton("MAKE NEW PRESET", false, 0, WIDGET_H)->setColorBack(ofxUIColor(200,33,200,128));;
 	staticUI->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
 
 	staticUI->addLabel("serverName", "not connected");
 
 	vector<string> empty;
-	ofxUIDropDownList * neigh = staticUI->addDropDownList("NEIGHBORS", empty,  (ofGetWidth() - retinaScale * 2 * EDGE_SPACE - retinaScale * 8));
+	ofxUIDropDownList * neigh = staticUI->addDropDownList("NEIGHBORS", empty,  WIDGET_FULL_W);
+	neigh->getRect()->setHeight(WIDGET_H);
 	neigh->setColorBack(ofxUIColor(128,200));
 	neigh->setAllowMultiple(false);
 	neigh->setShowCurrentSelected(false);
 	neigh->setAutoClose(true);
 	neigh->setModal(false);
 
-
 	//staticUI->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-	ofxUIDropDownList * presets = staticUI->addDropDownList("PRESETS", empty,  (ofGetWidth() - retinaScale * 2 * EDGE_SPACE - retinaScale * 8));
+	ofxUIDropDownList * presets = staticUI->addDropDownList("PRESETS", empty,  WIDGET_FULL_W);
+	presets->getRect()->setHeight(WIDGET_H);
 	presets->setColorBack(ofxUIColor(0,160,160,255));
 	presets->setAllowMultiple(false);
 	presets->setShowCurrentSelected(true);
@@ -163,16 +166,18 @@ void testApp::prepareStaticUI(){
 }
 
 
-
-
 void testApp::allocUI(){
 	// DYNAMIC UI //////////////////
 	if(gui !=NULL) delete gui;
-    gui = new ofxUIScrollableCanvas(EDGE_SPACE, STATIC_UI_H - 15 , ofGetWidth() - 2 * EDGE_SPACE, ofGetHeight() - STATIC_UI_H);
+
+	//staticUI = new ofxUICanvas( EDGE_SPACE, EDGE_SPACE, CANVAS_FULL_W , STATIC_UI_H );
+    gui = new ofxUIScrollableCanvas(EDGE_SPACE, DYNAMIC_UI_STARTING_Y  , CANVAS_FULL_W, ofGetHeight() - DYNAMIC_UI_STARTING_Y);
 
 #ifdef TARGET_OF_IOS
 	//gui->setRetinaResolution();
 #endif
+
+	gui->setFont(FONT_FILE, true, false);
 
 	gui->setDrawBack(false);
 	gui->setDrawWidgetPadding(false);
@@ -183,9 +188,10 @@ void testApp::allocUI(){
 	gui->setColorOutline(ofxUIColor(0,0,255));
 	gui->setColorOutline(ofxUIColor(255));
 
-	gui->setFontSize(OFX_UI_FONT_SMALL, 5);
-	gui->setFontSize(OFX_UI_FONT_MEDIUM, 7);
-	gui->setFontSize(OFX_UI_FONT_LARGE, 10);
+	gui->setFontSize(OFX_UI_FONT_SMALL, FONT_SIZE_SMALL);
+	gui->setFontSize(OFX_UI_FONT_MEDIUM, FONT_SIZE_MEDIUM);
+	gui->setFontSize(OFX_UI_FONT_LARGE, FONT_SIZE_LARGE);
+
 
 	ofAddListener(gui->newGUIEvent, this, &testApp::guiEvent);
 
@@ -443,7 +449,7 @@ void testApp::fullParamsUpdate(){
 		allocUI();
 		gui->removeWidgets();
 		gui->addSpacer(ofGetWidth(), GROUP_SPACE_H);
-		string group = "randomcrapname";
+		string group = "randomCrapName";
 
 		for(int i = 0; i < paramList.size(); i++){
 
@@ -457,47 +463,53 @@ void testApp::fullParamsUpdate(){
 				cout << "new group!" << endl;
 				group = p.group;
 
-				if(i != 0) gui->addSpacer(ofGetWidth(), GROUP_SPACE_H);
-				ofxUIWidget * w = gui->addWidgetDown(new ofxUILabel(group, OFX_UI_FONT_LARGE));
+				if(i != 0) gui->addSpacer(0, GROUP_SPACE_H);
+				ofxUIWidget * w = gui->addWidgetDown(new ofxUILabel(0,0,WIDGET_FULL_W,group, OFX_UI_FONT_LARGE));
 				w->setColorPadded(GROUP_BG_COLOR);
 				w->setDrawPadding(true);
-				gui->addSpacer(ofGetWidth(), GROUP_SPACE_H);
+				gui->addSpacer(0, GROUP_SPACE_H);
 			};
 
 			switch(p.type){
 
 				case REMOTEUI_PARAM_UNKNOWN:
+					cout << "REMOTEUI_PARAM_UNKNOWN" << endl;
 					break;
 				case REMOTEUI_PARAM_FLOAT:
-				gui->addSlider(paramName, p.minFloat, p.maxFloat, p.floatVal, ofGetWidth() - retinaScale * 2 * EDGE_SPACE - retinaScale * 8, WIDGET_H);
+					gui->addSlider(paramName, p.minFloat, p.maxFloat, p.floatVal, WIDGET_FULL_W, SLIDER_H);
 				break;
 
 				case REMOTEUI_PARAM_INT:
-				gui->addIntSlider(paramName, p.minInt, p.maxInt, p.intVal);
+					gui->addIntSlider(paramName, p.minInt, p.maxInt, p.intVal, WIDGET_FULL_W, SLIDER_H);
 				break;
 
 				case REMOTEUI_PARAM_BOOL:
-				gui->addToggle(paramName, p.boolVal);
+					gui->addToggle(paramName, p.boolVal, WIDGET_H, WIDGET_H);
 				break;
 
 				case REMOTEUI_PARAM_COLOR:{
-				float h = 20;
-				float w = ( ofGetWidth() )/ 6.0  ;
-				gui->addWidgetDown(new ofxUILabel(paramName, OFX_UI_FONT_MEDIUM));
-				//gui->addWidgetDown(new ofxUIMinimalSlider(w, h, 0, 255, p.redVal, paramName + ".r",OFX_UI_FONT_SMALL));
+					float h = COLOR_SLIDER_H;
+					float w = WIDGET_FULL_W * 0.48 ;
+					gui->addWidgetDown(new ofxUILabel(paramName, OFX_UI_FONT_MEDIUM));
+					//gui->addWidgetDown(new ofxUIMinimalSlider(w, h, 0, 255, p.redVal, paramName + ".r",OFX_UI_FONT_SMALL));
 
-				gui->addIntSlider(paramName + ".r", 0, 255, p.redVal, w, h);
-				gui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-				gui->addIntSlider(paramName + ".g", 0, 255, p.greenVal, w, h);
-				gui->addIntSlider(paramName + ".b", 0, 255, p.blueVal, w, h);
-				gui->addIntSlider(paramName + ".a", 0, 255, p.alphaVal, w, h);
-				gui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+					gui->addIntSlider(paramName + ".r", 0, 255, p.redVal, w, h);
+					gui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+					gui->addIntSlider(paramName + ".g", 0, 255, p.greenVal, w, h);
+					gui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+					gui->addIntSlider(paramName + ".b", 0, 255, p.blueVal, w, h);
+					gui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+					gui->addIntSlider(paramName + ".a", 0, 255, p.alphaVal, w, h);
+					gui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
 				}break;
 
 				case REMOTEUI_PARAM_STRING:
-
-				gui->addWidgetDown(new ofxUILabel(paramName, OFX_UI_FONT_SMALL));
-				gui->addTextInput(paramName, p.stringVal)->setAutoClear(false);
+					gui->addSpacer(0, ENUM_SURROUNDING_SPACE);
+					gui->addWidgetDown( new ofxUILabel(0,0,WIDGET_FULL_W * 0.5 - PADDING, paramName, OFX_UI_FONT_MEDIUM) );
+					gui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+					gui->addTextInput(paramName, p.stringVal, WIDGET_FULL_W * 0.5 - 0.5 * PADDING,  WIDGET_H )->setAutoClear(false);
+					gui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+					gui->addSpacer(0, ENUM_SURROUNDING_SPACE);
 				break;
 
 				case REMOTEUI_PARAM_ENUM:{
@@ -505,11 +517,13 @@ void testApp::fullParamsUpdate(){
 				for(int i = 0; i < p.enumList.size(); i++){
 					items.push_back(p.enumList[i]);
 				}
-				gui->addWidgetDown(new ofxUILabel(0,0, ofGetWidth()/3, paramName, OFX_UI_FONT_MEDIUM));
+				gui->addSpacer(0, ENUM_SURROUNDING_SPACE);
+				gui->addWidgetDown(new ofxUILabel(0,0, WIDGET_FULL_W * 0.5 - 0.5 * PADDING, paramName, OFX_UI_FONT_MEDIUM));
 				gui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-				ofxUIDropDownList * l = gui->addDropDownList(paramName, items, ofGetWidth()/2, 20.0, ofGetWidth()/2);
+				ofxUIDropDownList * l = gui->addDropDownList(paramName, items, WIDGET_FULL_W * 0.5 - 0.5 * PADDING, WIDGET_H);
+				l->getRect()->setHeight(WIDGET_H);
 				gui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
-
+				gui->addSpacer(0, ENUM_SURROUNDING_SPACE);
 				l->setAllowMultiple(false);
 				l->setAutoClose(true);
 				l->setShowCurrentSelected(true);

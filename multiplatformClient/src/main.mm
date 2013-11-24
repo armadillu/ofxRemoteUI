@@ -12,7 +12,7 @@ int main( ){
 		iOSWindow->enableRetina();
 	}
 
-	ofSetupOpenGL(iOSWindow, WINDOW_WDITH, 320, OF_FULLSCREEN);
+	ofSetupOpenGL(iOSWindow, 450, 320, OF_FULLSCREEN);
 	ofRunApp(new testApp);
 
 #else

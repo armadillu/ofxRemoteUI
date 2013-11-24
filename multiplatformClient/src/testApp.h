@@ -4,13 +4,29 @@
 #include "ofxRemoteUIClient.h"
 #include "ofxUI.h"
 
-#define STATIC_UI_H		(retinaScale * 110 )
-#define GROUP_SPACE_H	3
-#define EDGE_SPACE		10
-#define WINDOW_WDITH	480
-#define WIDGET_H		(retinaScale * 17)
+#define WIDGET_H		( retinaScale * 22 )
+#define COLOR_SLIDER_H	( retinaScale * 16 )
+#define SLIDER_H		( retinaScale * 18 )
+#define PADDING			(4 * retinaScale)
+#define WIDGET_SPACING	(4 * retinaScale)
+#define GROUP_SPACE_H	3 * retinaScale
+#define ENUM_SURROUNDING_SPACE 2 * retinaScale
+#define EDGE_SPACE		5 * retinaScale
+#define STATIC_UI_H		( 4 * WIDGET_H + 4 * PADDING + WIDGET_SPACING )
+#define DYNAMIC_UI_STARTING_Y (STATIC_UI_H + 5 * retinaScale)
+#define CANVAS_FULL_W	( ofGetWidth() - 2 * EDGE_SPACE)
+#define WIDGET_FULL_W	( ofGetWidth() - 2 * EDGE_SPACE - 2 * PADDING)
 
-#define GROUP_BG_COLOR	ofxUIColor(186, 0, 180)
+#define FONT_FILE			"GUI/CPMono_v07 Plain.otf"
+#define FONT_SIZE_MULT		1.0
+#define FONT_SIZE_SMALL		5 * retinaScale * FONT_SIZE_MULT
+#define FONT_SIZE_MEDIUM	7 * retinaScale * FONT_SIZE_MULT
+#define FONT_SIZE_LARGE		13 * retinaScale * FONT_SIZE_MULT
+
+
+#define GROUP_BG_COLOR		ofxUIColor(186, 0, 180)
+#define STATIC_UI_BG_COLOR	ofxUIColor(32, 96,160,128)
+
 
 //declare callback method
 void clientCallback(RemoteUIClientCallBackArg a);
