@@ -27,6 +27,8 @@ std::vector<std::string> split(const std::string &s, char delim) {
 
 void testApp::setup(){
 
+	retinaScale = 1.0;
+
 	ofSetFrameRate(60);
 	ofBackground(22);
 	ofSetWindowTitle("ofxRemoteUI Client");
@@ -58,6 +60,7 @@ void testApp::preparePresetUI(){
 
 	float h = 80;
 	float w = ofGetWidth() * 0.8;
+	float widgetH = 40;
 
 	if(presetNameUI) delete presetNameUI;
 	presetNameUI = new ofxUICanvas( (ofGetWidth() - w )/2.0, ofGetHeight()/2 -h/2, w , h );
@@ -71,9 +74,9 @@ void testApp::preparePresetUI(){
 	ti->setDrawOutline(true);
 
 	presetNameUI->setWidgetFontSize(OFX_UI_FONT_SMALL);
-	presetNameUI->addLabelButton("CANCEL", false, 80.0, 20.0);
+	presetNameUI->addLabelButton("CANCEL", false, 80.0, widgetH);
 	presetNameUI->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-	presetNameUI->addLabelButton("MAKE NEW PRESET", false, 170.0, 20.0);
+	presetNameUI->addLabelButton("MAKE NEW PRESET", false, 170.0, widgetH);
 	presetNameUI->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
 
 	presetNameUI->centerWidgetsOnCanvas(true, true);
@@ -84,16 +87,22 @@ void testApp::preparePresetUI(){
 
 
 void testApp::prepareStaticUI(){
-	// STATIC UI ///////////////////
-	staticUI = new ofxUICanvas( EDGE_SPACE, EDGE_SPACE, ofGetWidth() - 2 * EDGE_SPACE, STATIC_UI_H  - 2 * EDGE_SPACE);
 
-	staticUI->setFontSize(OFX_UI_FONT_SMALL, 5);
-	staticUI->setFontSize(OFX_UI_FONT_MEDIUM, 5);
-	staticUI->setFontSize(OFX_UI_FONT_LARGE, 8);
+	// STATIC UI ///////////////////
+	staticUI = new ofxUICanvas( EDGE_SPACE, EDGE_SPACE, retinaScale * ( ofGetWidth() - 2 * EDGE_SPACE), STATIC_UI_H  - 2 * EDGE_SPACE);
 
 #ifdef TARGET_OF_IOS
-	//staticUI->setRetinaResolution();
+	staticUI->setRetinaResolution();
+	if ( [[UIScreen mainScreen] scale] > 1 ){
+		retinaScale = 2.0;
+	}
 #endif
+
+
+	staticUI->setFontSize(OFX_UI_FONT_SMALL, retinaScale * 5);
+	staticUI->setFontSize(OFX_UI_FONT_MEDIUM, retinaScale * 5);
+	staticUI->setFontSize(OFX_UI_FONT_LARGE, retinaScale * 8);
+
 
 	//	staticUI->setDrawBack(true);
 	staticUI->setColorBack(ofxUIColor(0,33,128,128));
@@ -122,17 +131,18 @@ void testApp::prepareStaticUI(){
 	//	staticUI->addLabel("port");
 	//	staticUI->addTextInput("portField", "");
 
-	ofxUILabelButton * save = staticUI->addLabelButton("SAVE TO XML", false, 100.0, 20.0);
+
+	ofxUILabelButton * save = staticUI->addLabelButton("SAVE TO XML", false, retinaScale * 100.0, WIDGET_H);
 	save->setColorBack(ofxUIColor(255,44,44,128));
 	staticUI->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-	staticUI->addLabelButton("SYNC", false, 50.0, 20.0)->setColorBack(ofxUIColor(33,255,33,128));;
-	staticUI->addLabelButton("MAKE NEW PRESET", false, 120.0, 20.0)->setColorBack(ofxUIColor(200,33,200,128));;
+	staticUI->addLabelButton("SYNC", false, retinaScale *  50.0, WIDGET_H)->setColorBack(ofxUIColor(33,255,33,128));;
+	staticUI->addLabelButton("MAKE NEW PRESET", false, retinaScale * 120.0, WIDGET_H)->setColorBack(ofxUIColor(200,33,200,128));;
 	staticUI->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
 
 	staticUI->addLabel("serverName", "not connected");
 
 	vector<string> empty;
-	ofxUIDropDownList * neigh = staticUI->addDropDownList("NEIGHBORS", empty, ofGetWidth() - 2 * EDGE_SPACE - 8);
+	ofxUIDropDownList * neigh = staticUI->addDropDownList("NEIGHBORS", empty,  (ofGetWidth() - retinaScale * 2 * EDGE_SPACE - retinaScale * 8));
 	neigh->setColorBack(ofxUIColor(128,200));
 	neigh->setAllowMultiple(false);
 	neigh->setShowCurrentSelected(false);
@@ -141,7 +151,7 @@ void testApp::prepareStaticUI(){
 
 
 	//staticUI->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-	ofxUIDropDownList * presets = staticUI->addDropDownList("PRESETS", empty, ofGetWidth() - 2 * EDGE_SPACE - 8);
+	ofxUIDropDownList * presets = staticUI->addDropDownList("PRESETS", empty,  (ofGetWidth() - retinaScale * 2 * EDGE_SPACE - retinaScale * 8));
 	presets->setColorBack(ofxUIColor(0,160,160,255));
 	presets->setAllowMultiple(false);
 	presets->setShowCurrentSelected(true);
@@ -459,7 +469,7 @@ void testApp::fullParamsUpdate(){
 				case REMOTEUI_PARAM_UNKNOWN:
 					break;
 				case REMOTEUI_PARAM_FLOAT:
-				gui->addSlider(paramName, p.minFloat, p.maxFloat, p.floatVal);
+				gui->addSlider(paramName, p.minFloat, p.maxFloat, p.floatVal, ofGetWidth() - retinaScale * 2 * EDGE_SPACE - retinaScale * 8, WIDGET_H);
 				break;
 
 				case REMOTEUI_PARAM_INT:

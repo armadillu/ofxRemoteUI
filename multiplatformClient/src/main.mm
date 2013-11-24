@@ -9,7 +9,7 @@ int main( ){
 	ofAppiOSWindow * iOSWindow = new ofAppiOSWindow();
 	if ( [[UIScreen mainScreen] scale] > 1 ){
 		//if ( ofxiPhoneGetDeviceType() != OFXIPHONE_DEVICE_IPAD )
-		//iOSWindow->enableRetina();
+		iOSWindow->enableRetina();
 	}
 
 	ofSetupOpenGL(iOSWindow, WINDOW_WDITH, 320, OF_FULLSCREEN);

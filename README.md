@@ -6,6 +6,8 @@ OF addon allows you to serve any variables you want (bool, float, int, enum, str
 Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 
 ![OSX Client](http://farm4.staticflickr.com/3680/10821138976_d11125455d_o.png "OSX Client")
+![MultiPlatform Client](http://farm4.staticflickr.com/3827/11024829803_7da98b3d3c_o.png "WIP MultiPlatform Client")
+
 
 ---
 
@@ -96,4 +98,4 @@ ofxRemoteUIServer listens for the keyDown event, and if "tab" is pressed, it dis
 
 ## WIP
 
-- A basic multi-platform client (based in OF, so can target win/linux/ios/androd) based on ofxUI.
+- A basic multi-platform client (based in OF, so can target win/linux/ios/android) based on ofxUI.

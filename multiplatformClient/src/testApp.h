@@ -4,10 +4,11 @@
 #include "ofxRemoteUIClient.h"
 #include "ofxUI.h"
 
-#define STATIC_UI_H		110
+#define STATIC_UI_H		(retinaScale * 110 )
 #define GROUP_SPACE_H	3
 #define EDGE_SPACE		10
 #define WINDOW_WDITH	480
+#define WIDGET_H		(retinaScale * 17)
 
 #define GROUP_BG_COLOR	ofxUIColor(186, 0, 180)
 
@@ -61,5 +62,7 @@ class testApp : public ofBaseApp{
 	map<string,string> neighborNames; //from "screen name" to address for neighbors
 
 	ofxRemoteUIClient *				client;
+
+	float retinaScale;
 
 };
