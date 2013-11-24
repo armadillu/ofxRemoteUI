@@ -13,6 +13,7 @@ Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 
 * Edit & Track variables remotely through UDP/OSC (bool, int, float, string, Enum, ofColor).
 * Native OSX interface.
+* Alternative mutliplatform client built on top of ofxUI (with less features for now)
 * Allows to save/load your variable states across app launches.
 * Parameter values are saved in your app's data folder, in xml format.
 * Allows creation/deletion of Presets, variable states that you can switch from and to quickly.
