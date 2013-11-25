@@ -29,6 +29,13 @@ void testApp::setup(){
 
 	retinaScale = 1.0;
 
+	#ifdef TARGET_OF_IOS
+	if ( [[UIScreen mainScreen] scale] > 1 ){
+		//staticUI->setRetinaResolution();
+		retinaScale = 2.0;
+	}
+	#endif
+
 	ofSetFrameRate(60);
 	ofBackground(22);
 	ofSetWindowTitle("ofxRemoteUI Client");
@@ -97,13 +104,6 @@ void testApp::preparePresetUI(){
 void testApp::prepareStaticUI(){
 
 	staticUI = new ofxUICanvas( EDGE_SPACE, EDGE_SPACE, CANVAS_FULL_W , STATIC_UI_H );
-
-	#ifdef TARGET_OF_IOS
-	if ( [[UIScreen mainScreen] scale] > 1 ){
-		staticUI->setRetinaResolution();
-		retinaScale = 2.0;
-	}
-	#endif
 
 	staticUI->setFont(FONT_FILE, true, false);
 	staticUI->setPadding(PADDING);
