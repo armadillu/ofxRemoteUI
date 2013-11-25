@@ -58,32 +58,33 @@ void testApp::setup(){
 
 void testApp::preparePresetUI(){
 
-	float h = 80;
+	float h = 100 * retinaScale;
 	float w = ofGetWidth() * 0.8;
-	float widgetH = 40;
 
 	if(presetNameUI) delete presetNameUI;
 	presetNameUI = new ofxUICanvas( (ofGetWidth() - w )/2.0, ofGetHeight()/2 -h/2, w , h );
 
 	presetNameUI->setFont(FONT_FILE, true, false);
+	presetNameUI->setPadding(PADDING);
+	presetNameUI->setWidgetSpacing(WIDGET_SPACING);
 
-	gui->setFontSize(OFX_UI_FONT_SMALL, FONT_SIZE_SMALL);
-	gui->setFontSize(OFX_UI_FONT_MEDIUM, FONT_SIZE_MEDIUM);
-	gui->setFontSize(OFX_UI_FONT_LARGE, FONT_SIZE_LARGE);
+	presetNameUI->setFontSize(OFX_UI_FONT_SMALL, FONT_SIZE_SMALL + 2);
+	presetNameUI->setFontSize(OFX_UI_FONT_MEDIUM, FONT_SIZE_MEDIUM + 2) ;
+	presetNameUI->setFontSize(OFX_UI_FONT_LARGE, FONT_SIZE_LARGE + 2);
 
-	presetNameUI->setDrawOutline(true);
+	//presetNameUI->setDrawOutline(true);
 	presetNameUI->setColorBack(ofxUIColor(64,128));
 	presetNameUI->setColorFill(ofxUIColor(255,128));
 
-	presetNameUI->addWidgetDown(new ofxUILabel("TYPE IN NEW PRESET NAME", OFX_UI_FONT_LARGE));
+	presetNameUI->addWidgetDown(new ofxUILabel("TYPE IN NEW PRESET NAME", OFX_UI_FONT_SMALL));
 	presetNameUI->setWidgetFontSize(OFX_UI_FONT_LARGE);
-	ofxUITextInput* ti = presetNameUI->addTextInput("TEXT INPUT", "myPreset", OFX_UI_FONT_MEDIUM);
+	ofxUITextInput* ti = presetNameUI->addTextInput("TEXT INPUT", "myPreset");
 	ti->setDrawOutline(true);
 
 	presetNameUI->setWidgetFontSize(OFX_UI_FONT_SMALL);
-	presetNameUI->addLabelButton("CANCEL", false, 80.0, widgetH);
+	presetNameUI->addLabelButton("CANCEL", false, 0, WIDGET_H);
 	presetNameUI->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
-	presetNameUI->addLabelButton("MAKE NEW PRESET", false, 170.0, widgetH);
+	presetNameUI->addLabelButton("MAKE PRESET", false, 0, WIDGET_H);
 	presetNameUI->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
 
 	presetNameUI->centerWidgetsOnCanvas(true, true);
@@ -138,7 +139,7 @@ void testApp::prepareStaticUI(){
 	save->setColorBack(ofxUIColor(255,44,44,128));
 	staticUI->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
 	staticUI->addLabelButton("SYNC", false, 0, WIDGET_H)->setColorBack(ofxUIColor(33,255,33,128));;
-	staticUI->addLabelButton("MAKE NEW PRESET", false, 0, WIDGET_H)->setColorBack(ofxUIColor(200,33,200,128));;
+	staticUI->addLabelButton("MAKE PRESET", false, 0, WIDGET_H)->setColorBack(ofxUIColor(200,33,200,128));;
 	staticUI->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
 
 	staticUI->addLabel("serverName", "not connected");
@@ -212,7 +213,7 @@ void testApp::presetGuiEvent(ofxUIEventArgs &e){
 			doneWithScreen = true;
 		}
 	}else
-	if(paramName == "MAKE NEW PRESET"){
+	if(paramName == "MAKE PRESET"){
 
 		if (e.getButton()->getValue()){
 			ofxUITextInput * ti = (ofxUITextInput*)presetNameUI->getWidget("TEXT INPUT");
@@ -275,7 +276,7 @@ void testApp::staticGuiEvent(ofxUIEventArgs &e){
 			client->requestCompleteUpdate(); //both params and presets
 		}
 	}else
-	if(paramName == "MAKE NEW PRESET"){
+	if(paramName == "MAKE PRESET"){
 
 		if (e.getButton()->getValue()){
 			staticUI->setVisible(false);

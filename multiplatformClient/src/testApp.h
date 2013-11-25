@@ -17,10 +17,10 @@
 #define CANVAS_FULL_W	( ofGetWidth() - 2 * EDGE_SPACE)
 #define WIDGET_FULL_W	( ofGetWidth() - 2 * EDGE_SPACE - 2 * PADDING)
 
-#define FONT_FILE			"GUI/CPMono_v07 Plain.otf"
+#define FONT_FILE			"CPMono_v07 Plain.otf"
 #define FONT_SIZE_MULT		1.0
 #define FONT_SIZE_SMALL		5 * retinaScale * FONT_SIZE_MULT
-#define FONT_SIZE_MEDIUM	7 * retinaScale * FONT_SIZE_MULT
+#define FONT_SIZE_MEDIUM	6 * retinaScale * FONT_SIZE_MULT
 #define FONT_SIZE_LARGE		13 * retinaScale * FONT_SIZE_MULT
 
 
