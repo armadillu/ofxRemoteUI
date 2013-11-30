@@ -100,13 +100,41 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 @implementation AppDelegate
 
+-(void)restartXcodeApp{
+	NSAppleScript* appleScript = [[NSAppleScript alloc] initWithSource: (NSString *)
+								  @"activate application \"Xcode\"\n"
+								  @"tell application \"System Events\"\n"
+								  @"tell process \"Xcode\"\n"
+								  @"click menu item \"Stop\" of menu 1 of menu bar item \"Product\" of menu bar 1\n"
+								  @"end tell\n"
+								  @"end tell\n"
+								  @"activate application \"Xcode\"\n"
+								  @"tell application \"System Events\"\n"
+								  @"tell process \"Xcode\"\n"
+								  @"click menu item \"Run\" of menu 1 of menu bar item \"Product\" of menu bar 1\n"
+								  @"end tell\n"
+								  @"end tell\n"
+								  ];
+	bool c = [appleScript compileAndReturnError:nil];
+	bool r = [appleScript executeAndReturnError:nil];
+	[appleScript release];
+}
+
+-(IBAction)restartXcodeApp:(id)sender{
+	client->saveCurrentStateToDefaultXML();
+	//[self performSelector:@selector(stopXcodeApp) withObject:Nil afterDelay:0.33];
+	[self performSelector:@selector(restartXcodeApp) withObject:Nil afterDelay:0.33];
+}
+
+
 -(void)log:(RemoteUIClientCallBackArg) arg{
 
-	if (	arg.action == SERVER_SENT_FULL_PARAMS_UPDATE ||
-			arg.action == SERVER_PRESETS_LIST_UPDATED ||
-		arg.action == NEIGHBORS_UPDATED ){
-
-		return; //this stuff is not worth logging
+	if (
+		arg.action == SERVER_SENT_FULL_PARAMS_UPDATE ||
+		arg.action == SERVER_PRESETS_LIST_UPDATED ||
+		arg.action == NEIGHBORS_UPDATED
+		){
+			return; //this stuff is not worth logging
 	}
 	
 	NSString * action = @"";

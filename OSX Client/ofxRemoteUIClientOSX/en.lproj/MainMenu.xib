@@ -201,6 +201,15 @@
 									<reference key="NSOnImage" ref="465035805"/>
 									<reference key="NSMixedImage" ref="56238410"/>
 								</object>
+								<object class="NSMenuItem" id="378585646">
+									<reference key="NSMenu" ref="573535174"/>
+									<string key="NSTitle">Restart Xcode Project</string>
+									<string type="base64-UTF8" key="NSKeyEquiv">DQ</string>
+									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="465035805"/>
+									<reference key="NSMixedImage" ref="56238410"/>
+								</object>
 							</array>
 						</object>
 					</object>
@@ -1667,7 +1676,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="203420949"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
+				<string key="NSScreenRect">{{0, 0}, {2048, 1130}}</string>
 				<string key="NSMinSize">{372, 272}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<string key="NSFrameAutosaveName">mainwin</string>
@@ -1763,7 +1772,7 @@
 									<reference key="NSDocView" ref="459942669"/>
 									<reference key="NSBGColor" ref="631047369"/>
 									<object class="NSCursor" key="NSCursor">
-										<string key="NSHotSpot">{1, -1}</string>
+										<string key="NSHotSpot">{5, 5}</string>
 										<int key="NSCursorType">0</int>
 									</object>
 									<int key="NScvFlags">4</int>
@@ -1831,7 +1840,7 @@
 					</array>
 					<string key="NSFrameSize">{276, 378}</string>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
+				<string key="NSScreenRect">{{0, 0}, {2048, 1130}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<string key="NSFrameAutosaveName">logView</string>
 				<bool key="NSWindowIsRestorable">NO</bool>
@@ -2019,7 +2028,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="962428149"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
+				<string key="NSScreenRect">{{0, 0}, {2048, 1130}}</string>
 				<string key="NSMinSize">{252, 149}</string>
 				<string key="NSMaxSize">{252, 150}</string>
 				<string key="NSFrameAutosaveName">prefs</string>
@@ -2695,6 +2704,14 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
+						<string key="label">restartXcodeApp:</string>
+						<reference key="source" ref="550585456"/>
+						<reference key="destination" ref="378585646"/>
+					</object>
+					<string key="id">S2B-mx-g6V</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
 						<string key="label">makeKeyAndOrderFront:</string>
 						<reference key="source" ref="49556678"/>
 						<reference key="destination" ref="278663174"/>
@@ -2846,6 +2863,7 @@
 						<reference key="object" ref="573535174"/>
 						<array class="NSMutableArray" key="children">
 							<reference ref="865227404"/>
+							<reference ref="378585646"/>
 						</array>
 						<reference key="parent" ref="96058912"/>
 					</object>
@@ -3815,6 +3833,11 @@
 						<reference key="object" ref="459942669"/>
 						<reference key="parent" ref="765726733"/>
 					</object>
+					<object class="IBObjectRecord">
+						<string key="id">h6d-Hv-5Qn</string>
+						<reference key="object" ref="378585646"/>
+						<reference key="parent" ref="573535174"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -4201,6 +4224,8 @@
 				<string key="dvw-BD-lfZ.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<reference key="dvw-BD-lfZ.IBUserGuides" ref="0"/>
 				<boolean value="NO" key="dvw-BD-lfZ.showNotes"/>
+				<string key="h6d-Hv-5Qn.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<boolean value="NO" key="h6d-Hv-5Qn.showNotes"/>
 				<string key="hSn-jR-U3G.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="hSn-jR-U3G.showNotes"/>
 				<string key="r8p-Gw-FJI.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4225,8 +4250,9 @@
 						<string key="filterType:">id</string>
 						<string key="pasteSpecial:">id</string>
 						<string key="pressedConnect:">id</string>
-						<string key="pressedContinuously:">NSButton</string>
+						<string key="pressedContinuously:">id</string>
 						<string key="pressedSync:">id</string>
+						<string key="restartXcodeApp:">id</string>
 						<string key="userAddPreset:">id</string>
 						<string key="userChoseGroup:">id</string>
 						<string key="userChoseNeighbor:">id</string>
@@ -4263,10 +4289,14 @@
 						</object>
 						<object class="IBActionInfo" key="pressedContinuously:">
 							<string key="name">pressedContinuously:</string>
-							<string key="candidateClassName">NSButton</string>
+							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="pressedSync:">
 							<string key="name">pressedSync:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="restartXcodeApp:">
+							<string key="name">restartXcodeApp:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="userAddPreset:">

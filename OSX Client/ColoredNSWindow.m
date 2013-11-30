@@ -55,8 +55,9 @@ NSMutableArray * coloredWindows = nil;
 	method_exchangeImplementations(m1, m2);
 
 	//NSLog(@"awake %@", self);
-	if(myWinColor == nil) myWinColor = [[NSColor whiteColor] retain];
+	if(myWinColor == nil) myWinColor = [[NSColor orangeColor] retain];
 }
+
 
 - (void)drawRect:(NSRect)rect{
 

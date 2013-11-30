@@ -95,6 +95,8 @@ void clientCallback(RemoteUIClientCallBackArg a);
 -(IBAction)userChosePreset:(id)sender;
 -(IBAction)userChoseNeighbor:(id)sender;
 
+-(IBAction)restartXcodeApp:(id)sender;
+-(void)restartXcodeApp;
 
 -(IBAction)userPressedSave:(id)sender;
 
