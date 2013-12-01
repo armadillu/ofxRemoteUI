@@ -43,6 +43,8 @@
 		BB5CC61E177E49D500B595F8 /* ofxXmlSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC60A177E49D500B595F8 /* ofxXmlSettings.cpp */; };
 		BB65837B16A315B2000B45F0 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = BB65837A16A315B2000B45F0 /* icon.icns */; };
 		BB6CC35D174698DE0043F523 /* MyScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = BB6CC35C174698DE0043F523 /* MyScrollView.m */; };
+		BB7EA611184B89DC00048F7A /* RestartXcodeApp.scptd in Resources */ = {isa = PBXBuildFile; fileRef = BB7EA610184B89DC00048F7A /* RestartXcodeApp.scptd */; };
+		BB7EA613184B91CD00048F7A /* openAccessibility.scpt in Resources */ = {isa = PBXBuildFile; fileRef = BB7EA612184B91CD00048F7A /* openAccessibility.scpt */; };
 		BB8776E917C99B3700CC74B8 /* NSColorStringExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = BB8776E817C99B3700CC74B8 /* NSColorStringExtension.m */; };
 		BB94E57F17464E1800A7A3CC /* View.xib in Resources */ = {isa = PBXBuildFile; fileRef = BB94E57D17464E1800A7A3CC /* View.xib */; };
 		BB94E5AE17468EAE00A7A3CC /* ColorView.m in Sources */ = {isa = PBXBuildFile; fileRef = BB94E5AD17468EAE00A7A3CC /* ColorView.m */; };
@@ -145,6 +147,8 @@
 		BB65837A16A315B2000B45F0 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = icon.icns; sourceTree = "<group>"; };
 		BB6CC35B174698DE0043F523 /* MyScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyScrollView.h; sourceTree = "<group>"; };
 		BB6CC35C174698DE0043F523 /* MyScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyScrollView.m; sourceTree = "<group>"; };
+		BB7EA610184B89DC00048F7A /* RestartXcodeApp.scptd */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = RestartXcodeApp.scptd; sourceTree = "<group>"; };
+		BB7EA612184B91CD00048F7A /* openAccessibility.scpt */ = {isa = PBXFileReference; lastKnownFileType = file; path = openAccessibility.scpt; sourceTree = "<group>"; };
 		BB8776E717C99B3700CC74B8 /* NSColorStringExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSColorStringExtension.h; sourceTree = "<group>"; };
 		BB8776E817C99B3700CC74B8 /* NSColorStringExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSColorStringExtension.m; sourceTree = "<group>"; };
 		BB94E57E17464E1800A7A3CC /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = View.xib; sourceTree = "<group>"; };
@@ -248,6 +252,8 @@
 		BB089AC11799C437009C4BC7 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				BB7EA612184B91CD00048F7A /* openAccessibility.scpt */,
+				BB7EA610184B89DC00048F7A /* RestartXcodeApp.scptd */,
 				BBDCBDDD16A0512300F1C5EC /* en.lproj */,
 				BBC385851797377C007E2DD1 /* Growl Registration Ticket.growlRegDict */,
 				BBDCBDFC16A0526C00F1C5EC /* ofxRemoteUIClientOSX-Info.plist */,
@@ -535,12 +541,14 @@
 				BBAF53C51800C9CC0055A481 /* warning.png in Resources */,
 				BBDCBDE416A0512300F1C5EC /* Credits.rtf in Resources */,
 				BBDCBDE516A0512300F1C5EC /* InfoPlist.strings in Resources */,
+				BB7EA611184B89DC00048F7A /* RestartXcodeApp.scptd in Resources */,
 				BBDCBDE616A0512300F1C5EC /* MainMenu.xib in Resources */,
 				BB65837B16A315B2000B45F0 /* icon.icns in Resources */,
 				BBE6075A16A466A7002F1707 /* offline.png in Resources */,
 				BB94E57F17464E1800A7A3CC /* View.xib in Resources */,
 				BBB1F6FB1749003B00992119 /* connected.png in Resources */,
 				BBB1F6FC1749003B00992119 /* connected@2x.png in Resources */,
+				BB7EA613184B91CD00048F7A /* openAccessibility.scpt in Resources */,
 				BBAF53C41800C9CC0055A481 /* warning@2x.png in Resources */,
 				BBB1F6FE174900D100992119 /* offline@2x.png in Resources */,
 				BBC385861797377C007E2DD1 /* Growl Registration Ticket.growlRegDict in Resources */,

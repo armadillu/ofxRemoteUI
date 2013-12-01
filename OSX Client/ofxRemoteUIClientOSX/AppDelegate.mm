@@ -100,23 +100,26 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 @implementation AppDelegate
 
--(void)restartXcodeApp{
-	NSAppleScript* appleScript = [[NSAppleScript alloc] initWithSource: (NSString *)
-								  @"activate application \"Xcode\"\n"
-								  @"tell application \"System Events\"\n"
-								  @"tell process \"Xcode\"\n"
-								  @"click menu item \"Stop\" of menu 1 of menu bar item \"Product\" of menu bar 1\n"
-								  @"end tell\n"
-								  @"end tell\n"
-								  @"activate application \"Xcode\"\n"
-								  @"tell application \"System Events\"\n"
-								  @"tell process \"Xcode\"\n"
-								  @"click menu item \"Run\" of menu 1 of menu bar item \"Product\" of menu bar 1\n"
-								  @"end tell\n"
-								  @"end tell\n"
-								  ];
+-(void)openAccessibilitySystemPrefs{
+	NSAppleScript* appleScript = [[NSAppleScript alloc] initWithContentsOfURL:[[NSBundle mainBundle] URLForResource:@"openAccessibility" withExtension:@"scpt" ] error:nil];
 	bool c = [appleScript compileAndReturnError:nil];
-	bool r = [appleScript executeAndReturnError:nil];
+	NSDictionary *errDict = nil;
+	bool r = [appleScript executeAndReturnError:&errDict];
+	if(!r){
+		NSLog(@"openAccessibilitySystemPrefs: %d %d >> %@", c, r, errDict);
+	}
+	[appleScript release];
+}
+
+-(void)restartXcodeApp{
+	NSAppleScript* appleScript = [[NSAppleScript alloc] initWithContentsOfURL:[[NSBundle mainBundle] URLForResource:@"RestartXcodeApp" withExtension:@"scptd" ] error:nil];
+	bool c = [appleScript compileAndReturnError:nil];
+	NSDictionary *errDict = nil;
+	bool r = [appleScript executeAndReturnError:&errDict];
+	if( r == false){
+		[self openAccessibilitySystemPrefs];
+		NSLog(@"restartXcodeApp: %d %d >> %@", c, r, errDict);
+	}
 	[appleScript release];
 }
 

@@ -97,6 +97,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 
 -(IBAction)restartXcodeApp:(id)sender;
 -(void)restartXcodeApp;
+-(void)openAccessibilitySystemPrefs;
 
 -(IBAction)userPressedSave:(id)sender;
 
