@@ -17,6 +17,7 @@ Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 * Native OSX interface.
 * Alternative mutliplatform client built on top of ofxUI (with less features for now)
 * Allows to save/load your variable states across app launches.
+* MIDI controller bindings. Bind any parameter to any MIDI controller knob/slider.
 * Parameter values are saved in your app's data folder, in xml format.
 * Allows creation/deletion of Presets, variable states that you can switch from and to quickly.
 * Easily create Parameter Groups, and access them through keyboard shortcuts from the OSX Client.
@@ -95,7 +96,21 @@ OFX_REMOTEUI_SERVER_SETUP() assigns a random port the first time the app is laun
 
 ofxRemoteUIServer listens for the keyDown event, and if "tab" is pressed, it displays all your parameters on screen.
 
+To Bind any connected MIDI controller slider/knob to a param, do this:
 
-## WIP
+1. Click on a param name on the main Window. It will start blinking.
+2. Rotate/slide your device's know/slider.
+3. Done! You can now control that param from your midi device. 
 
-- A basic multi-platform client (based in OF, so can target win/linux/ios/android) based on ofxUI.
+You can Save/Load your midi bindings from the "MIDI Bindings" window. 
+For now, only int, float, enums and bools can be controlled from a midi controller.
+Bindings are lost when the app is quit. You can doubleclick any .midiBind file form the finder to load your previously saved bindings.
+
+
+## LICENSE and ATTRIBUTIONS
+
+ofxRemoteUI is made available under the [MIT](http://opensource.org/licenses/MIT) license.
+
+The OSX Client uses the [vvMidi](https://github.com/mrRay/vvopensource) frameworks to handle MIDI devices more easily. VVMidi uses a [LGPL](https://github.com/mrRay/vvopensource/blob/master/lgpl-3.0.txt) license. 
+
+ofxRemoteUI bundles ofxXmlSettings and ofxOSC, taken from [OpenFrameworks](http://openframeworks.cc).

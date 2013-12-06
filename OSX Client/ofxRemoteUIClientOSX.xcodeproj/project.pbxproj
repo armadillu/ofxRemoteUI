@@ -50,6 +50,10 @@
 		BB94E5AE17468EAE00A7A3CC /* ColorView.m in Sources */ = {isa = PBXBuildFile; fileRef = BB94E5AD17468EAE00A7A3CC /* ColorView.m */; };
 		BBAF53C41800C9CC0055A481 /* warning@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BBAF53C21800C9CC0055A481 /* warning@2x.png */; };
 		BBAF53C51800C9CC0055A481 /* warning.png in Resources */ = {isa = PBXBuildFile; fileRef = BBAF53C31800C9CC0055A481 /* warning.png */; };
+		BBB1D0021851E54B0015D282 /* VVMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBB1D0011851E54B0015D282 /* VVMIDI.framework */; };
+		BBB1D0031851E59D0015D282 /* VVMIDI.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBB1D0011851E54B0015D282 /* VVMIDI.framework */; };
+		BBB1D0051851E7FC0015D282 /* VVBasics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBB1D0041851E7FC0015D282 /* VVBasics.framework */; };
+		BBB1D0061851E8020015D282 /* VVBasics.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBB1D0041851E7FC0015D282 /* VVBasics.framework */; };
 		BBB1F6FB1749003B00992119 /* connected.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB1F6F91749003B00992119 /* connected.png */; };
 		BBB1F6FC1749003B00992119 /* connected@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB1F6FA1749003B00992119 /* connected@2x.png */; };
 		BBB1F6FE174900D100992119 /* offline@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB1F6FD174900D100992119 /* offline@2x.png */; };
@@ -86,6 +90,8 @@
 			dstSubfolderSpec = 10;
 			files = (
 				BBC385881797385C007E2DD1 /* Growl.framework in CopyFiles */,
+				BBB1D0061851E8020015D282 /* VVBasics.framework in CopyFiles */,
+				BBB1D0031851E59D0015D282 /* VVMIDI.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,6 +164,8 @@
 		BBAAAFA8173BF54B00FE94C4 /* ofxRemoteUIClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUIClient.h; sourceTree = "<group>"; };
 		BBAF53C21800C9CC0055A481 /* warning@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "warning@2x.png"; sourceTree = "<group>"; };
 		BBAF53C31800C9CC0055A481 /* warning.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = warning.png; sourceTree = "<group>"; };
+		BBB1D0011851E54B0015D282 /* VVMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VVMIDI.framework; path = ofxRemoteUIClientOSX/VVMIDI.framework; sourceTree = "<group>"; };
+		BBB1D0041851E7FC0015D282 /* VVBasics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VVBasics.framework; path = ofxRemoteUIClientOSX/VVBasics.framework; sourceTree = "<group>"; };
 		BBB1F6F91749003B00992119 /* connected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = connected.png; path = ofxRemoteUIClientOSX/connected.png; sourceTree = SOURCE_ROOT; };
 		BBB1F6FA1749003B00992119 /* connected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "connected@2x.png"; path = "ofxRemoteUIClientOSX/connected@2x.png"; sourceTree = SOURCE_ROOT; };
 		BBB1F6FD174900D100992119 /* offline@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "offline@2x.png"; path = "ofxRemoteUIClientOSX/offline@2x.png"; sourceTree = SOURCE_ROOT; };
@@ -190,6 +198,8 @@
 				BB395E96173E6326002FA815 /* QuartzCore.framework in Frameworks */,
 				73002CDB140ABCF60035299A /* Cocoa.framework in Frameworks */,
 				BBC38584179736CB007E2DD1 /* Growl.framework in Frameworks */,
+				BBB1D0051851E7FC0015D282 /* VVBasics.framework in Frameworks */,
+				BBB1D0021851E54B0015D282 /* VVMIDI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -222,6 +232,8 @@
 		73002CD9140ABCF60035299A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BBB1D0041851E7FC0015D282 /* VVBasics.framework */,
+				BBB1D0011851E54B0015D282 /* VVMIDI.framework */,
 				BBC38583179736CB007E2DD1 /* Growl.framework */,
 				BB395E95173E6326002FA815 /* QuartzCore.framework */,
 				73002CDA140ABCF60035299A /* Cocoa.framework */,
@@ -730,13 +742,15 @@
 				DEAD_CODE_STRIPPING = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)\"",
+					"$(SRCROOT)",
+					"/Users/oriol/Programming/svn.uri.cat/OF_Projects/_Addons/ofxRemoteUI/OSX\\ Client/ofxRemoteUIClientOSX",
 				);
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch";
 				GCC_VERSION = "";
 				INFOPLIST_FILE = "$(SRCROOT)/ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = ofxRemoteUIClientOSX;
 				SDKROOT = macosx10.7;
@@ -755,13 +769,15 @@
 				DEAD_CODE_STRIPPING = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)\"",
+					"$(SRCROOT)",
+					"/Users/oriol/Programming/svn.uri.cat/OF_Projects/_Addons/ofxRemoteUI/OSX\\ Client/ofxRemoteUIClientOSX",
 				);
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch";
 				GCC_VERSION = "";
 				INFOPLIST_FILE = "$(SRCROOT)/ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = ofxRemoteUIClientOSX;
 				SDKROOT = macosx10.7;

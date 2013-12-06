@@ -13,6 +13,8 @@
 }
 
 -(id)initWithParam: (RemoteUIParam)p paramName:(string)name ID:(int)n{
+	waitingForMidiTimer = nil;
+	midiHighlightAnim = false;
 	self = [super init];
 	numberID = n;
 	widget = nil;
@@ -27,6 +29,8 @@
 	[ui setWantsLayer:YES];
 	CALayer *viewLayer = [CALayer layer];
 	[ui setLayer:viewLayer];
+
+	[paramLabel setButtonType:NSMomentaryChangeButton];
 
 
 	CALayer * l = [CALayer layer];
@@ -145,6 +149,10 @@
 	[widget setEnabled:true];
 }
 
+-(string)getParamName{
+	return paramName;
+}
+
 
 -(void)remapSlider;{
 	if ([widget isKindOfClass: [NSSlider class]]){
@@ -162,8 +170,49 @@
 	}
 }
 
+-(void)waitForMdidAnimationTrigger{
+	[CATransaction begin];
+	[CATransaction setAnimationDuration: 0.33];
+		if([ui layer].opacity < 0.66 || !midiHighlightAnim){
+			[ui layer].opacity = 1.0;
+		}else{
+			[ui layer].opacity = 0.33;
+		}
+		[CATransaction commit];
+	[CATransaction commit];
+	if(!midiHighlightAnim){
+		[waitingForMidiTimer invalidate];
+		waitingForMidiTimer = nil;
+	}
+}
+
+-(void)stopMidiAnim{
+	midiHighlightAnim = false;
+}
+
+
+-(IBAction)clickOnLabel:(id)sender;{
+
+	if (param.type == REMOTEUI_PARAM_INT || param.type == REMOTEUI_PARAM_FLOAT ||
+		param.type == REMOTEUI_PARAM_BOOL || param.type == REMOTEUI_PARAM_ENUM
+		){
+		if(!midiHighlightAnim){
+			waitingForMidiTimer = [NSTimer scheduledTimerWithTimeInterval:0.33 target:self selector:@selector(waitForMdidAnimationTrigger) userInfo:Nil repeats:YES];
+			midiHighlightAnim = true;
+			[self waitForMdidAnimationTrigger];
+			NSLog(@"clickOnLabel %@", sender);
+		}else{
+			midiHighlightAnim = false; //stop anim
+		}
+		[[NSApp delegate] userClickedOnParamForMidiBinding: self];
+	}
+}
+
 
 -(void)setupUI{
+
+	[paramLabel setAction:@selector(clickOnLabel:)];
+	[paramLabel setTarget:self];
 
 	switch (param.type) {
 		case REMOTEUI_PARAM_FLOAT:
@@ -249,8 +298,8 @@
 		default:NSLog(@"wtf is this?");
 			break;
 	}
-	paramLabel.stringValue = [self stringFromString:paramName];
-	[paramLabel setToolTip:paramLabel.stringValue];
+	paramLabel.title = [self stringFromString:paramName];
+	[paramLabel setToolTip:paramLabel.title];
 	
 	if (param.group != OFXREMOTEUI_DEFAULT_PARAM_GROUP){
 		paramGroup.stringValue = [self stringFromString:param.group];
@@ -355,7 +404,10 @@
 }
 
 -(IBAction)updateFloatManually:(id)sender{
-	param.floatVal = [sender floatValue];
+	NSString * userTyped = [sender stringValue]; //whatever user types for input float (, or .), we convert back to "."
+	userTyped = [userTyped stringByReplacingOccurrencesOfString:@"," withString:@"."];
+	[sender setStringValue:userTyped];
+	param.floatVal = [userTyped floatValue];
 	[slider setFloatValue:param.floatVal];
 	if ([[NSApp delegate] respondsToSelector:@selector(userChangedParam:paramName:)]){
 		[[NSApp delegate] userChangedParam: param paramName: paramName];  //blindly send message to App Delegate (TODO!)

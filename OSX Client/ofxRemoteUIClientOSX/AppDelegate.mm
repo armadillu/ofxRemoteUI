@@ -100,6 +100,186 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 @implementation AppDelegate
 
+-(void)userClickedOnParamForMidiBinding:(ParamUI*)param{
+
+	if( upcomingMidiParam == nil ){ //no current param waiting to be set
+		upcomingMidiParam = param;
+		[window setTitle:@"ofxRemoteUI (Waiting for Midi Input)"];
+	}else{ //already have one waiting param, wtf is the user doing?
+		[upcomingMidiParam stopMidiAnim];
+		if (upcomingMidiParam == param){ //user cliked on blinking param, most likely wants to cancel
+			upcomingMidiParam = nil;
+			[window setTitle:@"ofxRemoteUI"];
+		}else{ //usr clicked on another param, lets make that one the selected one
+			upcomingMidiParam = param;
+		}
+	}
+}
+
+
+- (void) receivedMIDI:(NSArray *)a fromNode:(VVMIDINode *)n	{
+
+	NSEnumerator		*it = [a objectEnumerator];
+	VVMIDIMessage		*msgPtr;
+
+	while (msgPtr = [it nextObject]){
+
+		if([msgPtr type] == 0xB0 ){ //only slider type of midi msgs for now
+
+			//NSLog(@"%@ %f", [msgPtr description], [msgPtr doubleValue]);
+			string desc = [[[n deviceName] stringByReplacingOccurrencesOfString:@" " withString:@"_"] UTF8String];
+			string channel = [ [NSString stringWithFormat:@"[%d #%d]", [msgPtr data1], [msgPtr channel]] UTF8String];
+			string controllerUniqueAddress = channel + "@" + desc;
+			//printf("%s\n", controllerUniqueAddress.c_str());
+
+			if( upcomingMidiParam == nil ){ //we are not setting a midi binding
+
+				map<string,string>::iterator ii = midiBindings.find(controllerUniqueAddress);
+				if ( ii != midiBindings.end() ){ //found a param linked to that controller
+					string paramName = midiBindings[controllerUniqueAddress];
+					map<string,ParamUI*>::iterator it = widgets.find(paramName);
+					if ( it == widgets.end() ){	//not found! wtf?
+						NSLog(@"uh? midi binding pointing to an unexisting param!");
+					}else{
+						ParamUI * item = widgets[paramName];
+						RemoteUIParam p = client->getParamForName(paramName);
+						switch(p.type){
+							case REMOTEUI_PARAM_BOOL:
+								p.boolVal = [msgPtr doubleValue] > 0.5;
+								break;
+							case REMOTEUI_PARAM_FLOAT:
+								p.floatVal = p.minFloat + (p.maxFloat - p.minFloat) * [msgPtr doubleValue];
+								break;
+							case REMOTEUI_PARAM_ENUM:
+							case REMOTEUI_PARAM_INT:
+								p.intVal = p.minInt + (p.maxInt - p.minInt) * [msgPtr doubleValue];
+								break;
+							default:
+								break;//ignore other types
+						}
+						client->sendUntrackedParamUpdate(p, paramName); //send over network
+						[item updateParam:p];
+						[self performSelectorOnMainThread:@selector(updateParamUIOnMainThread:) withObject:item waitUntilDone:NO];
+					}
+				}
+			}else{ // we are setting a midi binding
+
+				midiBindings[controllerUniqueAddress] = (string)[upcomingMidiParam getParamName];
+				[midiBindingsTable reloadData];
+				[upcomingMidiParam stopMidiAnim];
+				upcomingMidiParam = nil;
+				[window setTitle:@"ofxRemoteUI"];
+			}
+		}
+	}
+}
+
+-(IBAction)saveMidiBindings:(id)who{
+
+	//fill in a NSDict to save as plist
+	NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithCapacity:5];
+	for(int i = 0; i < midiBindings.size(); i++){
+		map<string,string>::iterator ii = midiBindings.begin();
+		std::advance(ii, i);
+		NSString* midiAddress = [NSString stringWithUTF8String: (*ii).first.c_str()];
+		NSString* paramName = [NSString stringWithUTF8String: (*ii).second.c_str()];
+		[dict setObject:paramName forKey:midiAddress];
+	}
+
+	NSSavePanel *panel = [NSSavePanel savePanel];
+	[panel setExtensionHidden:YES];
+	[panel setAllowedFileTypes:[NSArray arrayWithObjects:@"midiBind", nil]];
+	[panel setRequiredFileType:@"midiBind"];
+	[panel setCanSelectHiddenExtension:NO];
+
+
+	NSInteger ret = [panel runModal];
+	if (ret == NSFileHandlingPanelOKButton) {
+		NSURL * path = [panel URL];
+		[dict writeToURL:[panel URL] atomically:YES];
+	}
+}
+
+-(IBAction)loadMidiBindings:(id)who;{
+
+	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+	[openPanel setDirectoryURL:[NSURL fileURLWithPath:[@"~" stringByExpandingTildeInPath]]];
+	[openPanel setCanChooseDirectories:YES];
+	[openPanel setTitle:@"Locate your midiBindings file"];
+	[openPanel beginWithCompletionHandler:^(NSInteger result) {
+		if(result == NSFileHandlingPanelOKButton) {
+			[self parseMidiBindingsFromFile: [[openPanel URLs] objectAtIndex:0]];
+		}
+	}];
+}
+
+-(BOOL)parseMidiBindingsFromFile:(NSURL*) file{
+	NSDictionary * d = [NSDictionary dictionaryWithContentsOfURL:file];
+	if(d){
+		NSArray * keys = [d allKeys];
+		midiBindings.clear();
+		for( id key in keys ){
+			midiBindings[[key UTF8String]] = [[d objectForKey:key] UTF8String];
+		}
+		[midiBindingsTable reloadData];
+		return YES;
+	}
+	return NO;
+}
+
+- (BOOL)application:(NSApplication *)sender openFile:(NSString *)fileName{
+	return [self parseMidiBindingsFromFile: [NSURL fileURLWithPath:fileName]];
+}
+
+
+-(void)updateParamUIOnMainThread:(ParamUI*)item{
+	[item updateUI];
+}
+
+- (NSInteger) numberOfRowsInTableView:(NSTableView *)tv	{
+	return midiBindings.size();
+}
+
+//populate midiBindings table
+- (id) tableView:(NSTableView *)tv objectValueForTableColumn:(NSTableColumn *)tc row:(NSInteger)row	{
+	if(row >= midiBindings.size()) return nil;
+	map<string,string>::iterator ii = midiBindings.begin();
+	std::advance(ii, row);
+
+	if([[tc identifier] isEqualToString:@"MIDI @"]){
+		return [NSString stringWithFormat:@"%s",(*ii).first.c_str()];
+	}else{
+		return [NSString stringWithFormat:@"%s",(*ii).second.c_str()];
+	}
+}
+
+//allow user to type in a custom param name in the midi bindings table
+- (void) tableView:(NSTableView *)tv setObjectValue:(id)v forTableColumn:(NSTableColumn *)tc row:(NSInteger)row	{
+
+	if(row >= midiBindings.size()) return;
+	if([[tc identifier] isEqualToString:@"MIDI @"]) return; //dont allow editing midi @'s
+
+	NSString * p = v;
+	if ([p length] == 0){ //user did input an empty param name, shortcut for deleting this row
+		map<string,string>::iterator ii = midiBindings.begin();
+		std::advance(ii, row);
+		midiBindings.erase( ii );
+		[midiBindingsTable reloadData];
+		return;
+	}
+	if(![[tc identifier] isEqualToString:@"MIDI @"]){ //we can set param names by hand if we really want to.
+		map<string,string>::iterator ii = midiBindings.begin();
+		std::advance(ii, row);
+		string paramName = [p UTF8String];
+		map<string,ParamUI*>::iterator it = widgets.find(paramName);
+		if(it != widgets.end()){
+			midiBindings[(*ii).first] = paramName;
+		}
+	}
+}
+
+///////// END MIDI ////////////////////////////
+
 -(void)openAccessibilitySystemPrefs{
 	NSAppleScript* appleScript = [[NSAppleScript alloc] initWithContentsOfURL:[[NSBundle mainBundle] URLForResource:@"openAccessibility" withExtension:@"scpt" ] error:nil];
 	bool c = [appleScript compileAndReturnError:nil];
@@ -322,6 +502,11 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[window setAllowsToolTipsWhenApplicationIsInactive:YES];
 	[[NSUserDefaults standardUserDefaults] setObject: [NSNumber numberWithInt: 1]
 											  forKey: @"NSInitialToolTipDelay"];
+
+	midiManager = [[VVMIDIManager alloc] init];
+	[midiManager setDelegate:self];
+	upcomingMidiParam = nil;
+
 	launched = TRUE;
 	NSLog(@"Launched ofxRemoteUI version %@", GIT_COMMIT_NUMBER);
 

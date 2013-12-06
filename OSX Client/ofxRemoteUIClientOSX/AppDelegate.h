@@ -13,6 +13,7 @@
 #import "ColoredNSWindow.h"
 #import "GitCommitNumber.h"
 #import <Growl/Growl.h>
+#import <VVMIDI/VVMIDI.h>
 
 #define REFRESH_RATE			1.0f/15.0f
 #define STATUS_REFRESH_RATE		0.333f
@@ -32,7 +33,7 @@ struct LayoutConfig{
 //declare callback method 
 void clientCallback(RemoteUIClientCallBackArg a);
 
-@interface AppDelegate : NSObject <NSApplicationDelegate>{
+@interface AppDelegate : NSObject <NSApplicationDelegate, VVMIDIDelegateProtocol>{
 
 @public
 
@@ -80,6 +81,13 @@ void clientCallback(RemoteUIClientCallBackArg a);
 	BOOL							showNotifications;
 
 	bool							needFullParamsUpdate;
+
+
+	//MIDI
+	VVMIDIManager					*midiManager;
+	ParamUI							*upcomingMidiParam;
+	map<string, string>				midiBindings;
+	IBOutlet NSTableView			*midiBindingsTable;
 }
 
 -(ofxRemoteUIClient *)getClient;
@@ -100,6 +108,9 @@ void clientCallback(RemoteUIClientCallBackArg a);
 -(void)openAccessibilitySystemPrefs;
 
 -(IBAction)userPressedSave:(id)sender;
+
+-(IBAction)saveMidiBindings:(id)who;
+-(IBAction)loadMidiBindings:(id)who;
 
 -(IBAction)userWantsRestoreXML:(id)sender;
 -(IBAction)userWantsRestoreDefaults:(id)sender;
@@ -125,6 +136,9 @@ void clientCallback(RemoteUIClientCallBackArg a);
 
 -(vector<string>)getParamsInGroup:(string)group;
 -(vector<string>)getAllGroupsInParams;
+
+//midi
+-(void)userClickedOnParamForMidiBinding:(ParamUI*)param;
 
 //growl
 -(void)showNotificationWithTitle:(NSString*)title description:(NSString*)desc ID:(NSString*)key priority:(int)p;

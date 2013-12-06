@@ -388,7 +388,7 @@ void ofxRemoteUIClient::trackParam(string paramName, unsigned char* param){
 	}else{
 		p = params[paramName];
 		if (p.type != REMOTEUI_PARAM_COLOR ){
-			cout << "wtf called trackParam(bool) on a param that's not a color!" << endl;
+			cout << "wtf called trackParam(color) on a param that's not a color!" << endl;
 		}
 	}
 	p.redValAddr = param;

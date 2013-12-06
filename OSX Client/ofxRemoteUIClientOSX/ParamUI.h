@@ -18,7 +18,7 @@
 	IBOutlet NSSlider *slider;
 	IBOutlet NSTextField *textView;
 	IBOutlet NSButton *button;
-	IBOutlet NSTextField *paramLabel;
+	IBOutlet NSButton *paramLabel;
 	IBOutlet NSTextField *paramGroup;
 	IBOutlet NSTextField *sliderVal;
 	IBOutlet NSTextField *sliderMin;
@@ -29,7 +29,10 @@
 
 	int numberID; // to handle alternating rows in table draw
 	bool shouldBeFlashing;
-	
+
+	//midi
+	bool midiHighlightAnim;
+	NSTimer * waitingForMidiTimer;	
 }
 
 -(void)dealloc;
@@ -45,12 +48,17 @@
 -(void)disableChanges;
 -(void)enableChanges;
 -(void)remapSlider;
+-(string)getParamName;
 
 -(NSString*)formatedFloat:(float) f;
 
+//midi
+-(void)stopMidiAnim;
 
 -(IBAction)updateFloat:(id)sender;
 -(IBAction)updateInt:(id)sender;
 -(IBAction)updateBool:(id)sender;
 -(IBAction)updateString:(id)sender;
+
+-(IBAction)clickOnLabel:(id)sender;
 @end
