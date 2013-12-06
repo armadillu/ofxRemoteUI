@@ -200,11 +200,10 @@
 			waitingForMidiTimer = [NSTimer scheduledTimerWithTimeInterval:0.33 target:self selector:@selector(waitForMdidAnimationTrigger) userInfo:Nil repeats:YES];
 			midiHighlightAnim = true;
 			[self waitForMdidAnimationTrigger];
-			NSLog(@"clickOnLabel %@", sender);
 		}else{
 			midiHighlightAnim = false; //stop anim
 		}
-		[[NSApp delegate] userClickedOnParamForMidiBinding: self];
+		[[NSApp delegate] userClickedOnParamForMidiBinding: self]; //ugly! TODO
 	}
 }
 
