@@ -65,7 +65,7 @@
 									<int key="NSCellFlags">-2080374784</int>
 									<int key="NSCellFlags2">134217728</int>
 									<string key="NSContents">ON</string>
-									<object class="NSFont" key="NSSupport" id="447866399">
+									<object class="NSFont" key="NSSupport">
 										<string key="NSName">.LucidaGrandeUI</string>
 										<double key="NSSize">13</double>
 										<int key="NSfFlags">1044</int>
@@ -344,7 +344,7 @@
 								<reference key="NSNextResponder" ref="521005238"/>
 								<int key="NSvFlags">268</int>
 								<array class="NSMutableArray" key="NSSubviews"/>
-								<string key="NSFrame">{{9, 5}, {112, 22}}</string>
+								<string key="NSFrame">{{3, 7}, {112, 19}}</string>
 								<reference key="NSSuperview" ref="521005238"/>
 								<reference key="NSWindow"/>
 								<bool key="NSViewIsLayerTreeHost">YES</bool>
@@ -354,11 +354,15 @@
 									<int key="NSCellFlags">67108864</int>
 									<int key="NSCellFlags2">0</int>
 									<string key="NSContents">Label</string>
-									<reference key="NSSupport" ref="447866399"/>
+									<object class="NSFont" key="NSSupport">
+										<string key="NSName">LucidaGrande</string>
+										<double key="NSSize">11</double>
+										<int key="NSfFlags">16</int>
+									</object>
 									<string key="NSCellIdentifier">_NS:22</string>
 									<reference key="NSControlView" ref="919059071"/>
-									<int key="NSButtonFlags">104087552</int>
-									<int key="NSButtonFlags2">134</int>
+									<int key="NSButtonFlags">146030592</int>
+									<int key="NSButtonFlags2">173</int>
 									<object class="NSImage" key="NSNormalImage">
 										<int key="NSImageFlags">549650432</int>
 										<string key="NSSize">{1, 1}</string>
@@ -454,7 +458,7 @@ Ac0AAA</bytes>
 								<string key="NSFrame">{{-9, 18}, {132, 16}}</string>
 								<reference key="NSSuperview" ref="521005238"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView"/>
+								<reference key="NSNextKeyView" ref="919059071"/>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSTextFieldCell" key="NSCell" id="189257399">
 									<int key="NSCellFlags">606076993</int>

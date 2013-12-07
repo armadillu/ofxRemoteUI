@@ -11,6 +11,7 @@
 #import "NSColorStringExtension.h"
 
 //ofxRemoteUIClient callback entry point
+#pragma mark - CALLBACKS
 void clientCallback(RemoteUIClientCallBackArg a){
 
 	AppDelegate * me = [NSApp delegate];
@@ -100,6 +101,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 @implementation AppDelegate
 
+#pragma mark - MIDI
 -(void)userClickedOnParamForMidiBinding:(ParamUI*)param{
 
 	if( upcomingMidiParam == nil ){ //no current param waiting to be set
@@ -123,14 +125,18 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	VVMIDIMessage		*msgPtr;
 
 	while (msgPtr = [it nextObject]){
+		Byte b = [msgPtr type];
+		//only slider type , noteOn and noteOff
+		bool slider = ( b >= 0xb0 && b <= 0xbF );
+		bool noteOff = ( b >= 0x80 && b <= 0x8F );
+		bool noteOn = ( b >= 0x90 && b <= 0x9F );
 
-		if([msgPtr type] == 0xB0 ){ //only slider type of midi msgs for now
+		if( slider || noteOff || noteOn ) {
 
 			//NSLog(@"%@ %f", [msgPtr description], [msgPtr doubleValue]);
 			string desc = [[[n deviceName] stringByReplacingOccurrencesOfString:@" " withString:@"_"] UTF8String];
-			string channel = [ [NSString stringWithFormat:@"[%d #%d]", [msgPtr data1], [msgPtr channel]] UTF8String];
+			string channel = [ [NSString stringWithFormat:@"[%d#%d]", [msgPtr data1], [msgPtr channel]] UTF8String];
 			string controllerUniqueAddress = channel + "@" + desc;
-			//printf("%s\n", controllerUniqueAddress.c_str());
 
 			if( upcomingMidiParam == nil ){ //we are not setting a midi binding
 
@@ -143,32 +149,46 @@ void clientCallback(RemoteUIClientCallBackArg a){
 					}else{
 						ParamUI * item = widgets[paramName];
 						RemoteUIParam p = client->getParamForName(paramName);
-						switch(p.type){
-							case REMOTEUI_PARAM_BOOL:
-								p.boolVal = [msgPtr doubleValue] > 0.5;
-								break;
-							case REMOTEUI_PARAM_FLOAT:
-								p.floatVal = p.minFloat + (p.maxFloat - p.minFloat) * [msgPtr doubleValue];
-								break;
-							case REMOTEUI_PARAM_ENUM:
-							case REMOTEUI_PARAM_INT:
-								p.intVal = p.minInt + (p.maxInt - p.minInt) * [msgPtr doubleValue];
-								break;
-							default:
-								break;//ignore other types
+						if(slider){ //control type midi msg (slider)
+							switch(p.type){
+								case REMOTEUI_PARAM_BOOL:
+									p.boolVal = [msgPtr doubleValue] > 0.5;
+									break;
+								case REMOTEUI_PARAM_FLOAT:
+									p.floatVal = p.minFloat + (p.maxFloat - p.minFloat) * [msgPtr doubleValue];
+									break;
+								case REMOTEUI_PARAM_ENUM:
+								case REMOTEUI_PARAM_INT:
+									p.intVal = p.minInt + (p.maxInt - p.minInt) * [msgPtr doubleValue];
+									break;
+								default:
+									break;//ignore other types
+							}
+						}else{ //must be noteOn or noteOff midi msg
+							if(p.type == REMOTEUI_PARAM_BOOL){
+								p.boolVal = noteOn; //noteOff implies !noteOn
+							}
 						}
 						client->sendUntrackedParamUpdate(p, paramName); //send over network
 						[item updateParam:p];
+						//this is called form second thread, we need to update UI from main thread
 						[self performSelectorOnMainThread:@selector(updateParamUIOnMainThread:) withObject:item waitUntilDone:NO];
 					}
 				}
 			}else{ // we are setting a midi binding
 
-				midiBindings[controllerUniqueAddress] = (string)[upcomingMidiParam getParamName];
-				[midiBindingsTable reloadData];
-				[upcomingMidiParam stopMidiAnim];
-				upcomingMidiParam = nil;
-				[window setTitle:@"ofxRemoteUI"];
+				if (
+					( upcomingMidiParam->param.type == REMOTEUI_PARAM_BOOL && (noteOn || noteOff ) ) //piano keys only for bools
+					||
+					slider //slider midi msg for any valid param
+					){
+						string paramN = [upcomingMidiParam getParamName];
+						midiBindings[controllerUniqueAddress] = paramN;
+						[midiBindingsTable reloadData];
+						[upcomingMidiParam stopMidiAnim];
+						upcomingMidiParam = nil;
+						[window setTitle:@"ofxRemoteUI"];
+				}
 			}
 		}
 	}
@@ -391,6 +411,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	return client;
 }
 
+#pragma mark - LAUNCH
 
 - (void)applicationDidFinishLaunching:(NSNotification *)note {
 
@@ -437,6 +458,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
     id searchCell = [addressField cell];
     [searchCell setSearchMenuTemplate:cellMenu];
 
+	[progress setUsesThreadedAnimation: YES];
 	///////////////////////////////////////////////
 
 	client = new ofxRemoteUIClient();
@@ -1065,7 +1087,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		[portField setEnabled:true];
 		[updateFromServerButton setEnabled: false];
 		[updateContinuouslyCheckbox setEnabled:false];
-		[statusImage setImage:[NSImage imageNamed:@"offline"]];
+		if ([statusImage image] != [NSImage imageNamed:@"offline"])
+			[statusImage setImage:[NSImage imageNamed:@"offline"]];
 		[progress stopAnimation:self];
 		lagField.stringValue = @"";
 		[self cleanUpGUIParams];
@@ -1105,12 +1128,15 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		if (lag > OFXREMOTEUI_CONNECTION_TIMEOUT || lag < 0.0f){
 			[self connect]; //force disconnect if lag is too large
 			[progress stopAnimation:self];
-			[statusImage setImage:[NSImage imageNamed:@"offline"]];
+			if ([statusImage image] != [NSImage imageNamed:@"offline"])
+				[statusImage setImage:[NSImage imageNamed:@"offline"]];
 		}else{
 			if (lag > 0.0f){
 				lagField.stringValue = [NSString stringWithFormat:@"%.0fms", 1000 * lag];
 				[progress stopAnimation:self];
-				[statusImage setImage:[NSImage imageNamed:@"connected"]];
+				if ([statusImage image] != [NSImage imageNamed:@"connected"]){
+					[statusImage setImage:[NSImage imageNamed:@"connected"]];
+				}
 			}
 		}
 	}

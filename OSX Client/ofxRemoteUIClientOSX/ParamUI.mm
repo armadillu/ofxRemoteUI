@@ -170,7 +170,8 @@
 	}
 }
 
--(void)waitForMdidAnimationTrigger{
+-(void)waitForMIDIAnimationTrigger{
+	[ui setWantsLayer:YES];
 	[CATransaction begin];
 	[CATransaction setAnimationDuration: 0.33];
 		if([ui layer].opacity < 0.66 || !midiHighlightAnim){
@@ -183,10 +184,12 @@
 	if(!midiHighlightAnim){
 		[waitingForMidiTimer invalidate];
 		waitingForMidiTimer = nil;
+		[ui setWantsLayer:NO];
 	}
 }
 
 -(void)stopMidiAnim{
+	[ui setWantsLayer:NO];
 	midiHighlightAnim = false;
 }
 
@@ -197,9 +200,9 @@
 		param.type == REMOTEUI_PARAM_BOOL || param.type == REMOTEUI_PARAM_ENUM
 		){
 		if(!midiHighlightAnim){
-			waitingForMidiTimer = [NSTimer scheduledTimerWithTimeInterval:0.33 target:self selector:@selector(waitForMdidAnimationTrigger) userInfo:Nil repeats:YES];
+			waitingForMidiTimer = [NSTimer scheduledTimerWithTimeInterval:0.33 target:self selector:@selector(waitForMIDIAnimationTrigger) userInfo:Nil repeats:YES];
 			midiHighlightAnim = true;
-			[self waitForMdidAnimationTrigger];
+			[self waitForMIDIAnimationTrigger];
 		}else{
 			midiHighlightAnim = false; //stop anim
 		}
@@ -298,7 +301,13 @@
 			break;
 	}
 	paramLabel.title = [self stringFromString:paramName];
-	[paramLabel setToolTip:paramLabel.title];
+	int t = param.type;
+	if (t == REMOTEUI_PARAM_FLOAT || t == REMOTEUI_PARAM_INT || t == REMOTEUI_PARAM_BOOL || t == REMOTEUI_PARAM_ENUM ){
+		[paramLabel setToolTip: [paramLabel.title stringByAppendingString:@" Parameter\nPress Button to bind MIDI controller"]];
+	}else{
+		[paramLabel setToolTip: [paramLabel.title stringByAppendingString:@" Parameter\nCan't bind to MIDI controller"]];
+	}
+	[paramLabel sizeToFit];
 	
 	if (param.group != OFXREMOTEUI_DEFAULT_PARAM_GROUP){
 		paramGroup.stringValue = [self stringFromString:param.group];

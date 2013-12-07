@@ -103,7 +103,7 @@ To Bind any connected MIDI controller slider/knob to a param, do this:
 3. Done! You can now control that param from your midi device. 
 
 You can Save/Load your midi bindings from the "MIDI Bindings" window. 
-For now, only int, float, enums and bools can be controlled from a midi controller.
+For now, only int, float, enums and bools can be controlled from a midi controller. MIDI Sliders/ Knobs can be binded to float, int, enum and bool. Bools can be binded to piano keys.
 Bindings are lost when the app is quit. You can doubleclick any .midiBind file form the finder to load your previously saved bindings.
 
 
