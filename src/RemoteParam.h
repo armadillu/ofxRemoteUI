@@ -139,7 +139,7 @@ public:
 	string group;
 	vector<string> enumList; //for enum type
 
-	unsigned char r,g,b,a; // color [0,255]
+	unsigned char r,g,b,a; // param bg color [0,255] 
 };
 
 

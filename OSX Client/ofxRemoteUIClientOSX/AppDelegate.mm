@@ -161,6 +161,17 @@ void clientCallback(RemoteUIClientCallBackArg a){
 								case REMOTEUI_PARAM_INT:
 									p.intVal = p.minInt + (p.maxInt - p.minInt) * [msgPtr doubleValue];
 									break;
+								case REMOTEUI_PARAM_COLOR:{
+									NSColor * c = [NSColor colorWithDeviceRed:p.redVal/255. green:p.greenVal/255. blue:p.blueVal/255. alpha:p.alphaVal/255.];
+									float sat = [c saturationComponent];
+									float bri = [c brightnessComponent];
+									float a = [c alphaComponent];
+									NSColor * c2 = [NSColor colorWithDeviceHue:[msgPtr doubleValue] saturation:sat brightness:bri alpha:a];
+									p.redVal = [c2 redComponent] * 255.f;
+									p.greenVal = [c2 greenComponent] * 255.f;
+									p.blueVal = [c2 blueComponent] * 255.f;
+									p.alphaVal = [c2 alphaComponent] * 255.f;
+								}break;
 								default:
 									break;//ignore other types
 							}
@@ -212,12 +223,12 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[panel setRequiredFileType:@"midiBind"];
 	[panel setCanSelectHiddenExtension:NO];
 
-
 	NSInteger ret = [panel runModal];
 	if (ret == NSFileHandlingPanelOKButton) {
 		NSURL * path = [panel URL];
 		[dict writeToURL:[panel URL] atomically:YES];
 	}
+	[dict release];
 }
 
 -(IBAction)loadMidiBindings:(id)who;{
@@ -232,6 +243,25 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		}
 	}];
 }
+
+-(IBAction)clearMidiBindings:(id)sender;{
+	midiBindings.clear();
+	[midiBindingsTable reloadData];
+}
+
+
+-(IBAction)deleteSelectedMidiBinding:(id)sender;{
+	int sel = [midiBindingsTable selectedRow];
+	if (sel >= 0 && sel < midiBindings.size()){
+		map<string,string>::iterator ii = midiBindings.begin();
+		std::advance(ii, sel);
+		midiBindings.erase(ii);
+		[midiBindingsTable reloadData];
+	}else{
+		NSBeep();
+	}
+}
+
 
 -(BOOL)parseMidiBindingsFromFile:(NSURL*) file{
 	NSDictionary * d = [NSDictionary dictionaryWithContentsOfURL:file];

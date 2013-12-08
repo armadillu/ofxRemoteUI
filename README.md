@@ -52,9 +52,6 @@ ofxRemoteUI uses Macros + the singleton pattern to make it very easy to share an
 
 The OSX client also allows to copy all the current params as plain text. You can also paste them back after editing them! Thx to @kritzikratzi for this idea!
 
-**"Restore to initial XML Values"** sets alls params to whatever values they had at server app launch.  
-**"Restore to Default Values"** sets alls params to whatever values the shared variable had before sharing it with OFX_REMOTEUI_SERVER_SHARE_PARAM().
-
 To use it outside of OpenFrameworks, you can see how the example-noOF is setup.   
 
 -----
@@ -84,18 +81,8 @@ To use it outside of OpenFrameworks, you can see how the example-noOF is setup.
 Use the supplied OSX Client to view and edit your shared parameters.
 
 
-## Notes
-
-Enums must be consecutive so that each enum item is +1 the previous one for them to work.
-
-When loading a preset, it might be that the preset doesn't specify values for all your current params. If so, the params whose values haven't been modified by the preset will show a small warning sign for a few seconds.
-
-Automatic discovery relies on each server advertising itself (its hostname, app name and port) on port 25748 over OSC.
-
-OFX_REMOTEUI_SERVER_SETUP() assigns a random port the first time the app is launched, and it uses that same port on successive launches. You can also manually specify a port by supplying it OFX_REMOTEUI_SERVER_SETUP(10000);
-
-ofxRemoteUIServer listens for the keyDown event, and if "tab" is pressed, it displays all your parameters on screen.
-
+## MIDI
+The ofxRemoteUI OSX client allows to bind any midi control to any of your params.
 To Bind any connected MIDI controller slider/knob to a param, do this:
 
 1. Click on a param name on the main Window. It will start blinking.
@@ -103,8 +90,27 @@ To Bind any connected MIDI controller slider/knob to a param, do this:
 3. Done! You can now control that param from your midi device. 
 
 You can Save/Load your midi bindings from the "MIDI Bindings" window. 
-For now, only int, float, enums and bools can be controlled from a midi controller. MIDI Sliders/ Knobs can be binded to float, int, enum and bool. Bools can be binded to piano keys.
+
+For now, only ints, floats, enums bools and colors can be controlled from a midi controller. MIDI Sliders/ Knobs can be binded to floats, ints, enums, bools and colors. For ints, floats and enums, the mapping is obvious; for bools, the lower half of a slider/knob sets the param to false, the upper half to true. For colors, the slider shifts the hue of the color parameter.
+
+Bools can also be binded to "piano keys"; params being set to true for as long as a key is held down.
+
 Bindings are lost when the app is quit. You can doubleclick any .midiBind file form the finder to load your previously saved bindings.
+
+## Random Notes
+
+**"Restore to initial XML Values"** sets alls params to whatever values they had at server app launch.  
+**"Restore to Default Values"** sets alls params to whatever values the shared variable had before sharing it with OFX_REMOTEUI_SERVER_SHARE_PARAM().
+
+Enums must be consecutive so that each enum item is +1 the previous one for them to work. This is usually the default behavior if you don't set specific values when defining your enums.
+
+When loading a preset, it might be that the preset doesn't specify values for all your current params (bc it's an older preset). If so, the params whose values haven't been modified by the preset will show a small warning sign for a few seconds.
+
+Automatic discovery relies on each server advertising itself (its hostname, app name and port) on port 25748 over OSC.
+
+OFX_REMOTEUI_SERVER_SETUP() assigns a random port the first time the app is launched, and it uses that same port on successive launches. You can also manually specify a port by supplying it OFX_REMOTEUI_SERVER_SETUP(10000);
+
+ofxRemoteUIServer listens for the keyDown event, and if "tab" is pressed, it displays all your parameters on screen.
 
 
 ## LICENSE and ATTRIBUTIONS

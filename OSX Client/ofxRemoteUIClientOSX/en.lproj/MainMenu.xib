@@ -1765,7 +1765,7 @@
 									<reference key="NSDocView" ref="459942669"/>
 									<reference key="NSBGColor" ref="631047369"/>
 									<object class="NSCursor" key="NSCursor">
-										<string key="NSHotSpot">{1, -1}</string>
+										<string key="NSHotSpot">{5, 5}</string>
 										<int key="NSCursorType">0</int>
 									</object>
 									<int key="NScvFlags">4</int>
@@ -2035,7 +2035,7 @@
 										<object class="NSTableView" id="183081819">
 											<reference key="NSNextResponder" ref="990149162"/>
 											<int key="NSvFlags">256</int>
-											<string key="NSFrameSize">{320, 266}</string>
+											<string key="NSFrameSize">{320, 262}</string>
 											<reference key="NSSuperview" ref="990149162"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="66278858"/>
@@ -2148,7 +2148,7 @@
 											<int key="NSTableViewGroupRowStyle">1</int>
 										</object>
 									</array>
-									<string key="NSFrame">{{1, 17}, {320, 266}}</string>
+									<string key="NSFrame">{{1, 17}, {320, 262}}</string>
 									<reference key="NSSuperview" ref="860569294"/>
 									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="183081819"/>
@@ -2202,7 +2202,7 @@
 								</object>
 								<reference ref="835970168"/>
 							</array>
-							<string key="NSFrame">{{-1, 91}, {322, 284}}</string>
+							<string key="NSFrame">{{-1, 95}, {322, 280}}</string>
 							<reference key="NSSuperview" ref="354912816"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="469254459"/>
@@ -2271,7 +2271,7 @@
 						<object class="NSTextField" id="802011495">
 							<reference key="NSNextResponder" ref="354912816"/>
 							<int key="NSvFlags">293</int>
-							<string key="NSFrame">{{8, 25}, {309, 56}}</string>
+							<string key="NSFrame">{{8, 31}, {309, 56}}</string>
 							<reference key="NSSuperview" ref="354912816"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="549149181"/>
@@ -2294,6 +2294,54 @@ ciBLbm9iL1NsaWRlciB0byBiaW5kIAozIC0gRG9uZSE</string>
 							<bool key="NSControlAutosetMaxLayoutWidth">YES</bool>
 							<double key="NSPreferredMaxLayoutWidth">305</double>
 							<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
+						</object>
+						<object class="NSButton" id="275475647">
+							<reference key="NSNextResponder" ref="354912816"/>
+							<int key="NSvFlags">292</int>
+							<string key="NSFrame">{{10, 6}, {65, 19}}</string>
+							<reference key="NSSuperview" ref="354912816"/>
+							<reference key="NSWindow"/>
+							<string key="NSReuseIdentifierKey">_NS:22</string>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSButtonCell" key="NSCell" id="997274352">
+								<int key="NSCellFlags">-2080374784</int>
+								<int key="NSCellFlags2">134348800</int>
+								<string key="NSContents">Clear All</string>
+								<reference key="NSSupport" ref="26"/>
+								<string key="NSCellIdentifier">_NS:22</string>
+								<reference key="NSControlView" ref="275475647"/>
+								<int key="NSButtonFlags">-2038153216</int>
+								<int key="NSButtonFlags2">163</int>
+								<string key="NSAlternateContents"/>
+								<string key="NSKeyEquivalent"/>
+								<int key="NSPeriodicDelay">400</int>
+								<int key="NSPeriodicInterval">75</int>
+							</object>
+							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+						</object>
+						<object class="NSButton" id="840432240">
+							<reference key="NSNextResponder" ref="354912816"/>
+							<int key="NSvFlags">292</int>
+							<string key="NSFrame">{{83, 6}, {65, 19}}</string>
+							<reference key="NSSuperview" ref="354912816"/>
+							<reference key="NSWindow"/>
+							<string key="NSReuseIdentifierKey">_NS:22</string>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSButtonCell" key="NSCell" id="571739382">
+								<int key="NSCellFlags">-2080374784</int>
+								<int key="NSCellFlags2">134348800</int>
+								<string key="NSContents">Delete</string>
+								<reference key="NSSupport" ref="26"/>
+								<string key="NSCellIdentifier">_NS:22</string>
+								<reference key="NSControlView" ref="840432240"/>
+								<int key="NSButtonFlags">-2038153216</int>
+								<int key="NSButtonFlags2">163</int>
+								<string key="NSAlternateContents"/>
+								<string key="NSKeyEquivalent"/>
+								<int key="NSPeriodicDelay">400</int>
+								<int key="NSPeriodicInterval">75</int>
+							</object>
+							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 						</object>
 					</array>
 					<string key="NSFrameSize">{320, 374}</string>
@@ -3015,6 +3063,22 @@ ciBLbm9iL1NsaWRlciB0byBiaW5kIAozIC0gRG9uZSE</string>
 						<reference key="destination" ref="112298439"/>
 					</object>
 					<string key="id">NNs-MZ-ohJ</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">deleteSelectedMidiBinding:</string>
+						<reference key="source" ref="550585456"/>
+						<reference key="destination" ref="840432240"/>
+					</object>
+					<string key="id">G3F-k6-oIg</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">clearMidiBindings:</string>
+						<reference key="source" ref="550585456"/>
+						<reference key="destination" ref="275475647"/>
+					</object>
+					<string key="id">2EG-2u-ydf</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -4181,6 +4245,8 @@ ciBLbm9iL1NsaWRlciB0byBiaW5kIAozIC0gRG9uZSE</string>
 							<reference ref="549149181"/>
 							<reference ref="802011495"/>
 							<reference ref="860569294"/>
+							<reference ref="275475647"/>
+							<reference ref="840432240"/>
 						</array>
 						<reference key="parent" ref="973328136"/>
 					</object>
@@ -4293,6 +4359,32 @@ ciBLbm9iL1NsaWRlciB0byBiaW5kIAozIC0gRG9uZSE</string>
 						<string key="id">Kvu-ai-KZi</string>
 						<reference key="object" ref="112298439"/>
 						<reference key="parent" ref="573535174"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">x5c-OP-K3q</string>
+						<reference key="object" ref="275475647"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="997274352"/>
+						</array>
+						<reference key="parent" ref="354912816"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">rTx-aj-AzK</string>
+						<reference key="object" ref="997274352"/>
+						<reference key="parent" ref="275475647"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">WjH-1N-ncp</string>
+						<reference key="object" ref="840432240"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="571739382"/>
+						</array>
+						<reference key="parent" ref="354912816"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">thj-q4-4BF</string>
+						<reference key="object" ref="571739382"/>
+						<reference key="parent" ref="840432240"/>
 					</object>
 				</array>
 			</object>
@@ -4688,6 +4780,7 @@ ciBLbm9iL1NsaWRlciB0byBiaW5kIAozIC0gRG9uZSE</string>
 				<string key="P2p-54-jzi.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<reference key="P2p-54-jzi.IBUserGuides" ref="0"/>
 				<boolean value="NO" key="P2p-54-jzi.showNotes"/>
+				<string key="WjH-1N-ncp.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="Xa4-6c-7UB.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="YH0-36-EGb.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="Z6E-sL-1K0.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4701,12 +4794,15 @@ ciBLbm9iL1NsaWRlciB0byBiaW5kIAozIC0gRG9uZSE</string>
 				<string key="oOB-CY-bhg.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="r8p-Gw-FJI.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="r8p-Gw-FJI.showNotes"/>
+				<string key="rTx-aj-AzK.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="rq5-nZ-5Zh.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="siP-kg-R7o.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="t3m-yI-obe.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="thj-q4-4BF.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="unx-pJ-AlZ.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="wUt-Qh-LaV.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="wUt-Qh-LaV.showNotes"/>
+				<string key="x5c-OP-K3q.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="ys9-TH-Cdi.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			</dictionary>
 			<dictionary class="NSMutableDictionary" key="unlocalizedProperties"/>
@@ -4722,12 +4818,14 @@ ciBLbm9iL1NsaWRlciB0byBiaW5kIAozIC0gRG9uZSE</string>
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="applyPrefs:">id</string>
 						<string key="clearLog:">id</string>
+						<string key="clearMidiBindings:">id</string>
 						<string key="copySpecial:">id</string>
+						<string key="deleteSelectedMidiBinding:">id</string>
 						<string key="filterType:">id</string>
 						<string key="loadMidiBindings:">id</string>
 						<string key="pasteSpecial:">id</string>
 						<string key="pressedConnect:">id</string>
-						<string key="pressedContinuously:">id</string>
+						<string key="pressedContinuously:">NSButton</string>
 						<string key="pressedSync:">id</string>
 						<string key="restartXcodeApp:">id</string>
 						<string key="saveMidiBindings:">id</string>
@@ -4749,8 +4847,16 @@ ciBLbm9iL1NsaWRlciB0byBiaW5kIAozIC0gRG9uZSE</string>
 							<string key="name">clearLog:</string>
 							<string key="candidateClassName">id</string>
 						</object>
+						<object class="IBActionInfo" key="clearMidiBindings:">
+							<string key="name">clearMidiBindings:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 						<object class="IBActionInfo" key="copySpecial:">
 							<string key="name">copySpecial:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="deleteSelectedMidiBinding:">
+							<string key="name">deleteSelectedMidiBinding:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="filterType:">
@@ -4771,7 +4877,7 @@ ciBLbm9iL1NsaWRlciB0byBiaW5kIAozIC0gRG9uZSE</string>
 						</object>
 						<object class="IBActionInfo" key="pressedContinuously:">
 							<string key="name">pressedContinuously:</string>
-							<string key="candidateClassName">id</string>
+							<string key="candidateClassName">NSButton</string>
 						</object>
 						<object class="IBActionInfo" key="pressedSync:">
 							<string key="name">pressedSync:</string>

@@ -111,6 +111,8 @@ void clientCallback(RemoteUIClientCallBackArg a);
 
 -(IBAction)saveMidiBindings:(id)who;
 -(IBAction)loadMidiBindings:(id)who;
+-(IBAction)clearMidiBindings:(id)sender;
+-(IBAction)deleteSelectedMidiBinding:(id)sender;
 
 -(IBAction)userWantsRestoreXML:(id)sender;
 -(IBAction)userWantsRestoreDefaults:(id)sender;

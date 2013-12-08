@@ -197,7 +197,7 @@
 -(IBAction)clickOnLabel:(id)sender;{
 
 	if (param.type == REMOTEUI_PARAM_INT || param.type == REMOTEUI_PARAM_FLOAT ||
-		param.type == REMOTEUI_PARAM_BOOL || param.type == REMOTEUI_PARAM_ENUM
+		param.type == REMOTEUI_PARAM_BOOL || param.type == REMOTEUI_PARAM_ENUM || param.type == REMOTEUI_PARAM_COLOR
 		){
 		if(!midiHighlightAnim){
 			waitingForMidiTimer = [NSTimer scheduledTimerWithTimeInterval:0.33 target:self selector:@selector(waitForMIDIAnimationTrigger) userInfo:Nil repeats:YES];
