@@ -22,12 +22,13 @@ Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 * Allows creation/deletion of Presets, variable states that you can switch from and to quickly.
 * Easily create Parameter Groups, and access them through keyboard shortcuts from the OSX Client.
 * Colorize your variables to visually group them in the OSX client.
-* Automatic discovery of servers in the network; easily control multiple apps from the OSX Client.
+* Realtime Filter your params by name to find things quickly.
+* Automatic discovery of servers in the network; easily control multiple apps from one Client interface.
 * Press "tab" on server app to quickly see all your params on screen
-* Notifications in both OSX client (through growl) and on your OF app.
+* Event notifications in both OSX client (through growl) and on your OF app.
 * Restore parameters to the "previous launch" state or to the default values.
 * ofxRemoteUI Can be used outside OF in any C++ project, and in Processing thx to [@kritzikratzi](http://github.com/kirtzikratzi)
-* Easy to use macros hide complexity away, very easy to plug into any existing project.
+* Easy to use C++ Macros hide complexity away, very easy to plug into any existing project.
 
 
 
