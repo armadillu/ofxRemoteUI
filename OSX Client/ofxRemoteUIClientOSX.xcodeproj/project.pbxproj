@@ -743,7 +743,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",
-					"/Users/oriol/Programming/svn.uri.cat/OF_Projects/_Addons/ofxRemoteUI/OSX\\ Client/ofxRemoteUIClientOSX",
+					ofxRemoteUIClientOSX,
 				);
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -770,7 +770,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",
-					"/Users/oriol/Programming/svn.uri.cat/OF_Projects/_Addons/ofxRemoteUI/OSX\\ Client/ofxRemoteUIClientOSX",
+					ofxRemoteUIClientOSX,
 				);
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
