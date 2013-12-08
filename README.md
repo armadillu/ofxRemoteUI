@@ -90,7 +90,7 @@ To Bind any connected MIDI controller slider/knob to a param, do this:
 2. Rotate/slide your device's know/slider.
 3. Done! You can now control that param from your midi device. 
 
-You can Save/Load your midi bindings from the "MIDI Bindings" window. 
+You can Save/Load/Edit/Clear your midi bindings from the "MIDI Bindings" window. 
 
 For now, only ints, floats, enums bools and colors can be controlled from a midi controller. MIDI Sliders/ Knobs can be binded to floats, ints, enums, bools and colors. For ints, floats and enums, the mapping is obvious; for bools, the lower half of a slider/knob sets the param to false, the upper half to true. For colors, the slider shifts the hue of the color parameter.
 
