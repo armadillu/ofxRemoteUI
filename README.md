@@ -87,7 +87,7 @@ The ofxRemoteUI OSX client allows to bind any midi control to any of your params
 To Bind any connected MIDI controller slider/knob to a param, do this:
 
 1. Click on a param name on the main Window. It will start blinking.
-2. Rotate/slide your device's know/slider.
+2. Rotate/slide your device's knob/slider.
 3. Done! You can now control that param from your midi device. 
 
 You can Save/Load/Edit/Clear your midi bindings from the "MIDI Bindings" window. 
