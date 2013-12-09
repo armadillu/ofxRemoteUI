@@ -78,7 +78,6 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	ofColor prevColor = ofColor::fromHsb(0, 255, 255, 40);
 	for(int i = 0; i < 30; i++){
 		ofColor c = prevColor;
-		cout << prevColor.getHue() << endl;
 		c.setHue(  ((int) (prevColor.getHue() + 25) ) % 255 );
 		//c.setSaturation(prevColor.getSaturation() + ofRandom(-0.1,0.1) );
 		colorTables.push_back( c );
