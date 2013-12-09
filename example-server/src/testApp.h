@@ -14,7 +14,7 @@ public:
 		void setup();
 		void update();
 		void draw();
-		void keyPressed( int key ){ /* ofToggleFullscreen();*/}
+		void keyPressed( int key );
 
 		float x;
 		float y;

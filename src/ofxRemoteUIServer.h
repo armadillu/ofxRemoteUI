@@ -129,6 +129,8 @@ public:
 	void setSaveToXMLOnExit(bool save);
 	void setDrawsNotificationsAutomaticallly(bool draw);
 
+	void pushParamsToClient(); //pushes all param values to client, updating its UI
+
 
 
 private:

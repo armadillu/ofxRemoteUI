@@ -425,6 +425,14 @@ void ofxRemoteUIServer::restoreAllParamsToDefaultValues(){
 	}
 }
 
+void ofxRemoteUIServer::pushParamsToClient(){
+	if(readyToSend){
+		vector<string>paramsList = getAllParamNamesList();
+		syncAllParamsToPointers();
+		sendUpdateForParamsInList(paramsList);
+		sendREQU(true); //once all send, confirm to close the REQU
+	}
+}
 
 void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 
@@ -493,9 +501,17 @@ void ofxRemoteUIServer::_update(ofEventArgs &e){
 }
 
 void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
+	if (showValuesOnScreen){
+		if(e.key == 's'){ //you can save current config from tab screen by pressing s
+			saveToXML(OFXREMOTEUI_SETTINGS_FILENAME);
+			onScreenNotifications.addNotification("SAVED CONFIG to default XML");
+		}
+	}
 	if(e.key == '\t'){
 		showValuesOnScreen = !showValuesOnScreen;
 	}
+
+
 }
 
 void ofxRemoteUIServer::startInBackgroundThread(){
@@ -530,10 +546,11 @@ void ofxRemoteUIServer::draw(int x, int y){
 	#ifdef OF_AVAILABLE
 	ofPushStyle();
 	ofFill();
+	ofEnableAlphaBlending();
 	if(showValuesOnScreen){
 		int padding = 30;
 		int x = padding;
-		int y = padding * 2;
+		int y = padding * 2.5;
 		int colw = 320;
 		int valOffset = colw * 0.6;
 		int spacing = 24;
@@ -541,10 +558,10 @@ void ofxRemoteUIServer::draw(int x, int y){
 		ofSetColor(11, 245);
 		ofRect(0,0, ofGetWidth(), ofGetHeight());
 		ofSetColor(44, 245);
-		ofRect(0,0, ofGetWidth(), padding + spacing * 0.5);
+		ofRect(0,0, ofGetWidth(), padding + spacing );
 
 		ofSetColor(255);
-		ofDrawBitmapString("ofxRemoteUIServer params list : press TAB to hide", padding,  padding - 3);
+		ofDrawBitmapString("ofxRemoteUIServer params list : press 'TAB' to hide.\nPress 's' to save current config.", padding,  padding - 3);
 
 		for(int i = 0; i < orderedKeys.size(); i++){
 			string key = orderedKeys[i];

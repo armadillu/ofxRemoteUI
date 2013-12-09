@@ -136,3 +136,8 @@ void testApp::serverCallback(RemoteUIServerCallBackArg arg){
 		default:break;
 	}
 }
+
+void testApp::keyPressed( int key ){
+	//force an update in the client side (same as pressing sync button on osx client)
+	OFX_REMOTEUI_SERVER_GET_INSTANCE()->pushParamsToClient();
+}
