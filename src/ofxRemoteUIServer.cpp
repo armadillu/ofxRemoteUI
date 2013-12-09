@@ -75,16 +75,17 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	int a = 80;
 #ifdef OF_AVAILABLE
 	ofSeedRandom(1979);
-	ofColor prevColor = ofColor::fromHsb(0, 255, 255, 30);
+	ofColor prevColor = ofColor::fromHsb(0, 255, 255, 40);
 	for(int i = 0; i < 30; i++){
 		ofColor c = prevColor;
-		c.setHue(  ((int) (prevColor.getHue() + 15 )) % 255 );
+		cout << prevColor.getHue() << endl;
+		c.setHue(  ((int) (prevColor.getHue() + 25) ) % 255 );
 		//c.setSaturation(prevColor.getSaturation() + ofRandom(-0.1,0.1) );
 		colorTables.push_back( c );
 		prevColor = c;
 	}
 	//shuffle
-	std::random_shuffle ( colorTables.begin(), colorTables.end() );
+	//std::random_shuffle ( colorTables.begin(), colorTables.end() );
 	ofSeedRandom();
 #else
 	colorTables.push_back(ofColor(194,144,221,a) );
