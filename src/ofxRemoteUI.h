@@ -47,6 +47,8 @@ using namespace std;
  SERVER:	SEND INT PARAM_NAME2 val (int)
  SERVER:	SEND BOL PARAM_NAME3 val (bool)
  SERVER:	SEND STR PARAM_NAME4 val (string)
+ SERVER:	SEND ENU PARAM_NAME5 val (int)
+ SERVER:	SEND COL PARAM_NAME6 val (int)
  SERVER:	REQU OK								//server closes REQU
  ...
  CLIENT:	PREL								//Preset List - client requests list of presets
@@ -54,14 +56,14 @@ using namespace std;
  ...
 
  // normal operation //////////
- CLIENT:	SEND TYP VAR_NAME val (varType)		//client sends a var change to server
+ CLIENT:	SEND *** PARAM_NAME val (*** Type)		//client sends a var change to server, where *** is FLT, INT, BOL, etc
  ...
- CLIENT:	TEST								//every second, client sends a msg to server to measure delay
+ CLIENT:	TEST								//every OFXREMOTEUI_LATENCY_TEST_RATE, client sends a msg to server to measure delay and connectivity
  SERVER:	TEST								//server replies
  ...
  CLIENT:	SETP PRESET_NAME					//Set Preset - client wants to change all params according to preset "X"
  SERVER:	SETP PRESET_NAME OK					//server says ok
- SERVER:	MISP PRESET_NAME					//server reports missing params not set in this preset
+ SERVER:	MISP PRESET_NAME (param list)		//server reports missing params not set in this preset
  CLIENT:	REQU								//client wants values for that preset
  SERVER:	SEND *****							//server sends all params
  SERVER:	REQU OK
@@ -76,15 +78,17 @@ using namespace std;
  CLIENT:	PREL								//Client requests full list of presets
  SERVER:	PREL PRESET_NAME_LIST(n)			//server sends all preset names
  ...
- CLIENT:	RESX								//client wants to delete load all params from the 1st loaded xml (last saved settings)
+ CLIENT:	RESX								//client wants to reset all params from the 1st loaded xml (last saved settings)
  SERVER:	RESX OK								//server says ok
  CLIENT:	REQU								//client wants ALL values
  SERVER:	SEND *****							//server sends all params
+ SERVER:	REQU OK								//server closes REQU
  ...
- CLIENT:	RESD								//client wants to delete load all params from the code defaults
+ CLIENT:	RESD								//client wants to reset all params from the code defaults
  SERVER:	RESD OK								//server says ok
  CLIENT:	REQU								//client wants ALL values
  SERVER:	SEND *****							//server sends all params
+ SERVER:	REQU OK								//server closes REQU
  ...
  CLIENT:	SAVE								//client wants to save current state of params to default xml
  SERVER:	SAVE OK
