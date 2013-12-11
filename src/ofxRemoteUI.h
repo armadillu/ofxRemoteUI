@@ -37,9 +37,10 @@ using namespace std;
 
 /*
 
- // COMM /////////////////////////
+ // COMM ////////////////////////////////////////////////////////////////////////////////////
 
- // init / setup connection /////
+ // init / setup connection /////////////////////////////////////////////////////////////////
+
  CLIENT:	HELO								//client says HI
  SERVER:	HELO								//server says HI
  CLIENT:	REQU								//client requests all params from server
@@ -55,49 +56,61 @@ using namespace std;
  SERVER:	PREL PRESET_NAME_LIST(n)			//server sends all preset names
  ...
 
- // normal operation //////////
+ // normal operation ///////////////////////////////////////////////////////////////////////
+
+ // client updates a param
  CLIENT:	SEND *** PARAM_NAME val (*** Type)		//client sends a var change to server, where *** is FLT, INT, BOL, etc
- ...
+ 
+ // keep alive
  CLIENT:	TEST								//every OFXREMOTEUI_LATENCY_TEST_RATE, client sends a msg to server to measure delay and connectivity
  SERVER:	TEST								//server replies
- ...
+
+ //client sets a preset
  CLIENT:	SETP PRESET_NAME					//Set Preset - client wants to change all params according to preset "X"
  SERVER:	SETP PRESET_NAME OK					//server says ok
  SERVER:	MISP PRESET_NAME (param list)		//server reports missing params not set in this preset
  CLIENT:	REQU								//client wants values for that preset
  SERVER:	SEND *****							//server sends all params
  SERVER:	REQU OK								//server closes REQU
- ...
+ 
+ // client saves a preset
  CLIENT:    SAVP PRESET_NAME					//Save Preset - client wants to save current params as a preset named PRESET_NAME, overwrites if already exists
  SERVER:	SAVP PRESET_NAME OK					//server replies OK
  CLIENT:	PREL								//Client requests full list of presets
  SERVER:	PREL PRESET_NAME_LIST(n)			//server sends all preset names
- ...
+ 
+ // client deletes a preset
  CLIENT:	DELP PRESET_NAME					//client wants to delete preset named PRESET_NAME
  SERVER:	DELP PRESET_NAME OK					//server says ok
  CLIENT:	PREL								//Client requests full list of presets
  SERVER:	PREL PRESET_NAME_LIST(n)			//server sends all preset names
- ...
+
+ // client resets to default xml values
  CLIENT:	RESX								//client wants to reset all params from the 1st loaded xml (last saved settings)
  SERVER:	RESX OK								//server says ok
  CLIENT:	REQU								//client wants ALL values
  SERVER:	SEND *****							//server sends all params
  SERVER:	REQU OK								//server closes REQU
- ...
+ 
+ // client resets to starting values
  CLIENT:	RESD								//client wants to reset all params from the code defaults
  SERVER:	RESD OK								//server says ok
  CLIENT:	REQU								//client wants ALL values
  SERVER:	SEND *****							//server sends all params
  SERVER:	REQU OK								//server closes REQU
- ...
+
+ // client saves current params to default xml
  CLIENT:	SAVE								//client wants to save current state of params to default xml
  SERVER:	SAVE OK
- ...
+ 
+ // client disconnects
  CLIENT:	CIAO								//client disconnects
  SERVER:	CIAO								//server disconnects
 
-
- // closing connection ////////
+ 
+ // advertising; server broadcasts itself every OFXREMOTEUI_BORADCAST_INTERVAL on OSC port OFXREMOTEUI_BROADCAST_PORT
+ SERVER:	oscPort(arg0:int) hostName(arg1:string) appName(arg2:string)
+ 
 
  // SERVER API ////////////////////////////////////////
 
@@ -105,6 +118,9 @@ using namespace std;
  server->shareParam("paramName", &paramName, ... );
  ...
  server->update(dt);
+
+ ...
+ server->pushParamsToClient(); //force an update of the client UI (bc the server changed some params and wants to force an update)
 
  // CLIENT API ////////////////////////////////////////
 
