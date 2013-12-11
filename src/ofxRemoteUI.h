@@ -66,7 +66,7 @@ using namespace std;
  SERVER:	MISP PRESET_NAME (param list)		//server reports missing params not set in this preset
  CLIENT:	REQU								//client wants values for that preset
  SERVER:	SEND *****							//server sends all params
- SERVER:	REQU OK
+ SERVER:	REQU OK								//server closes REQU
  ...
  CLIENT:    SAVP PRESET_NAME					//Save Preset - client wants to save current params as a preset named PRESET_NAME, overwrites if already exists
  SERVER:	SAVP PRESET_NAME OK					//server replies OK
