@@ -108,8 +108,9 @@ using namespace std;
  SERVER:	CIAO								//server disconnects
 
  
- // advertising; server broadcasts itself every OFXREMOTEUI_BORADCAST_INTERVAL on OSC port OFXREMOTEUI_BROADCAST_PORT
- SERVER:	oscPort(arg0:int) hostName(arg1:string) appName(arg2:string)
+ // self-advertising: server broadcasts itself every OFXREMOTEUI_BORADCAST_INTERVAL on OSC port OFXREMOTEUI_BROADCAST_PORT
+ // this is for clients to see all available servers on the network
+ SERVER:	send packet with contents: arg0(oscPort:int) arg1(hostName:string) arg2(appName:string)
  
 
  // SERVER API ////////////////////////////////////////
