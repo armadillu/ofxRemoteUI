@@ -173,10 +173,12 @@ private:
 
 	#ifdef OF_AVAILABLE
 	ofxRemoteUISimpleNotifications onScreenNotifications;
-	void _appExited(ofEventArgs &e);
-	void _draw(ofEventArgs &d);
-	void _update(ofEventArgs &d);
-	void _keyPressed(ofKeyEventArgs &e);
+	void			_appExited(ofEventArgs &e);
+	void			_draw(ofEventArgs &d);
+	void			_update(ofEventArgs &d);
+	void			_keyPressed(ofKeyEventArgs &e);
+
+	int				selectedItem;
 	#endif
 
 	static ofxRemoteUIServer* singleton;

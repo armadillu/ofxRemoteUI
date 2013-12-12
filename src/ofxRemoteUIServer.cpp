@@ -72,6 +72,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	loadedFromXML = false;
 	//add random colors to table
 	colorTableIndex = 0;
+	selectedItem = 0;
 	int a = 80;
 #ifdef OF_AVAILABLE
 	ofSeedRandom(1979);
@@ -501,10 +502,47 @@ void ofxRemoteUIServer::_update(ofEventArgs &e){
 }
 
 void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
+
 	if (showValuesOnScreen){
-		if(e.key == 's'){ //you can save current config from tab screen by pressing s
-			saveToXML(OFXREMOTEUI_SETTINGS_FILENAME);
-			onScreenNotifications.addNotification("SAVED CONFIG to default XML");
+		switch(e.key){ //you can save current config from tab screen by pressing s
+			case 's':
+				saveToXML(OFXREMOTEUI_SETTINGS_FILENAME);
+				onScreenNotifications.addNotification("SAVED CONFIG to default XML");
+				break;
+			case OF_KEY_UP:
+				selectedItem -= 1;
+				if(selectedItem<0) selectedItem = orderedKeys.size() - 1;
+				break;
+			case OF_KEY_DOWN:
+				selectedItem += 1;
+				if(selectedItem >= orderedKeys.size()) selectedItem = 0;
+				break;
+			case OF_KEY_LEFT:
+			case OF_KEY_RIGHT:{
+				float sign = e.key == OF_KEY_RIGHT ? 1.0 : -1.0;
+				string key = orderedKeys[selectedItem];
+				RemoteUIParam p = params[key];
+				switch (p.type) {
+					case REMOTEUI_PARAM_FLOAT:
+						p.floatVal += sign * (p.maxFloat - p.minFloat) * 0.01;
+						p.floatVal = ofClamp(p.floatVal, p.minFloat, p.maxFloat);
+						break;
+					case REMOTEUI_PARAM_ENUM:
+					case REMOTEUI_PARAM_INT:
+						p.intVal += sign;
+						p.intVal = ofClamp(p.intVal, p.minInt, p.maxInt);
+						break;
+					case REMOTEUI_PARAM_BOOL:
+						p.boolVal = !p.boolVal;
+						break;
+					default:
+						break;
+				}
+				params[key] = p;
+				syncPointerToParam(key);
+				pushParamsToClient();
+				}break;
+
 		}
 	}
 	if(e.key == '\t'){
@@ -561,7 +599,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 		ofRect(0,0, ofGetWidth(), padding + spacing );
 
 		ofSetColor(255);
-		ofDrawBitmapString("ofxRemoteUIServer params list : press 'TAB' to hide.\nPress 's' to save current config.", padding,  padding - 3);
+		ofDrawBitmapString("ofxRemoteUIServer params list : press 'TAB' to hide.\nPress 's' to save current config. Arrows to edit values.", padding,  padding - 3);
 
 		for(int i = 0; i < orderedKeys.size(); i++){
 			string key = orderedKeys[i];
@@ -572,7 +610,8 @@ void ofxRemoteUIServer::draw(int x, int y){
 			if (chars*charw > valOffset){
 				key = key.substr(0, (valOffset) / charw );
 			}
-			ofSetColor(200);
+			if (selectedItem != i) ofSetColor(200);
+			else ofSetColor(255,0,0);
 			ofDrawBitmapString(key, x,y);
 			switch (p.type) {
 				case REMOTEUI_PARAM_FLOAT:

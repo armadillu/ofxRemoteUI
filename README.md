@@ -24,7 +24,7 @@ Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 * Colorize your variables to visually group them in the OSX client.
 * Realtime Filter your params by name to find things quickly.
 * Automatic discovery of servers in the network; easily control multiple apps from one Client interface.
-* Press "tab" on server app to quickly see all your params on screen
+* Press "tab" on server app to see your params on screen, allows you to do clientless edits.
 * Event notifications in both OSX client (through growl) and on your OF app.
 * Restore parameters to the "previous launch" state or to the default values.
 * ofxRemoteUI Can be used outside OF in any C++ project, and in Processing thx to [@kritzikratzi](http://github.com/kirtzikratzi)

@@ -183,8 +183,8 @@ protected:
 	void updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage dm);
 	void syncAllParamsToPointers();
 	void syncAllPointersToParams();
-	void syncParamToPointer(string paramName);
-	void syncPointerToParam(string paramName);
+	void syncParamToPointer(string paramName); //copies the param0s pointer value over the value
+	void syncPointerToParam(string paramName); //the other way around
 	void addParamToDB(RemoteUIParam p, string paramName);
 
 	void clearOscReceiverMsgQueue();
