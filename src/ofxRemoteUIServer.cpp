@@ -524,7 +524,7 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				RemoteUIParam p = params[key];
 				switch (p.type) {
 					case REMOTEUI_PARAM_FLOAT:
-						p.floatVal += sign * (p.maxFloat - p.minFloat) * 0.01;
+						p.floatVal += sign * (p.maxFloat - p.minFloat) * 0.0025;
 						p.floatVal = ofClamp(p.floatVal, p.minFloat, p.maxFloat);
 						break;
 					case REMOTEUI_PARAM_ENUM:

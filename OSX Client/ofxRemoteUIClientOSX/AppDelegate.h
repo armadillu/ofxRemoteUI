@@ -82,7 +82,6 @@ void clientCallback(RemoteUIClientCallBackArg a);
 
 	bool							needFullParamsUpdate;
 
-
 	//MIDI
 	VVMIDIManager					*midiManager;
 	ParamUI							*upcomingMidiParam;
