@@ -119,6 +119,6 @@ ofxRemoteUI is made available under the [MIT](http://opensource.org/licenses/MIT
 
 The OSX Client uses the [vvMidi](https://github.com/mrRay/vvopensource) frameworks to handle MIDI devices more easily. VVMidi uses a [LGPL](https://github.com/mrRay/vvopensource/blob/master/lgpl-3.0.txt) license. 
 
-The OSX Client's HID capabilities come mostly from [https://github.com/jotapeh/MacJoystickHIDTest](https://github.com/jotapeh/MacJoystickHIDTest).
+The OSX Client's HID capabilities come mostly from [@jotapeh](https://github.com/jotapeh/MacJoystickHIDTest).
 
 ofxRemoteUI bundles ofxXmlSettings and ofxOSC, taken from [OpenFrameworks](http://openframeworks.cc).
