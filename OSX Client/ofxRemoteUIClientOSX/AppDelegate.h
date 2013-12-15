@@ -14,6 +14,7 @@
 #import "GitCommitNumber.h"
 #import <Growl/Growl.h>
 #import <VVMIDI/VVMIDI.h>
+#import "JoystickNotificationDelegate.h"
 
 #define REFRESH_RATE			1.0f/15.0f
 #define STATUS_REFRESH_RATE		0.333f
@@ -33,7 +34,7 @@ struct LayoutConfig{
 //declare callback method 
 void clientCallback(RemoteUIClientCallBackArg a);
 
-@interface AppDelegate : NSObject <NSApplicationDelegate, VVMIDIDelegateProtocol>{
+@interface AppDelegate : NSObject <NSApplicationDelegate, VVMIDIDelegateProtocol, JoystickNotificationDelegate>{
 
 @public
 
@@ -57,6 +58,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 	IBOutlet NSColorWell *			colorWell;
 	IBOutlet NSButton *				alwaysOnTopCheckbox;
 	IBOutlet NSButton *				showNotificationsCheckbox;
+	IBOutlet NSButton *				externalButtonsBehaveAsToggleCheckbox;
 
 	IBOutlet NSTextView *			logView;
 
@@ -79,13 +81,15 @@ void clientCallback(RemoteUIClientCallBackArg a);
 	BOOL							launched;
 	BOOL							alwaysOnTop;
 	BOOL							showNotifications;
+	BOOL							externalButtonsBehaveAsToggle;	//if true, one press on midi or joystick toggles a bool;
+																	//otherwise, it is true for as long as its pressed
 
 	bool							needFullParamsUpdate;
 
 	//MIDI
 	VVMIDIManager					*midiManager;
 	ParamUI							*upcomingMidiParam;
-	map<string, string>				midiBindings;
+	map<string, string>				bindingsMap; //table of bindings for midi and joystick
 	IBOutlet NSTableView			*midiBindingsTable;
 }
 
@@ -140,6 +144,13 @@ void clientCallback(RemoteUIClientCallBackArg a);
 
 //midi
 -(void)userClickedOnParamForMidiBinding:(ParamUI*)param;
+
+//joystick
+- (void)joystickAdded:(Joystick *)joystick ;
+- (void)joystickAxisChanged:(Joystick *)joystick atAxisIndex:(int)axis;
+- (void)joystickButtonPushed:(int)buttonIndex onJoystick:(Joystick *)joystick;
+- (void)joystickButtonReleased:(int)buttonIndex onJoystick:(Joystick *)joystick;
+
 
 //growl
 -(void)showNotificationWithTitle:(NSString*)title description:(NSString*)desc ID:(NSString*)key priority:(int)p;

@@ -17,7 +17,7 @@ Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 * Native OSX interface.
 * Alternative mutliplatform client built on top of ofxUI (with less features for now)
 * Allows to save/load your variable states across app launches.
-* MIDI controller bindings. Bind any parameter to any MIDI controller knob/slider.
+* MIDI and Joystick controller bindings. Bind any parameter to any MIDI controller knob/slider or HID Joystick.
 * Parameter values are saved in your app's data folder, in xml format.
 * Allows creation/deletion of Presets, variable states that you can switch from and to quickly.
 * Easily create Parameter Groups, and access them through keyboard shortcuts from the OSX Client.
@@ -82,13 +82,12 @@ To use it outside of OpenFrameworks, you can see how the example-noOF is setup.
 Use the supplied OSX Client to view and edit your shared parameters.
 
 
-## MIDI
-The ofxRemoteUI OSX client allows to bind any midi control to any of your params.
-To Bind any connected MIDI controller slider/knob to a param, do this:
+## Controller Bindings
+The ofxRemoteUI OSX client allows to bind any midi control / joystick axis / button to any of your params. To do so, do this:
 
 1. Click on a param name on the main Window. It will start blinking.
-2. Rotate/slide your device's knob/slider.
-3. Done! You can now control that param from your midi device. 
+2. roate/push/press your external device control (joystick, gamepad button, midi slider, knob, etc).
+3. Done! You can now control that param from your device. 
 
 You can Save/Load/Edit/Clear your midi bindings from the "MIDI Bindings" window. 
 
@@ -119,5 +118,7 @@ ofxRemoteUIServer listens for the keyDown event, and if "tab" is pressed, it dis
 ofxRemoteUI is made available under the [MIT](http://opensource.org/licenses/MIT) license.
 
 The OSX Client uses the [vvMidi](https://github.com/mrRay/vvopensource) frameworks to handle MIDI devices more easily. VVMidi uses a [LGPL](https://github.com/mrRay/vvopensource/blob/master/lgpl-3.0.txt) license. 
+
+The OSX Client's HID capabilities come mostly from [https://github.com/jotapeh/MacJoystickHIDTest](https://github.com/jotapeh/MacJoystickHIDTest).
 
 ofxRemoteUI bundles ofxXmlSettings and ofxOSC, taken from [OpenFrameworks](http://openframeworks.cc).

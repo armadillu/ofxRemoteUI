@@ -9,6 +9,8 @@
 #import "ParamUI.h"
 #import "AppDelegate.h"
 #import "NSColorStringExtension.h"
+#import "Joystick.h"
+#import "JoystickManager.h"
 
 //ofxRemoteUIClient callback entry point
 #pragma mark - CALLBACKS
@@ -106,7 +108,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	if( upcomingMidiParam == nil ){ //no current param waiting to be set
 		upcomingMidiParam = param;
-		[window setTitle:@"ofxRemoteUI (Waiting for Midi Input)"];
+		[window setTitle:@"ofxRemoteUI (Waiting for External Device Input)"];
 	}else{ //already have one waiting param, wtf is the user doing?
 		[upcomingMidiParam stopMidiAnim];
 		if (upcomingMidiParam == param){ //user cliked on blinking param, most likely wants to cancel
@@ -140,9 +142,9 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 			if( upcomingMidiParam == nil ){ //we are not setting a midi binding
 
-				map<string,string>::iterator ii = midiBindings.find(controllerUniqueAddress);
-				if ( ii != midiBindings.end() ){ //found a param linked to that controller
-					string paramName = midiBindings[controllerUniqueAddress];
+				map<string,string>::iterator ii = bindingsMap.find(controllerUniqueAddress);
+				if ( ii != bindingsMap.end() ){ //found a param linked to that controller
+					string paramName = bindingsMap[controllerUniqueAddress];
 					map<string,ParamUI*>::iterator it = widgets.find(paramName);
 					if ( it == widgets.end() ){	//not found! wtf?
 						NSLog(@"uh? midi binding pointing to an unexisting param!");
@@ -177,7 +179,13 @@ void clientCallback(RemoteUIClientCallBackArg a){
 							}
 						}else{ //must be noteOn or noteOff midi msg
 							if(p.type == REMOTEUI_PARAM_BOOL){
-								p.boolVal = noteOn; //noteOff implies !noteOn
+								if(externalButtonsBehaveAsToggle){
+									if(noteOn){ //ignore onRelease event if we toggle
+										p.boolVal = !p.boolVal;
+									}
+								}else{
+									p.boolVal = noteOn;
+								}
 							}
 						}
 						client->sendUntrackedParamUpdate(p, paramName); //send over network
@@ -194,7 +202,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 					slider //slider midi msg for any valid param
 					){
 						string paramN = [upcomingMidiParam getParamName];
-						midiBindings[controllerUniqueAddress] = paramN;
+						bindingsMap[controllerUniqueAddress] = paramN;
 						[midiBindingsTable reloadData];
 						[upcomingMidiParam stopMidiAnim];
 						upcomingMidiParam = nil;
@@ -209,8 +217,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	//fill in a NSDict to save as plist
 	NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithCapacity:5];
-	for(int i = 0; i < midiBindings.size(); i++){
-		map<string,string>::iterator ii = midiBindings.begin();
+	for(int i = 0; i < bindingsMap.size(); i++){
+		map<string,string>::iterator ii = bindingsMap.begin();
 		std::advance(ii, i);
 		NSString* midiAddress = [NSString stringWithUTF8String: (*ii).first.c_str()];
 		NSString* paramName = [NSString stringWithUTF8String: (*ii).second.c_str()];
@@ -236,7 +244,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
 	[openPanel setDirectoryURL:[NSURL fileURLWithPath:[@"~" stringByExpandingTildeInPath]]];
 	[openPanel setCanChooseDirectories:YES];
-	[openPanel setTitle:@"Locate your midiBindings file"];
+	[openPanel setTitle:@"Locate your bindingsMap file"];
 	[openPanel beginWithCompletionHandler:^(NSInteger result) {
 		if(result == NSFileHandlingPanelOKButton) {
 			[self parseMidiBindingsFromFile: [[openPanel URLs] objectAtIndex:0]];
@@ -245,17 +253,17 @@ void clientCallback(RemoteUIClientCallBackArg a){
 }
 
 -(IBAction)clearMidiBindings:(id)sender;{
-	midiBindings.clear();
+	bindingsMap.clear();
 	[midiBindingsTable reloadData];
 }
 
 
 -(IBAction)deleteSelectedMidiBinding:(id)sender;{
 	int sel = [midiBindingsTable selectedRow];
-	if (sel >= 0 && sel < midiBindings.size()){
-		map<string,string>::iterator ii = midiBindings.begin();
+	if (sel >= 0 && sel < bindingsMap.size()){
+		map<string,string>::iterator ii = bindingsMap.begin();
 		std::advance(ii, sel);
-		midiBindings.erase(ii);
+		bindingsMap.erase(ii);
 		[midiBindingsTable reloadData];
 	}else{
 		NSBeep();
@@ -267,9 +275,9 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	NSDictionary * d = [NSDictionary dictionaryWithContentsOfURL:file];
 	if(d){
 		NSArray * keys = [d allKeys];
-		midiBindings.clear();
+		bindingsMap.clear();
 		for( id key in keys ){
-			midiBindings[[key UTF8String]] = [[d objectForKey:key] UTF8String];
+			bindingsMap[[key UTF8String]] = [[d objectForKey:key] UTF8String];
 		}
 		[midiBindingsTable reloadData];
 		return YES;
@@ -287,16 +295,16 @@ void clientCallback(RemoteUIClientCallBackArg a){
 }
 
 - (NSInteger) numberOfRowsInTableView:(NSTableView *)tv	{
-	return midiBindings.size();
+	return bindingsMap.size();
 }
 
-//populate midiBindings table
+//populate bindingsMap table
 - (id) tableView:(NSTableView *)tv objectValueForTableColumn:(NSTableColumn *)tc row:(NSInteger)row	{
-	if(row >= midiBindings.size()) return nil;
-	map<string,string>::iterator ii = midiBindings.begin();
+	if(row >= bindingsMap.size()) return nil;
+	map<string,string>::iterator ii = bindingsMap.begin();
 	std::advance(ii, row);
 
-	if([[tc identifier] isEqualToString:@"MIDI @"]){
+	if([[tc identifier] isEqualToString:@"Device @"]){
 		return [NSString stringWithFormat:@"%s",(*ii).first.c_str()];
 	}else{
 		return [NSString stringWithFormat:@"%s",(*ii).second.c_str()];
@@ -306,29 +314,154 @@ void clientCallback(RemoteUIClientCallBackArg a){
 //allow user to type in a custom param name in the midi bindings table
 - (void) tableView:(NSTableView *)tv setObjectValue:(id)v forTableColumn:(NSTableColumn *)tc row:(NSInteger)row	{
 
-	if(row >= midiBindings.size()) return;
-	if([[tc identifier] isEqualToString:@"MIDI @"]) return; //dont allow editing midi @'s
+	if(row >= bindingsMap.size()) return;
+	if([[tc identifier] isEqualToString:@"Device @"]) return; //dont allow editing midi @'s
 
 	NSString * p = v;
 	if ([p length] == 0){ //user did input an empty param name, shortcut for deleting this row
-		map<string,string>::iterator ii = midiBindings.begin();
+		map<string,string>::iterator ii = bindingsMap.begin();
 		std::advance(ii, row);
-		midiBindings.erase( ii );
+		bindingsMap.erase( ii );
 		[midiBindingsTable reloadData];
 		return;
 	}
-	if(![[tc identifier] isEqualToString:@"MIDI @"]){ //we can set param names by hand if we really want to.
-		map<string,string>::iterator ii = midiBindings.begin();
+	if(![[tc identifier] isEqualToString:@"Device @"]){ //we can set param names by hand if we really want to.
+		map<string,string>::iterator ii = bindingsMap.begin();
 		std::advance(ii, row);
 		string paramName = [p UTF8String];
 		map<string,ParamUI*>::iterator it = widgets.find(paramName);
 		if(it != widgets.end()){
-			midiBindings[(*ii).first] = paramName;
+			bindingsMap[(*ii).first] = paramName;
 		}
 	}
 }
 
 ///////// END MIDI ////////////////////////////
+
+#pragma mark joystick
+
+
+- (void)joystickAdded:(Joystick *)joystick {
+    [joystick registerForNotications:self];
+    NSLog(@"Added Joystick: \"%@ (%@)\"", [joystick productName], [joystick manufacturerName] );
+
+}
+
+- (void)joystickAxisChanged:(Joystick *)joystick atAxisIndex:(int)axisIndex{
+
+	string desc = [[[joystick productName] stringByReplacingOccurrencesOfString:@" " withString:@"_"] UTF8String];
+
+	char numstr[21]; // enough to hold all numbers up to 64-bits
+	sprintf(numstr, "%d", axisIndex);
+	string controllerAddress = "Axis_" + (string)numstr + "@" + desc;
+
+	if( upcomingMidiParam == nil ){ //we are not setting a midi binding
+
+		map<string,string>::iterator ii = bindingsMap.find(controllerAddress);
+		if ( ii != bindingsMap.end() ){ //found a param linked to that controller
+
+			float value = [joystick getRelativeValueOfAxesIndex:axisIndex];
+			string paramName = bindingsMap[controllerAddress];
+			map<string,ParamUI*>::iterator it = widgets.find(paramName);
+			if ( it == widgets.end() ){	//not found! wtf?
+				NSLog(@"uh? joystick binding pointing to an unexisting param!");
+			}else{
+				ParamUI * item = widgets[paramName];
+				RemoteUIParam p = client->getParamForName(paramName);
+				switch(p.type){
+					case REMOTEUI_PARAM_FLOAT:
+						p.floatVal = p.minFloat + (p.maxFloat - p.minFloat) * value;
+						break;
+					case REMOTEUI_PARAM_ENUM:
+					case REMOTEUI_PARAM_INT:
+						p.intVal = p.minInt + (p.maxInt - p.minInt) * value;
+						break;
+					case REMOTEUI_PARAM_COLOR:{
+						NSColor * c = [NSColor colorWithDeviceRed:p.redVal/255. green:p.greenVal/255. blue:p.blueVal/255. alpha:p.alphaVal/255.];
+						float sat = [c saturationComponent];
+						float bri = [c brightnessComponent];
+						float a = [c alphaComponent];
+						NSColor * c2 = [NSColor colorWithDeviceHue:value saturation:sat brightness:bri alpha:a];
+						p.redVal = [c2 redComponent] * 255.f;
+						p.greenVal = [c2 greenComponent] * 255.f;
+						p.blueVal = [c2 blueComponent] * 255.f;
+						p.alphaVal = [c2 alphaComponent] * 255.f;
+					}break;
+					default:
+						break;//ignore other types
+				}
+				client->sendUntrackedParamUpdate(p, paramName); //send over network
+				[item updateParam:p];
+				//this is called form second thread, we need to update UI from main thread
+				[self performSelectorOnMainThread:@selector(updateParamUIOnMainThread:) withObject:item waitUntilDone:NO];
+			}
+		}
+	}else{
+		if (	upcomingMidiParam->param.type == REMOTEUI_PARAM_FLOAT ||
+				upcomingMidiParam->param.type == REMOTEUI_PARAM_INT ||
+				upcomingMidiParam->param.type == REMOTEUI_PARAM_COLOR ||
+				upcomingMidiParam->param.type == REMOTEUI_PARAM_ENUM
+			){
+				string paramN = [upcomingMidiParam getParamName];
+				bindingsMap[controllerAddress] = paramN;
+				[midiBindingsTable reloadData];
+				[upcomingMidiParam stopMidiAnim];
+				upcomingMidiParam = nil;
+				[window setTitle:@"ofxRemoteUI"];
+		}
+	}
+}
+
+- (void)joystickButton:(int)buttonIndex state:(BOOL)pressed onJoystick:(Joystick*)joystick{
+
+	string desc = [[[joystick productName] stringByReplacingOccurrencesOfString:@" " withString:@"_"] UTF8String];
+	char numstr[21]; // enough to hold all numbers up to 64-bits
+	sprintf(numstr, "%d", buttonIndex);
+	string controllerAddress = "Button_" + (string)numstr + "@" + desc;
+
+	if( upcomingMidiParam == nil ){ //we are not setting a midi binding
+
+		map<string,string>::iterator ii = bindingsMap.find(controllerAddress);
+		if ( ii != bindingsMap.end() ){ //found a param linked to that controller
+
+			string paramName = bindingsMap[controllerAddress];
+			map<string,ParamUI*>::iterator it = widgets.find(paramName);
+			if ( it == widgets.end() ){	//not found! wtf?
+				NSLog(@"uh? joystick binding pointing to an unexisting param!");
+			}else{
+				ParamUI * item = widgets[paramName];
+				RemoteUIParam p = client->getParamForName(paramName);
+				if(p.type ==  REMOTEUI_PARAM_BOOL){
+					if(externalButtonsBehaveAsToggle){
+						if(pressed){ //ignore onRelease event if we toggle
+							p.boolVal = !p.boolVal;
+						}
+					}else{
+						p.boolVal = pressed;
+					}
+					client->sendUntrackedParamUpdate(p, paramName); //send over network
+					[item updateParam:p];
+					//this is called form second thread, we need to update UI from main thread
+					[self performSelectorOnMainThread:@selector(updateParamUIOnMainThread:) withObject:item waitUntilDone:NO];
+				}
+			}
+		}
+
+	}else{
+		if (upcomingMidiParam->param.type == REMOTEUI_PARAM_BOOL){
+			string paramN = [upcomingMidiParam getParamName];
+			bindingsMap[controllerAddress] = paramN;
+			[midiBindingsTable reloadData];
+			[upcomingMidiParam stopMidiAnim];
+			upcomingMidiParam = nil;
+			[window setTitle:@"ofxRemoteUI"];
+		}
+	}
+
+}
+
+#pragma mark applescript
+
 
 -(void)openAccessibilitySystemPrefs{
 	NSAppleScript* appleScript = [[NSAppleScript alloc] initWithContentsOfURL:[[NSBundle mainBundle] URLForResource:@"openAccessibility" withExtension:@"scpt" ] error:nil];
@@ -424,7 +557,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		[currentNeighbors addObject:[NSString stringWithFormat:@"%s:%d",  ns[i].IP.c_str(), ns[i].port]];
 		[arr addObject:[NSString stringWithFormat:@"%s @ %s (%s:%d)", ns[i].binary.c_str(), ns[i].name.c_str(), ns[i].IP.c_str(), ns[i].port]];
 	}
-	NSString * text = [NSString stringWithFormat:@"(%d)",[arr count] ];
+	NSString * text = [NSString stringWithFormat:@"(%d)",(int)[arr count] ];
 	[neigbhorsMenu addItemsWithTitles: arr];
 	[neigbhorsField setStringValue: text];
 }
@@ -555,9 +688,15 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[[NSUserDefaults standardUserDefaults] setObject: [NSNumber numberWithInt: 1]
 											  forKey: @"NSInitialToolTipDelay"];
 
+	//midi
 	midiManager = [[VVMIDIManager alloc] init];
 	[midiManager setDelegate:self];
 	upcomingMidiParam = nil;
+
+	//joystick
+	JoystickManager *theJoystickManager = [JoystickManager sharedInstance];
+    [theJoystickManager setJoystickAddedDelegate:self];
+
 
 	launched = TRUE;
 	NSLog(@"Launched ofxRemoteUI version %@", GIT_COMMIT_NUMBER);
@@ -1183,6 +1322,9 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	else [window setLevel:NSNormalWindowLevel];
 	[alwaysOnTopCheckbox setState:onTop];
 
+	externalButtonsBehaveAsToggle = (int)[d integerForKey:@"externalButtonsBehaveAsToggle"];
+	[externalButtonsBehaveAsToggleCheckbox setState:externalButtonsBehaveAsToggle];
+
 	showNotifications = (int)[d integerForKey:@"showNotifications"];
 	[showNotificationsCheckbox setState:showNotifications];
 
@@ -1206,7 +1348,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	else [window setLevel:NSNormalWindowLevel];
 
 	showNotifications = (int)[showNotificationsCheckbox state];
-
+	externalButtonsBehaveAsToggle = (int)[externalButtonsBehaveAsToggleCheckbox state];
 	[window setColor:[colorWell color]];
 }
 
@@ -1216,6 +1358,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[d setValue:[[colorWell color] stringRepresentation] forKey:@"windowColor"];
 	[d setInteger: ([window level] == NSScreenSaverWindowLevel) ? 1 : 0   forKey:@"alwaysOnTop"];
 	[d setInteger: showNotifications  forKey:@"showNotifications"];
+	[d setInteger: externalButtonsBehaveAsToggle  forKey:@"externalButtonsBehaveAsToggle"];
 	[d synchronize];
 }
 

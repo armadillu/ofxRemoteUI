@@ -22,6 +22,10 @@
 
 /* Begin PBXBuildFile section */
 		73002CDB140ABCF60035299A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73002CDA140ABCF60035299A /* Cocoa.framework */; };
+		BB37FC98185E0FDB008DA8DD /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB37FC97185E0FDB008DA8DD /* IOKit.framework */; };
+		BB37FCA0185E0FE6008DA8DD /* Joystick.m in Sources */ = {isa = PBXBuildFile; fileRef = BB37FC9A185E0FE6008DA8DD /* Joystick.m */; };
+		BB37FCA1185E0FE6008DA8DD /* JoystickHatswitch.m in Sources */ = {isa = PBXBuildFile; fileRef = BB37FC9C185E0FE6008DA8DD /* JoystickHatswitch.m */; };
+		BB37FCA2185E0FE6008DA8DD /* JoystickManager.m in Sources */ = {isa = PBXBuildFile; fileRef = BB37FC9F185E0FE6008DA8DD /* JoystickManager.m */; };
 		BB395E96173E6326002FA815 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB395E95173E6326002FA815 /* QuartzCore.framework */; };
 		BB3AACC417BD647300401E86 /* ColoredNSWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = BB3AACC317BD647300401E86 /* ColoredNSWindow.m */; };
 		BB5CC60C177E49D500B595F8 /* IpEndpointName.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5DD177E49D500B595F8 /* IpEndpointName.cpp */; };
@@ -104,6 +108,14 @@
 		73002CDE140ABCF60035299A /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		73002CDF140ABCF60035299A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		BB0C16FC18292645008C7D8B /* GitCommitNumber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GitCommitNumber.h; sourceTree = "<group>"; };
+		BB37FC97185E0FDB008DA8DD /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = ../../../../../../../../Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/IOKit.framework; sourceTree = "<group>"; };
+		BB37FC99185E0FE6008DA8DD /* Joystick.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Joystick.h; sourceTree = "<group>"; };
+		BB37FC9A185E0FE6008DA8DD /* Joystick.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Joystick.m; sourceTree = "<group>"; };
+		BB37FC9B185E0FE6008DA8DD /* JoystickHatswitch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JoystickHatswitch.h; sourceTree = "<group>"; };
+		BB37FC9C185E0FE6008DA8DD /* JoystickHatswitch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JoystickHatswitch.m; sourceTree = "<group>"; };
+		BB37FC9D185E0FE6008DA8DD /* JoystickNotificationDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JoystickNotificationDelegate.h; sourceTree = "<group>"; };
+		BB37FC9E185E0FE6008DA8DD /* JoystickManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JoystickManager.h; sourceTree = "<group>"; };
+		BB37FC9F185E0FE6008DA8DD /* JoystickManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JoystickManager.m; sourceTree = "<group>"; };
 		BB395E95173E6326002FA815 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
 		BB3AACC217BD647300401E86 /* ColoredNSWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ColoredNSWindow.h; sourceTree = "<group>"; };
 		BB3AACC317BD647300401E86 /* ColoredNSWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ColoredNSWindow.m; sourceTree = "<group>"; };
@@ -195,6 +207,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB37FC98185E0FDB008DA8DD /* IOKit.framework in Frameworks */,
 				BB395E96173E6326002FA815 /* QuartzCore.framework in Frameworks */,
 				73002CDB140ABCF60035299A /* Cocoa.framework in Frameworks */,
 				BBC38584179736CB007E2DD1 /* Growl.framework in Frameworks */,
@@ -232,6 +245,7 @@
 		73002CD9140ABCF60035299A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BB37FC97185E0FDB008DA8DD /* IOKit.framework */,
 				BBB1D0041851E7FC0015D282 /* VVBasics.framework */,
 				BBB1D0011851E54B0015D282 /* VVMIDI.framework */,
 				BBC38583179736CB007E2DD1 /* Growl.framework */,
@@ -288,9 +302,24 @@
 			name = Images;
 			sourceTree = "<group>";
 		};
+		BB37FC96185E0FC0008DA8DD /* joystick */ = {
+			isa = PBXGroup;
+			children = (
+				BB37FC99185E0FE6008DA8DD /* Joystick.h */,
+				BB37FC9A185E0FE6008DA8DD /* Joystick.m */,
+				BB37FC9B185E0FE6008DA8DD /* JoystickHatswitch.h */,
+				BB37FC9C185E0FE6008DA8DD /* JoystickHatswitch.m */,
+				BB37FC9D185E0FE6008DA8DD /* JoystickNotificationDelegate.h */,
+				BB37FC9E185E0FE6008DA8DD /* JoystickManager.h */,
+				BB37FC9F185E0FE6008DA8DD /* JoystickManager.m */,
+			);
+			name = joystick;
+			sourceTree = "<group>";
+		};
 		BB4E4413169F291B00A94935 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				BB37FC96185E0FC0008DA8DD /* joystick */,
 				BBDCBDED16A0513D00F1C5EC /* main.m */,
 				BBDCBDE716A0513D00F1C5EC /* AppDelegate.h */,
 				BBDCBDE816A0513D00F1C5EC /* AppDelegate.mm */,
@@ -594,6 +623,7 @@
 				BBDCBDF716A051B000F1C5EC /* ofxRemoteUI.cpp in Sources */,
 				BBDCBDF816A0523200F1C5EC /* AppDelegate.mm in Sources */,
 				BBD3270F173BFFF200D59359 /* ofxRemoteUIClient.cpp in Sources */,
+				BB37FCA2185E0FE6008DA8DD /* JoystickManager.m in Sources */,
 				BBDCBDF916A0523500F1C5EC /* ParamUI.mm in Sources */,
 				BBDCBDFB16A0523A00F1C5EC /* main.m in Sources */,
 				BB94E5AE17468EAE00A7A3CC /* ColorView.m in Sources */,
@@ -609,9 +639,11 @@
 				BB5CC614177E49D500B595F8 /* OscTypes.cpp in Sources */,
 				BB5CC616177E49D500B595F8 /* ofxOscBundle.cpp in Sources */,
 				BB5CC617177E49D500B595F8 /* ofxOscMessage.cpp in Sources */,
+				BB37FCA1185E0FE6008DA8DD /* JoystickHatswitch.m in Sources */,
 				BB5CC618177E49D500B595F8 /* ofxOscReceiver.cpp in Sources */,
 				BB5CC619177E49D500B595F8 /* ofxOscSender.cpp in Sources */,
 				BB5CC61A177E49D500B595F8 /* tinyxml.cpp in Sources */,
+				BB37FCA0185E0FE6008DA8DD /* Joystick.m in Sources */,
 				BB5CC61B177E49D500B595F8 /* tinyxmlerror.cpp in Sources */,
 				BB5CC61C177E49D500B595F8 /* tinyxmlparser.cpp in Sources */,
 				BB5CC61E177E49D500B595F8 /* ofxXmlSettings.cpp in Sources */,
