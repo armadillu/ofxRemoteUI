@@ -227,8 +227,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	NSSavePanel *panel = [NSSavePanel savePanel];
 	[panel setExtensionHidden:YES];
-	[panel setAllowedFileTypes:[NSArray arrayWithObjects:@"midiBind", nil]];
-	[panel setRequiredFileType:@"midiBind"];
+	[panel setAllowedFileTypes:[NSArray arrayWithObjects:@"ctrlrBind", nil]];
+	[panel setRequiredFileType:@"ctrlrBind"];
 	[panel setCanSelectHiddenExtension:NO];
 
 	NSInteger ret = [panel runModal];
