@@ -65,15 +65,15 @@ static JoystickManager *instance;
 
 - (void)registerNewJoystick:(Joystick *)joystick {
     [joysticks setObject:joystick forKey:[NSNumber numberWithInt:joystickIDIndex++]];
-    NSLog(@"Gamepad was plugged in");
-    NSLog(@"Gamepads registered: %lu", joysticks.count);
+    NSLog(@"JoystickManager: Gamepad was plugged in");
+    NSLog(@"JoystickManager: Gamepads registered: %lu", joysticks.count);
     [joystickAddedDelegate joystickAdded:joystick];
 }
 
 
 
 void gamepadWasRemoved(void* inContext, IOReturn inResult, void* inSender, IOHIDDeviceRef device) {
-    NSLog(@"Gamepad was unplugged");
+    NSLog(@"JoystickManager: Gamepad was unplugged");
 }
 
 void gamepadAction(void* inContext, IOReturn inResult, void* inSender, IOHIDValueRef value) {

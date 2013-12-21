@@ -48,8 +48,8 @@
         axes = [[NSArray arrayWithArray:tempAxes] retain];
         hats = [[NSArray arrayWithArray:tempHats] retain];
         
-        NSLog(@"New device address: %p from %p",device,theDevice);
-        NSLog(@"found %lu buttons, %lu axes and %lu hats",tempButtons.count,tempAxes.count,tempHats.count);
+        //NSLog(@"New device address: %p from %p",device,theDevice);
+        NSLog(@"Joystick: found %lu buttons, %lu axes and %lu hats",tempButtons.count,tempAxes.count,tempHats.count);
         // For more detailed info there are Usage tables
         // eg: kHIDUsage_GD_X
         // declared in IOHIDUsageTables.h
@@ -65,14 +65,14 @@
 
 		if ((vendor = (CFNumberRef)IOHIDDeviceGetProperty(device, CFSTR(kIOHIDVendorIDKey))) != NULL)
 			CFNumberGetValue(vendor, kCFNumberSInt32Type, &vendorID);
-		printf("vendorID: %04lX ", vendorID);
+		NSLog(@"Joystick: vendorID: %04lX ", vendorID);
 
 		/*
          Get the product ID (which is a 32-bit integer)
 		 */
 		if ((product = (CFNumberRef)IOHIDDeviceGetProperty(device, CFSTR(kIOHIDProductIDKey))) != NULL)
 			CFNumberGetValue((CFNumberRef)product, kCFNumberSInt32Type, &productID);
-		printf("productID: %04lX\n", productID);
+		NSLog(@"Joystick: productID: %04lX\n", productID);
 
 		/*
          Get the manufacturer name (which is a string)
@@ -80,7 +80,7 @@
 		if ((manufacturer = (CFStringRef)IOHIDDeviceGetProperty(device, CFSTR(kIOHIDManufacturerKey)))!= NULL)
 		{
 			CFStringGetCString(manufacturer, string_buffer, sizeof(string_buffer), kCFStringEncodingUTF8);
-			printf("Manufacturer: %s\n", string_buffer);
+			NSLog(@"Joystick: Manufacturer: %s\n", string_buffer);
 			manufacturerName = [[NSString stringWithUTF8String:string_buffer] retain];
 		}
 
@@ -90,7 +90,7 @@
 		if ((productName_ = (CFStringRef)IOHIDDeviceGetProperty(device, CFSTR(kIOHIDProductKey))) != NULL)
 		{
 			CFStringGetCString(productName_, string_buffer, sizeof(string_buffer), kCFStringEncodingUTF8);
-			printf("Product Name: %s\n", string_buffer);
+			NSLog(@"Joystick: Product Name: %s", string_buffer);
 			productName = [[NSString stringWithUTF8String:string_buffer] retain];
 		}
 
