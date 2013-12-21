@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">13A603</string>
+		<string key="IBDocument.SystemVersion">13B42</string>
 		<string key="IBDocument.InterfaceBuilderVersion">4514</string>
 		<string key="IBDocument.AppKitVersion">1265</string>
-		<string key="IBDocument.HIToolboxVersion">695.00</string>
+		<string key="IBDocument.HIToolboxVersion">696.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			<string key="NS.object.0">4514</string>
@@ -729,6 +729,40 @@
 									<reference key="NSMenu" ref="662185258"/>
 									<string key="NSTitle">this will list param groups</string>
 									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="465035805"/>
+									<reference key="NSMixedImage" ref="56238410"/>
+								</object>
+							</array>
+						</object>
+					</object>
+					<object class="NSMenuItem" id="995430015">
+						<reference key="NSMenu" ref="489010233"/>
+						<string key="NSTitle">Presets</string>
+						<string key="NSKeyEquiv"/>
+						<int key="NSKeyEquivModMask">1048576</int>
+						<int key="NSMnemonicLoc">2147483647</int>
+						<reference key="NSOnImage" ref="465035805"/>
+						<reference key="NSMixedImage" ref="56238410"/>
+						<string key="NSAction">submenuAction:</string>
+						<reference key="NSTarget" ref="211055464"/>
+						<object class="NSMenu" key="NSSubmenu" id="211055464">
+							<string key="NSTitle">Presets</string>
+							<array class="NSMutableArray" key="NSMenuItems">
+								<object class="NSMenuItem" id="407697592">
+									<reference key="NSMenu" ref="211055464"/>
+									<string key="NSTitle">Previous Preset</string>
+									<string key="NSKeyEquiv"></string>
+									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="465035805"/>
+									<reference key="NSMixedImage" ref="56238410"/>
+								</object>
+								<object class="NSMenuItem" id="449399611">
+									<reference key="NSMenu" ref="211055464"/>
+									<string key="NSTitle">Next Preset</string>
+									<string key="NSKeyEquiv"></string>
+									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="465035805"/>
 									<reference key="NSMixedImage" ref="56238410"/>
@@ -1699,7 +1733,7 @@
 											<string key="NSFrameSize">{276, 357}</string>
 											<reference key="NSSuperview" ref="1008838109"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="527747412"/>
+											<reference key="NSNextKeyView" ref="727692780"/>
 											<object class="NSTextContainer" key="NSTextContainer" id="545008335">
 												<object class="NSLayoutManager" key="NSLayoutManager">
 													<object class="NSTextStorage" key="NSTextStorage">
@@ -1799,7 +1833,7 @@
 							<string key="NSFrame">{{-1, 20}, {278, 359}}</string>
 							<reference key="NSSuperview" ref="182307548"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="727692780"/>
+							<reference key="NSNextKeyView" ref="1008838109"/>
 							<int key="NSsFlags">133650</int>
 							<reference key="NSVScroller" ref="527747412"/>
 							<reference key="NSHScroller" ref="727692780"/>
@@ -1814,7 +1848,6 @@
 							<string key="NSFrame">{{233, 0}, {42, 19}}</string>
 							<reference key="NSSuperview" ref="182307548"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<string key="NSHuggingPriority">{250, 750}</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="346864163">
@@ -1971,7 +2004,6 @@
 											<string key="NSFrame">{{33, 12}, {206, 18}}</string>
 											<reference key="NSSuperview" ref="933717995"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="1055332903">
 												<int key="NSCellFlags">67108864</int>
@@ -2063,7 +2095,7 @@
 											<string key="NSFrameSize">{320, 262}</string>
 											<reference key="NSSuperview" ref="990149162"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="66278858"/>
+											<reference key="NSNextKeyView" ref="469254459"/>
 											<string key="NSReuseIdentifierKey">_NS:13</string>
 											<bool key="NSEnabled">YES</bool>
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -2230,7 +2262,7 @@
 							<string key="NSFrame">{{-1, 95}, {322, 280}}</string>
 							<reference key="NSSuperview" ref="354912816"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="469254459"/>
+							<reference key="NSNextKeyView" ref="990149162"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<int key="NSsFlags">133682</int>
 							<reference key="NSVScroller" ref="66278858"/>
@@ -2249,7 +2281,6 @@
 							<string key="NSFrame">{{249, 6}, {65, 19}}</string>
 							<reference key="NSSuperview" ref="354912816"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<string key="NSReuseIdentifierKey">_NS:22</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="232602527">
@@ -3125,6 +3156,22 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
+						<string key="label">previousPreset:</string>
+						<reference key="source" ref="550585456"/>
+						<reference key="destination" ref="407697592"/>
+					</object>
+					<string key="id">k1O-BW-bBx</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">nextPreset:</string>
+						<reference key="source" ref="550585456"/>
+						<reference key="destination" ref="449399611"/>
+					</object>
+					<string key="id">zqz-fc-Sog</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
 						<string key="label">makeKeyAndOrderFront:</string>
 						<reference key="source" ref="49556678"/>
 						<reference key="destination" ref="278663174"/>
@@ -3201,6 +3248,7 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 							<reference ref="477692792"/>
 							<reference ref="535671472"/>
 							<reference ref="570822635"/>
+							<reference ref="995430015"/>
 						</array>
 						<reference key="parent" ref="0"/>
 					</object>
@@ -4443,6 +4491,33 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 						<reference key="object" ref="1055332903"/>
 						<reference key="parent" ref="780464407"/>
 					</object>
+					<object class="IBObjectRecord">
+						<string key="id">raB-R5-iS5</string>
+						<reference key="object" ref="995430015"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="211055464"/>
+						</array>
+						<reference key="parent" ref="489010233"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">goj-h4-PYC</string>
+						<reference key="object" ref="211055464"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="407697592"/>
+							<reference ref="449399611"/>
+						</array>
+						<reference key="parent" ref="995430015"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">HGt-Sv-MBj</string>
+						<reference key="object" ref="407697592"/>
+						<reference key="parent" ref="211055464"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">fmI-jp-yPS</string>
+						<reference key="object" ref="449399611"/>
+						<reference key="parent" ref="211055464"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -4826,6 +4901,8 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 				<string key="DIJ-oz-nxI.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="E0D-6K-XOf.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="GQY-kD-Eca.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="HGt-Sv-MBj.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<boolean value="NO" key="HGt-Sv-MBj.showNotes"/>
 				<string key="Hmg-i2-mKA.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="Hmg-i2-mKA.showNotes"/>
 				<string key="JNx-mr-Yk2.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4849,6 +4926,10 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 				<string key="dvw-BD-lfZ.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<reference key="dvw-BD-lfZ.IBUserGuides" ref="0"/>
 				<boolean value="NO" key="dvw-BD-lfZ.showNotes"/>
+				<string key="fmI-jp-yPS.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<boolean value="NO" key="fmI-jp-yPS.showNotes"/>
+				<string key="goj-h4-PYC.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<boolean value="NO" key="goj-h4-PYC.showNotes"/>
 				<string key="h6d-Hv-5Qn.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="h6d-Hv-5Qn.showNotes"/>
 				<string key="hSn-jR-U3G.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4857,6 +4938,8 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 				<string key="r8p-Gw-FJI.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="r8p-Gw-FJI.showNotes"/>
 				<string key="rTx-aj-AzK.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="raB-R5-iS5.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<boolean value="NO" key="raB-R5-iS5.showNotes"/>
 				<string key="rq5-nZ-5Zh.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="siP-kg-R7o.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="t3m-yI-obe.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4885,10 +4968,12 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 						<string key="deleteSelectedMidiBinding:">id</string>
 						<string key="filterType:">id</string>
 						<string key="loadMidiBindings:">id</string>
+						<string key="nextPreset:">id</string>
 						<string key="pasteSpecial:">id</string>
 						<string key="pressedConnect:">id</string>
 						<string key="pressedContinuously:">id</string>
 						<string key="pressedSync:">id</string>
+						<string key="previousPreset:">id</string>
 						<string key="restartXcodeApp:">id</string>
 						<string key="saveMidiBindings:">id</string>
 						<string key="userAddPreset:">id</string>
@@ -4929,6 +5014,10 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 							<string key="name">loadMidiBindings:</string>
 							<string key="candidateClassName">id</string>
 						</object>
+						<object class="IBActionInfo" key="nextPreset:">
+							<string key="name">nextPreset:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 						<object class="IBActionInfo" key="pasteSpecial:">
 							<string key="name">pasteSpecial:</string>
 							<string key="candidateClassName">id</string>
@@ -4943,6 +5032,10 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 						</object>
 						<object class="IBActionInfo" key="pressedSync:">
 							<string key="name">pressedSync:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="previousPreset:">
+							<string key="name">previousPreset:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="restartXcodeApp:">

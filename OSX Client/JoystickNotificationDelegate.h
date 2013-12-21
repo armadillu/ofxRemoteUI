@@ -13,7 +13,7 @@
 @protocol JoystickNotificationDelegate
 
 - (void)joystickAxisChanged:(Joystick *)joystick atAxisIndex:(int)axis;
+- (void)joystickAdded:(Joystick *)joystick;
 - (void)joystickButton:(int)buttonIndex state:(BOOL)pressed onJoystick:(Joystick*)joystick;
-
 
 @end

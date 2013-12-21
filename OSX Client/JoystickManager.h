@@ -10,6 +10,10 @@
 #import <IOKit/hid/IOHIDLib.h>
 #import "Joystick.h"
 
+void gamepadWasRemoved(void* inContext, IOReturn inResult, void* inSender, IOHIDDeviceRef device);
+void gamepadWasAdded(void* inContext, IOReturn inResult, void* inSender, IOHIDDeviceRef device);
+void gamepadAction(void* inContext, IOReturn inResult, void* inSender, IOHIDValueRef value);
+
 @interface JoystickManager : NSObject {
     id      joystickAddedDelegate;
     

@@ -418,6 +418,7 @@ void ofxRemoteUI::syncPointerToParam(string paramName){
 			if (p.stringValAddr){
 				*p.stringValAddr = p.stringVal;
 			}break;
+		default: break;
 	}
 
 	params[paramName] = p;
@@ -457,6 +458,7 @@ void ofxRemoteUI::syncParamToPointer(string paramName){
 			if (p.stringValAddr){
 				p.stringVal = *p.stringValAddr;
 			}break;
+		default: break;
 	}
 
 	params[paramName] = p;
@@ -497,7 +499,7 @@ bool ofxRemoteUI::hasParamChanged(RemoteUIParam p){
 				if (*p.stringValAddr != p.stringVal) return true; else return false;
 			}
 			return false;
-
+		default: break;
 	}
 	cout << "ofxRemoteUIServer::hasParamChanged >> something went wrong, unknown param type" << endl;
 	return false;
@@ -512,6 +514,7 @@ string ofxRemoteUI::stringForParamType(RemoteUIParamType t){
 		case REMOTEUI_PARAM_ENUM: return "ENU";
 		case REMOTEUI_PARAM_BOOL: return "BOL";
 		case REMOTEUI_PARAM_STRING: return "STR";
+		default: break;
 	}
 	cout << "ofxRemoteUI::stringForParamType >> UNKNOWN TYPE!" << endl;
 	return "ERR";
@@ -545,6 +548,7 @@ string ofxRemoteUI::getValuesAsString(){
 			case REMOTEUI_PARAM_ENUM: out << param.intVal << endl; break;
 			case REMOTEUI_PARAM_BOOL: out << (param.boolVal?"1":"0") << endl; break;
 			case REMOTEUI_PARAM_STRING: out << UriEncode(param.stringVal) << endl; break;
+			default: break;
 		}
 		++it;
 	}
@@ -582,6 +586,7 @@ void ofxRemoteUI::setValuesFromString( string values ){
 				case REMOTEUI_PARAM_ENUM: valstr >> param.intVal; break;
 				case REMOTEUI_PARAM_BOOL: valstr >> param.boolVal; break;
 				case REMOTEUI_PARAM_STRING: param.stringVal = valstr.str(); break;
+				default: break;
 			}
 
 			if ( !param.isEqualTo(original) ){ // if the udpdate changed the param, keep track of it
@@ -619,6 +624,7 @@ void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
 				m.addStringArg(p.enumList[i]);
 			}
 		}break;
+		default: break;
 	}
 	m.addIntArg(p.r); m.addIntArg(p.g); m.addIntArg(p.b); m.addIntArg(p.a); // set bg color!
 	m.addStringArg(p.group);

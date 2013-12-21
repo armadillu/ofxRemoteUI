@@ -39,9 +39,9 @@
                 [tempHats addObject:hatSwitch];
                 [hatSwitch release];
             } else if (elementType == kIOHIDElementTypeInput_Axis || elementType == kIOHIDElementTypeInput_Misc) {
-                [tempAxes addObject:thisElement];
+                [tempAxes addObject:(id)thisElement];
             } else {
-                [tempButtons addObject:thisElement];
+                [tempButtons addObject:(id)thisElement];
             }
         }
         buttons = [[NSArray arrayWithArray:tempButtons] retain];
@@ -49,7 +49,7 @@
         hats = [[NSArray arrayWithArray:tempHats] retain];
         
         //NSLog(@"New device address: %p from %p",device,theDevice);
-        NSLog(@"Joystick: found %lu buttons, %lu axes and %lu hats",tempButtons.count,tempAxes.count,tempHats.count);
+        NSLog(@"Joystick: found %d buttons, %d axes and %d hats",(int)tempButtons.count,(int)tempAxes.count, (int)tempHats.count);
         // For more detailed info there are Usage tables
         // eg: kHIDUsage_GD_X
         // declared in IOHIDUsageTables.h
@@ -106,7 +106,7 @@
     IOHIDDeviceGetValue(device, theElement, &pValue);
     
     int elementUsage = IOHIDElementGetUsage(theElement);
-    int value = IOHIDValueGetIntegerValue(pValue);
+    int value = (int)IOHIDValueGetIntegerValue(pValue);
     int i;
     
     if (elementUsage == kHIDUsage_GD_Hatswitch) {
@@ -139,7 +139,7 @@
         
         for (i=0; i<delegates.count; ++i) {
             id <JoystickNotificationDelegate> delegate = [delegates objectAtIndex:i];
-			[delegate joystickButton:[self getElementIndex:theElement] state:(BOOL)(value==1) onJoystick:self];
+			[delegate joystickButton: [self getElementIndex:theElement] state:(BOOL)(value==1) onJoystick:self];
         }
         
         //NSLog(@"Non-axis reported value of %d",value);
@@ -190,7 +190,7 @@
     int i;
     
     for (i=0; i<searchArray.count; ++i) {
-        if ([searchArray objectAtIndex:i] == theElement)
+        if ((IOHIDElementRef)[searchArray objectAtIndex:i] == (IOHIDElementRef)theElement)
             return i;
             //  returnString = [NSString stringWithFormat:@"%@_%d",returnString,i];
     }
