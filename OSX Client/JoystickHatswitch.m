@@ -59,10 +59,7 @@
     for (i=0; i<4; ++i) {
         if (newButtonStates[i] != buttonStates[i]) {
             // dispatch a button change event
-            if (newButtonStates[i])
-                [delegate joystickButtonPushed:offset+i onJoystick:owner];
-            else
-                [delegate joystickButtonReleased:offset+i onJoystick:owner];
+			[delegate joystickButton:offset + i state: newButtonStates[i] onJoystick:owner];
         }
     
         buttonStates[i] = newButtonStates[i];
