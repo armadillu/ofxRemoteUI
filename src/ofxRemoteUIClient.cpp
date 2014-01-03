@@ -41,7 +41,13 @@ void ofxRemoteUIClient::setup(string address, int port_){
 	oscReceiver.setup(port + 1);
 
 	if(verbose_) cout << "ofxRemoteUIClient connecting to " << address << endl;
-	oscSender.setup(address, port);
+	try{
+		oscSender.setup(address, port);
+		OSCsetup = true;
+	}catch(exception e){
+		cout << "ofxRemoteUIClient exception setting up oscSender" << e.what() << endl;
+		OSCsetup = false;
+	}
 }
 
 vector<Neighbor> ofxRemoteUIClient::getNeighbors(){
@@ -49,6 +55,8 @@ vector<Neighbor> ofxRemoteUIClient::getNeighbors(){
 }
 
 void ofxRemoteUIClient::disconnect(){
+
+	OSC_CHECK;
 	if (readyToSend){
 		if(verbose_) cout << "ofxRemoteUIClient: disconnect()" << endl;
 		sendCIAO();
@@ -59,6 +67,7 @@ void ofxRemoteUIClient::disconnect(){
 }
 
 void ofxRemoteUIClient::connect(){
+	OSC_CHECK;
 	if(!readyToSend){
 		if(verbose_) cout << "ofxRemoteUIClient: connect()" << endl;
 		sendHELLO();	//on first connect, send HI!
@@ -71,14 +80,17 @@ void ofxRemoteUIClient::connect(){
 
 
 void ofxRemoteUIClient::saveCurrentStateToDefaultXML(){
+	OSC_CHECK;
 	sendSAVE();
 }
 
 void ofxRemoteUIClient::restoreAllParamsToInitialXML(){
+	OSC_CHECK;
 	sendRESX();
 }
 
 void ofxRemoteUIClient::restoreAllParamsToDefaultValues(){
+	OSC_CHECK;
 	sendRESD();
 }
 
@@ -107,9 +119,12 @@ void ofxRemoteUIClient::updateAutoDiscovery(float dt){
 
 
 void ofxRemoteUIClient::update(float dt){
+
 	//cout << "ofxRemoteUIClient::update readyToSend = " << readyToSend << endl;
 
 	if (readyToSend){ // if connected
+
+		OSC_CHECK;
 
 		timeCounter += dt;
 		timeSinceLastReply += dt;

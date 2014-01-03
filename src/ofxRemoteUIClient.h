@@ -18,6 +18,7 @@
 #include <vector>
 #include "ofxRemoteUINeigbors.h"
 
+#define OSC_CHECK	if(!OSCsetup) { printf("OSC NOT SETUP!\n");return; }
 using namespace std;
 
 class ofxRemoteUIClient: public ofxRemoteUI{
@@ -84,6 +85,7 @@ private:
 
 	void fillPresetListFromMessage(ofxOscMessage m);
 
+	bool					OSCsetup;
 	string					host;
 	bool					gotNewInfo;
 	int						pendingOperations;
