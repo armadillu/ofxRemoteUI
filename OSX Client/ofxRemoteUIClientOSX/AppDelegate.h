@@ -105,6 +105,8 @@ void clientCallback(RemoteUIClientCallBackArg a);
 -(IBAction)userChoseGroup:(id)sender;
 -(IBAction)userChosePreset:(id)sender;
 -(IBAction)userChoseNeighbor:(id)sender;
+-(IBAction)nextPreset:(id)sender;
+-(IBAction)previousPreset:(id)sender;
 
 -(IBAction)restartXcodeApp:(id)sender;
 -(void)restartXcodeApp;
@@ -134,6 +136,8 @@ void clientCallback(RemoteUIClientCallBackArg a);
 -(void)fullParamsUpdate;
 -(void)partialParamsUpdate;
 
+-(void)hideAllWarnings;
+
 -(void)userChangedParam:(RemoteUIParam)p paramName:(string)name; //this is a delegate method, items will call this on widgetChange
 
 -(void)updateGroupPopup;
@@ -145,11 +149,14 @@ void clientCallback(RemoteUIClientCallBackArg a);
 //midi
 -(void)userClickedOnParamForMidiBinding:(ParamUI*)param;
 
-//joystick
+//midi delegate
+- (void) setupChanged;
+- (void) receivedMIDI:(NSArray *)a fromNode:(VVMIDINode *)n;
+
+//joystick delegates
 - (void)joystickAdded:(Joystick *)joystick ;
 - (void)joystickAxisChanged:(Joystick *)joystick atAxisIndex:(int)axis;
-- (void)joystickButtonPushed:(int)buttonIndex onJoystick:(Joystick *)joystick;
-- (void)joystickButtonReleased:(int)buttonIndex onJoystick:(Joystick *)joystick;
+- (void)joystickButton:(int)buttonIndex state:(BOOL)pressed onJoystick:(Joystick*)joystick;
 
 
 //growl

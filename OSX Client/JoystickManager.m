@@ -8,6 +8,7 @@
 
 #import "JoystickManager.h"
 
+
 @implementation JoystickManager
 
 @synthesize joystickAddedDelegate;
@@ -66,7 +67,7 @@ static JoystickManager *instance;
 - (void)registerNewJoystick:(Joystick *)joystick {
     [joysticks setObject:joystick forKey:[NSNumber numberWithInt:joystickIDIndex++]];
     NSLog(@"JoystickManager: Gamepad was plugged in");
-    NSLog(@"JoystickManager: Gamepads registered: %lu", joysticks.count);
+    NSLog(@"JoystickManager: Gamepads registered: %d", (int)joysticks.count);
     [joystickAddedDelegate joystickAdded:joystick];
 }
 

@@ -120,6 +120,9 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	}
 }
 
+//midi setup delegate
+- (void) setupChanged{
+}
 
 - (void) receivedMIDI:(NSArray *)a fromNode:(VVMIDINode *)n	{
 
@@ -228,12 +231,12 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	NSSavePanel *panel = [NSSavePanel savePanel];
 	[panel setExtensionHidden:YES];
 	[panel setAllowedFileTypes:[NSArray arrayWithObjects:@"ctrlrBind", nil]];
-	[panel setRequiredFileType:@"ctrlrBind"];
+	[panel setAllowedFileTypes:@[@"ctrlrBind"]];
 	[panel setCanSelectHiddenExtension:NO];
 
 	NSInteger ret = [panel runModal];
 	if (ret == NSFileHandlingPanelOKButton) {
-		NSURL * path = [panel URL];
+		//NSURL * path = [panel URL];
 		[dict writeToURL:[panel URL] atomically:YES];
 	}
 	[dict release];
@@ -259,7 +262,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 
 -(IBAction)deleteSelectedMidiBinding:(id)sender;{
-	int sel = [midiBindingsTable selectedRow];
+	int sel = (int)[midiBindingsTable selectedRow];
 	if (sel >= 0 && sel < bindingsMap.size()){
 		map<string,string>::iterator ii = bindingsMap.begin();
 		std::advance(ii, sel);
@@ -1075,6 +1078,29 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	client->setPreset(prest);
 	currentPreset = prest;
 	//NSLog(@"user chose preset: %@", preset );
+}
+
+-(IBAction)nextPreset:(id)sender;{
+	int n = (int)[presetsMenu numberOfItems];
+	if (n > 0){
+		int sel = (int)[presetsMenu indexOfSelectedItem];
+		sel ++;
+		if(sel >= n ) sel = 0;
+		[presetsMenu selectItemAtIndex:sel];
+		[self userChosePreset:presetsMenu];
+	}
+}
+
+-(IBAction)previousPreset:(id)sender;{
+
+	int n = (int)[presetsMenu numberOfItems];
+	if (n > 0){
+		int sel = (int)[presetsMenu indexOfSelectedItem];
+		sel --;
+		if(sel < 0 ) sel = n - 1;
+		[presetsMenu selectItemAtIndex:sel];
+		[self userChosePreset:presetsMenu];
+	}
 }
 
 
