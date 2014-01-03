@@ -13,6 +13,7 @@
 		<string>ServerDidResetToDefault</string>
 		<string>CurrentParamsSavedToDefaultXML</string>
 		<string>ServerDidSetPreset</string>
+		<string>CantSetupClient</string>
 	</array>
 	<key>TicketVersion</key>
 	<integer>2</integer>

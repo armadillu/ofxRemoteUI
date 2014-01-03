@@ -26,7 +26,7 @@ void ofxRemoteUIClient::setCallback( void (*callb)(RemoteUIClientCallBackArg) ){
 	callBack = callb;
 }
 
-void ofxRemoteUIClient::setup(string address, int port_){
+bool ofxRemoteUIClient::setup(string address, int port_){
 
 	params.clear();
 	orderedKeys.clear();
@@ -48,6 +48,7 @@ void ofxRemoteUIClient::setup(string address, int port_){
 		cout << "ofxRemoteUIClient exception setting up oscSender" << e.what() << endl;
 		OSCsetup = false;
 	}
+	return OSCsetup;
 }
 
 vector<Neighbor> ofxRemoteUIClient::getNeighbors(){
@@ -443,6 +444,10 @@ void ofxRemoteUIClient::requestCompleteUpdate(){
 
 bool ofxRemoteUIClient::isReadyToSend(){
 	return readyToSend;
+}
+
+bool ofxRemoteUIClient::isSetup(){
+	return OSCsetup;
 }
 
 

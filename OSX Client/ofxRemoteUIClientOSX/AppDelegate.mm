@@ -26,11 +26,11 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		}break;
 
 		case SERVER_DELETED_PRESET:{
-			[me showNotificationWithTitle:@"Server Deleted Preset OK" description:[NSString stringWithFormat:@"%@ deleted preset named '%s'", remoteIP, a.msg.c_str()] ID:@"ServerDeletedPreset" priority:2];
+			[me showNotificationWithTitle:@"Server Deleted Preset OK" description:[NSString stringWithFormat:@"%@ deleted preset named '%s'", remoteIP, a.msg.c_str()] ID:@"ServerDeletedPreset" priority:1];
 		}break;
 
 		case SERVER_SAVED_PRESET:{
-			[me showNotificationWithTitle:@"Server Saved Preset OK" description:[NSString stringWithFormat:@"%@ saved preset named '%s'", remoteIP, a.msg.c_str()] ID:@"ServerSavedPreset" priority:2];
+			[me showNotificationWithTitle:@"Server Saved Preset OK" description:[NSString stringWithFormat:@"%@ saved preset named '%s'", remoteIP, a.msg.c_str()] ID:@"ServerSavedPreset" priority:1];
 		}break;
 
 		case SERVER_DID_SET_PRESET:{
@@ -67,17 +67,17 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 		case SERVER_CONFIRMED_SAVE:{
 			NSString * s = [NSString stringWithFormat:@"%@ - Default XML now holds the current param values", remoteIP];
-			[me showNotificationWithTitle:@"Server Saved OK" description:s ID:@"CurrentParamsSavedToDefaultXML" priority:2];
+			[me showNotificationWithTitle:@"Server Saved OK" description:s ID:@"CurrentParamsSavedToDefaultXML" priority:1];
 		}break;
 
 		case SERVER_DID_RESET_TO_XML:{
 			NSString * s = [NSString stringWithFormat:@"%@ - Params are reset to Server-Launch XML values", remoteIP];
-			[me showNotificationWithTitle:@"Server Did Reset To XML OK" description:s ID:@"ServerDidResetToXML" priority:1];
+			[me showNotificationWithTitle:@"Server Did Reset To XML OK" description:s ID:@"ServerDidResetToXML" priority:0];
 		}break;
 
 		case SERVER_DID_RESET_TO_DEFAULTS:{
 			NSString * s = [NSString stringWithFormat:@"%@ - Params are reset to its Share-Time values (Source Code Defaults)", remoteIP];
-			[me showNotificationWithTitle:@"Server Did Reset To Default OK" description:s ID:@"ServerDidResetToDefault" priority:1];
+			[me showNotificationWithTitle:@"Server Did Reset To Default OK" description:s ID:@"ServerDidResetToDefault" priority:0];
 		}break;
 
 		case SERVER_REPORTS_MISSING_PARAMS_IN_PRESET:{
@@ -708,7 +708,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 
 -(void)windowBecameMain:(id)a{
-	if(connectButton.state == 0){
+	if(connectButton.state == 0 && client->isSetup()){
 		[self connect];
 	}
 	//[window resignKeyWindow];
@@ -717,7 +717,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification{
 
-	if(connectButton.state == 0 && launched){
+	if(connectButton.state == 0 && launched && client->isSetup()){
 		[self connect];
 	}
 }
@@ -1250,14 +1250,22 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	if ([[connectButton title] isEqualToString:@"Connect"]){ //we are not connected, let's connect
 
+		int port = [portField.stringValue intValue];
+		bool OK = client->setup([addressField.stringValue UTF8String], port);
+		if (!OK){//most likely no network inerfaces available!
+			NSLog(@"Can't Setup ofxRemoteUI Client! Most likely no network interfaces available!");
+			[self showNotificationWithTitle:@"Cant Setup ofxRemoteUI Client!"
+								description:@"No Network Interface available?"
+										 ID:@"CantSetupClient"
+								   priority:2];
+			return;
+		}
 		//NSLog(@"connecting");
 		[addressField setEnabled:false];
 		[portField setEnabled:false];
 		connectButton.title = @"Disconnect";
 		connectButton.state = 1;
 		printf("ofxRemoteUIClientOSX Connecting to %s\n", [addressField.stringValue UTF8String] );
-		int port = [portField.stringValue intValue];
-		client->setup([addressField.stringValue UTF8String], port);
 		[updateFromServerButton setEnabled: true];
 		[updateContinuouslyCheckbox setEnabled: true];
 		[statusImage setImage:nil];
@@ -1392,23 +1400,25 @@ int weJustDisconnected = 0;
 
 -(void)update{
 
-	client->updateAutoDiscovery(REFRESH_RATE);
-	client->update(REFRESH_RATE);
+	if (client->isSetup()){
+		client->updateAutoDiscovery(REFRESH_RATE);
+		client->update(REFRESH_RATE);
 
-	if ( connectButton.state == 1 ){ // if connected
+		if ( connectButton.state == 1 ){ // if connected
 
-		if(updateContinuosly){
-			client->requestCompleteUpdate();
+			if(updateContinuosly){
+				client->requestCompleteUpdate();
+			}
+
+			if(!client->isReadyToSend() && weJustDisconnected <= 0){	//if the other side disconnected, or error
+				//NSLog(@"disconnect cos its NOT isReadyToSend");
+				[self connect]; //this disconnects if we were connectd
+				weJustDisconnected = 10;
+			}
 		}
-
-		if(!client->isReadyToSend() && weJustDisconnected <= 0){	//if the other side disconnected, or error
-			//NSLog(@"disconnect cos its NOT isReadyToSend");
-			[self connect]; //this disconnects if we were connectd
-			weJustDisconnected = 10;
-		}
-	}
-	weJustDisconnected--;
-	if(weJustDisconnected <= 0) weJustDisconnected = 0;
+		weJustDisconnected--;
+		if(weJustDisconnected <= 0) weJustDisconnected = 0;
+}
 }
 
 
@@ -1462,7 +1472,7 @@ int weJustDisconnected = 0;
 }
 
 -(void)showNotificationWithTitle:(NSString*)title description:(NSString*)desc ID:(NSString*)key priority:(int)p{
-	if(showNotifications){
+	if(showNotifications || p >= 2){
 		if ([GrowlApplicationBridge isGrowlRunning]){
 			[GrowlApplicationBridge notifyWithTitle:title
 										description:desc

@@ -26,7 +26,7 @@ class ofxRemoteUIClient: public ofxRemoteUI{
 public:
 
 	ofxRemoteUIClient();
-	void setup(string address, int port = OFXREMOTEUI_PORT);
+	bool setup(string address, int port = OFXREMOTEUI_PORT);
 	void update(float dt);
 	void updateAutoDiscovery(float dt);
 
@@ -79,6 +79,7 @@ public:
 
 	vector<Neighbor> getNeighbors();
 	bool isReadyToSend();
+	bool isSetup();
 
 private:
 
