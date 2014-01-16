@@ -60,6 +60,7 @@ struct myColor{
 #define	OFX_REMOTEUI_SERVER_LOAD_FROM_XML()				( ofxRemoteUIServer::instance()->loadFromXML(OFXREMOTEUI_SETTINGS_FILENAME) )
 #define	OFX_REMOTEUI_SERVER_SET_SAVES_ON_EXIT(save)		( ofxRemoteUIServer::instance()->setSaveToXMLOnExit(save) )
 #define	OFX_REMOTEUI_SERVER_SET_DRAWS_NOTIF(draw)		( ofxRemoteUIServer::instance()->setDrawsNotificationsAutomaticallly(draw) )
+#define OFX_REMOTEUI_SERVER_PUSH_TO_CLIENT()			( ofxRemoteUIServer::instance()->pushParamsToClient() ) /*sends all params to client, same as pressing sync on client*/
 #define OFX_REMOTEUI_SERVER_GET_INSTANCE()				( ofxRemoteUIServer::instance() )
 
 #ifdef OF_AVAILABLE //threaded only works in OF
