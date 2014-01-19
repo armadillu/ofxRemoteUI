@@ -55,7 +55,7 @@ void split(vector<string> &tokens, const string &text, char separator) {
 
 ofxRemoteUIServer::ofxRemoteUIServer(){
 
-	cout << "serving at: " << getMyIP() << endl;
+	//cout << "serving at: " << getMyIP() << endl;
 	readyToSend = false;
 	saveToXmlOnExit = true;
 	broadcastTime = OFXREMOTEUI_BORADCAST_INTERVAL + 0.05;

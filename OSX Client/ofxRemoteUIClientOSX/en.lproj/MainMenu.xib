@@ -1298,6 +1298,7 @@
 									<string key="NSFrame">{{305, 13}, {58, 18}}</string>
 									<reference key="NSSuperview" ref="4517047"/>
 									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView"/>
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSButtonCell" key="NSCell" id="443113037">
 										<int key="NSCellFlags">67108864</int>
@@ -1342,7 +1343,7 @@
 											<string key="NSFrameSize">{361, 258}</string>
 											<reference key="NSSuperview" ref="234736369"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="603737454"/>
+											<reference key="NSNextKeyView" ref="143466135"/>
 										</object>
 									</array>
 									<string key="NSFrameSize">{361, 258}</string>
@@ -1388,7 +1389,7 @@
 							<string key="NSFrame">{{0, 67}, {372, 258}}</string>
 							<reference key="NSSuperview" ref="1062600852"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="234736369"/>
+							<reference key="NSNextKeyView" ref="603737454"/>
 							<int key="NSsFlags">22544</int>
 							<reference key="NSVScroller" ref="143466135"/>
 							<reference key="NSHScroller" ref="603737454"/>
@@ -1829,7 +1830,7 @@
 									<reference key="NSDocView" ref="459942669"/>
 									<reference key="NSBGColor" ref="631047369"/>
 									<object class="NSCursor" key="NSCursor">
-										<string key="NSHotSpot">{5, 5}</string>
+										<string key="NSHotSpot">{1, -1}</string>
 										<int key="NSCursorType">0</int>
 									</object>
 									<int key="NScvFlags">4</int>

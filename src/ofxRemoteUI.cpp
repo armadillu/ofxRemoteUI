@@ -149,6 +149,8 @@ string ofxRemoteUI::getMyIP(){
 	//from https://github.com/jvcleave/LocalAddressGrabber/blob/master/src/LocalAddressGrabber.h
 	//and http://stackoverflow.com/questions/17288908/get-network-interface-name-from-ipv4-address
 	string output = "NOT FOUND";
+	cout << "ofxRemoteUI establishing local interface and IP @" << endl;
+
 #ifdef __APPLE__
 	struct ifaddrs *myaddrs;
 	struct ifaddrs *ifa;
