@@ -303,9 +303,9 @@
 	paramLabel.title = [self stringFromString:paramName];
 	int t = param.type;
 	if (t == REMOTEUI_PARAM_FLOAT || t == REMOTEUI_PARAM_INT || t == REMOTEUI_PARAM_BOOL || t == REMOTEUI_PARAM_ENUM ){
-		[paramLabel setToolTip: [paramLabel.title stringByAppendingString:@" Parameter\nPress Button to bind MIDI controller"]];
+		[paramLabel setToolTip: [paramLabel.title stringByAppendingString:@" Parameter\nPress Button to bind to controller"]];
 	}else{
-		[paramLabel setToolTip: [paramLabel.title stringByAppendingString:@" Parameter\nCan't bind to MIDI controller"]];
+		[paramLabel setToolTip: [paramLabel.title stringByAppendingString:@" Parameter\nCan't bind to controller"]];
 	}
 	[paramLabel sizeToFit];
 	
