@@ -168,14 +168,15 @@ void ofxRemoteUIServer::setParamColor( ofColor c ){
 	paramColor = c;
 }
 
-void ofxRemoteUIServer::setNewParamColor(){
-
-	ofColor c = colorTables[colorTableIndex];
-	colorSet = true;
-	paramColor = c;
-	colorTableIndex++;
-	if(colorTableIndex>= colorTables.size()){
-		colorTableIndex = 0;
+void ofxRemoteUIServer::setNewParamColor(int num){
+	for(int i = 0; i < num; i++){
+		ofColor c = colorTables[colorTableIndex];
+		colorSet = true;
+		paramColor = c;
+		colorTableIndex++;
+		if(colorTableIndex>= colorTables.size()){
+			colorTableIndex = 0;
+		}
 	}
 }
 

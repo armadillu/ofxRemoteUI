@@ -48,10 +48,11 @@ struct myColor{
 //easy param sharing macros, share from from anywhere!
 #define OFX_REMOTEUI_SERVER_SHARE_PARAM(val,...)		( ofxRemoteUIServer::instance()->shareParam( #val, &val, ##__VA_ARGS__ ) )
 #define OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM(val,enumMin,enumMax,menuList,...)	( ofxRemoteUIServer::instance()->shareParam( #val, (int*)&val,enumMin, enumMax,menuList, ##__VA_ARGS__ ) )
-#define OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color,...)	( ofxRemoteUIServer::instance()->shareParam( #color, (unsigned char*)&color.v[0], ##__VA_ARGS__ ) )
+#define OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color,...)( ofxRemoteUIServer::instance()->shareParam( #color, (unsigned char*)&color.v[0], ##__VA_ARGS__ ) )
 #define OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_COLOR(c)	( ofxRemoteUIServer::instance()->setParamColor( c ) )
 #define OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP(g)	( ofxRemoteUIServer::instance()->setParamGroup( g ) )
-#define OFX_REMOTEUI_SERVER_SET_NEW_COLOR()				( ofxRemoteUIServer::instance()->setNewParamColor() )
+#define OFX_REMOTEUI_SERVER_SET_NEW_COLOR()				( ofxRemoteUIServer::instance()->setNewParamColor(1) )
+#define OFX_REMOTEUI_SERVER_SET_NEW_COLOR_N(num)		( ofxRemoteUIServer::instance()->setNewParamColor(num) )
 #define OFX_REMOTEUI_SERVER_SETUP(port, ...)			( ofxRemoteUIServer::instance()->setup(port, ##__VA_ARGS__) )
 #define OFX_REMOTEUI_SERVER_UPDATE(deltaTime)			( ofxRemoteUIServer::instance()->update(deltaTime) )
 #define OFX_REMOTEUI_SERVER_DRAW(x,y)					( ofxRemoteUIServer::instance()->draw(x,y) ) /*only call this if you disabled automatic notifications and still want to see them*/
@@ -108,7 +109,7 @@ public:
 	void setParamGroup(string g);		//set for all the upcoming params
 	void setParamColor( ofColor c );
 
-	void setNewParamColor(); //randomly sets a new param color for all upcoming params
+	void setNewParamColor(int num); //randomly sets a new param color for all upcoming params
 	void unsetParamColor();  //back to un-colored params (shows alternating rows on OSX client)
 
 	//get notified when a client changes something remotelly

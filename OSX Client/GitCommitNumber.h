@@ -1,1 +1,1 @@
-#define GIT_COMMIT_NUMBER @"241"
+#define GIT_COMMIT_NUMBER @"242"

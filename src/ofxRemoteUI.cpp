@@ -178,6 +178,7 @@ string ofxRemoteUI::getMyIP(){
 					if (interface[0] == 'e' && interface[1] == 'n'){
 					//if(string(ifa->ifa_name) == "en0" ){ //TODO this returns only en0!
 						output = string(buf);
+						cout << "ofxRemoteUI using interface: " << interface << endl;
 						break;
 					}
 				}
