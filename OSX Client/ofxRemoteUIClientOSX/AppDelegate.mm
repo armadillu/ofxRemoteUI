@@ -12,6 +12,7 @@
 #import "Joystick.h"
 #import "JoystickManager.h"
 
+
 //ofxRemoteUIClient callback entry point
 #pragma mark - CALLBACKS
 void clientCallback(RemoteUIClientCallBackArg a){
@@ -218,6 +219,19 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 -(IBAction)saveMidiBindings:(id)who{
 
+	NSSavePanel *panel = [NSSavePanel savePanel];
+	[panel setExtensionHidden:YES];
+	[panel setAllowedFileTypes:[NSArray arrayWithObjects:@"ctrlrBind", nil]];
+	[panel setAllowedFileTypes:@[@"ctrlrBind"]];
+	[panel setCanSelectHiddenExtension:NO];
+
+	NSInteger ret = [panel runModal];
+	if (ret == NSFileHandlingPanelOKButton) {
+		[self saveMidiBindingsToFile:[panel URL]];
+	}
+}
+
+-(void)saveMidiBindingsToFile:(NSURL*)path;{
 	//fill in a NSDict to save as plist
 	NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithCapacity:5];
 	for(int i = 0; i < bindingsMap.size(); i++){
@@ -228,16 +242,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		[dict setObject:paramName forKey:midiAddress];
 	}
 
-	NSSavePanel *panel = [NSSavePanel savePanel];
-	[panel setExtensionHidden:YES];
-	[panel setAllowedFileTypes:[NSArray arrayWithObjects:@"ctrlrBind", nil]];
-	[panel setAllowedFileTypes:@[@"ctrlrBind"]];
-	[panel setCanSelectHiddenExtension:NO];
-
-	NSInteger ret = [panel runModal];
-	if (ret == NSFileHandlingPanelOKButton) {
-		//NSURL * path = [panel URL];
-		[dict writeToURL:[panel URL] atomically:YES];
+	if([dict count] > 0){
+		[dict writeToURL:path atomically:YES];
 	}
 	[dict release];
 }
@@ -686,6 +692,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	//[scroll setScrollerStyle:NSScrollerStyleOverlay];
 	//[scroll setScrollerKnobStyle:NSScrollerKnobStyleDefault];
 
+	[self parseMidiBindingsFromFile:[NSURL fileURLWithPath:[DEFAULT_BINDINGS_FOLDER stringByAppendingString:DEFAULT_BINDINGS_FILE]]];//load last used midi bindings
+
 	[self loadPrefs];
 	[window setAllowsToolTipsWhenApplicationIsInactive:YES];
 	[[NSUserDefaults standardUserDefaults] setObject: [NSNumber numberWithInt: 1]
@@ -724,6 +732,11 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 - (void)applicationWillTerminate:(NSNotification *)notification;{
 	[self savePrefs:self];
+	//save current bindings setup, to keep it across launches
+	NSFileManager * fm = [NSFileManager defaultManager];
+	[fm createDirectoryAtPath:DEFAULT_BINDINGS_FOLDER withIntermediateDirectories:YES attributes:Nil error:nil];
+	NSString * fullPath = [DEFAULT_BINDINGS_FOLDER stringByAppendingString:DEFAULT_BINDINGS_FILE];
+	[self saveMidiBindingsToFile: [NSURL fileURLWithPath:fullPath]];
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender{

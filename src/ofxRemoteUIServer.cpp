@@ -642,9 +642,9 @@ void ofxRemoteUIServer::draw(int x, int y){
 				y = 2 * padding;
 			}
 		}
+	}else{
+		onScreenNotifications.draw(x, y);
 	}
-
-	onScreenNotifications.draw(x, y);
 
 	ofPopStyle();
 	#endif
@@ -738,6 +738,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 					cbArg.paramName = dm.paramName;
 					cbArg.param = params[dm.paramName];  //copy the updated param to the callbakc arg
 					callBack(cbArg);
+					onScreenNotifications.addParamUpdate(dm.paramName, cbArg.param.getValueAsString());
 				}
 			}
 				break;

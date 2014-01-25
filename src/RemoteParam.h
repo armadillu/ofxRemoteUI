@@ -10,6 +10,7 @@
 #define emptyExample_RemoteParam_h
 
 #include <stdio.h>
+#include <sstream>
 
 enum RemoteUICallClientAction{
 	SERVER_CONNECTED, SERVER_DISCONNECTED, SERVER_SENT_FULL_PARAMS_UPDATE, SERVER_PRESETS_LIST_UPDATED,
@@ -102,6 +103,22 @@ public:
 		return equal;
 	}
 
+	string getValueAsString(){
+		std::ostringstream ss;
+		char aux[50];
+		switch (type) {
+			case REMOTEUI_PARAM_FLOAT: ss << floatVal; return ss.str();
+			case REMOTEUI_PARAM_ENUM:
+			case REMOTEUI_PARAM_INT: ss << intVal; return ss.str();
+			case REMOTEUI_PARAM_BOOL: return boolVal ? "TRUE" : "FALSE";
+			case REMOTEUI_PARAM_STRING: return stringVal;
+			case REMOTEUI_PARAM_COLOR:{
+				sprintf(aux, "RGBA: [%d, %d, %d, %d]", redVal, greenVal, blueVal, alphaVal);
+				return string(aux);
+			}
+			default: return "unknown value (BUG!)";
+		}
+	}
 
 	void print(){
 		switch (type) {

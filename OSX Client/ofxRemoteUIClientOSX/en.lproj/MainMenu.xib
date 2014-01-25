@@ -4977,7 +4977,7 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 					<object class="IBToolTipAttribute" key="NS.object.0">
 						<string key="name">ToolTip</string>
 						<reference key="object" ref="780464407"/>
-						<string key="toolTip">If enabled, joystick and midi buttons will just change the boolean param state when  pressed; otherwise they set to true for al long as being held</string>
+						<string key="toolTip">If enabled, joystick and midi buttons will just change the boolean param state when  pressed; otherwise they set to true for al long as being held. Applies to Joystick Buttons and Midi "Note" events.</string>
 					</object>
 				</object>
 				<string key="SUX-g4-3ud.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>

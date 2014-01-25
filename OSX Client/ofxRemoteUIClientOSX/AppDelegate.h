@@ -24,6 +24,9 @@
 #define DIRTY_PRESET_NAME		@"*No Preset"
 #define NUM_FLASH_WARNING		5
 
+#define DEFAULT_BINDINGS_FOLDER ([NSString stringWithFormat:@"%@/Library/Application Support/ofxRemoteUIClient/",NSHomeDirectory()])
+#define DEFAULT_BINDINGS_FILE (@"lastUsedBindings.ctrlrBind")
+
 struct LayoutConfig{
 	NSPoint colsRows;
 	int howManyPerCol;
@@ -129,6 +132,8 @@ void clientCallback(RemoteUIClientCallBackArg a);
 -(void)log:(RemoteUIClientCallBackArg) arg;
 -(IBAction)clearLog:(id)sender;
 -(void)updateNeighbors;
+
+-(void)saveMidiBindingsToFile:(NSURL*)path;
 
 -(void)connect;
 -(void)update;
