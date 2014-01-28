@@ -1402,6 +1402,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[window setColor:col];
 
 	autoConnectToggle = (int)[d integerForKey:@"autoConnectToJustLaunchedApps"];
+	[autoConnectCheckbox setState: autoConnectToggle];
 }
 
 
