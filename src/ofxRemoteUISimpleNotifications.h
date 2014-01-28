@@ -78,11 +78,12 @@ public:
 		for(it_type it = paramNotifications.begin(); it != paramNotifications.end(); it++){
 			float a = ofClamp( 3.0 * it->second.time, 0.0f, 1.0f);
 			float fresh = 1.0f - ofClamp(OFXREMOTEUI_PARAM_UPDATE_NOTIFICATION_SCREENTIME - it->second.time, 0.0f, 1.0f);
-			ofDrawBitmapStringHighlight( it->first + " : " + it->second.value,
+			string freshS = (fresh > 0.4 ) ? (ofGetFrameNum() % 15 < 8 ? "*" : "") : "";
+			ofDrawBitmapStringHighlight( it->first + " : " + it->second.value + freshS,
 										x,
 										y - spacing * ( notifications.size() + (paramNotifications.size()-1) - c ),
 										ofColor(0, 255 * a),
-										ofColor(255 * fresh, 255, 0, 255 * a)
+										ofColor(0, 255, 0, 255 * a)
 										);
 			c++;
 		}
