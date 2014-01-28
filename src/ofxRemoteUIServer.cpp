@@ -564,7 +564,6 @@ void ofxRemoteUIServer::update(float dt){
 
 	if(!threadedUpdate && !updatedThisFrame){
 		updateServer(dt);
-		onScreenNotifications.update(dt);
 	}
 	updatedThisFrame = true;
 }
@@ -658,6 +657,8 @@ void ofxRemoteUIServer::updateServer(float dt){
 	timeCounter += dt;
 	broadcastTime += dt;
 	timeSinceLastReply  += dt;
+
+	onScreenNotifications.update(dt);
 
 	if(readyToSend){
 		if (timeCounter > updateInterval){
