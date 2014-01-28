@@ -16,7 +16,7 @@ enum RemoteUICallClientAction{
 	SERVER_CONNECTED, SERVER_DISCONNECTED, SERVER_SENT_FULL_PARAMS_UPDATE, SERVER_PRESETS_LIST_UPDATED,
 	SERVER_CONFIRMED_SAVE, SERVER_DID_RESET_TO_DEFAULTS, SERVER_DELETED_PRESET,
 	SERVER_SAVED_PRESET, SERVER_DID_RESET_TO_XML, SERVER_DID_SET_PRESET, SERVER_REPORTS_MISSING_PARAMS_IN_PRESET,
-	NEIGHBORS_UPDATED
+	NEIGHBORS_UPDATED, NEIGHBOR_JUST_LAUNCHED_SERVER
 };
 
 enum RemoteUICallServerAction{
@@ -164,6 +164,7 @@ struct RemoteUIClientCallBackArg{
 	RemoteUICallClientAction action;
 	string msg; //sort of a wildcard; usually its the preset name
 	string host;
+	int port;
 	vector<string> paramList; //wildacard, used for missing param list
 };
 

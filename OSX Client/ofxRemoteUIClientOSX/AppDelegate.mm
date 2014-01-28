@@ -91,7 +91,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 		case NEIGHBORS_UPDATED:{
 			[me updateNeighbors];
-		}
+		}break;
+
+		case NEIGHBOR_JUST_LAUNCHED_SERVER:
+			[me autoConnectToNeighbor:a.host port:a.port];
 			break;
 		default:
 			break;
@@ -507,7 +510,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	if (
 		arg.action == SERVER_SENT_FULL_PARAMS_UPDATE ||
 		arg.action == SERVER_PRESETS_LIST_UPDATED ||
-		arg.action == NEIGHBORS_UPDATED
+		arg.action == NEIGHBORS_UPDATED ||
+		arg.action == NEIGHBOR_JUST_LAUNCHED_SERVER
 		){
 			return; //this stuff is not worth logging
 	}
@@ -1255,6 +1259,16 @@ void clientCallback(RemoteUIClientCallBackArg a){
 }
 
 
+-(void) autoConnectToNeighbor:(string)host_ port:(int)port_{
+	if ([[connectButton title] isEqualToString:@"Connect"]){ //we are not connected, let's connect to this newly launched neighbor!
+		NSString * host = [NSString stringWithFormat:@"%s", host_.c_str()];
+		NSString * port = [NSString stringWithFormat:@"%d", port_];
+		[addressField setStringValue: host];
+		[portField setStringValue: port];
+		[self connect];
+	}
+}
+
 -(void) connect{
 	//NSLog(@"connect!");
 	NSUserDefaults * df = [NSUserDefaults standardUserDefaults];
@@ -1386,7 +1400,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	[colorWell setColor:col];
 	[window setColor:col];
+
+	autoConnectToggle = (int)[d integerForKey:@"autoConnectToJustLaunchedApps"];
 }
+
 
 -(IBAction)applyPrefs:(id)sender{
 
@@ -1397,6 +1414,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	showNotifications = (int)[showNotificationsCheckbox state];
 	externalButtonsBehaveAsToggle = (int)[externalButtonsBehaveAsToggleCheckbox state];
 	[window setColor:[colorWell color]];
+	autoConnectToggle = [autoConnectCheckbox state];
 }
 
 
@@ -1406,6 +1424,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[d setInteger: ([window level] == NSScreenSaverWindowLevel) ? 1 : 0   forKey:@"alwaysOnTop"];
 	[d setInteger: showNotifications  forKey:@"showNotifications"];
 	[d setInteger: externalButtonsBehaveAsToggle  forKey:@"externalButtonsBehaveAsToggle"];
+	[d setInteger: autoConnectToggle forKey:@"autoConnectToJustLaunchedApps"];
 	[d synchronize];
 }
 

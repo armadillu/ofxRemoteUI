@@ -1730,7 +1730,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="203420949"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {2048, 1130}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
 				<string key="NSMinSize">{372, 272}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<string key="NSFrameAutosaveName">mainwin</string>
@@ -1830,7 +1830,7 @@
 									<reference key="NSDocView" ref="459942669"/>
 									<reference key="NSBGColor" ref="631047369"/>
 									<object class="NSCursor" key="NSCursor">
-										<string key="NSHotSpot">{1, -1}</string>
+										<string key="NSHotSpot">{5, 5}</string>
 										<int key="NSCursorType">0</int>
 									</object>
 									<int key="NScvFlags">4</int>
@@ -1908,7 +1908,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="765726733"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {2048, 1130}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<string key="NSFrameAutosaveName">logView</string>
 				<bool key="NSWindowIsRestorable">NO</bool>
@@ -1922,14 +1922,14 @@
 			<object class="NSWindowTemplate" id="952571255">
 				<int key="NSWindowStyleMask">287</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{344, 728}, {286, 150}}</string>
+				<string key="NSWindowRect">{{344, 728}, {333, 186}}</string>
 				<int key="NSWTFlags">1685586944</int>
-				<string key="NSWindowTitle">Preferences</string>
+				<string key="NSWindowTitle">ofxRemoteUIClientOSX Preferences</string>
 				<string key="NSWindowClass">NSPanel</string>
 				<nil key="NSViewClass"/>
 				<nil key="NSUserInterfaceItemIdentifier"/>
-				<string key="NSWindowContentMaxSize">{286, 151}</string>
-				<string key="NSWindowContentMinSize">{286, 150}</string>
+				<string key="NSWindowContentMaxSize">{333, 187}</string>
+				<string key="NSWindowContentMinSize">{333, 186}</string>
 				<object class="NSView" key="NSWindowView" id="200400381">
 					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
@@ -1948,7 +1948,7 @@
 											<set class="NSMutableSet" key="NSDragTypes">
 												<string>NSColor pasteboard type</string>
 											</set>
-											<string key="NSFrame">{{16, 75}, {34, 23}}</string>
+											<string key="NSFrame">{{16, 104}, {34, 23}}</string>
 											<reference key="NSSuperview" ref="933717995"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="795858447"/>
@@ -1963,7 +1963,7 @@
 										<object class="NSButton" id="909134735">
 											<reference key="NSNextResponder" ref="933717995"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{33, 52}, {114, 18}}</string>
+											<string key="NSFrame">{{33, 81}, {114, 18}}</string>
 											<reference key="NSSuperview" ref="933717995"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="524905484"/>
@@ -1988,7 +1988,7 @@
 										<object class="NSTextField" id="795858447">
 											<reference key="NSNextResponder" ref="933717995"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{52, 78}, {92, 17}}</string>
+											<string key="NSFrame">{{52, 107}, {92, 17}}</string>
 											<reference key="NSSuperview" ref="933717995"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="909134735"/>
@@ -2008,7 +2008,7 @@
 										<object class="NSButton" id="524905484">
 											<reference key="NSNextResponder" ref="933717995"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{33, 32}, {139, 18}}</string>
+											<string key="NSFrame">{{33, 61}, {139, 18}}</string>
 											<reference key="NSSuperview" ref="933717995"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="780464407"/>
@@ -2033,10 +2033,10 @@
 										<object class="NSButton" id="780464407">
 											<reference key="NSNextResponder" ref="933717995"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{33, 12}, {206, 18}}</string>
+											<string key="NSFrame">{{33, 41}, {206, 18}}</string>
 											<reference key="NSSuperview" ref="933717995"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView"/>
+											<reference key="NSNextKeyView" ref="778635557"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="1055332903">
 												<int key="NSCellFlags">67108864</int>
@@ -2055,14 +2055,39 @@
 											</object>
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 										</object>
+										<object class="NSButton" id="778635557">
+											<reference key="NSNextResponder" ref="933717995"/>
+											<int key="NSvFlags">268</int>
+											<string key="NSFrame">{{33, 21}, {248, 18}}</string>
+											<reference key="NSSuperview" ref="933717995"/>
+											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView"/>
+											<bool key="NSEnabled">YES</bool>
+											<object class="NSButtonCell" key="NSCell" id="495423700">
+												<int key="NSCellFlags">67108864</int>
+												<int key="NSCellFlags2">268435456</int>
+												<string key="NSContents">AutoConnect to just-launched Apps</string>
+												<reference key="NSSupport" ref="72202591"/>
+												<reference key="NSControlView" ref="778635557"/>
+												<int key="NSButtonFlags">1211912448</int>
+												<int key="NSButtonFlags2">2</int>
+												<reference key="NSNormalImage" ref="463713625"/>
+												<reference key="NSAlternateImage" ref="606189059"/>
+												<string key="NSAlternateContents"/>
+												<string key="NSKeyEquivalent"/>
+												<int key="NSPeriodicDelay">400</int>
+												<int key="NSPeriodicInterval">75</int>
+											</object>
+											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+										</object>
 									</array>
-									<string key="NSFrame">{{1, 1}, {250, 114}}</string>
+									<string key="NSFrame">{{1, 1}, {297, 143}}</string>
 									<reference key="NSSuperview" ref="962428149"/>
 									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="649339376"/>
 								</object>
 							</array>
-							<string key="NSFrame">{{17, 16}, {252, 116}}</string>
+							<string key="NSFrame">{{17, 23}, {299, 145}}</string>
 							<reference key="NSSuperview" ref="200400381"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="933717995"/>
@@ -2089,14 +2114,14 @@
 							<bool key="NSTransparent">NO</bool>
 						</object>
 					</array>
-					<string key="NSFrameSize">{286, 150}</string>
+					<string key="NSFrameSize">{333, 186}</string>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="962428149"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {2048, 1130}}</string>
-				<string key="NSMinSize">{286, 166}</string>
-				<string key="NSMaxSize">{286, 167}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
+				<string key="NSMinSize">{333, 202}</string>
+				<string key="NSMaxSize">{333, 203}</string>
 				<string key="NSFrameAutosaveName">prefs</string>
 				<bool key="NSWindowIsRestorable">NO</bool>
 			</object>
@@ -2442,7 +2467,7 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 					<reference key="NSNextKeyView" ref="860569294"/>
 					<string key="NSReuseIdentifierKey">_NS:21</string>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {2048, 1130}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
 				<string key="NSMinSize">{320, 396}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<string key="NSFrameAutosaveName">midi</string>
@@ -3203,6 +3228,22 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 						<reference key="destination" ref="495982957"/>
 					</object>
 					<string key="id">zqz-fc-Sog</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">applyPrefs:</string>
+						<reference key="source" ref="550585456"/>
+						<reference key="destination" ref="778635557"/>
+					</object>
+					<string key="id">NGm-5L-Xtg</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">autoConnectCheckbox</string>
+						<reference key="source" ref="550585456"/>
+						<reference key="destination" ref="778635557"/>
+					</object>
+					<string key="id">3oK-PW-IBG</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -4293,6 +4334,7 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 							<reference ref="524905484"/>
 							<reference ref="780464407"/>
 							<reference ref="795858447"/>
+							<reference ref="778635557"/>
 						</array>
 						<reference key="parent" ref="200400381"/>
 					</object>
@@ -4551,6 +4593,19 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 						<string key="id">fmI-jp-yPS</string>
 						<reference key="object" ref="495982957"/>
 						<reference key="parent" ref="265179694"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">fxe-d6-Ssj</string>
+						<reference key="object" ref="778635557"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="495423700"/>
+						</array>
+						<reference key="parent" ref="962428149"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">HjG-CT-Kxg</string>
+						<reference key="object" ref="495423700"/>
+						<reference key="parent" ref="778635557"/>
 					</object>
 				</array>
 			</object>
@@ -4961,6 +5016,8 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 				<string key="GQY-kD-Eca.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="HGt-Sv-MBj.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="HGt-Sv-MBj.showNotes"/>
+				<string key="HjG-CT-Kxg.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<boolean value="NO" key="HjG-CT-Kxg.showNotes"/>
 				<string key="Hmg-i2-mKA.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="Hmg-i2-mKA.showNotes"/>
 				<string key="JNx-mr-Yk2.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -5002,6 +5059,17 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 				<boolean value="NO" key="dvw-BD-lfZ.showNotes"/>
 				<string key="fmI-jp-yPS.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="fmI-jp-yPS.showNotes"/>
+				<object class="NSMutableDictionary" key="fxe-d6-Ssj.IBAttributePlaceholdersKey">
+					<string key="NS.key.0">ToolTip</string>
+					<object class="IBToolTipAttribute" key="NS.object.0">
+						<string key="name">ToolTip</string>
+						<reference key="object" ref="778635557"/>
+						<string key="toolTip">If enabled, ofxRemoteUIClient ill connect to apps that just launched in the local neighbor (if not currently connected)</string>
+					</object>
+				</object>
+				<string key="fxe-d6-Ssj.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<reference key="fxe-d6-Ssj.IBUserGuides" ref="0"/>
+				<boolean value="NO" key="fxe-d6-Ssj.showNotes"/>
 				<string key="goj-h4-PYC.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="goj-h4-PYC.showNotes"/>
 				<string key="h6d-Hv-5Qn.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -5156,6 +5224,7 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="addressField">NSSearchField</string>
 						<string key="alwaysOnTopCheckbox">NSButton</string>
+						<string key="autoConnectCheckbox">NSButton</string>
 						<string key="colorWell">NSColorWell</string>
 						<string key="connectButton">NSButton</string>
 						<string key="externalButtonsBehaveAsToggleCheckbox">NSButton</string>
@@ -5184,6 +5253,10 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="alwaysOnTopCheckbox">
 							<string key="name">alwaysOnTopCheckbox</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="autoConnectCheckbox">
+							<string key="name">autoConnectCheckbox</string>
 							<string key="candidateClassName">NSButton</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="colorWell">

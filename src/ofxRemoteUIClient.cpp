@@ -98,11 +98,24 @@ void ofxRemoteUIClient::restoreAllParamsToDefaultValues(){
 void ofxRemoteUIClient::updateAutoDiscovery(float dt){
 
 	bool neigbhorChange = false;
+	bool neighborJustLaunched = false;
 	//listen for broadcast from all servers in the broadcast channel OFXREMOTEUI_BROADCAST_PORT
 	while( broadcastReceiver.hasWaitingMessages() ){// check for waiting messages from client
 		ofxOscMessage m;
 		broadcastReceiver.getNextMessage(&m);
-		neigbhorChange |= closebyServers.gotPing(m.getRemoteIp(), m.getArgAsInt32(0), m.getArgAsString(1), m.getArgAsString(2));
+		neigbhorChange |= closebyServers.gotPing(m.getRemoteIp(), m.getArgAsInt32(0)/*port*/, m.getArgAsString(1), m.getArgAsString(2));
+		//read the broadcast sequence number
+		int broadcastSequenceNumber = m.getArgAsInt32(3);
+		neighborJustLaunched = (broadcastSequenceNumber == 0); //keep track of just launched apps
+		if(neighborJustLaunched){
+			if(callBack != NULL){
+				RemoteUIClientCallBackArg cbArg; // to notify our "delegate"
+				cbArg.action = NEIGHBOR_JUST_LAUNCHED_SERVER;
+				cbArg.host = m.getRemoteIp();
+				cbArg.port = m.getArgAsInt32(0);
+				callBack(cbArg);
+			}
+		}
 		//cout << "got broadcast message from " << m.getRemoteIp() << ":" << m.getArgAsInt32(0) << endl;
 		//closebyServers.print();
 	}

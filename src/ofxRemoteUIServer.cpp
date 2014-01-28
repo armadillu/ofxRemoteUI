@@ -72,6 +72,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	loadedFromXML = false;
 	//add random colors to table
 	colorTableIndex = 0;
+	broadcastCount = 0;
 	selectedItem = 0;
 	int a = 80;
 #ifdef OF_AVAILABLE
@@ -668,8 +669,8 @@ void ofxRemoteUIServer::updateServer(float dt){
 	}
 
 	//let everyone know I exist and which is my port, every now and then
-	if(broadcastTime > OFXREMOTEUI_BORADCAST_INTERVAL){
-		if(doBroadcast){
+	if(doBroadcast){
+		if(broadcastTime > OFXREMOTEUI_BORADCAST_INTERVAL){
 			broadcastTime = 0.0f;
 			if (computerName.size() == 0){
 				#ifdef OF_AVAILABLE
@@ -694,7 +695,9 @@ void ofxRemoteUIServer::updateServer(float dt){
 			m.addIntArg(port); //0
 			m.addStringArg(computerName); //1
 			m.addStringArg(binaryName);	//2
+			m.addIntArg(broadcastCount); // 3
 			broadcastSender.sendMessage(m);
+			broadcastCount++;
 		}
 	}
 

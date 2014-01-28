@@ -157,6 +157,7 @@ private:
 	string			upcomingGroup;
 	ofxOscSender	broadcastSender;
 	float			broadcastTime;
+	int				broadcastCount;
 	bool			portIsSet;
 
 	string			computerName;

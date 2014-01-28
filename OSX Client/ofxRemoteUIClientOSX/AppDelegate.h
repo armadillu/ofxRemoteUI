@@ -62,6 +62,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 	IBOutlet NSButton *				alwaysOnTopCheckbox;
 	IBOutlet NSButton *				showNotificationsCheckbox;
 	IBOutlet NSButton *				externalButtonsBehaveAsToggleCheckbox;
+	IBOutlet NSButton *				autoConnectCheckbox;
 
 	IBOutlet NSTextView *			logView;
 
@@ -86,6 +87,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 	BOOL							showNotifications;
 	BOOL							externalButtonsBehaveAsToggle;	//if true, one press on midi or joystick toggles a bool;
 																	//otherwise, it is true for as long as its pressed
+	BOOL							autoConnectToggle;
 
 	bool							needFullParamsUpdate;
 
@@ -136,6 +138,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 -(void)saveMidiBindingsToFile:(NSURL*)path;
 
 -(void)connect;
+-(void)autoConnectToNeighbor:(string) host port:(int)p;
 -(void)update;
 
 -(void)fullParamsUpdate;
