@@ -77,11 +77,12 @@ public:
 		int c = 0;
 		for(it_type it = paramNotifications.begin(); it != paramNotifications.end(); it++){
 			float a = ofClamp( 3.0 * it->second.time, 0.0f, 1.0f);
+			float fresh = 1.0f - ofClamp(OFXREMOTEUI_PARAM_UPDATE_NOTIFICATION_SCREENTIME - it->second.time, 0.0f, 1.0f);
 			ofDrawBitmapStringHighlight( it->first + " : " + it->second.value,
 										x,
 										y - spacing * ( notifications.size() + (paramNotifications.size()-1) - c ),
 										ofColor(0, 255 * a),
-										ofColor(0,255,0, 255 * a)
+										ofColor(255 * fresh, 255, 0, 255 * a)
 										);
 			c++;
 		}
@@ -90,14 +91,14 @@ public:
 	void addNotification(string msg){
 		SimpleNotification n;
 		n.msg = msg;
-		n.time = OFXREMOTEUI_NOTIFICATION_SCREENTIME;
+		n.time = OFXREMOTEUI_EVENT_NOTIFICATION_SCREENTIME;
 		notifications.push_back(n);
 	};
 
 	void addParamUpdate(string paramName, string paramValue){
 		ParamNotification n;
 		n.value = paramValue;
-		n.time = OFXREMOTEUI_NOTIFICATION_SCREENTIME;
+		n.time = OFXREMOTEUI_PARAM_UPDATE_NOTIFICATION_SCREENTIME;
 		paramNotifications[paramName] = n;
 	};
 
