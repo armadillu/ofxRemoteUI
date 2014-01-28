@@ -627,7 +627,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 					ofDrawBitmapString(p.boolVal ? "true" : "false", x + valOffset, y);
 					break;
 				case REMOTEUI_PARAM_STRING:
-					p.stringVal;
+					ofDrawBitmapString(p.stringVal, x + valOffset, y);
 					break;
 				case REMOTEUI_PARAM_COLOR:
 					ofSetColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal);
