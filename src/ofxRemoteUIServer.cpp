@@ -73,9 +73,9 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	//add random colors to table
 	colorTableIndex = 0;
 	broadcastCount = 0;
-	selectedItem = 0;
 	int a = 80;
 #ifdef OF_AVAILABLE
+	selectedItem = 0;
 	ofSeedRandom(1979);
 	ofColor prevColor = ofColor::fromHsb(0, 255, 255, 40);
 	for(int i = 0; i < 30; i++){
@@ -562,10 +562,14 @@ void ofxRemoteUIServer::startInBackgroundThread(){
 
 void ofxRemoteUIServer::update(float dt){
 
+	#ifdef OF_AVAILABLE
 	if(!threadedUpdate && !updatedThisFrame){
 		updateServer(dt);
 	}
-	updatedThisFrame = true;
+	updatedThisFrame = true; //this only makes sense when
+	#else
+	updateServer(dt);
+	#endif
 }
 
 #ifdef OF_AVAILABLE
@@ -658,7 +662,9 @@ void ofxRemoteUIServer::updateServer(float dt){
 	broadcastTime += dt;
 	timeSinceLastReply  += dt;
 
+	#ifdef OF_AVAILABLE
 	onScreenNotifications.update(dt);
+	#endif
 
 	if(readyToSend){
 		if (timeCounter > updateInterval){
@@ -686,10 +692,13 @@ void ofxRemoteUIServer::updateServer(float dt){
 						binaryName = p[p.depth()];
 					#endif
 					#ifdef TARGET_WIN32						
-						GetModuleFileNameA( NULL, pathbuf, bufsize ); //no iea why, but GetModuleFileName() is not defined?
+						GetModuleFileNameA( NULL, pathbuf, bufsize ); //no idea why, but GetModuleFileName() is not defined?
 						Poco::Path p = Poco::Path(pathbuf);
 						binaryName = p[p.depth()];
 					#endif
+				#else
+					computerName = "Computer"; //TODO!
+					binaryName = "App";
 				#endif
 			}
 			ofxOscMessage m;
@@ -722,7 +731,9 @@ void ofxRemoteUIServer::updateServer(float dt){
 					callBack(cbArg);
 				}
 				if(verbose_) cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " says HELLO!"  << endl;
+				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("CONNECTED (" + cbArg.host +  ")!");
+				#endif
 				break;
 
 			case REQUEST_ACTION:{ //send all params to client
@@ -742,7 +753,9 @@ void ofxRemoteUIServer::updateServer(float dt){
 					cbArg.paramName = dm.paramName;
 					cbArg.param = params[dm.paramName];  //copy the updated param to the callbakc arg
 					callBack(cbArg);
+					#ifdef OF_AVAILABLE
 					onScreenNotifications.addParamUpdate(dm.paramName, cbArg.param.getValueAsString());
+					#endif
 				}
 			}
 				break;
@@ -750,7 +763,9 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case CIAO_ACTION:{
 				if(verbose_) cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " says CIAO!" << endl;
 				sendCIAO();
+				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("DISCONNECTED (" + cbArg.host +  ")!");
+				#endif
 				if(callBack != NULL){
 					cbArg.action = CLIENT_DISCONNECTED;
 					callBack(cbArg);
@@ -784,7 +799,9 @@ void ofxRemoteUIServer::updateServer(float dt){
 					cbArg.msg = presetName;
 					callBack(cbArg);
 				}
+				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("SET PRESET to '" + string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml'");
+				#endif
 			}break;
 
 			case SAVE_PRESET_ACTION:{ //client wants to save current xml as a new preset
@@ -792,7 +809,11 @@ void ofxRemoteUIServer::updateServer(float dt){
 				if(verbose_) cout << "ofxRemoteUIServer: saving NEW preset: " << presetName << endl;
 				saveToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
 				sendSAVP(presetName);
+				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("SAVED PRESET to '" + string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml'");
+				#endif
+
+
 				if(callBack != NULL){
 					cbArg.action = CLIENT_SAVED_PRESET;
 					cbArg.msg = presetName;
@@ -805,7 +826,9 @@ void ofxRemoteUIServer::updateServer(float dt){
 				if(verbose_) cout << "ofxRemoteUIServer: DELETE preset: " << presetName << endl;
 				deletePreset(presetName);
 				sendDELP(presetName);
+				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("DELETED PRESET '" + string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml'");
+				#endif
 				if(callBack != NULL){
 					cbArg.action = CLIENT_DELETED_PRESET;
 					cbArg.msg = presetName;
@@ -816,7 +839,9 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case SAVE_CURRENT_STATE_ACTION:{
 				if(verbose_) cout << "ofxRemoteUIServer: SAVE CURRENT PARAMS TO DEFAULT XML: " << endl;
 				saveToXML(OFXREMOTEUI_SETTINGS_FILENAME);
+				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("SAVED CONFIG to default XML");
+				#endif
 				sendSAVE(true);
 				if(callBack != NULL){
 					cbArg.action = CLIENT_SAVED_STATE;
@@ -828,7 +853,9 @@ void ofxRemoteUIServer::updateServer(float dt){
 				if(verbose_) cout << "ofxRemoteUIServer: RESET TO XML: " << endl;
 				restoreAllParamsToInitialXML();
 				sendRESX(true);
+				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("RESET CONFIG TO SERVER-LAUNCH XML values");
+				#endif
 				if(callBack != NULL){
 					cbArg.action = CLIENT_DID_RESET_TO_XML;
 					callBack(cbArg);
@@ -839,7 +866,9 @@ void ofxRemoteUIServer::updateServer(float dt){
 				if(verbose_) cout << "ofxRemoteUIServer: RESET TO DEFAULTS: " << endl;
 				restoreAllParamsToDefaultValues();
 				sendRESD(true);
+				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("RESET CONFIG TO DEFAULTS (source defined values)");
+				#endif
 				if(callBack != NULL){
 					cbArg.action = CLIENT_DID_RESET_TO_DEFAULTS;
 					callBack(cbArg);

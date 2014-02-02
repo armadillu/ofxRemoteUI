@@ -9,9 +9,10 @@
 #ifndef emptyExample_ofxRemoteUISimpleNotifications_h
 #define emptyExample_ofxRemoteUISimpleNotifications_h
 
-#include "ofMain.h"
 
 #if defined OF_VERSION_MINOR /*if OF exists*/
+
+#include "ofMain.h"
 
 class ofxRemoteUISimpleNotifications{
 

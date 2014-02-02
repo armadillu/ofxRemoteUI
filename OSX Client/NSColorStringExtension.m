@@ -24,8 +24,7 @@
     return string;
 }
 
-+ (NSColor*)colorFromString:(NSString*)string forColorSpace:(NSColorSpace*)colorSpace
-{
++ (NSColor*)colorFromString:(NSString*)string forColorSpace:(NSColorSpace*)colorSpace{
     CGFloat components[10];    // doubt any color spaces need more than 10 components
     NSArray *componentStrings = [string componentsSeparatedByString:@" "];
     int count = (int)[componentStrings count];
