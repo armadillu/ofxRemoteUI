@@ -158,6 +158,7 @@ void ofxRemoteUIServer::close(){
 
 void ofxRemoteUIServer::setParamGroup(string g){
 	upcomingGroup = g;
+	setNewParamColor(2);
 }
 
 void ofxRemoteUIServer::unsetParamColor(){

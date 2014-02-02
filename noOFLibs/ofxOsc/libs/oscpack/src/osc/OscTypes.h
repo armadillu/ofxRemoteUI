@@ -126,7 +126,7 @@ struct NilType{
 };
 
 #ifndef _OBJC_OBJC_H_
-	extern NilType Nil;
+	extern NilType OscNil;
 #endif 
 
 struct InfinitumType{

@@ -19,6 +19,7 @@
 #include <vector>
 #include "ofxRemoteUISimpleNotifications.h"
 
+
 #ifndef OF_VERSION_MINOR //if OF is not available, redefine ofColor to myColor
 #define ofColor myColor
 struct myColor{
@@ -40,6 +41,11 @@ struct myColor{
 		struct { unsigned char r, g, b, a; };
 		unsigned char v[4];
 	};
+#ifdef CINDER_CINDER //if cinder available, define an easy port to cinderColor
+	cinder::ColorA8u toCinder(){
+		return cinder::ColorA8u(r,g,b,a);
+	}
+#endif
 };
 #else
 #define OF_AVAILABLE 1 //
@@ -65,7 +71,7 @@ struct myColor{
 #define OFX_REMOTEUI_SERVER_GET_INSTANCE()				( ofxRemoteUIServer::instance() )
 
 #ifdef OF_AVAILABLE //threaded only works in OF
-	#define OFX_REMOTEUI_SERVER_START_THREADED()			( ofxRemoteUIServer::instance()->startInBackgroundThread() )
+#define OFX_REMOTEUI_SERVER_START_THREADED()			( ofxRemoteUIServer::instance()->startInBackgroundThread() )
 #endif
 
 
@@ -82,16 +88,16 @@ public:
 
 	void setup(int port = -1, float updateInterval = 0.1/*sec*/);
 
-	#ifdef OF_AVAILABLE
+#ifdef OF_AVAILABLE
 	void startInBackgroundThread(); //calling this means you don't need to call update
-									//all param changes will run in a separate thread
-									//this might cause issues with your app
-									//as parameters can be changed at any time!
-									//so be aware, especially with strings you might get crashes!
-									//but this can be useful in situation where your main thread is blocked for seconds
-									//bc using a background therad means you can still control your params
-									//as the main thread is blocked
-	#endif
+	//all param changes will run in a separate thread
+	//this might cause issues with your app
+	//as parameters can be changed at any time!
+	//so be aware, especially with strings you might get crashes!
+	//but this can be useful in situation where your main thread is blocked for seconds
+	//bc using a background therad means you can still control your params
+	//as the main thread is blocked
+#endif
 
 	void update(float dt);
 	void draw(int x = 20, int y = 20); //draws important notifications on screen
@@ -174,7 +180,7 @@ private:
 	bool			showValuesOnScreen; //displays all params on screen
 	bool			updatedThisFrame;
 
-	#ifdef OF_AVAILABLE
+#ifdef OF_AVAILABLE
 	ofxRemoteUISimpleNotifications onScreenNotifications;
 	void			_appExited(ofEventArgs &e);
 	void			_draw(ofEventArgs &d);
@@ -182,7 +188,7 @@ private:
 	void			_keyPressed(ofKeyEventArgs &e);
 
 	int				selectedItem;
-	#endif
+#endif
 
 	static ofxRemoteUIServer* singleton;
 };
