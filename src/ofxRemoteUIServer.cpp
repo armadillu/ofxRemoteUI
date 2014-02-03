@@ -115,17 +115,6 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 #endif
 #endif
 
-	computerIP = getMyIP();
-	if (computerIP != "NOT FOUND"){
-		doBroadcast = true;
-		vector<string>comps;
-		split(comps, computerIP, '.');
-		string multicastIP = comps[0] + "." + comps[1] + "." + comps[2] + "." + "255";
-		broadcastSender.setup( multicastIP, OFXREMOTEUI_BROADCAST_PORT ); //multicast @
-		cout << "ofxRemoteUIServer: letting everyone know that I am at " << multicastIP << ":" << OFXREMOTEUI_BROADCAST_PORT << endl;
-	}else{
-		doBroadcast = false;
-	}
 }
 
 ofxRemoteUIServer::~ofxRemoteUIServer(){
@@ -438,7 +427,25 @@ void ofxRemoteUIServer::pushParamsToClient(){
 	}
 }
 
+
+void ofxRemoteUIServer::setNetworkInterface(string iface){
+	userSuppliedNetInterface = iface;
+}
+
 void ofxRemoteUIServer::setup(int port_, float updateInterval_){
+
+	//setup the broadcasting
+	computerIP = getMyIP(userSuppliedNetInterface);
+	if (computerIP != "NOT FOUND"){
+		doBroadcast = true;
+		vector<string>comps;
+		split(comps, computerIP, '.');
+		string multicastIP = comps[0] + "." + comps[1] + "." + comps[2] + "." + "255";
+		broadcastSender.setup( multicastIP, OFXREMOTEUI_BROADCAST_PORT ); //multicast @
+		cout << "ofxRemoteUIServer: letting everyone know that I am at " << multicastIP << ":" << OFXREMOTEUI_BROADCAST_PORT << endl;
+	}else{
+		doBroadcast = false;
+	}
 
 	if(port_ == -1){ //if no port specified, pick a random one, but only the very first time we get launched!
 		portIsSet = false;

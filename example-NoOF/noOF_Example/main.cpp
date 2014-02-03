@@ -44,6 +44,7 @@ void serverCallback(RemoteUIServerCallBackArg arg){
 			break;
 
 		/*see RemoteUICallServerAction enum for more event callbacks */
+
 		default:
 			break;
 	}
@@ -55,7 +56,7 @@ int main(int argc, const char * argv[]){
 	std::cout << "Hello, World!\n";
 
 	//setup our client callback, to get notified when client changes things
-	OFX_REMOTEUI_SERVER_GET_INSTANCE()->setCallback(serverCallback);
+	OFX_REMOTEUI_SERVER_SET_CALLBACK(serverCallback);
 
 	//start the server
 	OFX_REMOTEUI_SERVER_SETUP();

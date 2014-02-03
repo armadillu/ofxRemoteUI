@@ -48,6 +48,12 @@
  the first time, and it will be reused for successive launches */
 #define OFX_REMOTEUI_SERVER_SETUP(port, ...)										( ofxRemoteUIServer::instance()->setup(port, ##__VA_ARGS__) )
 
+/*setup the server-client callback. This will be called on important events
+ and param updates from the UI. Supplied method should look like:
+	void serverCallback(RemoteUIServerCallBackArg arg); 
+ See example code below. */
+#define OFX_REMOTEUI_SERVER_SET_CALLBACK(serverCallback)							( ofxRemoteUIServer::instance()->setCallback(serverCallback) )
+
 /*update the server. no need to call this from OF*/
 #define OFX_REMOTEUI_SERVER_UPDATE(deltaTime)										( ofxRemoteUIServer::instance()->update(deltaTime) )
 
@@ -68,6 +74,10 @@
 
 /*set if saves to XML automatically on app exit. Default is YES in OF*/
 #define	OFX_REMOTEUI_SERVER_SET_SAVES_ON_EXIT(save)									( ofxRemoteUIServer::instance()->setSaveToXMLOnExit(save) )
+
+/*Set which network interface to use instead of auto-picking the 1st one.
+ Supply "en0" or similar. Call this before setup() */
+#define	OFX_REMOTEUI_SERVER_SET_NET_INTERFACE(iface)								( ofxRemoteUIServer::instance()->setNetworkInterface(iface) )
 
 /*in OF, auto draws on screen imprtant events and param updates. defaults to YES in OF*/
 #define	OFX_REMOTEUI_SERVER_SET_DRAWS_NOTIF(draw)									( ofxRemoteUIServer::instance()->setDrawsNotificationsAutomaticallly(draw) )
@@ -152,7 +162,7 @@ public:
 
 	void setSaveToXMLOnExit(bool save);
 	void setDrawsNotificationsAutomaticallly(bool draw);
-
+	void setNetworkInterface(string iface);
 	void pushParamsToClient(); //pushes all param values to client, updating its UI
 
 

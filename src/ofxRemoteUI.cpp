@@ -144,14 +144,14 @@ DecodedMessage ofxRemoteUI::decode(ofxOscMessage m){
 }
 
 
-string ofxRemoteUI::getMyIP(){
+string ofxRemoteUI::getMyIP(string userChosenInteface){
 
 	//from https://github.com/jvcleave/LocalAddressGrabber/blob/master/src/LocalAddressGrabber.h
 	//and http://stackoverflow.com/questions/17288908/get-network-interface-name-from-ipv4-address
 	string output = "NOT FOUND";
 	cout << "ofxRemoteUI establishing local interface and IP @" << endl;
 
-#ifdef __APPLE__
+#ifdef __APPLE__ /*this should cover linux too TODO*/
 	struct ifaddrs *myaddrs;
 	struct ifaddrs *ifa;
 	struct sockaddr_in *s4;
@@ -174,18 +174,31 @@ string ofxRemoteUI::getMyIP(){
 			}else{
 				string interface = string(ifa->ifa_name);
 				cout << "ofxRemoteUI found interface: " << interface << endl;
-				if(interface.length() > 2){
-					if (interface[0] == 'e' && interface[1] == 'n'){
-					//if(string(ifa->ifa_name) == "en0" ){ //TODO this returns only en0!
-						output = string(buf);
-						cout << "ofxRemoteUI using interface: " << interface << endl;
-						break;
+				if( interface.length() > 2 || interface == userSuppliedNetInterface ){
+					if (userSuppliedNetInterface.length() > 0){
+						if (interface == userSuppliedNetInterface){
+							output = string(buf);
+							cout << "ofxRemoteUI using user chosen interface: " << interface << endl;
+							break;
+						}
+					}else{
+						if ( interface[0] == 'e' && interface[1] == 'n'){
+							output = string(buf);
+							cout << "ofxRemoteUI using interface: " << interface << endl;
+							break;
+						}
 					}
 				}
 			}
 		}
 	}
 	freeifaddrs(myaddrs);
+	if (userSuppliedNetInterface.length() > 0){
+		if (output == "NOT FOUND"){
+			cout << "ofxRemoteUI could not find the user supplied net interface: " << userSuppliedNetInterface << endl;
+			cout << "ofxRemoteUI automatic advertising will not work! " << endl;
+		}
+	}
 #endif
 
 #ifdef TARGET_WIN32

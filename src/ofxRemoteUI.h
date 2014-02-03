@@ -203,13 +203,12 @@ protected:
 	void sendSAVE(bool confirm = false);
 	void sendMISP(vector<string> missingParamsInPreset);
 
-	string getMyIP();
+	string getMyIP(string userChosenInteface = "");
 
 	bool							verbose_;
 	bool							readyToSend;
 	ofxOscSender					oscSender;
 	ofxOscReceiver					oscReceiver;
-
 
 
 	float							timeCounter;
@@ -220,6 +219,7 @@ protected:
 	float							updateInterval;
 	int								port;
 
+	string							userSuppliedNetInterface; //store user preference on network interface to use
 
 	map<string, RemoteUIParam>		params;
 	map<int, string>				orderedKeys; // used to keep the order in which the params were added
