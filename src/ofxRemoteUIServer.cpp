@@ -601,7 +601,8 @@ void ofxRemoteUIServer::draw(int x, int y){
 	if(showValuesOnScreen){
 		int padding = 30;
 		int x = padding;
-		int y = padding * 2.5;
+		int initialY = padding * 2.5;
+		int y = initialY;
 		int colw = 320;
 		int valOffset = colw * 0.6;
 		int spacing = 24;
@@ -651,7 +652,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 			y += spacing;
 			if (y > ofGetHeight() - padding){
 				x += colw;
-				y = 2 * padding;
+				y = initialY;
 			}
 		}
 	}else{
