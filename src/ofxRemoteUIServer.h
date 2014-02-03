@@ -19,59 +19,72 @@
 #include <vector>
 #include "ofxRemoteUISimpleNotifications.h"
 
+// ################################################################################################
+// ## EASY ACCES MACROS ## use these instead of direct calls
+// ################################################################################################
 
-#ifndef OF_VERSION_MINOR //if OF is not available, redefine ofColor to myColor
-#define ofColor myColor
-struct myColor{
+//use this macro to share floats, ints, bools
+#define OFX_REMOTEUI_SERVER_SHARE_PARAM(val,...)									( ofxRemoteUIServer::instance()->shareParam( #val, &val, ##__VA_ARGS__ ) )
 
-	myColor(){}
-	myColor(int rr, int gg, int bb, int aa){
-		r = rr;	g = gg;	b = bb; a = aa;
-	}
-	myColor(int bright){
-		r = g = b = bright; a = 255;
-	}
-	bool operator==(const myColor& c){
-		return r == c.r && g == c.g && b == c.b && a == c.a;
-	}
-	bool operator!=(const myColor& c){
-		return r != c.r || g != c.g || b != c.b || a != c.a;
-	}
-	union  {
-		struct { unsigned char r, g, b, a; };
-		unsigned char v[4];
-	};
-#ifdef CINDER_CINDER //if cinder available, define an easy port to cinderColor
-	cinder::ColorA8u toCinder(){
-		return cinder::ColorA8u(r,g,b,a);
-	}
-#endif
-};
-#else
-#define OF_AVAILABLE 1 //
-#endif
+//use this macro to share enums + enumList
+#define OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM(val,enumMin,enumMax,menuList,...)		( ofxRemoteUIServer::instance()->shareParam( #val, (int*)&val,enumMin, enumMax,menuList, ##__VA_ARGS__ ) )
 
-//easy param sharing macros, share from from anywhere!
-#define OFX_REMOTEUI_SERVER_SHARE_PARAM(val,...)		( ofxRemoteUIServer::instance()->shareParam( #val, &val, ##__VA_ARGS__ ) )
-#define OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM(val,enumMin,enumMax,menuList,...)	( ofxRemoteUIServer::instance()->shareParam( #val, (int*)&val,enumMin, enumMax,menuList, ##__VA_ARGS__ ) )
-#define OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color,...)( ofxRemoteUIServer::instance()->shareParam( #color, (unsigned char*)&color.v[0], ##__VA_ARGS__ ) )
-#define OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_COLOR(c)	( ofxRemoteUIServer::instance()->setParamColor( c ) )
-#define OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP(g)	( ofxRemoteUIServer::instance()->setParamGroup( g ) )
-#define OFX_REMOTEUI_SERVER_SET_NEW_COLOR()				( ofxRemoteUIServer::instance()->setNewParamColor(1) )
-#define OFX_REMOTEUI_SERVER_SET_NEW_COLOR_N(num)		( ofxRemoteUIServer::instance()->setNewParamColor(num) )
-#define OFX_REMOTEUI_SERVER_SETUP(port, ...)			( ofxRemoteUIServer::instance()->setup(port, ##__VA_ARGS__) )
-#define OFX_REMOTEUI_SERVER_UPDATE(deltaTime)			( ofxRemoteUIServer::instance()->update(deltaTime) )
-#define OFX_REMOTEUI_SERVER_DRAW(x,y)					( ofxRemoteUIServer::instance()->draw(x,y) ) /*only call this if you disabled automatic notifications and still want to see them in a custom place*/
-#define OFX_REMOTEUI_SERVER_CLOSE()						( ofxRemoteUIServer::instance()->close() )
-#define	OFX_REMOTEUI_SERVER_SAVE_TO_XML()				( ofxRemoteUIServer::instance()->saveToXML(OFXREMOTEUI_SETTINGS_FILENAME) )
-#define	OFX_REMOTEUI_SERVER_LOAD_FROM_XML()				( ofxRemoteUIServer::instance()->loadFromXML(OFXREMOTEUI_SETTINGS_FILENAME) )
-#define	OFX_REMOTEUI_SERVER_SET_SAVES_ON_EXIT(save)		( ofxRemoteUIServer::instance()->setSaveToXMLOnExit(save) )
-#define	OFX_REMOTEUI_SERVER_SET_DRAWS_NOTIF(draw)		( ofxRemoteUIServer::instance()->setDrawsNotificationsAutomaticallly(draw) )
-#define OFX_REMOTEUI_SERVER_PUSH_TO_CLIENT()			( ofxRemoteUIServer::instance()->pushParamsToClient() ) /*sends all params to client, same as pressing sync on client*/
-#define OFX_REMOTEUI_SERVER_GET_INSTANCE()				( ofxRemoteUIServer::instance() )
+//use this macro to share ofColors
+#define OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color,...)							( ofxRemoteUIServer::instance()->shareParam( #color, (unsigned char*)&color.v[0], ##__VA_ARGS__ ) )
 
-#ifdef OF_AVAILABLE //threaded only works in OF
-#define OFX_REMOTEUI_SERVER_START_THREADED()			( ofxRemoteUIServer::instance()->startInBackgroundThread() )
+/*set a specific color for the upcoming params */
+#define OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_COLOR(c)								( ofxRemoteUIServer::instance()->setParamColor( c ) )
+
+/*set a new group for the upcoming params*/
+#define OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP(g)								( ofxRemoteUIServer::instance()->setParamGroup( g ) )
+
+/*set a new 'random' color upcoming params*/
+#define OFX_REMOTEUI_SERVER_SET_NEW_COLOR()											( ofxRemoteUIServer::instance()->setNewParamColor(1) )
+
+/*set a new color with a custom level of difference from the prev color*/
+#define OFX_REMOTEUI_SERVER_SET_NEW_COLOR_N(num)									( ofxRemoteUIServer::instance()->setNewParamColor(num) )
+
+/*setup the server, set a specific port if you must. otherwise a random one will be chosen 
+ the first time, and it will be reused for successive launches */
+#define OFX_REMOTEUI_SERVER_SETUP(port, ...)										( ofxRemoteUIServer::instance()->setup(port, ##__VA_ARGS__) )
+
+/*update the server. no need to call this from OF*/
+#define OFX_REMOTEUI_SERVER_UPDATE(deltaTime)										( ofxRemoteUIServer::instance()->update(deltaTime) )
+
+/*draw the server msgs. no need to call this from OF
+ only call this if you disabled automatic notifications and still 
+ want to see them in a custom location*/
+#define OFX_REMOTEUI_SERVER_DRAW(x,y)												( ofxRemoteUIServer::instance()->draw(x,y) )
+
+/*close the server. no need to call this from OF*/
+#define OFX_REMOTEUI_SERVER_CLOSE()													( ofxRemoteUIServer::instance()->close() )
+
+/*save current param status to default xml.
+  No need to call this on app quit in OF, happensautomatically */
+#define	OFX_REMOTEUI_SERVER_SAVE_TO_XML()											( ofxRemoteUIServer::instance()->saveToXML(OFXREMOTEUI_SETTINGS_FILENAME) )
+
+/*loads last saved default xml params into your variables */
+#define	OFX_REMOTEUI_SERVER_LOAD_FROM_XML()											( ofxRemoteUIServer::instance()->loadFromXML(OFXREMOTEUI_SETTINGS_FILENAME) )
+
+/*set if saves to XML automatically on app exit. Default is YES in OF*/
+#define	OFX_REMOTEUI_SERVER_SET_SAVES_ON_EXIT(save)									( ofxRemoteUIServer::instance()->setSaveToXMLOnExit(save) )
+
+/*in OF, auto draws on screen imprtant events and param updates. defaults to YES in OF*/
+#define	OFX_REMOTEUI_SERVER_SET_DRAWS_NOTIF(draw)									( ofxRemoteUIServer::instance()->setDrawsNotificationsAutomaticallly(draw) )
+
+/*sends all params to client, same as pressing sync on client
+ updates client UI to match current param values. use this if you modify 
+ params internally and want those changes reflected in the UI*/
+#define OFX_REMOTEUI_SERVER_PUSH_TO_CLIENT()										( ofxRemoteUIServer::instance()->pushParamsToClient() )
+
+/*get a pointer to the server*/
+#define OFX_REMOTEUI_SERVER_GET_INSTANCE()											( ofxRemoteUIServer::instance() )
+
+#ifdef OF_AVAILABLE
+/*run the server on a back thread. Useful for apps with very low framerate.
+ default is disabled in OF; only works in OF! */
+#define OFX_REMOTEUI_SERVER_START_THREADED()										( ofxRemoteUIServer::instance()->startInBackgroundThread() )
+
 #endif
 
 
@@ -89,16 +102,19 @@ public:
 	void setup(int port = -1, float updateInterval = 0.1/*sec*/);
 
 #ifdef OF_AVAILABLE
-	void startInBackgroundThread(); //calling this means you don't need to call update
-	//all param changes will run in a separate thread
-	//this might cause issues with your app
-	//as parameters can be changed at any time!
-	//so be aware, especially with strings you might get crashes!
-	//but this can be useful in situation where your main thread is blocked for seconds
-	//bc using a background therad means you can still control your params
-	//as the main thread is blocked
+	void startInBackgroundThread();
+	/*	Calling this will run the server in a background thread.
+		all param changes will run in a separate thread, this might cause issues with your app
+		as parameters can be changed at any time! so be aware, especially with strings. You might get crashes.
+		This can be useful in situation where your main thread is blocked for seconds, or your app runs
+		at a very low framerate. In those situations, the server doesnt get updated often enough,
+		and you might get disconnected. Using a background thread means you can still control your params
+		as the main thread is blocked, but it also means the changes may happen at any time. Also, the
+		callback method will be called from a background thread, so keep it in mind. (no GL calls in there!)
+	 */
 #endif
 
+	//You shouldnt need to call any of these directly. Use the Macros supplied above instead.
 	void update(float dt);
 	void draw(int x = 20, int y = 20); //draws important notifications on screen
 	void close();
@@ -143,7 +159,7 @@ public:
 
 private:
 
-	ofxRemoteUIServer(); // use ofxRemoteUIServer::instance() instead!
+	ofxRemoteUIServer(); // use ofxRemoteUIServer::instance() instead! Use the MACROS defined above!
 	~ofxRemoteUIServer();
 
 	void			restoreAllParamsToInitialXML();

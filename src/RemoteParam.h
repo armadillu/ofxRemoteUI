@@ -177,5 +177,36 @@ struct RemoteUIServerCallBackArg{
 };
 
 
+#ifndef OF_VERSION_MINOR //if OF is not available, redefine ofColor to myColor
+#define ofColor myColor
+struct myColor{
+
+	myColor(){}
+	myColor(int rr, int gg, int bb, int aa){
+		r = rr;	g = gg;	b = bb; a = aa;
+	}
+	myColor(int bright){
+		r = g = b = bright; a = 255;
+	}
+	bool operator==(const myColor& c){
+		return r == c.r && g == c.g && b == c.b && a == c.a;
+	}
+	bool operator!=(const myColor& c){
+		return r != c.r || g != c.g || b != c.b || a != c.a;
+	}
+	union  {
+		struct { unsigned char r, g, b, a; };
+		unsigned char v[4];
+	};
+#ifdef CINDER_CINDER //if cinder available, define an easy port to cinderColor
+	cinder::ColorA8u toCinder(){
+		return cinder::ColorA8u(r,g,b,a);
+	}
+#endif
+};
+#else
+#define OF_AVAILABLE 1 //define our custom Constant to detect OF presence
+#endif
+
 
 #endif
