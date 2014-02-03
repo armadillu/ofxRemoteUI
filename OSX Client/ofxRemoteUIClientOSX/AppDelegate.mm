@@ -1260,12 +1260,14 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 
 -(void) autoConnectToNeighbor:(string)host_ port:(int)port_{
-	if ([[connectButton title] isEqualToString:@"Connect"]){ //we are not connected, let's connect to this newly launched neighbor!
-		NSString * host = [NSString stringWithFormat:@"%s", host_.c_str()];
-		NSString * port = [NSString stringWithFormat:@"%d", port_];
-		[addressField setStringValue: host];
-		[portField setStringValue: port];
-		[self connect];
+	if(autoConnectToggle){
+		if ([[connectButton title] isEqualToString:@"Connect"]){ //we are not connected, let's connect to this newly launched neighbor!
+			NSString * host = [NSString stringWithFormat:@"%s", host_.c_str()];
+			NSString * port = [NSString stringWithFormat:@"%d", port_];
+			[addressField setStringValue: host];
+			[portField setStringValue: port];
+			[self connect];
+		}
 	}
 }
 
