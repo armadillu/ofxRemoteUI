@@ -95,7 +95,7 @@ For now, only ints, floats, enums, bools and colors can be controlled from a mid
 
 Bools can also be binded to "piano keys"; params being set to true for as long as a key is held down.
 
-Bindings are lost when the app is quit. You can doubleclick any .midiBind file form the finder to load your previously saved bindings.
+Bindings are saved when the app is quit. You can also doubleclick any .midiBind file form the finder to load your previously saved bindings. There is a "bindings" window that allows you to delete particular bindings.
 
 ## Random Notes
 
