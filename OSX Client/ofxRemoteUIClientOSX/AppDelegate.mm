@@ -712,10 +712,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	JoystickManager *theJoystickManager = [JoystickManager sharedInstance];
     [theJoystickManager setJoystickAddedDelegate:self];
 
-
 	launched = TRUE;
 	NSLog(@"Launched ofxRemoteUI version %@", GIT_COMMIT_NUMBER);
-
 }
 
 

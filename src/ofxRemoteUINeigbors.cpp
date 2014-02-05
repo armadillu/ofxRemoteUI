@@ -26,7 +26,7 @@ bool ofxRemoteUINeigbors::update(float dt){
 		Neighbor n = iterator->second;
 		float timeLastSeen = n.timeLastSeen;
 		float lastSeenSecAgo = time - timeLastSeen;
-		if (lastSeenSecAgo > OFXREMOTEUI_DEATH_BY_TIME){
+		if (lastSeenSecAgo > OFXREMOTEUI_NEIGHBOR_DEATH_BY_TIME){
 			idsToDelete.push_back(ID);
 			updated = true;
 		}

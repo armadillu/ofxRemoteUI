@@ -12,8 +12,6 @@
 
 #include "ofxRemoteUI.h"
 
-#define MAX_MISSING_TIME	3	/*seconds*/
-
 struct Neighbor{
 	Neighbor(){};
 	Neighbor(string ip, int p, float t, string n, string bin){IP = ip; port = p; timeLastSeen = t; name = n; binary = bin;}
