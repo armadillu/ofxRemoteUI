@@ -22,7 +22,7 @@
 	paramName = name;
 	BOOL didLoad = [NSBundle loadNibNamed:@"View" owner:self];
 	if(!didLoad){
-		NSLog(@"can0t load Nib for Parameter View!");
+		NSLog(@"can't load Nib for Parameter View!");
 		return nil;
 	}
 
