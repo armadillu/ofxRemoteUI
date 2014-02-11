@@ -637,10 +637,15 @@ void ofxRemoteUIServer::draw(int x, int y){
 			if (chars*charw > valOffset){
 				key = key.substr(0, (valOffset) / charw );
 			}
-			if (selectedItem != i) ofSetColor(200);
+			if (selectedItem != i) ofSetColor(p.r, p.g, p.b);
 			else ofSetColor(255,0,0);
-			if(p.type != REMOTEUI_PARAM_SPACER) ofDrawBitmapString(key, x,y);
-			else ofDrawBitmapString(p.stringVal, x,y);
+
+			if(p.type != REMOTEUI_PARAM_SPACER){
+				string sel = (selectedItem == i) ? ">" : " ";
+				ofDrawBitmapString(sel + key, x, y);
+			}else{
+				ofDrawBitmapString(p.stringVal, x,y);
+			}
 
 			switch (p.type) {
 				case REMOTEUI_PARAM_FLOAT:
