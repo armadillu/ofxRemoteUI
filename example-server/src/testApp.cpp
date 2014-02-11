@@ -43,13 +43,12 @@ void testApp::setup(){
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(numCircles, 0, 30);	//variable, rangeMin, rangeMax
 
 	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP("whatever"); //make a new group
-	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_COLOR( ofColor(255,0,0,64) ); // you can set a custom upcoming color too
 
 	// SHARE AN STRING PARAM //////////////////////////////////////
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentSentence, ofColor(0,0,255,64));	// you can also set a color on a per-param basis
 
 	// SHARE A FLOAT //////////////////////////////////////
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentMouseX, 0, ofGetWidth(), ofColor(255,64));
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentMouseX, 0, ofGetWidth());
 
 	// SHARE AN ENUM PARAM //////////////////////////////////////
 	vector<string> menuItems;

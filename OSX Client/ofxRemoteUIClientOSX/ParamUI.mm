@@ -270,7 +270,7 @@
 			[sliderMin removeFromSuperviewWithoutNeedingDisplay];
 			[sliderVal removeFromSuperviewWithoutNeedingDisplay];
 			[colorWell removeFromSuperviewWithoutNeedingDisplay];
-			[enumeratorMenu removeFromSuperviewWithoutNeedingDisplay];
+			[enumeratorMenu removeAllItems];
 			[spacerTitle removeFromSuperviewWithoutNeedingDisplay];
 			for(int i = 0; i < param.enumList.size(); i++){
 				[enumeratorMenu addItemWithTitle:[NSString stringWithFormat:@"%s", param.enumList[i].c_str()]];
