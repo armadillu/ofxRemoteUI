@@ -27,13 +27,13 @@ void testApp::setup(){
 
 	// SET PARAM GROUPS / COLORS //////////////////////////////////
 	OFX_REMOTEUI_SERVER_SET_NEW_COLOR(); // set a bg color for all the upcoming params (optional)
-	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP("position"); //make a new group (optional)
+	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP("POSITION"); //make a new group (optional)
 
 	// SHARE A FLOAT PARAM ////////////////////////////////////////
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(x, 0, ofGetWidth() ); //add an "x" float param to the current group ("position")
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(y, 0, ofGetHeight()); //provide a variable, a rangeMin and a rangeMax
 
-	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP("style"); //make a new group (optional)
+	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP("STYLE"); //make a new group (optional)
 	OFX_REMOTEUI_SERVER_SET_NEW_COLOR(); // set a bg color for the upcoming params (optional)
 
 	// SHARE A BOOL PARAM ////////////////////////////////////////
@@ -42,7 +42,7 @@ void testApp::setup(){
 	// SHARE A FLOAT PARAM ////////////////////////////////////////
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(numCircles, 0, 30);	//variable, rangeMin, rangeMax
 
-	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP("whatever"); //make a new group
+	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP("OTHER"); //make a new group
 
 	// SHARE AN STRING PARAM //////////////////////////////////////
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentSentence, ofColor(0,0,255,64));	// you can also set a color on a per-param basis
@@ -79,7 +79,6 @@ void testApp::update(){
 	float dt = 0.016666;
 
 	currentMouseX = ofGetMouseX();
-	OFX_REMOTEUI_SERVER_UPDATE(dt);
 }
 
 
@@ -138,5 +137,5 @@ void testApp::serverCallback(RemoteUIServerCallBackArg arg){
 
 void testApp::keyPressed( int key ){
 	//force an update in the client side (same as pressing sync button on osx client)
-	OFX_REMOTEUI_SERVER_GET_INSTANCE()->pushParamsToClient();
+	OFX_REMOTEUI_SERVER_PUSH_TO_CLIENT();
 }
