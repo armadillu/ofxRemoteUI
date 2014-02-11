@@ -7,7 +7,7 @@
 @implementation ParamUI
 
 -(void)dealloc{
-	[ui removeFromSuperview];
+	[ui removeFromSuperviewWithoutNeedingDisplay];
 	[ui release];
 	[super dealloc];
 }
