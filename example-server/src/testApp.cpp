@@ -23,7 +23,7 @@ void testApp::setup(){
 									//the first time you launch it, and will use it forever
 
 	// SETUP A CALLBACK ///////////////////////////////////////////
-	OFX_REMOTEUI_SERVER_GET_INSTANCE()->setCallback(testApp::serverCallback); // (optional!)
+	OFX_REMOTEUI_SERVER_SET_CALLBACK(testApp::serverCallback); // (optional!)
 
 	// SET PARAM GROUPS / COLORS //////////////////////////////////
 	OFX_REMOTEUI_SERVER_SET_NEW_COLOR(); // set a bg color for all the upcoming params (optional)
@@ -39,8 +39,12 @@ void testApp::setup(){
 	// SHARE A BOOL PARAM ////////////////////////////////////////
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawOutlines);
 
-	// SHARE A FLOAT PARAM ////////////////////////////////////////
+	OFX_REMOTEUI_SERVER_SET_NEW_COLOR(); //slighly change the bg color within the group
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(numCircles, 0, 30);	//variable, rangeMin, rangeMax
+
+
+	OFX_REMOTEUI_SERVER_SET_NEW_COLOR(); //slighly change the bg color within the group
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(circleSize, 1, 30);	//variable, rangeMin, rangeMax
 
 	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP("OTHER"); //make a new group
 
@@ -98,7 +102,7 @@ void testApp::draw(){
 		ofCircle(
 					-ofGetWidth() * 0.5 + ofGetWidth() * ofNoise((ofGetFrameNum() + 20 * i) * 0.004  + i),
 					-ofGetHeight() * 0.5 + ofGetHeight() * ofNoise((ofGetFrameNum() + 10 * i) * 0.004 + 4 * i),
-					25
+					circleSize
 				 );
 	}
 

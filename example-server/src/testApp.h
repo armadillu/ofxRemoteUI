@@ -7,7 +7,7 @@
 class testApp : public ofBaseApp{
 
 enum MenuItems{
-	MENU_OPTION_0,MENU_OPTION_1,MENU_OPTION_2, MENU_OPTION_3
+	MENU_OPTION_0, MENU_OPTION_1, MENU_OPTION_2, MENU_OPTION_3
 };
 
 public:
@@ -20,6 +20,7 @@ public:
 		float y;
 		bool drawOutlines;
 		int numCircles;
+		float circleSize;
 
 		ofColor color;
 		MenuItems menu;
