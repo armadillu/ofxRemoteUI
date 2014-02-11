@@ -224,11 +224,12 @@
 			[sliderVal setTarget:self];
 			[slider setMaxValue:param.maxFloat];
 			[slider setMinValue:param.minFloat];
-			[button removeFromSuperview];
-			[textView removeFromSuperview];
+			[button removeFromSuperviewWithoutNeedingDisplay];
+			[textView removeFromSuperviewWithoutNeedingDisplay];
 			[slider setAllowsTickMarkValuesOnly:false];
-			[enumeratorMenu removeFromSuperview];
-			[colorWell removeFromSuperview];
+			[enumeratorMenu removeFromSuperviewWithoutNeedingDisplay];
+			[colorWell removeFromSuperviewWithoutNeedingDisplay];
+			[spacerTitle removeFromSuperviewWithoutNeedingDisplay];
 			break;
 
 		case REMOTEUI_PARAM_INT:
@@ -239,35 +240,38 @@
 			[sliderVal setTarget:self];
 			[slider setAllowsTickMarkValuesOnly:true];
 			[widget setAction:@selector(updateInt:)];
-			[button removeFromSuperview];
-			[textView removeFromSuperview];
-			[enumeratorMenu removeFromSuperview];
-			[colorWell removeFromSuperview];
+			[button removeFromSuperviewWithoutNeedingDisplay];
+			[textView removeFromSuperviewWithoutNeedingDisplay];
+			[enumeratorMenu removeFromSuperviewWithoutNeedingDisplay];
+			[colorWell removeFromSuperviewWithoutNeedingDisplay];
+			[spacerTitle removeFromSuperviewWithoutNeedingDisplay];
 			break;
 
 		case REMOTEUI_PARAM_COLOR:
 			widget = colorWell;
 			[widget setAction:@selector(updateColor:)];
-			[button removeFromSuperview];
-			[slider removeFromSuperview];
-			[sliderMax removeFromSuperview];
-			[sliderMin removeFromSuperview];
-			[sliderVal removeFromSuperview];
-			[textView removeFromSuperview];
-			[enumeratorMenu removeFromSuperview];
+			[button removeFromSuperviewWithoutNeedingDisplay];
+			[slider removeFromSuperviewWithoutNeedingDisplay];
+			[sliderMax removeFromSuperviewWithoutNeedingDisplay];
+			[sliderMin removeFromSuperviewWithoutNeedingDisplay];
+			[sliderVal removeFromSuperviewWithoutNeedingDisplay];
+			[textView removeFromSuperviewWithoutNeedingDisplay];
+			[enumeratorMenu removeFromSuperviewWithoutNeedingDisplay];
+			[spacerTitle removeFromSuperviewWithoutNeedingDisplay];
 			break;
 
 		case REMOTEUI_PARAM_ENUM:{
 			widget = enumeratorMenu;
 			[widget setAction:@selector(updateEnum:)];
-			[button removeFromSuperview];
-			[slider removeFromSuperview];
-			[textView removeFromSuperview];
-			[sliderMax removeFromSuperview];
-			[sliderMin removeFromSuperview];
-			[sliderVal removeFromSuperview];
-			[colorWell removeFromSuperview];
-			[enumeratorMenu removeAllItems];
+			[button removeFromSuperviewWithoutNeedingDisplay];
+			[slider removeFromSuperviewWithoutNeedingDisplay];
+			[textView removeFromSuperviewWithoutNeedingDisplay];
+			[sliderMax removeFromSuperviewWithoutNeedingDisplay];
+			[sliderMin removeFromSuperviewWithoutNeedingDisplay];
+			[sliderVal removeFromSuperviewWithoutNeedingDisplay];
+			[colorWell removeFromSuperviewWithoutNeedingDisplay];
+			[enumeratorMenu removeFromSuperviewWithoutNeedingDisplay];
+			[spacerTitle removeFromSuperviewWithoutNeedingDisplay];
 			for(int i = 0; i < param.enumList.size(); i++){
 				[enumeratorMenu addItemWithTitle:[NSString stringWithFormat:@"%s", param.enumList[i].c_str()]];
 			}
@@ -276,25 +280,43 @@
 		case REMOTEUI_PARAM_BOOL:
 			widget = button;
 			[button setAction:@selector(updateBool:)];
-			[slider removeFromSuperview];
-			[textView removeFromSuperview];
-			[sliderMax removeFromSuperview];
-			[sliderMin removeFromSuperview];
-			[sliderVal removeFromSuperview];
-			[colorWell removeFromSuperview];
-			[enumeratorMenu removeFromSuperview];
+			[slider removeFromSuperviewWithoutNeedingDisplay];
+			[textView removeFromSuperviewWithoutNeedingDisplay];
+			[sliderMax removeFromSuperviewWithoutNeedingDisplay];
+			[sliderMin removeFromSuperviewWithoutNeedingDisplay];
+			[sliderVal removeFromSuperviewWithoutNeedingDisplay];
+			[colorWell removeFromSuperviewWithoutNeedingDisplay];
+			[enumeratorMenu removeFromSuperviewWithoutNeedingDisplay];
+			[spacerTitle removeFromSuperviewWithoutNeedingDisplay];
 			break;
 
 		case REMOTEUI_PARAM_STRING:
 			widget = textView;
 			[textView setAction:@selector(updateString:)];
-			[slider removeFromSuperview];
-			[button removeFromSuperview];
-			[sliderMax removeFromSuperview];
-			[sliderMin removeFromSuperview];
-			[sliderVal removeFromSuperview];
-			[colorWell removeFromSuperview];
-			[enumeratorMenu removeFromSuperview];
+			[slider removeFromSuperviewWithoutNeedingDisplay];
+			[button removeFromSuperviewWithoutNeedingDisplay];
+			[sliderMax removeFromSuperviewWithoutNeedingDisplay];
+			[sliderMin removeFromSuperviewWithoutNeedingDisplay];
+			[sliderVal removeFromSuperviewWithoutNeedingDisplay];
+			[colorWell removeFromSuperviewWithoutNeedingDisplay];
+			[enumeratorMenu removeFromSuperviewWithoutNeedingDisplay];
+			[spacerTitle removeFromSuperviewWithoutNeedingDisplay];
+			break;
+
+		case REMOTEUI_PARAM_SPACER:
+			widget = spacerTitle;
+			[spacerTitle setStringValue:[self stringFromString: param.stringVal]];
+			[spacerTitle setTextColor:[NSColor whiteColor]];
+			[textView removeFromSuperviewWithoutNeedingDisplay];
+			[slider removeFromSuperviewWithoutNeedingDisplay];
+			[button removeFromSuperviewWithoutNeedingDisplay];
+			[sliderMax removeFromSuperviewWithoutNeedingDisplay];
+			[sliderMin removeFromSuperviewWithoutNeedingDisplay];
+			[sliderVal removeFromSuperviewWithoutNeedingDisplay];
+			[colorWell removeFromSuperviewWithoutNeedingDisplay];
+			[enumeratorMenu removeFromSuperviewWithoutNeedingDisplay];
+			[paramGroup removeFromSuperviewWithoutNeedingDisplay];
+			[paramLabel setHidden:YES];
 			break;
 
 		default:NSLog(@"wtf is this?");
@@ -361,7 +383,8 @@
 			[textView setStringValue: [self stringFromString: param.stringVal]];
 			//[textView setStringValue: [NSString stringWithFormat:@"%@", [NSDate date]]];
 			break;
-
+		case REMOTEUI_PARAM_SPACER:
+			break;
 		default:
 			NSLog(@"updateUI wtf");
 			break;

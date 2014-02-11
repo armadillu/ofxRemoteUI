@@ -130,6 +130,9 @@ DecodedMessage ofxRemoteUI::decode(ofxOscMessage m){
 						if (arg1 == "ENU") dm.argument = ENUM_ARG;
 						else
 							if (arg1 == "COL") dm.argument = COLOR_ARG;
+							else
+								if (arg1 == "SPA") dm.argument = SPACER_ARG;
+
 
 
 	}
@@ -324,6 +327,12 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 				*p.stringValAddr = p.stringVal;
 			}break;
 
+		case SPACER_ARG:
+			p.type = REMOTEUI_PARAM_SPACER;
+			p.stringVal = m.getArgAsString(arg); arg++;
+			break;
+			
+
 		case NULL_ARG: cout << "updateParamFromDecodedMessage NULL type!" << endl; break;
 		default: cout << "updateParamFromDecodedMessage unknown type!" << endl; break;
 	}
@@ -430,6 +439,7 @@ void ofxRemoteUI::syncPointerToParam(string paramName){
 				*p.boolValAddr = p.boolVal;
 			}break;
 
+		case REMOTEUI_PARAM_SPACER:
 		case REMOTEUI_PARAM_STRING:
 			if (p.stringValAddr){
 				*p.stringValAddr = p.stringVal;
@@ -470,6 +480,7 @@ void ofxRemoteUI::syncParamToPointer(string paramName){
 				p.boolVal = *p.boolValAddr;
 			}break;
 
+		case REMOTEUI_PARAM_SPACER:
 		case REMOTEUI_PARAM_STRING:
 			if (p.stringValAddr){
 				p.stringVal = *p.stringValAddr;
@@ -515,6 +526,7 @@ bool ofxRemoteUI::hasParamChanged(RemoteUIParam p){
 				if (*p.stringValAddr != p.stringVal) return true; else return false;
 			}
 			return false;
+		case REMOTEUI_PARAM_SPACER: return false;
 		default: break;
 	}
 	cout << "ofxRemoteUIServer::hasParamChanged >> something went wrong, unknown param type" << endl;
@@ -530,6 +542,7 @@ string ofxRemoteUI::stringForParamType(RemoteUIParamType t){
 		case REMOTEUI_PARAM_ENUM: return "ENU";
 		case REMOTEUI_PARAM_BOOL: return "BOL";
 		case REMOTEUI_PARAM_STRING: return "STR";
+		case REMOTEUI_PARAM_SPACER: return "SPA";
 		default: break;
 	}
 	cout << "ofxRemoteUI::stringForParamType >> UNKNOWN TYPE!" << endl;
@@ -564,6 +577,7 @@ string ofxRemoteUI::getValuesAsString(){
 			case REMOTEUI_PARAM_ENUM: out << param.intVal << endl; break;
 			case REMOTEUI_PARAM_BOOL: out << (param.boolVal?"1":"0") << endl; break;
 			case REMOTEUI_PARAM_STRING: out << UriEncode(param.stringVal) << endl; break;
+			case REMOTEUI_PARAM_SPACER: break;
 			default: break;
 		}
 		++it;
@@ -602,6 +616,7 @@ void ofxRemoteUI::setValuesFromString( string values ){
 				case REMOTEUI_PARAM_ENUM: valstr >> param.intVal; break;
 				case REMOTEUI_PARAM_BOOL: valstr >> param.boolVal; break;
 				case REMOTEUI_PARAM_STRING: param.stringVal = valstr.str(); break;
+				case REMOTEUI_PARAM_SPACER: break;
 				default: break;
 			}
 
@@ -640,6 +655,7 @@ void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
 				m.addStringArg(p.enumList[i]);
 			}
 		}break;
+		case REMOTEUI_PARAM_SPACER: m.addStringArg(p.stringVal); break;
 		default: break;
 	}
 	m.addIntArg(p.r); m.addIntArg(p.g); m.addIntArg(p.b); m.addIntArg(p.a); // set bg color!

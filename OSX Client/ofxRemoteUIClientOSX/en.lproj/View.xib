@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">13A603</string>
+		<string key="IBDocument.SystemVersion">13B42</string>
 		<string key="IBDocument.InterfaceBuilderVersion">4514</string>
 		<string key="IBDocument.AppKitVersion">1265</string>
-		<string key="IBDocument.HIToolboxVersion">695.00</string>
+		<string key="IBDocument.HIToolboxVersion">696.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			<string key="NS.object.0">4514</string>
@@ -48,6 +48,45 @@
 				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">15</int>
 				<array class="NSMutableArray" key="NSSubviews">
+					<object class="NSTextField" id="49430787">
+						<reference key="NSNextResponder" ref="743967783"/>
+						<int key="NSvFlags">258</int>
+						<string key="NSFrame">{{11, 6}, {359, 21}}</string>
+						<reference key="NSSuperview" ref="743967783"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="521005238"/>
+						<string key="NSReuseIdentifierKey">_NS:397</string>
+						<string key="NSHuggingPriority">{251, 750}</string>
+						<bool key="NSEnabled">YES</bool>
+						<object class="NSTextFieldCell" key="NSCell" id="913576808">
+							<int key="NSCellFlags">67108864</int>
+							<int key="NSCellFlags2">138416128</int>
+							<string key="NSContents">SPACER NAME</string>
+							<object class="NSFont" key="NSSupport">
+								<string key="NSName">LucidaGrande-Bold</string>
+								<double key="NSSize">14</double>
+								<int key="NSfFlags">16</int>
+							</object>
+							<string key="NSCellIdentifier">_NS:397</string>
+							<reference key="NSControlView" ref="49430787"/>
+							<bool key="NSDrawsBackground">YES</bool>
+							<object class="NSColor" key="NSBackgroundColor">
+								<int key="NSColorSpace">4</int>
+								<bytes key="NSWhite">MC44IDAAA</bytes>
+							</object>
+							<object class="NSColor" key="NSTextColor" id="460488847">
+								<int key="NSColorSpace">6</int>
+								<string key="NSCatalogName">System</string>
+								<string key="NSColorName">controlTextColor</string>
+								<object class="NSColor" key="NSColor" id="1038477509">
+									<int key="NSColorSpace">3</int>
+									<bytes key="NSWhite">MAA</bytes>
+								</object>
+							</object>
+						</object>
+						<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+						<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
+					</object>
 					<object class="NSCustomView" id="718633621">
 						<reference key="NSNextResponder" ref="743967783"/>
 						<int key="NSvFlags">266</int>
@@ -117,10 +156,7 @@
 										<int key="NSColorSpace">6</int>
 										<string key="NSCatalogName">System</string>
 										<string key="NSColorName">textColor</string>
-										<object class="NSColor" key="NSColor" id="1038477509">
-											<int key="NSColorSpace">3</int>
-											<bytes key="NSWhite">MAA</bytes>
-										</object>
+										<reference key="NSColor" ref="1038477509"/>
 									</object>
 								</object>
 								<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -132,7 +168,7 @@
 								<string key="NSFrame">{{202, 0}, {43, 11}}</string>
 								<reference key="NSSuperview" ref="718633621"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="521005238"/>
+								<reference key="NSNextKeyView" ref="49430787"/>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSTextFieldCell" key="NSCell" id="28522386">
 									<int key="NSCellFlags">68157504</int>
@@ -153,12 +189,7 @@
 											<bytes key="NSWhite">MC42NjY2NjY2NjY3AA</bytes>
 										</object>
 									</object>
-									<object class="NSColor" key="NSTextColor" id="460488847">
-										<int key="NSColorSpace">6</int>
-										<string key="NSCatalogName">System</string>
-										<string key="NSColorName">controlTextColor</string>
-										<reference key="NSColor" ref="1038477509"/>
-									</object>
+									<reference key="NSTextColor" ref="460488847"/>
 								</object>
 								<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 								<int key="NSTextFieldAlignmentRectInsetsVersion">1</int>
@@ -347,6 +378,7 @@
 								<string key="NSFrame">{{3, 7}, {112, 19}}</string>
 								<reference key="NSSuperview" ref="521005238"/>
 								<reference key="NSWindow"/>
+								<reference key="NSNextKeyView"/>
 								<bool key="NSViewIsLayerTreeHost">YES</bool>
 								<string key="NSReuseIdentifierKey">_NS:22</string>
 								<bool key="NSEnabled">YES</bool>
@@ -611,6 +643,14 @@ Ac0AAA</bytes>
 					</object>
 					<string key="id">h8T-DY-FmO</string>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">spacerTitle</string>
+						<reference key="source" ref="463036018"/>
+						<reference key="destination" ref="49430787"/>
+					</object>
+					<string key="id">HXW-0A-DTA</string>
+				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<array key="orderedObjects">
@@ -643,8 +683,9 @@ Ac0AAA</bytes>
 						<reference key="object" ref="743967783"/>
 						<array class="NSMutableArray" key="children">
 							<reference ref="228048907"/>
-							<reference ref="521005238"/>
 							<reference ref="718633621"/>
+							<reference ref="521005238"/>
+							<reference ref="49430787"/>
 						</array>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Container</string>
@@ -850,6 +891,19 @@ Ac0AAA</bytes>
 						<reference key="object" ref="88517854"/>
 						<reference key="parent" ref="919059071"/>
 					</object>
+					<object class="IBObjectRecord">
+						<string key="id">9jn-Sy-aZj</string>
+						<reference key="object" ref="49430787"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="913576808"/>
+						</array>
+						<reference key="parent" ref="743967783"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">914-Om-xGQ</string>
+						<reference key="object" ref="913576808"/>
+						<reference key="parent" ref="49430787"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -924,6 +978,8 @@ Ac0AAA</bytes>
 				<string key="9.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<reference key="9.IBUserGuides" ref="0"/>
 				<boolean value="NO" key="9.showNotes"/>
+				<string key="914-Om-xGQ.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="9jn-Sy-aZj.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="MEi-hq-3CS.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="TPD-cG-QHf.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="kFv-Z2-6K4.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1008,6 +1064,7 @@ Ac0AAA</bytes>
 						<string key="sliderMax">NSTextField</string>
 						<string key="sliderMin">NSTextField</string>
 						<string key="sliderVal">NSTextField</string>
+						<string key="spacerTitle">NSTextField</string>
 						<string key="textView">NSTextField</string>
 						<string key="ui">ColorView</string>
 						<string key="warningSign">NSImageView</string>
@@ -1051,6 +1108,10 @@ Ac0AAA</bytes>
 						</object>
 						<object class="IBToOneOutletInfo" key="sliderVal">
 							<string key="name">sliderVal</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="spacerTitle">
+							<string key="name">spacerTitle</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="textView">

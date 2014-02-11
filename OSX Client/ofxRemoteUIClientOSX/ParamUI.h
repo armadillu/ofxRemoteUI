@@ -26,6 +26,7 @@
 	IBOutlet NSPopUpButton * enumeratorMenu;
 	IBOutlet NSColorWell * colorWell;
 	IBOutlet NSImageView * warningSign;
+	IBOutlet NSTextField * spacerTitle;
 
 	int numberID; // to handle alternating rows in table draw
 	bool shouldBeFlashing;

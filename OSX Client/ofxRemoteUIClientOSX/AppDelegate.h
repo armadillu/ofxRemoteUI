@@ -27,6 +27,9 @@
 #define DEFAULT_BINDINGS_FOLDER ([NSString stringWithFormat:@"%@/Library/Application Support/ofxRemoteUIClient/",NSHomeDirectory()])
 #define DEFAULT_BINDINGS_FILE (@"lastUsedBindings.ctrlrBind")
 
+#define CONNECT_STRING		@"Connect"
+#define DISCONNECT_STRING	@"Disconnect"
+
 struct LayoutConfig{
 	NSPoint colsRows;
 	int howManyPerCol;
@@ -90,6 +93,8 @@ void clientCallback(RemoteUIClientCallBackArg a);
 	BOOL							autoConnectToggle;
 
 	bool							needFullParamsUpdate;
+
+	bool							connecting;
 
 	//MIDI
 	VVMIDIManager					*midiManager;

@@ -550,7 +550,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		NSArray * info = [server_port componentsSeparatedByString:@":"];
 		[portField setStringValue:[info objectAtIndex:1]];
 		[addressField setStringValue:[info objectAtIndex:0]];
-		if([[connectButton title] isEqualToString:@"Connect"]){ //connect to that dude if not connected
+		if([[connectButton title] isEqualToString:CONNECT_STRING]){ //connect to that dude if not connected
 			[self connect];
 		}else{
 			[self connect];
@@ -592,6 +592,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 - (void)applicationDidFinishLaunching:(NSNotification *)note {
 
 	launched = FALSE;
+	connecting = FALSE;
 	currentNeighbors = [[NSMutableArray alloc] initWithCapacity:1];
 
 	// setup recent connections ///////////////
@@ -1259,7 +1260,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 -(void) autoConnectToNeighbor:(string)host_ port:(int)port_{
 	if(autoConnectToggle){
-		if ([[connectButton title] isEqualToString:@"Connect"]){ //we are not connected, let's connect to this newly launched neighbor!
+		if ([[connectButton title] isEqualToString:CONNECT_STRING] || connecting){ //we are not connected, let's connect to this newly launched neighbor!
 			NSString * host = [NSString stringWithFormat:@"%s", host_.c_str()];
 			NSString * port = [NSString stringWithFormat:@"%d", port_];
 			[addressField setStringValue: host];
@@ -1275,7 +1276,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[df setObject: addressField.stringValue forKey:@"lastAddress"];
 	[df setObject: portField.stringValue forKey:@"lastPort"];
 
-	if ([[connectButton title] isEqualToString:@"Connect"]){ //we are not connected, let's connect
+	if ([[connectButton title] isEqualToString:CONNECT_STRING]){ //we are not connected, let's connect
 
 		int port = [portField.stringValue intValue];
 		bool OK = client->setup([addressField.stringValue UTF8String], port);
@@ -1290,7 +1291,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		//NSLog(@"connecting");
 		[addressField setEnabled:false];
 		[portField setEnabled:false];
-		connectButton.title = @"Disconnect";
+		connectButton.title = DISCONNECT_STRING;
 		connectButton.state = 1;
 		printf("ofxRemoteUIClientOSX Connecting to %s\n", [addressField.stringValue UTF8String] );
 		[updateFromServerButton setEnabled: true];
@@ -1300,6 +1301,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		[self pressedSync:nil];
 		[self performSelector:@selector(pressedSync:) withObject:nil afterDelay:REFRESH_RATE];
 		[progress startAnimation:self];
+		connecting = TRUE;
 		lagField.stringValue = @"";
 		needFullParamsUpdate = YES;
 		client->connect();
@@ -1320,12 +1322,13 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		if ([statusImage image] != [NSImage imageNamed:@"offline"])
 			[statusImage setImage:[NSImage imageNamed:@"offline"]];
 		[progress stopAnimation:self];
+		connecting = FALSE;
 		lagField.stringValue = @"";
 		[self cleanUpGUIParams];
 		client->disconnect();
 		//client->update(REFRESH_RATE);
 		connectButton.state = 0;
-		connectButton.title = @"Connect";
+		connectButton.title = CONNECT_STRING;
 		[self layoutWidgetsWithConfig: [self calcLayoutParams]]; //update scrollbar
 	}
 }
@@ -1358,12 +1361,14 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		if (lag > OFXREMOTEUI_CONNECTION_TIMEOUT || lag < 0.0f){
 			[self connect]; //force disconnect if lag is too large
 			[progress stopAnimation:self];
+			connecting = FALSE;
 			if ([statusImage image] != [NSImage imageNamed:@"offline"])
 				[statusImage setImage:[NSImage imageNamed:@"offline"]];
 		}else{
 			if (lag > 0.0f){
 				lagField.stringValue = [NSString stringWithFormat:@"%.0fms", 1000 * lag];
 				[progress stopAnimation:self];
+				connecting = FALSE;
 				if ([statusImage image] != [NSImage imageNamed:@"connected"]){
 					[statusImage setImage:[NSImage imageNamed:@"connected"]];
 				}

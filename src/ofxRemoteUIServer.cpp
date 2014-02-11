@@ -73,11 +73,12 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	//add random colors to table
 	colorTableIndex = 0;
 	broadcastCount = 0;
+	newColorInGroupCounter = 0;
 	int a = 80;
 #ifdef OF_AVAILABLE
 	selectedItem = 0;
 	ofSeedRandom(1979);
-	ofColor prevColor = ofColor::fromHsb(0, 255, 255, 40);
+	ofColor prevColor = ofColor::fromHsb(0, 255, 200, BG_COLOR_ALPHA);
 	for(int i = 0; i < 30; i++){
 		ofColor c = prevColor;
 		c.setHue(  ((int) (prevColor.getHue() + 25) ) % 255 );
@@ -147,17 +148,24 @@ void ofxRemoteUIServer::close(){
 
 void ofxRemoteUIServer::setParamGroup(string g){
 	upcomingGroup = g;
+	newColorInGroupCounter = 0;
 	setNewParamColor(2);
+	setNewParamColorVariation();
+	addSpacer(g);
 }
 
 void ofxRemoteUIServer::unsetParamColor(){
 	colorSet = false;
 }
 
-void ofxRemoteUIServer::setParamColor( ofColor c ){
-	colorSet = true;
-	paramColor = c;
+
+void ofxRemoteUIServer::setNewParamColorVariation(){
+	paramColorCurrentVariation = paramColor;
+	int offset = newColorInGroupCounter%2;
+	paramColorCurrentVariation.a = BG_COLOR_ALPHA + offset * BG_COLOR_ALPHA * 0.75;
+	newColorInGroupCounter++;
 }
+
 
 void ofxRemoteUIServer::setNewParamColor(int num){
 	for(int i = 0; i < num; i++){
@@ -233,6 +241,9 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 				s.setValue("REMOTEUI_PARAM_STRING", (string)*t.stringValAddr, numStrings);
 				s.setAttribute("REMOTEUI_PARAM_STRING", "paramName", key, numStrings);
 				numStrings++;
+				break;
+
+			case REMOTEUI_PARAM_SPACER:
 				break;
 
 			default:
@@ -395,7 +406,9 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 		if( find(loadedParams.begin(), loadedParams.end(), paramName) != loadedParams.end() ){
 
 		}else{ //param name not in xml
-			paramsNotInXML.push_back(paramName);
+			if ((*ii).second.type != REMOTEUI_PARAM_SPACER){ //spacers dont count as params really
+				paramsNotInXML.push_back(paramName);
+			}
 		}
 	}
 	loadedFromXML = true;
@@ -626,7 +639,9 @@ void ofxRemoteUIServer::draw(int x, int y){
 			}
 			if (selectedItem != i) ofSetColor(200);
 			else ofSetColor(255,0,0);
-			ofDrawBitmapString(key, x,y);
+			if(p.type != REMOTEUI_PARAM_SPACER) ofDrawBitmapString(key, x,y);
+			else ofDrawBitmapString(p.stringVal, x,y);
+
 			switch (p.type) {
 				case REMOTEUI_PARAM_FLOAT:
 					ofDrawBitmapString(ofToString(p.floatVal), x + valOffset, y);
@@ -645,6 +660,9 @@ void ofxRemoteUIServer::draw(int x, int y){
 					ofSetColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal);
 					ofRect(x + valOffset, y - spacing * 0.6, 64, spacing * 0.85);
 					break;
+				case REMOTEUI_PARAM_SPACER:
+					break;
+
 				default: printf("weird RemoteUIParam at isEqualTo()!\n"); break;
 			}
 			ofSetColor(32);
@@ -939,16 +957,31 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(){
 void ofxRemoteUIServer::setColorForParam(RemoteUIParam &p, ofColor c){
 
 	if (c.a > 0){ //if user supplied a color, override the setColor
-		p.r = c.r;  p.g = c.g; p.b = c.b; p.a = c.a;
+		p.r = c.r;  p.g = c.g;  p.b = c.b;  p.a = c.a;
 	}else{
 		if (colorSet){
-			p.r = paramColor.r;
-			p.g = paramColor.g;
-			p.b = paramColor.b;
-			p.a = paramColor.a;
+			p.r = paramColorCurrentVariation.r;
+			p.g = paramColorCurrentVariation.g;
+			p.b = paramColorCurrentVariation.b;
+			p.a = paramColorCurrentVariation.a;
 		}
 	}
 }
+
+
+void ofxRemoteUIServer::addSpacer(string title){
+	RemoteUIParam p;
+	p.type = REMOTEUI_PARAM_SPACER;
+	p.stringVal = title;
+	p.r = paramColor.r;
+	p.g = paramColor.g;
+	p.b = paramColor.b;
+	p.group = upcomingGroup; //to ignore those in the client app later when grouping
+	p.a = 255; //spacer has full alpha
+	addParamToDB(p, title + " - " + ofToString((int)ofRandom(10000)));
+	cout << "ofxRemoteUIServer Adding Spacer '" << title << "'" << endl;
+}
+
 
 void ofxRemoteUIServer::shareParam(string paramName, float* param, float min, float max, ofColor c){
 	RemoteUIParam p;

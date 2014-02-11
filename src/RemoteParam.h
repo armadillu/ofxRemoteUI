@@ -32,6 +32,7 @@ enum RemoteUIParamType{
 	REMOTEUI_PARAM_STRING,
 	REMOTEUI_PARAM_ENUM,
 	REMOTEUI_PARAM_COLOR,
+	REMOTEUI_PARAM_SPACER,
 };
 
 enum ActionType{
@@ -42,7 +43,7 @@ enum ActionType{
 };
 
 enum ArgType{
-	FLT_ARG, INT_ARG, BOL_ARG, STR_ARG, ENUM_ARG, COLOR_ARG, NULL_ARG
+	FLT_ARG, INT_ARG, BOL_ARG, STR_ARG, ENUM_ARG, COLOR_ARG, SPACER_ARG, NULL_ARG
 };
 
 struct DecodedMessage{
@@ -98,6 +99,9 @@ public:
 			case REMOTEUI_PARAM_COLOR:
 				if (p.redVal != redVal || p.greenVal != greenVal || p.blueVal != blueVal || p.alphaVal != alphaVal ) equal = false;
 				break;
+			case REMOTEUI_PARAM_SPACER:
+				equal = false;
+				break;
 			default: printf("weird RemoteUIParam at isEqualTo()!\n"); break;
 		}
 		return equal;
@@ -116,6 +120,7 @@ public:
 				sprintf(aux, "RGBA: [%d, %d, %d, %d]", redVal, greenVal, blueVal, alphaVal);
 				return string(aux);
 			}
+			case REMOTEUI_PARAM_SPACER: return "";
 			default: return "unknown value (BUG!)";
 		}
 	}
@@ -128,6 +133,7 @@ public:
 			case REMOTEUI_PARAM_ENUM: printf("enum: %d [%d, %d]\n", intVal, minInt, maxInt); break;
 			case REMOTEUI_PARAM_BOOL: printf("bool: %s\n", boolVal ? "TRUE" : "FALSE"); break;
 			case REMOTEUI_PARAM_STRING: printf("string: %s\n", stringVal.c_str()); break;
+			case REMOTEUI_PARAM_SPACER: printf("\n"); break;
 			default: printf("weird RemoteUIParam at print()!\n"); break;
 		}
 	};
