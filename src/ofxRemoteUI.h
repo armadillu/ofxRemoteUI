@@ -104,6 +104,26 @@ using namespace std;
  CLIENT:	SAVE								//client wants to save current state of params to default xml
  SERVER:	SAVE OK
  
+ //client creates a group preset
+ CLIENT:    SAVp PRESET_NAME					//Save Preset - client wants to save current params as a preset named PRESET_NAME, overwrites if already exists
+ SERVER:	SAVp PRESET_NAME OK					//server replies OK
+ CLIENT:	PREL								//Client requests full list of presets
+ SERVER:	PREL PRESET_NAME_LIST(n)			//server sends all preset names
+
+ // client deletes a group preset
+ CLIENT:	DELp PRESET_NAME					//client wants to delete preset named PRESET_NAME
+ SERVER:	DELp PRESET_NAME OK					//server says ok
+ CLIENT:	PREL								//Client requests full list of presets
+ SERVER:	PREL PRESET_NAME_LIST(n)			//server sends all preset names
+
+ //client sets a group preset
+ CLIENT:	SETp PRESET_NAME					//Set Preset - client wants to change all params according to preset "X"
+ SERVER:	SETp PRESET_NAME OK					//server says ok
+ SERVER:	MISP PRESET_NAME (param list)		//server reports missing params not set in this group preset
+ CLIENT:	REQU								//client wants values for that preset
+ SERVER:	SEND *****							//server sends all params -- TODO only send params in this group!
+ SERVER:	REQU OK								//server closes REQU
+
  // client disconnects
  CLIENT:	CIAO								//client disconnects
  SERVER:	CIAO								//server disconnects
