@@ -142,7 +142,7 @@ void ofxRemoteUIClient::update(float dt){
 
 		timeCounter += dt;
 		timeSinceLastReply += dt;
-		//printf("waiting for reply: %d\n", waitingForReply);
+
 		if (timeCounter > OFXREMOTEUI_LATENCY_TEST_RATE){
 			if (!waitingForReply){
 				timeCounter = 0.0f;
@@ -222,16 +222,6 @@ void ofxRemoteUIClient::update(float dt){
 					}
 					break;
 
-				case SET_PRESET_ACTION: // server confirms that it has set the preset, request a full update
-					if(verbose_) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SET_PRESET_ACTION!" << endl;
-					requestCompleteUpdate();
-					if(callBack != NULL){
-						cbArg.action = SERVER_DID_SET_PRESET;
-						cbArg.msg = m.getArgAsString(0);
-						callBack(cbArg);
-					}
-					break;
-
 				case GET_MISSING_PARAMS_IN_PRESET:
 					if(callBack != NULL){
 						cbArg.action = SERVER_REPORTS_MISSING_PARAMS_IN_PRESET;
@@ -240,7 +230,16 @@ void ofxRemoteUIClient::update(float dt){
 						}
 						callBack(cbArg);
 					}
+					break;
 
+				case SET_PRESET_ACTION: // server confirms that it has set the preset, request a full update
+					if(verbose_) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SET_PRESET_ACTION!" << endl;
+					requestCompleteUpdate();
+					if(callBack != NULL){
+						cbArg.action = SERVER_DID_SET_PRESET;
+						cbArg.msg = m.getArgAsString(0);
+						callBack(cbArg);
+					}
 					break;
 
 				case SAVE_PRESET_ACTION:{ // server confirms that it has save the preset,
@@ -288,7 +287,40 @@ void ofxRemoteUIClient::update(float dt){
 						callBack(cbArg);
 					}
 					break;
-					
+
+				case SET_GROUP_PRESET_ACTION: // server confirms that it has set the group preset, request a full update
+					if(verbose_) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SET_GROUP_PRESET_ACTION!" << endl;
+					requestCompleteUpdate();
+					if(callBack != NULL){
+						cbArg.action = SERVER_DID_SET_GROUP_PRESET;
+						cbArg.msg = m.getArgAsString(0);
+						cbArg.group = m.getArgAsString(1);
+						callBack(cbArg);
+					}
+					break;
+
+				case SAVE_GROUP_PRESET_ACTION:{ // server confirms that it has saved the group preset,
+					if(verbose_) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SAVE_GROUP_PRESET_ACTION!" << endl;
+					vector<string> a;
+					sendPREL(a); //request preset list to server, send empty vector
+					cbArg.action = SERVER_GROUP_SAVED_PRESET;
+					cbArg.msg = m.getArgAsString(0);
+					cbArg.group = m.getArgAsString(1);
+					if(callBack != NULL) callBack(cbArg);
+				}break;
+
+				case DELETE_GROUP_PRESET_ACTION:{ // server confirms that it has deleted the group preset
+					if(verbose_) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says DELETE_GROUP_PRESET_ACTION!" << endl;
+					vector<string> a;
+					sendPREL(a); //request preset list to server, send empty vector
+					if(callBack != NULL){
+						cbArg.action = SERVER_DELETED_GROUP_PRESET;
+						cbArg.msg = m.getArgAsString(0);
+						cbArg.group = m.getArgAsString(1);
+						callBack(cbArg);
+					}
+				}break;
+
 				default: cout << "ofxRemoteUIClient::update >> UNKNOWN ACTION!!" <<endl; break;
 			}
 		}
@@ -300,16 +332,25 @@ void ofxRemoteUIClient::setPreset(string preset){
 	sendSETP(preset);
 }
 
-
 void ofxRemoteUIClient::savePresetWithName(string presetName){
 	sendSAVP(presetName);
 }
-
 
 void ofxRemoteUIClient::deletePreset(string presetName){
 	sendDELP(presetName);
 }
 
+void ofxRemoteUIClient::setGroupPreset(string preset, string group){
+	sendSETp(preset, group);
+}
+
+void ofxRemoteUIClient::saveGroupPresetWithName(string presetName, string group){
+	sendSAVp(presetName, group);
+}
+
+void ofxRemoteUIClient::deleteGroupPreset(string presetName, string group){
+	sendDELp(presetName, group);
+}
 
 
 void ofxRemoteUIClient::fillPresetListFromMessage(ofxOscMessage m){

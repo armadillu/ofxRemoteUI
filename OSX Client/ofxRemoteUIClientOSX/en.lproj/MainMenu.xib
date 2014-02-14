@@ -1575,17 +1575,17 @@
 										<object class="NSPopUpButton" id="714797354">
 											<reference key="NSNextResponder" ref="96229947"/>
 											<int key="NSvFlags">266</int>
-											<string key="NSFrame">{{11, 11}, {90, 22}}</string>
+											<string key="NSFrame">{{8, 8}, {96, 26}}</string>
 											<reference key="NSSuperview" ref="96229947"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="171279988"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSPopUpButtonCell" key="NSCell" id="72872553">
-												<int key="NSCellFlags">-2076180416</int>
-												<int key="NSCellFlags2">133120</int>
+												<int key="NSCellFlags">-2075131840</int>
+												<int key="NSCellFlags2">132096</int>
 												<reference key="NSSupport" ref="26"/>
 												<reference key="NSControlView" ref="714797354"/>
-												<int key="NSButtonFlags">109199360</int>
+												<int key="NSButtonFlags">-2038284288</int>
 												<int key="NSButtonFlags2">129</int>
 												<reference key="NSAlternateImage" ref="159208489"/>
 												<string key="NSAlternateContents"/>
@@ -1830,7 +1830,7 @@
 									<reference key="NSDocView" ref="459942669"/>
 									<reference key="NSBGColor" ref="631047369"/>
 									<object class="NSCursor" key="NSCursor">
-										<string key="NSHotSpot">{1, -1}</string>
+										<string key="NSHotSpot">{5, 5}</string>
 										<int key="NSCursorType">0</int>
 									</object>
 									<int key="NScvFlags">4</int>
@@ -5113,7 +5113,7 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 						<string key="nextPreset:">id</string>
 						<string key="pasteSpecial:">id</string>
 						<string key="pressedConnect:">id</string>
-						<string key="pressedContinuously:">id</string>
+						<string key="pressedContinuously:">NSButton</string>
 						<string key="pressedSync:">id</string>
 						<string key="previousPreset:">id</string>
 						<string key="restartXcodeApp:">id</string>
@@ -5170,7 +5170,7 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 						</object>
 						<object class="IBActionInfo" key="pressedContinuously:">
 							<string key="name">pressedContinuously:</string>
-							<string key="candidateClassName">id</string>
+							<string key="candidateClassName">NSButton</string>
 						</object>
 						<object class="IBActionInfo" key="pressedSync:">
 							<string key="name">pressedSync:</string>
@@ -5230,7 +5230,6 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 						<string key="externalButtonsBehaveAsToggleCheckbox">NSButton</string>
 						<string key="groupsMenu">NSPopUpButton</string>
 						<string key="groupsMenuBar">NSMenu</string>
-						<string key="lagField">NSTextField</string>
 						<string key="listContainer">NSView</string>
 						<string key="logView">NSTextView</string>
 						<string key="midiBindingsTable">NSTableView</string>
@@ -5278,10 +5277,6 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 						<object class="IBToOneOutletInfo" key="groupsMenuBar">
 							<string key="name">groupsMenuBar</string>
 							<string key="candidateClassName">NSMenu</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="lagField">
-							<string key="name">lagField</string>
-							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="listContainer">
 							<string key="name">listContainer</string>

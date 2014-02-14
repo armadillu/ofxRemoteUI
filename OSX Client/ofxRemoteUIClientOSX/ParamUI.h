@@ -13,27 +13,33 @@
 	NSControl * widget; //
 	//int row;//
 
-	IBOutlet ColorView * ui;
-	IBOutlet ColorView * bg;
-	IBOutlet NSSlider *slider;
-	IBOutlet NSTextField *textView;
-	IBOutlet NSButton *button;
-	IBOutlet NSButton *paramLabel;
-	IBOutlet NSTextField *paramGroup;
-	IBOutlet NSTextField *sliderVal;
-	IBOutlet NSTextField *sliderMin;
-	IBOutlet NSTextField *sliderMax;
-	IBOutlet NSPopUpButton * enumeratorMenu;
-	IBOutlet NSColorWell * colorWell;
-	IBOutlet NSImageView * warningSign;
-	IBOutlet NSTextField * spacerTitle;
+	IBOutlet ColorView *		ui;
+	IBOutlet ColorView *		bg;
+	IBOutlet NSSlider *			slider;
+	IBOutlet NSTextField *		textView;
+	IBOutlet NSButton *			button;
+	IBOutlet NSButton *			paramLabel;
+	IBOutlet NSTextField *		paramGroup;
+	IBOutlet NSTextField *		sliderVal;
+	IBOutlet NSTextField *		sliderMin;
+	IBOutlet NSTextField *		sliderMax;
+	IBOutlet NSPopUpButton *	enumeratorMenu;
+	IBOutlet NSColorWell *		colorWell;
+	IBOutlet NSImageView *		warningSign;
+	IBOutlet NSTextField *		spacerTitle;
+	IBOutlet NSPopUpButton *	groupPresetMenu;
+	IBOutlet NSButton *			groupPresetAddButton;
+	IBOutlet NSButton *			groupPresetDeleteButton;
 
 	int numberID; // to handle alternating rows in table draw
 	bool shouldBeFlashing;
 
 	//midi
 	bool midiHighlightAnim;
-	NSTimer * waitingForMidiTimer;	
+	NSTimer * waitingForMidiTimer;
+
+	//for that group
+	string currentPreset;
 }
 
 -(void)dealloc;
@@ -41,6 +47,9 @@
 -(id)initWithParam: (RemoteUIParam)p paramName:(string)name ID:(int)n;
 -(void)updateParam:(RemoteUIParam)p;
 -(void)updateUI;
+
+-(NSPopUpButton*)getPresetsMenu;
+-(void)updatePresetMenuSelectionToCurrent;
 
 -(void)fadeOut;
 -(void)fadeIn;
@@ -60,6 +69,10 @@
 -(IBAction)updateInt:(id)sender;
 -(IBAction)updateBool:(id)sender;
 -(IBAction)updateString:(id)sender;
+
+-(IBAction)userPressedAddGroupPreset:(id)sender;
+-(IBAction)userPressedDeleteGroupPreset:(id)sender;
+-(IBAction)userChoseGroupPreset:(id)sender;
 
 -(IBAction)clickOnLabel:(id)sender;
 @end

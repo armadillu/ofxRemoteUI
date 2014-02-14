@@ -7,7 +7,6 @@
 //
 
 #include "ofxRemoteUIServer.h"
-
 #ifdef TARGET_WIN32
 #include <winsock2.h>
 #endif
@@ -42,15 +41,6 @@ ofxRemoteUIServer* ofxRemoteUIServer::instance(){
 
 void ofxRemoteUIServer::setDrawsNotificationsAutomaticallly(bool draw){
 	drawNotifications = draw;
-}
-
-void split(vector<string> &tokens, const string &text, char separator) {
-	int start = 0, end = 0;
-	while ((end = text.find(separator, start)) != string::npos) {
-		tokens.push_back(text.substr(start, end - start));
-		start = end + 1;
-	}
-	tokens.push_back(text.substr(start));
 }
 
 ofxRemoteUIServer::ofxRemoteUIServer(){
@@ -179,6 +169,94 @@ void ofxRemoteUIServer::setNewParamColor(int num){
 	}
 }
 
+void ofxRemoteUIServer::saveParamToXmlSettings(RemoteUIParam t, string key, ofxXmlSettings & s, XmlCounter & c){
+
+	switch (t.type) {
+		case REMOTEUI_PARAM_FLOAT:
+			if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.floatValAddr <<") to XML" << endl;
+			s.setValue("REMOTEUI_PARAM_FLOAT", (double)*t.floatValAddr, c.numFloats);
+			s.setAttribute("REMOTEUI_PARAM_FLOAT", "paramName", key, c.numFloats);
+			c.numFloats++;
+			break;
+		case REMOTEUI_PARAM_INT:
+			if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.intValAddr <<") to XML" << endl;
+			s.setValue("REMOTEUI_PARAM_INT", (int)*t.intValAddr, c.numInts);
+			s.setAttribute("REMOTEUI_PARAM_INT", "paramName", key, c.numInts);
+			c.numInts++;
+			break;
+		case REMOTEUI_PARAM_COLOR:
+			s.addTag("REMOTEUI_PARAM_COLOR");
+			s.setAttribute("REMOTEUI_PARAM_COLOR", "paramName", key, c.numColors);
+			s.pushTag("REMOTEUI_PARAM_COLOR", c.numColors);
+			if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" << (int)*t.redValAddr << " " << (int)*(t.redValAddr+1) << " " << (int)*(t.redValAddr+2) << " " << (int)*(t.redValAddr+3) << ") to XML" << endl;
+			s.setValue("R", (int)*t.redValAddr);
+			s.setValue("G", (int)*(t.redValAddr+1));
+			s.setValue("B", (int)*(t.redValAddr+2));
+			s.setValue("A", (int)*(t.redValAddr+3));
+			s.popTag();
+			c.numColors++;
+			break;
+		case REMOTEUI_PARAM_ENUM:
+			if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.intValAddr <<") to XML" << endl;
+			s.setValue("REMOTEUI_PARAM_ENUM", (int)*t.intValAddr, c.numEnums);
+			s.setAttribute("REMOTEUI_PARAM_ENUM", "paramName", key, c.numEnums);
+			c.numEnums++;
+			break;
+		case REMOTEUI_PARAM_BOOL:
+			if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.boolValAddr <<") to XML" << endl;
+			s.setValue("REMOTEUI_PARAM_BOOL", (bool)*t.boolValAddr, c.numBools);
+			s.setAttribute("REMOTEUI_PARAM_BOOL", "paramName", key, c.numBools);
+			c.numBools++;
+			break;
+		case REMOTEUI_PARAM_STRING:
+			if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.stringValAddr <<") to XML" << endl;
+			s.setValue("REMOTEUI_PARAM_STRING", (string)*t.stringValAddr, c.numStrings);
+			s.setAttribute("REMOTEUI_PARAM_STRING", "paramName", key, c.numStrings);
+			c.numStrings++;
+			break;
+
+		case REMOTEUI_PARAM_SPACER:
+			break;
+
+		default:
+			break;
+	}
+}
+
+void ofxRemoteUIServer::saveGroupToXML(string fileName, string groupName){
+
+	cout << "ofxRemoteUIServer: saving group to xml '" << fileName << "'" << endl;
+	ofxXmlSettings s;
+	s.loadFile(fileName);
+	s.clear();
+	s.addTag(OFXREMOTEUI_XML_TAG);
+	s.pushTag(OFXREMOTEUI_XML_TAG);
+	XmlCounter counters;
+
+	#ifdef OF_AVAILABLE
+	ofDirectory d;
+	string path = string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName;
+	d.open(path);
+	d.create(true);
+	#else
+		#if defined(_WIN32)
+		_mkdir(path.c_str());
+		#else
+		mkdir(path.c_str(), 0777);
+		#endif
+	#endif
+
+
+	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+		string key = (*ii).first;
+		RemoteUIParam t = params[key];
+		if( t.group != OFXREMOTEUI_DEFAULT_PARAM_GROUP && t.group == groupName ){
+			saveParamToXmlSettings(t, key, s, counters);
+		}
+	}
+	s.saveFile(fileName);
+}
+
 
 void ofxRemoteUIServer::saveToXML(string fileName){
 
@@ -189,66 +267,11 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 	s.addTag(OFXREMOTEUI_XML_TAG);
 	s.pushTag(OFXREMOTEUI_XML_TAG);
 
-	int numFloats = 0;
-	int numInts = 0;
-	int numStrings = 0;
-	int numBools = 0;
-	int numEnums = 0;
-	int numColors = 0;
-
 	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		string key = (*ii).first;
 		RemoteUIParam t = params[key];
-		switch (t.type) {
-			case REMOTEUI_PARAM_FLOAT:
-				if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.floatValAddr <<") to XML" << endl;
-				s.setValue("REMOTEUI_PARAM_FLOAT", (double)*t.floatValAddr, numFloats);
-				s.setAttribute("REMOTEUI_PARAM_FLOAT", "paramName", key, numFloats);
-				numFloats++;
-				break;
-			case REMOTEUI_PARAM_INT:
-				if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.intValAddr <<") to XML" << endl;
-				s.setValue("REMOTEUI_PARAM_INT", (int)*t.intValAddr, numInts);
-				s.setAttribute("REMOTEUI_PARAM_INT", "paramName", key, numInts);
-				numInts++;
-				break;
-			case REMOTEUI_PARAM_COLOR:
-				s.addTag("REMOTEUI_PARAM_COLOR");
-				s.setAttribute("REMOTEUI_PARAM_COLOR", "paramName", key, numColors);
-				s.pushTag("REMOTEUI_PARAM_COLOR", numColors);
-				if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" << (int)*t.redValAddr << " " << (int)*(t.redValAddr+1) << " " << (int)*(t.redValAddr+2) << " " << (int)*(t.redValAddr+3) << ") to XML" << endl;
-				s.setValue("R", (int)*t.redValAddr);
-				s.setValue("G", (int)*(t.redValAddr+1));
-				s.setValue("B", (int)*(t.redValAddr+2));
-				s.setValue("A", (int)*(t.redValAddr+3));
-				s.popTag();
-				numColors++;
-				break;
-			case REMOTEUI_PARAM_ENUM:
-				if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.intValAddr <<") to XML" << endl;
-				s.setValue("REMOTEUI_PARAM_ENUM", (int)*t.intValAddr, numEnums);
-				s.setAttribute("REMOTEUI_PARAM_ENUM", "paramName", key, numEnums);
-				numEnums++;
-				break;
-			case REMOTEUI_PARAM_BOOL:
-				if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.boolValAddr <<") to XML" << endl;
-				s.setValue("REMOTEUI_PARAM_BOOL", (bool)*t.boolValAddr, numBools);
-				s.setAttribute("REMOTEUI_PARAM_BOOL", "paramName", key, numBools);
-				numBools++;
-				break;
-			case REMOTEUI_PARAM_STRING:
-				if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.stringValAddr <<") to XML" << endl;
-				s.setValue("REMOTEUI_PARAM_STRING", (string)*t.stringValAddr, numStrings);
-				s.setAttribute("REMOTEUI_PARAM_STRING", "paramName", key, numStrings);
-				numStrings++;
-				break;
-
-			case REMOTEUI_PARAM_SPACER:
-				break;
-
-			default:
-				break;
-		}
+		XmlCounter counters;
+		saveParamToXmlSettings(t, key, s, counters);
 	}
 
 	if(!portIsSet){
@@ -258,11 +281,9 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 	s.saveFile(fileName);
 }
 
-
 vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 
 	vector<string> loadedParams;
-
 	ofxXmlSettings s;
 	bool exists = s.loadFile(fileName);
 
@@ -688,6 +709,43 @@ void ofxRemoteUIServer::draw(int x, int y){
 }
 
 
+void ofxRemoteUIServer::handleBroadcast(){
+	if(doBroadcast){
+		if(broadcastTime > OFXREMOTEUI_BORADCAST_INTERVAL){
+			broadcastTime = 0.0f;
+			if (computerName.size() == 0){
+#ifdef OF_AVAILABLE
+				Poco::Environment e;
+				computerName = e.nodeName();
+
+				char pathbuf[2048];
+				uint32_t  bufsize = sizeof(pathbuf);
+#ifdef TARGET_OSX
+				_NSGetExecutablePath(pathbuf, &bufsize);
+				Poco::Path p = Poco::Path(pathbuf);
+				binaryName = p[p.depth()];
+#endif
+#ifdef TARGET_WIN32
+				GetModuleFileNameA( NULL, pathbuf, bufsize ); //no idea why, but GetModuleFileName() is not defined?
+				Poco::Path p = Poco::Path(pathbuf);
+				binaryName = p[p.depth()];
+#endif
+#else
+				computerName = "Computer"; //TODO!
+				binaryName = "App";
+#endif
+			}
+			ofxOscMessage m;
+			m.addIntArg(port); //0
+			m.addStringArg(computerName); //1
+			m.addStringArg(binaryName);	//2
+			m.addIntArg(broadcastCount); // 3
+			broadcastSender.sendMessage(m);
+			broadcastCount++;
+		}
+	}
+}
+
 void ofxRemoteUIServer::updateServer(float dt){
 
 	timeCounter += dt;
@@ -708,40 +766,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 	}
 
 	//let everyone know I exist and which is my port, every now and then
-	if(doBroadcast){
-		if(broadcastTime > OFXREMOTEUI_BORADCAST_INTERVAL){
-			broadcastTime = 0.0f;
-			if (computerName.size() == 0){
-				#ifdef OF_AVAILABLE
-					Poco::Environment e;
-					computerName = e.nodeName();
-
-					char pathbuf[2048];
-					uint32_t  bufsize = sizeof(pathbuf);
-					#ifdef TARGET_OSX
-						_NSGetExecutablePath(pathbuf, &bufsize);
-						Poco::Path p = Poco::Path(pathbuf);
-						binaryName = p[p.depth()];
-					#endif
-					#ifdef TARGET_WIN32						
-						GetModuleFileNameA( NULL, pathbuf, bufsize ); //no idea why, but GetModuleFileName() is not defined?
-						Poco::Path p = Poco::Path(pathbuf);
-						binaryName = p[p.depth()];
-					#endif
-				#else
-					computerName = "Computer"; //TODO!
-					binaryName = "App";
-				#endif
-			}
-			ofxOscMessage m;
-			m.addIntArg(port); //0
-			m.addStringArg(computerName); //1
-			m.addStringArg(binaryName);	//2
-			m.addIntArg(broadcastCount); // 3
-			broadcastSender.sendMessage(m);
-			broadcastCount++;
-		}
-	}
+	handleBroadcast();
 
 	while( oscReceiver.hasWaitingMessages() ){// check for waiting messages from client
 
@@ -820,7 +845,6 @@ void ofxRemoteUIServer::updateServer(float dt){
 				break;
 
 			case SET_PRESET_ACTION:{ // client wants to set a preset
-				//presetNames = getAvailablePresets();
 				string presetName = m.getArgAsString(0);
 				vector<string> missingParams = loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
 				if(verbose_) cout << "ofxRemoteUIServer: setting preset: " << presetName << endl;
@@ -907,28 +931,89 @@ void ofxRemoteUIServer::updateServer(float dt){
 				}
 			}break;
 
+			case SET_GROUP_PRESET_ACTION:{ // client wants to set a preset for a group
+				string presetName = m.getArgAsString(0);
+				string groupName = m.getArgAsString(1);
+				vector<string> missingParams = loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName + "/" + presetName + ".xml");
+				vector<string> filtered;
+				for(int i = 0; i < missingParams.size(); i++){
+					if ( params[ missingParams[i] ].group == groupName ){
+						filtered.push_back(missingParams[i]);
+					}
+				}
+				if(verbose_) cout << "ofxRemoteUIServer: setting preset group: " << groupName << "/" <<presetName << endl;
+				sendSETp(presetName, groupName);
+				sendMISP(filtered);
+				if(callBack != NULL){
+					cbArg.action = CLIENT_DID_SET_GRUP_PRESET;
+					cbArg.msg = presetName;
+					cbArg.group = groupName;
+					callBack(cbArg);
+				}
+				#ifdef OF_AVAILABLE
+				onScreenNotifications.addNotification("SET GROUP PRESET to '" + groupName + "/" + presetName + ".xml'");
+				#endif
+			}break;
+
+			case SAVE_GROUP_PRESET_ACTION:{ //client wants to save current xml as a new preset
+				string presetName = m.getArgAsString(0);
+				string groupName = m.getArgAsString(1);
+				if(verbose_) cout << "ofxRemoteUIServer: saving NEW preset: " << presetName << endl;
+				saveGroupToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName + "/" + presetName + ".xml", groupName);
+				sendSAVp(presetName, groupName);
+				#ifdef OF_AVAILABLE
+				onScreenNotifications.addNotification("SAVED GROUP PRESET to '" + string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName + "/" + presetName + ".xml'");
+				#endif
+				if(callBack != NULL){
+					cbArg.action = CLIENT_SAVED_GROUP_PRESET;
+					cbArg.msg = presetName;
+					cbArg.group = groupName;
+					callBack(cbArg);
+				}
+			}break;
+
+			case DELETE_GROUP_PRESET_ACTION:{
+				string presetName = m.getArgAsString(0);
+				string groupName = m.getArgAsString(1);
+				if(verbose_) cout << "ofxRemoteUIServer: DELETE preset: " << presetName << endl;
+				deletePreset(presetName, groupName);
+				sendDELp(presetName, groupName);
+				#ifdef OF_AVAILABLE
+				onScreenNotifications.addNotification("DELETED GROUP PRESET '" + groupName + "/" + presetName + ".xml'");
+				#endif
+				if(callBack != NULL){
+					cbArg.action = CLIENT_DELETED_GROUP_PRESET;
+					cbArg.msg = presetName;
+					cbArg.group = groupName;
+					callBack(cbArg);
+				}
+			}break;
 			default: cout << "ofxRemoteUIServer::update >> ERR!" <<endl; break;
 		}
 	}
 }
 
-void ofxRemoteUIServer::deletePreset(string name){
-
-#ifdef OF_AVAILABLE
+void ofxRemoteUIServer::deletePreset(string name, string group){
+	#ifdef OF_AVAILABLE
 	ofDirectory dir;
-	dir.open(string(OFXREMOTEUI_PRESET_DIR) + "/" + name + ".xml");
+	if (group == "")
+		dir.open(string(OFXREMOTEUI_PRESET_DIR) + "/" + name + ".xml");
+	else
+		dir.open(string(OFXREMOTEUI_PRESET_DIR) + "/" + group + "/" + name + ".xml");
 	dir.remove(true);
-#else
+	#else
 	string file = string(OFXREMOTEUI_PRESET_DIR) + "/" + name + ".xml";
+	if (group != "") file = string(OFXREMOTEUI_PRESET_DIR) + "/" + group + "/" + name + ".xml";
 	remove( file.c_str() );
-#endif
+	#endif
 }
+
 
 vector<string> ofxRemoteUIServer::getAvailablePresets(){
 
 	vector<string> presets;
 
-#ifdef OF_AVAILABLE
+	#ifdef OF_AVAILABLE
 	ofDirectory dir;
 	dir.listDir(ofToDataPath(OFXREMOTEUI_PRESET_DIR));
 	vector<ofFile> files = dir.getFiles();
@@ -937,12 +1022,25 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(){
 		string extension = files[i].getExtension();
 		std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 		if (files[i].isFile() && extension == "xml"){
-			//cout << "preset name: " << fileName << endl;
 			string presetName = fileName.substr(0, fileName.size()-4);
 			presets.push_back(presetName);
 		}
+		if (files[i].isDirectory()){
+			ofDirectory dir2;
+			dir2.listDir( ofToDataPath( string(OFXREMOTEUI_PRESET_DIR) + "/" + fileName) );
+			vector<ofFile> files2 = dir2.getFiles();
+			for(int j = 0; j < files2.size(); j++){
+				string fileName2 = files2[j].getFileName();
+				string extension2 = files2[j].getExtension();
+				std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+				if (files2[j].isFile() && extension2 == "xml"){
+					string presetName2 = fileName2.substr(0, fileName2.size()-4);
+					presets.push_back(fileName + "/" + presetName2);
+				}
+			}
+		}
 	}
-#else
+	#else
 	DIR *dir;
 	struct dirent *ent;
 	if ((dir = opendir (OFXREMOTEUI_PRESET_DIR)) != NULL) {
@@ -955,7 +1053,7 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(){
 		}
 		closedir (dir);
 	}
-#endif
+	#endif
 	return presets;
 }
 

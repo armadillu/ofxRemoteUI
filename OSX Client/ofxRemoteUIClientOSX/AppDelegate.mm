@@ -51,9 +51,14 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 		case SERVER_PRESETS_LIST_UPDATED:{
 			//NSLog(@"## Callback: PRESETS_UPDATED");
-			vector<string> list = [me getClient]->getPresetsList();
-			if ( list.size() > 0 ){
+			vector<string> presetsList = [me getClient]->getPresetsList();
+			if ( presetsList.size() > 0 ){
 				[me updatePresetsPopup];
+				[me updateGroupPresetMenus];
+			}
+			for(int i = 0; i < a.paramList.size(); i++){ //notify the missing params
+				ParamUI* t = me->widgets[ a.paramList[i] ];
+				[t flashWarning:[NSNumber numberWithInt:NUM_FLASH_WARNING]];
 			}
 			}break;
 
@@ -64,6 +69,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 			[me showNotificationWithTitle:@"Server Exited, Disconnected!" description:remoteIP ID:@"ServerDisconnected" priority:-1];
 			[me updateGroupPopup];
 			[me updatePresetsPopup];
+			[me updateGroupPresetMenus];
 		}break;
 
 		case SERVER_CONFIRMED_SAVE:{
@@ -82,7 +88,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		}break;
 
 		case SERVER_REPORTS_MISSING_PARAMS_IN_PRESET:{
-			printf("SERVER_REPORTS_MISSING_PARAMS_IN_PRESET\n");
+			//printf("SERVER_REPORTS_MISSING_PARAMS_IN_PRESET\n");
 			for(int i = 0; i < a.paramList.size(); i++){
 				ParamUI* t = me->widgets[ a.paramList[i] ];
 				[t flashWarning:[NSNumber numberWithInt:NUM_FLASH_WARNING]];
@@ -511,7 +517,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		arg.action == SERVER_SENT_FULL_PARAMS_UPDATE ||
 		arg.action == SERVER_PRESETS_LIST_UPDATED ||
 		arg.action == NEIGHBORS_UPDATED ||
-		arg.action == NEIGHBOR_JUST_LAUNCHED_SERVER
+		arg.action == NEIGHBOR_JUST_LAUNCHED_SERVER ||
+		arg.action == SERVER_GROUP_SAVED_PRESET ||
+		arg.action == SERVER_DID_SET_GROUP_PRESET ||
+		arg.action == SERVER_DELETED_GROUP_PRESET 
 		){
 			return; //this stuff is not worth logging
 	}
@@ -530,7 +539,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		case SERVER_DID_RESET_TO_DEFAULTS: action = @"Server Did Reset Params to Share-Time (Source Code)"; break;
 		case NEIGHBORS_UPDATED: action = @"Server found nearby neighbors"; break;
 		case SERVER_REPORTS_MISSING_PARAMS_IN_PRESET: action = @"Server loaded preset, but some params are not specified in it (old preset)"; break;
-		default: NSLog(@"aaaaa");
+		default: NSLog(@"log switch missing RemoteUICallClientAction!");
 	}
 
 	NSString * date = [[NSDate date] descriptionWithCalendarFormat:@"%H:%M:%S" timeZone:nil locale:nil];
@@ -651,7 +660,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	//NSLog(@"%@", [df stringForKey:@"lastAddress"]);
 	if([df stringForKey:@"lastAddress"]) [addressField setStringValue:[df stringForKey:@"lastAddress"]];
 	if([df stringForKey:@"lastPort"]) [portField setStringValue:[df stringForKey:@"lastPort"]];
-	lagField.stringValue = @"";
+	//lagField.stringValue = @"";
 	[self connect];
 
 	//get notified when window is resized
@@ -1004,15 +1013,13 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	// draw grid ///////////////////////////////////////////
 
 	for (int i = 1; i < colIndex + 1; i++) {
-		NSBox * box;
-		box = [[NSBox alloc] initWithFrame: NSMakeRect( i *  p.rowW, -ROW_HEIGHT, 1, 3 * ROW_HEIGHT + ROW_HEIGHT * numParams )];
+		NSBox * box = [[NSBox alloc] initWithFrame: NSMakeRect( i *  p.rowW, -ROW_HEIGHT, 1, 3 * ROW_HEIGHT + ROW_HEIGHT * numParams )];
 		[box setAutoresizingMask: NSViewHeightSizable | NSViewMinXMargin | NSViewMaxXMargin | NSViewMaxYMargin | NSViewMinYMargin ];
 		[listContainer addSubview:box];
 	}
 
 	for (int i = 0; i < p.maxPerCol ; i++) {
-		NSBox * box;
-		box = [[NSBox alloc] initWithFrame: NSMakeRect( -10,(numParams - 1) * ROW_HEIGHT - ROW_HEIGHT * i, scroll.frame.size.width + 20, 1)];
+		NSBox * box = [[NSBox alloc] initWithFrame: NSMakeRect( -10,(numParams - 1) * ROW_HEIGHT - ROW_HEIGHT * i, scroll.frame.size.width + 20, 1)];
 		[box setAutoresizingMask: NSViewMinYMargin | NSViewWidthSizable ];
 		[listContainer addSubview:box];
 	}
@@ -1195,7 +1202,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	vector<string> presetsList = client->getPresetsList();
 	[menuItemNameArray addObject: DIRTY_PRESET_NAME ];
 	for(int i = 0 ; i < presetsList.size(); i++){
-		if ( presetsList[i] != OFXREMOTEUI_NO_PRESETS ){
+		bool isGroupPreset = presetsList[i].find_first_of("/") != std::string::npos;
+		if ( presetsList[i] != OFXREMOTEUI_NO_PRESETS && !isGroupPreset){
 			[menuItemNameArray addObject: [NSString stringWithFormat:@"%s",presetsList[i].c_str()] ];
 		}
 	}
@@ -1208,6 +1216,37 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		}
 	}else{
 		[presetsMenu selectItemAtIndex:0];
+	}
+}
+
+
+-(void)updateGroupPresetMenus{
+
+	map<string, ParamUI*> groups;
+	for(int i = 0; i < orderedKeys.size(); i++){
+		ParamUI* t = widgets[ orderedKeys[i] ];
+		if(t->param.type == REMOTEUI_PARAM_SPACER){
+			groups[t->param.stringVal] = t;
+			[[t getPresetsMenu] removeAllItems];
+			[[t getPresetsMenu] addItemWithTitle:DIRTY_PRESET_NAME];
+		}
+	}
+
+	vector<string> presetsList = client->getPresetsList();
+
+	//walk all group presets, get the ParamUI assigned, empty and add dirty option to menu
+	//walk all group presets again, add options to menu as needed
+	for(int i = 0 ; i < presetsList.size(); i++){
+		bool isGroupPreset = presetsList[i].find_first_of("/") != std::string::npos;
+		if(isGroupPreset){
+			vector<string>sides;
+			split(sides, presetsList[i], '/');
+			string groupName = sides[0];
+			string presetName = sides[1];
+			NSPopUpButton * popup = [groups[groupName] getPresetsMenu];
+			[popup addItemWithTitle:[NSString stringWithFormat:@"%s",presetName.c_str()]];
+			[groups[groupName] updatePresetMenuSelectionToCurrent];
+		}
 	}
 }
 
@@ -1302,7 +1341,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		[self performSelector:@selector(pressedSync:) withObject:nil afterDelay:REFRESH_RATE];
 		[progress startAnimation:self];
 		connecting = TRUE;
-		lagField.stringValue = @"";
+		//lagField.stringValue = @"";
 		needFullParamsUpdate = YES;
 		client->connect();
 
@@ -1323,7 +1362,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 			[statusImage setImage:[NSImage imageNamed:@"offline"]];
 		[progress stopAnimation:self];
 		connecting = FALSE;
-		lagField.stringValue = @"";
+		//lagField.stringValue = @"";
 		[self cleanUpGUIParams];
 		client->disconnect();
 		//client->update(REFRESH_RATE);
@@ -1366,7 +1405,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 				[statusImage setImage:[NSImage imageNamed:@"offline"]];
 		}else{
 			if (lag > 0.0f){
-				lagField.stringValue = [NSString stringWithFormat:@"%.0fms", 1000 * lag];
+				//lagField.stringValue = [NSString stringWithFormat:@"%.0fms", 1000 * lag];
 				[progress stopAnimation:self];
 				connecting = FALSE;
 				if ([statusImage image] != [NSImage imageNamed:@"connected"]){
@@ -1483,7 +1522,7 @@ int weJustDisconnected = 0;
 									 defaultButton:@"Add Preset"
 								   alternateButton:@"Cancel"
 									   otherButton:nil
-						 informativeTextWithFormat:@"Type a new for the new preset"];
+						 informativeTextWithFormat:@"Type a name for the new preset"];
 	NSTextField *input = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 170, 24)];
 	[input setStringValue:defaultValue];
 	[input autorelease];

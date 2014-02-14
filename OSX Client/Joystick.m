@@ -177,14 +177,11 @@
     int elementType = IOHIDElementGetType(theElement);
     
     NSArray *searchArray;
-    NSString *returnString = @"";
-    
+
     if (elementType == kIOHIDElementTypeInput_Button) {
         searchArray = buttons;
-        returnString = @"Button";
     } else {
         searchArray = axes;
-        returnString = @"Axis";
     }
     
     int i;
@@ -192,7 +189,6 @@
     for (i=0; i<searchArray.count; ++i) {
         if ((IOHIDElementRef)[searchArray objectAtIndex:i] == (IOHIDElementRef)theElement)
             return i;
-            //  returnString = [NSString stringWithFormat:@"%@_%d",returnString,i];
     }
     
     return -1;

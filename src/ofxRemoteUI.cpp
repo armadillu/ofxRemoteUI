@@ -25,6 +25,16 @@
 #pragma comment(lib, "iphlpapi.lib")
 #endif
 
+void split(vector<string> &tokens, const string &text, char separator) {
+	int start = 0, end = 0;
+	while ((end = text.find(separator, start)) != string::npos) {
+		tokens.push_back(text.substr(start, end - start));
+		start = end + 1;
+	}
+	tokens.push_back(text.substr(start));
+}
+
+
 bool ofxRemoteUI::ready(){
 	return readyToSend;
 }
@@ -87,31 +97,22 @@ DecodedMessage ofxRemoteUI::decode(ofxOscMessage m){
 	//this is the lazynes maximus!
 	if (msgAddress.length() >= 3) {
 		if (action == "HELO") dm.action = HELO_ACTION;
-		else
-			if (action == "REQU") dm.action = REQUEST_ACTION;
-			else
-				if (action == "SEND") dm.action = SEND_PARAM_ACTION;
-				else
-					if (action == "CIAO") dm.action = CIAO_ACTION;
-					else
-						if (action == "TEST") dm.action = TEST_ACTION;
-						else
-							if (action == "DELP") dm.action = DELETE_PRESET_ACTION;
-							else
-								if (action == "PREL") dm.action = PRESET_LIST_ACTION;
-								else
-									if (action == "SAVP") dm.action = SAVE_PRESET_ACTION;
-									else
-										if (action == "SETP") dm.action = SET_PRESET_ACTION;
-										else
-											if (action == "RESX") dm.action = RESET_TO_XML_ACTION;
-											else
-												if (action == "RESD") dm.action = RESET_TO_DEFAULTS_ACTION;
-												else
-													if (action == "SAVE") dm.action = SAVE_CURRENT_STATE_ACTION;
-													else
-														if (action == "MISP") dm.action = GET_MISSING_PARAMS_IN_PRESET;
-
+		else if (action == "REQU") dm.action = REQUEST_ACTION;
+		else if (action == "SEND") dm.action = SEND_PARAM_ACTION;
+		else if (action == "CIAO") dm.action = CIAO_ACTION;
+		else if (action == "TEST") dm.action = TEST_ACTION;
+		else if (action == "PREL") dm.action = PRESET_LIST_ACTION;
+		else if (action == "DELP") dm.action = DELETE_PRESET_ACTION;
+		else if (action == "SAVP") dm.action = SAVE_PRESET_ACTION;
+		else if (action == "SETP") dm.action = SET_PRESET_ACTION;
+		else if (action == "RESX") dm.action = RESET_TO_XML_ACTION;
+		else if (action == "RESD") dm.action = RESET_TO_DEFAULTS_ACTION;
+		else if (action == "SAVE") dm.action = SAVE_CURRENT_STATE_ACTION;
+		else if (action == "MISP") dm.action = GET_MISSING_PARAMS_IN_PRESET;
+		//groups (note lower case p, l)
+		else if (action == "DELp") dm.action = DELETE_GROUP_PRESET_ACTION;
+		else if (action == "SAVp") dm.action = SAVE_GROUP_PRESET_ACTION;
+		else if (action == "SETp") dm.action = SET_GROUP_PRESET_ACTION;
 	}
 
 	if (msgAddress.length() >= 8) {
@@ -120,26 +121,16 @@ DecodedMessage ofxRemoteUI::decode(ofxOscMessage m){
 		dm.argument = NULL_ARG;
 
 		if (arg1 == "FLT") dm.argument = FLT_ARG;
-		else
-			if (arg1 == "INT") dm.argument = INT_ARG;
-			else
-				if (arg1 == "BOL") dm.argument = BOL_ARG;
-				else
-					if (arg1 == "STR") dm.argument = STR_ARG;
-					else
-						if (arg1 == "ENU") dm.argument = ENUM_ARG;
-						else
-							if (arg1 == "COL") dm.argument = COLOR_ARG;
-							else
-								if (arg1 == "SPA") dm.argument = SPACER_ARG;
-
-
-
+		else if (arg1 == "INT") dm.argument = INT_ARG;
+		else if (arg1 == "BOL") dm.argument = BOL_ARG;
+		else if (arg1 == "STR") dm.argument = STR_ARG;
+		else if (arg1 == "ENU") dm.argument = ENUM_ARG;
+		else if (arg1 == "COL") dm.argument = COLOR_ARG;
+		else if (arg1 == "SPA") dm.argument = SPACER_ARG;
 	}
 
 	if (msgAddress.length() >= 9) {
 		string paramName = msgAddress.substr(9, msgAddress.length() - 9);
-		//cout << msgAddress << " >> paramName: >" << paramName << "<" << endl;
 		dm.paramName = paramName;
 	}
 
@@ -257,14 +248,12 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 	RemoteUIParam p = original;
 	int arg = 0;
 
-	p.group = dm.paramGroup;
 	switch (dm.argument) {
 		case FLT_ARG:
 			p.type = REMOTEUI_PARAM_FLOAT;
  			p.floatVal = m.getArgAsFloat(arg); arg++;
 			p.minFloat = m.getArgAsFloat(arg); arg++;
 			p.maxFloat = m.getArgAsFloat(arg); arg++;
-			//if(verbose)cout << "updateParamFromDecodedMessage: " << dm.paramName << " to a new value: " << p.floatVal << endl;
 			if (p.floatValAddr){
 				*p.floatValAddr = p.floatVal;
 			}break;
@@ -274,7 +263,6 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 			p.intVal = m.getArgAsInt32(arg); arg++;
 			p.minInt = m.getArgAsInt32(arg); arg++;
 			p.maxInt = m.getArgAsInt32(arg); arg++;
-			//if(verbose)cout << "updateParamFromDecodedMessage: " << dm.paramName << " to a new value: " << p.intVal << endl;
 			if (p.intValAddr){
 				*p.intValAddr = p.intVal;
 			}break;
@@ -285,7 +273,6 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 			p.greenVal = (int)m.getArgAsInt32(arg); arg++;
 			p.blueVal = (int)m.getArgAsInt32(arg); arg++;
 			p.alphaVal = (int)m.getArgAsInt32(arg); arg++;
-			//if(verbose)cout << "updateParamFromDecodedMessage: " << dm.paramName << " to a new value: " <<(int)p.redVal<<" "<<(int)p.greenVal<<" "<<(int)p.blueVal<<" "<<(int)p.alphaVal << endl;
 			if (p.redValAddr){
 				*p.redValAddr = p.redVal;
 				*(p.redValAddr+1) = p.greenVal;
@@ -298,7 +285,6 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 			p.intVal = m.getArgAsInt32(arg); arg++;
 			p.minInt = m.getArgAsInt32(arg); arg++;
 			p.maxInt = m.getArgAsInt32(arg); arg++;
-			//if(verbose)cout << "updateParamFromDecodedMessage: " << dm.paramName << " to a new value: " << p.intVal << endl;
 			if (p.intValAddr){
 				*p.intValAddr = p.intVal;
 			}
@@ -314,7 +300,6 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 		case BOL_ARG:
 			p.type = REMOTEUI_PARAM_BOOL;
 			p.boolVal = m.getArgAsInt32(arg) == 0 ? false : true; arg++;
-			//if(verbose)cout << "updateParamFromDecodedMessage: " << dm.paramName << " to a new value: " << p.boolVal << endl;
 			if (p.boolValAddr){
 				*p.boolValAddr = p.boolVal;
 			}break;
@@ -322,7 +307,6 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 		case STR_ARG:
 			p.type = REMOTEUI_PARAM_STRING;
 			p.stringVal = m.getArgAsString(arg); arg++;
-			//if(verbose)cout << "updateParamFromDecodedMessage: " << dm.paramName << " to a new value: " << (p.stringVal) << endl;
 			if (p.stringValAddr){
 				*p.stringValAddr = p.stringVal;
 			}break;
@@ -361,13 +345,10 @@ vector<string> ofxRemoteUI::getAllParamNamesList(){
 
 	vector<string>paramsList;
 	//get list of params in add order
-	//cout << "getAllParamNamesList(): ";
 	for( map<int,string>::iterator ii = orderedKeys.begin(); ii != orderedKeys.end(); ++ii ){
 		string paramName = (*ii).second;
 		paramsList.push_back(paramName);
-		//cout << paramName << ", ";
 	}
-	//cout << endl;
 	return paramsList;
 }
 
@@ -782,10 +763,51 @@ void ofxRemoteUI::sendHELLO(){
 	oscSender.sendMessage(m);
 }
 
-
 void ofxRemoteUI::sendCIAO(){
 	ofxOscMessage m;
 	m.setAddress("CIAO");
+	oscSender.sendMessage(m);
+}
+
+//on client call, presetName should be the new preset name
+//on server call, presetName should be empty string (so it will send "OK"
+void ofxRemoteUI::sendSETp(string presetName, string group, bool confirm){
+	if(verbose_) cout << "sendSETp()" << endl;
+	ofxOscMessage m;
+	m.setAddress("SETp");
+	m.addStringArg(presetName);
+	m.addStringArg(group);
+	if (confirm){
+		m.addStringArg("OK");
+	}
+	oscSender.sendMessage(m);
+}
+
+//on client call, presetName should be the new preset name
+//on server call, presetName should be empty string (so it will send "OK"
+void ofxRemoteUI::sendSAVp(string presetName, string group, bool confirm){
+	if(verbose_) cout << "sendSAVp()" << endl;
+	ofxOscMessage m;
+	m.setAddress("SAVp");
+	m.addStringArg(presetName);
+	m.addStringArg(group);
+	if (confirm){
+		m.addStringArg("OK");
+	}
+	oscSender.sendMessage(m);
+}
+
+//on client call, presetName should be the new preset name
+//on server call, presetName should be empty string (so it will send "OK"
+void ofxRemoteUI::sendDELp(string presetName, string group, bool confirm){
+	if(verbose_) cout << "sendDELp()" << endl;
+	ofxOscMessage m;
+	m.setAddress("DELp");
+	m.addStringArg(presetName);
+	m.addStringArg(group);
+	if (confirm){
+		m.addStringArg("OK");
+	}
 	oscSender.sendMessage(m);
 }
 

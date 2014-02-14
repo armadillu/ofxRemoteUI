@@ -72,6 +72,11 @@
 	[CATransaction commit];
 }
 
+-(NSPopUpButton*)getPresetsMenu{
+	return groupPresetMenu;
+}
+
+
 -(void)hideWarning{
 	//[CATransaction flush];
 	[warningSign layer].opacity = 0.0;
@@ -136,7 +141,6 @@
 		 ];
 	}
 	[self setupUI];
-
 }
 
 
@@ -230,6 +234,9 @@
 			[enumeratorMenu removeFromSuperviewWithoutNeedingDisplay];
 			[colorWell removeFromSuperviewWithoutNeedingDisplay];
 			[spacerTitle removeFromSuperviewWithoutNeedingDisplay];
+			[groupPresetMenu removeFromSuperviewWithoutNeedingDisplay];
+			[groupPresetAddButton removeFromSuperviewWithoutNeedingDisplay];
+			[groupPresetDeleteButton removeFromSuperviewWithoutNeedingDisplay];
 			break;
 
 		case REMOTEUI_PARAM_INT:
@@ -245,6 +252,9 @@
 			[enumeratorMenu removeFromSuperviewWithoutNeedingDisplay];
 			[colorWell removeFromSuperviewWithoutNeedingDisplay];
 			[spacerTitle removeFromSuperviewWithoutNeedingDisplay];
+			[groupPresetMenu removeFromSuperviewWithoutNeedingDisplay];
+			[groupPresetAddButton removeFromSuperviewWithoutNeedingDisplay];
+			[groupPresetDeleteButton removeFromSuperviewWithoutNeedingDisplay];
 			break;
 
 		case REMOTEUI_PARAM_COLOR:
@@ -258,6 +268,9 @@
 			[textView removeFromSuperviewWithoutNeedingDisplay];
 			[enumeratorMenu removeFromSuperviewWithoutNeedingDisplay];
 			[spacerTitle removeFromSuperviewWithoutNeedingDisplay];
+			[groupPresetMenu removeFromSuperviewWithoutNeedingDisplay];
+			[groupPresetAddButton removeFromSuperviewWithoutNeedingDisplay];
+			[groupPresetDeleteButton removeFromSuperviewWithoutNeedingDisplay];
 			break;
 
 		case REMOTEUI_PARAM_ENUM:{
@@ -270,8 +283,11 @@
 			[sliderMin removeFromSuperviewWithoutNeedingDisplay];
 			[sliderVal removeFromSuperviewWithoutNeedingDisplay];
 			[colorWell removeFromSuperviewWithoutNeedingDisplay];
-			[enumeratorMenu removeAllItems];
 			[spacerTitle removeFromSuperviewWithoutNeedingDisplay];
+			[groupPresetMenu removeFromSuperviewWithoutNeedingDisplay];
+			[groupPresetAddButton removeFromSuperviewWithoutNeedingDisplay];
+			[groupPresetDeleteButton removeFromSuperviewWithoutNeedingDisplay];
+			[enumeratorMenu removeAllItems];
 			for(int i = 0; i < param.enumList.size(); i++){
 				[enumeratorMenu addItemWithTitle:[NSString stringWithFormat:@"%s", param.enumList[i].c_str()]];
 			}
@@ -288,6 +304,9 @@
 			[colorWell removeFromSuperviewWithoutNeedingDisplay];
 			[enumeratorMenu removeFromSuperviewWithoutNeedingDisplay];
 			[spacerTitle removeFromSuperviewWithoutNeedingDisplay];
+			[groupPresetMenu removeFromSuperviewWithoutNeedingDisplay];
+			[groupPresetAddButton removeFromSuperviewWithoutNeedingDisplay];
+			[groupPresetDeleteButton removeFromSuperviewWithoutNeedingDisplay];
 			break;
 
 		case REMOTEUI_PARAM_STRING:
@@ -301,12 +320,21 @@
 			[colorWell removeFromSuperviewWithoutNeedingDisplay];
 			[enumeratorMenu removeFromSuperviewWithoutNeedingDisplay];
 			[spacerTitle removeFromSuperviewWithoutNeedingDisplay];
+			[groupPresetMenu removeFromSuperviewWithoutNeedingDisplay];
+			[groupPresetAddButton removeFromSuperviewWithoutNeedingDisplay];
+			[groupPresetDeleteButton removeFromSuperviewWithoutNeedingDisplay];
 			break;
 
 		case REMOTEUI_PARAM_SPACER:
 			widget = spacerTitle;
 			[spacerTitle setStringValue:[self stringFromString: param.stringVal]];
 			[spacerTitle setTextColor:[NSColor whiteColor]];
+			[groupPresetAddButton setAction:@selector(userPressedAddGroupPreset:)];
+			[groupPresetAddButton setTarget:self];
+			[groupPresetDeleteButton setAction:@selector(userPressedDeleteGroupPreset:)];
+			[groupPresetDeleteButton setTarget:self];
+			[groupPresetMenu setAction:@selector(userChoseGroupPreset:)];
+			[groupPresetMenu setTarget:self];
 			[textView removeFromSuperviewWithoutNeedingDisplay];
 			[slider removeFromSuperviewWithoutNeedingDisplay];
 			[button removeFromSuperviewWithoutNeedingDisplay];
@@ -342,6 +370,59 @@
 
 -(void)updateParam:(RemoteUIParam)p;{
 	param = p;
+}
+
+
+-(void)updatePresetMenuSelectionToCurrent{
+	if(currentPreset == ""){
+		[groupPresetMenu selectItemAtIndex:0];
+	}else{
+		[groupPresetMenu selectItemWithTitle:[NSString stringWithFormat:@"%s",currentPreset.c_str()]];
+	}
+}
+
+
+-(IBAction)userPressedAddGroupPreset:(id)sender;{
+
+	AppDelegate* del = [NSApp delegate];
+	NSString * msg = [NSString stringWithFormat:@"Add a Preset For the '%s' Group", param.group.c_str() ];
+	NSString * newPreset = [del showAlertWithInput:msg defaultValue:@"myGroupPreset"];
+
+	if(newPreset != nil){
+		currentPreset = [newPreset UTF8String];
+		[del getClient]->saveGroupPresetWithName(currentPreset, param.group);
+	}
+}
+
+
+-(IBAction)userPressedDeleteGroupPreset:(id)sender;{
+
+	int index = (int)[groupPresetMenu indexOfSelectedItem];
+	if (index == 0) {
+		NSBeep();
+		return; //empty preset does nothing, cant be deleted
+	}
+	NSString * preset = [[groupPresetMenu itemAtIndex:index] title];
+	NSLog(@"user delete group preset: %@", preset );
+	AppDelegate* del = [NSApp delegate];
+	[groupPresetMenu selectItemAtIndex:index];
+	[del getClient]->deleteGroupPreset([preset UTF8String], param.group);
+	currentPreset = "";
+}
+
+
+-(IBAction)userChoseGroupPreset:(id)sender;{
+	int index = (int)[sender indexOfSelectedItem];
+	if (index == 0) {
+		return; //empty preset does nothing
+		currentPreset = "";
+	}
+	NSString * preset = [[sender itemAtIndex:index] title];
+	[groupPresetMenu selectItemAtIndex:index];
+	currentPreset = [preset UTF8String];
+	AppDelegate* del = [NSApp delegate];
+	[del getClient]->setGroupPreset(currentPreset, param.group);
+	NSLog(@"user chose group preset: %s", currentPreset.c_str() );
 }
 
 

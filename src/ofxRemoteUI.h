@@ -17,22 +17,22 @@
 #include <vector>
 using namespace std;
 
-#define OFXREMOTEUI_PORT					10000
-#define OFXREMOTEUI_BROADCAST_PORT			25748
-#define OFXREMOTEUI_BORADCAST_INTERVAL		0.25 /*secs*/
-#define OFXREMOTEUI_NEIGHBOR_DEATH_BY_TIME	1.1 /*sec*/
+#define OFXREMOTEUI_PORT									10000
+#define OFXREMOTEUI_BROADCAST_PORT							25748
+#define OFXREMOTEUI_BORADCAST_INTERVAL						0.25 /*secs*/
+#define OFXREMOTEUI_NEIGHBOR_DEATH_BY_TIME					1.1 /*sec*/
 #define OFXREMOTEUI_PARAM_UPDATE_NOTIFICATION_SCREENTIME	6.0
-#define OFXREMOTEUI_EVENT_NOTIFICATION_SCREENTIME	3.0
+#define OFXREMOTEUI_EVENT_NOTIFICATION_SCREENTIME			3.0
 
 
-#define OFXREMOTEUI_LATENCY_TEST_RATE		0.3333
-#define OFXREMOTEUI_CONNECTION_TIMEOUT		3.0f
-#define OFXREMOTEUI_SETTINGS_FILENAME		"ofxRemoteUISettings.xml"
-#define OFXREMOTEUI_XML_TAG					"OFX_REMOTE_UI_PARAMS"
-#define OFXREMOTEUI_XML_PORT				"OFX_REMOTE_UI_SERVER_PORT"
-#define OFXREMOTEUI_DEFAULT_PARAM_GROUP		"defaultGroup"
-#define OFXREMOTEUI_PRESET_DIR				"ofxRemoteUIPresets"
-#define OFXREMOTEUI_NO_PRESETS				"NO_PRESETS"
+#define OFXREMOTEUI_LATENCY_TEST_RATE						0.3333
+#define OFXREMOTEUI_CONNECTION_TIMEOUT						3.0f
+#define OFXREMOTEUI_SETTINGS_FILENAME						"ofxRemoteUISettings.xml"
+#define OFXREMOTEUI_XML_TAG									"OFX_REMOTE_UI_PARAMS"
+#define OFXREMOTEUI_XML_PORT								"OFX_REMOTE_UI_SERVER_PORT"
+#define OFXREMOTEUI_DEFAULT_PARAM_GROUP						"defaultGroup"
+#define OFXREMOTEUI_PRESET_DIR								"ofxRemoteUIPresets"
+#define OFXREMOTEUI_NO_PRESETS								"NO_PRESETS"
 #include "RemoteParam.h"
 
 
@@ -203,6 +203,11 @@ protected:
 	void sendSAVE(bool confirm = false);
 	void sendMISP(vector<string> missingParamsInPreset);
 
+	//group preset methods (note lowercase p, l)
+	void sendSAVp(string presetName, string group, bool confirm = false);
+	void sendSETp(string presetName, string group, bool confirm = false);
+	void sendDELp(string presetName, string group, bool confirm = false);
+
 	string getMyIP(string userChosenInteface = "");
 
 	bool							verbose_;
@@ -230,11 +235,12 @@ protected:
 	map<string, RemoteUIParam>		paramsFromCode; //this will hold a copy of all the params as they where when shared first
 	map<string, RemoteUIParam>		paramsFromXML; //this will hold a copy of all the params as they where when first loaded from XML
 
-
 private:
 
 	string stringForParamType(RemoteUIParamType t);
 	
 };
+
+void split(vector<string> &tokens, const string &text, char separator);
 
 #endif

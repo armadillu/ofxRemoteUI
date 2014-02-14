@@ -44,6 +44,12 @@ public:
 	void savePresetWithName(string presetName); //take current params and make a preset with them
 	void deletePreset(string presetName); //delete preset with this name
 
+	//work with group presets
+	void setGroupPreset(string preset, string group); //tell server to choose a preset
+	void saveGroupPresetWithName(string presetName, string group); //take current params and make a preset with them
+	void deleteGroupPreset(string presetName, string group); //delete preset with this name
+
+
 	//by doing this you allow ofxRemoteUIClient to modify your params
 	//you can find out which params got changed by calling getChangedParamsList()
 	void trackParam(string paramName, float* param);
@@ -52,7 +58,6 @@ public:
 	void trackParam(string paramName, string* param);
 	void trackParam(string paramName, unsigned char* param); //color! 4 components!
 	void trackParam(string paramName, int* param, vector<string> list);
-
 
 	//this makes the ofxRemoteUIClient fetch the current values of your param
 	//and send it to the server (will take actual value from the supplied pointer in trackParam())
@@ -84,7 +89,7 @@ public:
 private:
 
 
-	void fillPresetListFromMessage(ofxOscMessage m);
+	void					fillPresetListFromMessage(ofxOscMessage m);
 
 	bool					OSCsetup;
 	string					host;

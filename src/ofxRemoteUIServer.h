@@ -122,7 +122,9 @@ public:
 	void draw(int x = 20, int y = 20); //draws important notifications on screen
 	void close();
 	vector<string> loadFromXML(string fileName); //returns list of param names in current setup but not set in XML
-	void saveToXML(string fileName);
+
+	void saveToXML(string fileName); //save the whole list of params to an xml
+	void saveGroupToXML(string fileName, string groupName); //save only a subset of params into xml
 
 	void shareParam(string paramName, float* param, float min, float max, ofColor bgColor = ofColor(0,0,0,0) );
 	void shareParam(string paramName, bool* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
@@ -161,21 +163,32 @@ public:
 	void pushParamsToClient(); //pushes all param values to client, updating its UI
 
 
-
 private:
 
 	ofxRemoteUIServer(); // use ofxRemoteUIServer::instance() instead! Use the MACROS defined above!
 	~ofxRemoteUIServer();
+
+	struct XmlCounter{ //used to hold xml save counts when saving to xml
+		int numFloats = 0;
+		int numInts = 0;
+		int numStrings = 0;
+		int numBools = 0;
+		int numEnums = 0;
+		int numColors = 0;
+	};
 
 	void			restoreAllParamsToInitialXML();
 	void			restoreAllParamsToDefaultValues();
 	void			connect(string address, int port);
 	void			setColorForParam(RemoteUIParam &p, ofColor c);
 	vector<string>	getAvailablePresets();
-	void			deletePreset(string name);
+	void			deletePreset(string name, string group=""); //if group is not "", then this is a global preset. otherwise its a group preset
 	void			updateServer(float dt);
+	void			handleBroadcast();
 	void			(*callBack)(RemoteUIServerCallBackArg);
 	void			threadedFunction();
+
+	void			saveParamToXmlSettings(RemoteUIParam p, string key, ofxXmlSettings & s, XmlCounter & counter);
 
 	vector<ofColor> colorTables;
 	int				colorTableIndex;

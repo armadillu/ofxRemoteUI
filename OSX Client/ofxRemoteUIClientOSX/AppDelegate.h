@@ -52,7 +52,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 	IBOutlet NSTextField *			portField;
 	IBOutlet NSImageView *			statusImage;
 	IBOutlet NSProgressIndicator *	progress;
-	IBOutlet NSTextField *			lagField;
+//	IBOutlet NSTextField *			lagField;
 	IBOutlet NSView *				listContainer;
 	IBOutlet MyScrollView *			scroll;
 	IBOutlet NSPopUpButton *		groupsMenu;
@@ -155,6 +155,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 
 -(void)updateGroupPopup;
 -(void)updatePresetsPopup;
+-(void)updateGroupPresetMenus;
 
 -(vector<string>)getParamsInGroup:(string)group;
 -(vector<string>)getAllGroupsInParams;
@@ -175,4 +176,6 @@ void clientCallback(RemoteUIClientCallBackArg a);
 //growl
 -(void)showNotificationWithTitle:(NSString*)title description:(NSString*)desc ID:(NSString*)key priority:(int)p;
 
+//alert
+-(NSString *)showAlertWithInput: (NSString *)prompt defaultValue: (NSString *)defaultValue ;
 @end
