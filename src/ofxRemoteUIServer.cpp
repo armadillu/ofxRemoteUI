@@ -647,7 +647,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 		ofRect(0,0, ofGetWidth(), padding + spacing );
 
 		ofSetColor(255);
-		ofDrawBitmapString("ofxRemoteUIServer params list : press 'TAB' to hide.\nPress 's' to save current config. Arrows to edit values.", padding,  padding - 3);
+		ofDrawBitmapString("ofxRemoteUIServer params list : press 'TAB' to hide.\nPress 's' to save current config. Use Arrow Keys to edit values.", padding,  padding - 3);
 
 		for(int i = 0; i < orderedKeys.size(); i++){
 			string key = orderedKeys[i];
