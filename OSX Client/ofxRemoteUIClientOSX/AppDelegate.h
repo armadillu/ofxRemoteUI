@@ -157,6 +157,8 @@ void clientCallback(RemoteUIClientCallBackArg a);
 -(void)updatePresetsPopup;
 -(void)updateGroupPresetMenus;
 
+-(void)clearSelectionPresetMenu;
+
 -(vector<string>)getParamsInGroup:(string)group;
 -(vector<string>)getAllGroupsInParams;
 

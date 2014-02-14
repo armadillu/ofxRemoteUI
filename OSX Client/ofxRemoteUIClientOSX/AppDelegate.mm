@@ -550,6 +550,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
     [[logView textStorage] endEditing];
 }
 
+-(void)clearSelectionPresetMenu{
+	[presetsMenu selectItemAtIndex:0];
+	currentPreset = "";
+}
 
 -(IBAction)userChoseNeighbor:(id)sender{
 
@@ -1096,11 +1100,17 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		return; //empty preset does nothing
 		currentPreset = "";
 	}
-	NSString * preset = [[sender itemAtIndex:index] title];
-	string prest = [preset UTF8String];
+	string prest = [[[sender itemAtIndex:index] title] UTF8String];
 	client->setPreset(prest);
 	currentPreset = prest;
-	//NSLog(@"user chose preset: %@", preset );
+
+	//set all group presets to dirty
+	for(int i = 0; i < orderedKeys.size(); i++){
+		ParamUI* t = widgets[ orderedKeys[i] ];
+		if(t->param.type == REMOTEUI_PARAM_SPACER){ //spacers hold presets
+			[t resetSelectedPreset];
+		}
+	}
 }
 
 -(IBAction)nextPreset:(id)sender;{

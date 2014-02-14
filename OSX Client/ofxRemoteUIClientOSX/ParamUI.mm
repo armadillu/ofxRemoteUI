@@ -381,6 +381,10 @@
 	}
 }
 
+-(void)resetSelectedPreset{
+	[groupPresetMenu selectItemAtIndex:0];
+	currentPreset = "";
+}
 
 -(IBAction)userPressedAddGroupPreset:(id)sender;{
 
@@ -421,6 +425,7 @@
 	[groupPresetMenu selectItemAtIndex:index];
 	currentPreset = [preset UTF8String];
 	AppDelegate* del = [NSApp delegate];
+	[del clearSelectionPresetMenu];
 	[del getClient]->setGroupPreset(currentPreset, param.group);
 	NSLog(@"user chose group preset: %s", currentPreset.c_str() );
 }

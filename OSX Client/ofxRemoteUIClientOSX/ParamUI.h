@@ -50,6 +50,7 @@
 
 -(NSPopUpButton*)getPresetsMenu;
 -(void)updatePresetMenuSelectionToCurrent;
+-(void)resetSelectedPreset;
 
 -(void)fadeOut;
 -(void)fadeIn;
