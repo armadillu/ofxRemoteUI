@@ -76,6 +76,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 	map<string, ParamUI*>			widgets;
 	vector<string>					orderedKeys; // used to keep the order in which the items were added
 
+	map<string, ParamUI*>			spacerGroups; // a subset of the params, only the spacer params
 	ofxRemoteUIClient *				client;
 
 	NSTimer *						timer;
@@ -161,6 +162,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 
 -(vector<string>)getParamsInGroup:(string)group;
 -(vector<string>)getAllGroupsInParams;
+-(map<string, ParamUI*>)getAllGroupSpacerParams;
 
 //midi
 -(void)userClickedOnParamForMidiBinding:(ParamUI*)param;

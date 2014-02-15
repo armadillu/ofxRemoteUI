@@ -951,7 +951,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 					callBack(cbArg);
 				}
 				#ifdef OF_AVAILABLE
-				onScreenNotifications.addNotification("SET GROUP PRESET to '" + groupName + "/" + presetName + ".xml'");
+				onScreenNotifications.addNotification("SET '" + groupName + "' GROUP TO '" + presetName + ".xml' PRESET");
 				#endif
 			}break;
 
@@ -962,7 +962,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				saveGroupToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName + "/" + presetName + ".xml", groupName);
 				sendSAVp(presetName, groupName);
 				#ifdef OF_AVAILABLE
-				onScreenNotifications.addNotification("SAVED GROUP PRESET to '" + string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName + "/" + presetName + ".xml'");
+				onScreenNotifications.addNotification("SAVED PRESET '" + presetName + ".xml' FOR GROUP '" + groupName + "'");
 				#endif
 				if(callBack != NULL){
 					cbArg.action = CLIENT_SAVED_GROUP_PRESET;
@@ -979,7 +979,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				deletePreset(presetName, groupName);
 				sendDELp(presetName, groupName);
 				#ifdef OF_AVAILABLE
-				onScreenNotifications.addNotification("DELETED GROUP PRESET '" + groupName + "/" + presetName + ".xml'");
+				onScreenNotifications.addNotification("DELETED PRESET '" + presetName + ".xml' FOR GROUP'" + groupName + "'");
 				#endif
 				if(callBack != NULL){
 					cbArg.action = CLIENT_DELETED_GROUP_PRESET;

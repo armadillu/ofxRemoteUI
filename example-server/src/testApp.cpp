@@ -126,7 +126,7 @@ void testApp::serverCallback(RemoteUIServerCallBackArg arg){
 	switch (arg.action) {
 		case CLIENT_CONNECTED: cout << "CLIENT_CONNECTED" << endl; break;
 		case CLIENT_DISCONNECTED: cout << "CLIENT_DISCONNECTED" << endl; break;
-		case CLIENT_UPDATED_PARAM: cout << "CLIENT_UPDATED_PARAM: "<< arg.paramName << ": ";
+		case CLIENT_UPDATED_PARAM: cout << "CLIENT_UPDATED_PARAM: "<< arg.paramName << " - ";
 			arg.param.print();
 			break;
 		case CLIENT_DID_SET_PRESET: cout << "CLIENT_DID_SET_PRESET" << endl; break;

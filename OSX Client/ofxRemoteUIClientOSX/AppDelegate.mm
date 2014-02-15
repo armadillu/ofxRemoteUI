@@ -1230,32 +1230,44 @@ void clientCallback(RemoteUIClientCallBackArg a){
 }
 
 
--(void)updateGroupPresetMenus{
-
+-(map<string, ParamUI*>)getAllGroupSpacerParams{
 	map<string, ParamUI*> groups;
 	for(int i = 0; i < orderedKeys.size(); i++){
 		ParamUI* t = widgets[ orderedKeys[i] ];
 		if(t->param.type == REMOTEUI_PARAM_SPACER){
 			groups[t->param.stringVal] = t;
-			[[t getPresetsMenu] removeAllItems];
-			[[t getPresetsMenu] addItemWithTitle:DIRTY_PRESET_NAME];
 		}
 	}
+	return groups;
+}
 
+
+-(void)updateGroupPresetMenus{
+
+	spacerGroups = [self getAllGroupSpacerParams];
+
+	//walk all group spacer ParamUIs, empty and add dirty option to its menu
+	for( map<string,ParamUI*>::iterator ii = spacerGroups.begin(); ii != spacerGroups.end(); ++ii ){
+		string key = (*ii).first;
+		ParamUI* t = spacerGroups[key];
+		[[t getPresetsMenu] removeAllItems];
+		[[t getPresetsMenu] addItemWithTitle:DIRTY_PRESET_NAME];
+	}
+
+	//get all presets (global and local to group)
 	vector<string> presetsList = client->getPresetsList();
 
-	//walk all group presets, get the ParamUI assigned, empty and add dirty option to menu
-	//walk all group presets again, add options to menu as needed
+	//walk all presets, for al local ones, add options to menu as needed
 	for(int i = 0 ; i < presetsList.size(); i++){
 		bool isGroupPreset = presetsList[i].find_first_of("/") != std::string::npos;
 		if(isGroupPreset){
 			vector<string>sides;
-			split(sides, presetsList[i], '/');
+			split(sides, presetsList[i], '/'); //find out group name and preset name
 			string groupName = sides[0];
 			string presetName = sides[1];
-			NSPopUpButton * popup = [groups[groupName] getPresetsMenu];
+			NSPopUpButton * popup = [spacerGroups[groupName] getPresetsMenu];
 			[popup addItemWithTitle:[NSString stringWithFormat:@"%s",presetName.c_str()]];
-			[groups[groupName] updatePresetMenuSelectionToCurrent];
+			[spacerGroups[groupName] updatePresetMenuSelectionToCurrent];
 		}
 	}
 }
@@ -1517,6 +1529,10 @@ int weJustDisconnected = 0;
 		currentPreset = "";
 		//printf("client sending: "); p.print();
 		client->sendUntrackedParamUpdate(p, name);
+
+		if (spacerGroups.count(p.group) == 1){ //if the group of the param is there
+			[spacerGroups[p.group] resetSelectedPreset];
+		}
 	}
 }
 

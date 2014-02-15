@@ -134,7 +134,7 @@ public:
 		switch (type) {
 			case REMOTEUI_PARAM_FLOAT: printf("float: %.2f [%.2f, %.2f]\n", floatVal, minFloat, maxFloat); break;
 			case REMOTEUI_PARAM_INT: printf("int: %d [%d, %d]\n", intVal, minInt, maxInt); break;
-			case REMOTEUI_PARAM_COLOR: printf("color: %d %d %d %d\n", redVal, greenVal, blueVal, alphaVal); break;
+			case REMOTEUI_PARAM_COLOR: printf("color: RGBA(%d %d %d %d)\n", redVal, greenVal, blueVal, alphaVal); break;
 			case REMOTEUI_PARAM_ENUM: printf("enum: %d [%d, %d]\n", intVal, minInt, maxInt); break;
 			case REMOTEUI_PARAM_BOOL: printf("bool: %s\n", boolVal ? "TRUE" : "FALSE"); break;
 			case REMOTEUI_PARAM_STRING: printf("string: %s\n", stringVal.c_str()); break;
