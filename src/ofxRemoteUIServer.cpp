@@ -267,10 +267,11 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 	s.addTag(OFXREMOTEUI_XML_TAG);
 	s.pushTag(OFXREMOTEUI_XML_TAG);
 
+	XmlCounter counters;
+
 	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		string key = (*ii).first;
 		RemoteUIParam t = params[key];
-		XmlCounter counters;
 		saveParamToXmlSettings(t, key, s, counters);
 	}
 
