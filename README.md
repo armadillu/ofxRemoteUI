@@ -6,7 +6,7 @@ OF addon allows you to serve any variables you want (bool, float, int, enum, str
 Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 
 
-![MultiPlatform Client](http://farm4.staticflickr.com/3756/11038662486_79c63c2950_o.png "WIP MultiPlatform Client") (OSX Client and multipatform client side by side.)
+![MultiPlatform Client](http://farm8.staticflickr.com/7374/12552022143_1cb696052a_o.png "WIP MultiPlatform Client") (OSX Client and multipatform client side by side.)
 
 
 ---
@@ -14,17 +14,18 @@ Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 ## Features
 
 * Edit & Track variables remotely through UDP/OSC (bool, int, float, string, Enum, ofColor).
-* Native OSX interface.
-* Alternative mutliplatform client built on top of ofxUI (with less features for now)
+* Client provieds a native OSX interface.
+* Alternative mutliplatform (iOS/win) client built on top of ofxUI (with less features for now)
 * Allows to save/load your variable states across app launches.
 * MIDI and Joystick controller bindings. Bind any parameter to any MIDI controller knob/slider or HID Joystick.
 * Parameter values are saved in your app's data folder, in xml format.
 * Allows creation/deletion of Presets, variable states that you can switch from and to quickly.
+* Presets can be created globally ()saving all paramater values), or for indiviual params inside a groups.
 * Easily create Parameter Groups, and access them through keyboard shortcuts from the OSX Client.
 * Colorize your variables to visually group them in the OSX client.
 * Realtime Filter your params by name to find things quickly.
 * Automatic discovery of servers in the network; easily control multiple apps from one Client interface.
-* Press "tab" on server app to see your params on screen, allows you to do clientless edits.
+* Press "tab" on server app to see your params inside your app, allows you to do clientless edits.
 * Event notifications in both OSX client (through growl) and on your OF app.
 * Restore parameters to the "previous launch" state or to the default values.
 * ofxRemoteUI Can be used outside OF in any C++ project, and in Processing thx to [@kritzikratzi](http://github.com/kirtzikratzi)
