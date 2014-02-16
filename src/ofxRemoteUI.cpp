@@ -549,8 +549,9 @@ string ofxRemoteUI::getValuesAsString(){
 	map<int,string>::iterator it = orderedKeys.begin();
 	while( it != orderedKeys.end() ){
 		RemoteUIParam param = params[it->second];
-		out << UriEncode(it->second) << "=";
-
+		if(param.type != REMOTEUI_PARAM_SPACER){
+			out << UriEncode(it->second) << "=";
+		}
 		switch (param.type) {
 			case REMOTEUI_PARAM_FLOAT: out << param.floatVal << endl; break;
 			case REMOTEUI_PARAM_INT: out << param.intVal << endl; break;

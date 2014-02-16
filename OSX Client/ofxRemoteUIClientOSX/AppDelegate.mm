@@ -39,6 +39,19 @@ void clientCallback(RemoteUIClientCallBackArg a){
 			[me showNotificationWithTitle:@"Server Did Set Preset OK" description:[NSString stringWithFormat:@"%@ did set preset named '%s'", remoteIP, a.msg.c_str()] ID:@"ServerDidSetPreset" priority:-1];
 		}break;
 
+		case SERVER_SAVED_GROUP_PRESET:{
+			[me showNotificationWithTitle:@"Server Saved Group Preset OK" description:[NSString stringWithFormat:@"%@ saved group preset named '%s'", remoteIP, a.msg.c_str()] ID:@"ServerSavedPreset" priority:1];
+		}break;
+
+		case SERVER_DID_SET_GROUP_PRESET:{
+			[me hideAllWarnings];
+			[me showNotificationWithTitle:@"Server Did Set Group Preset OK" description:[NSString stringWithFormat:@"%@ did set group preset named '%s'", remoteIP, a.msg.c_str()] ID:@"ServerDidSetPreset" priority:-1];
+		}break;
+
+		case SERVER_DELETED_GROUP_PRESET:{
+			[me showNotificationWithTitle:@"Server Deleted Group Preset OK" description:[NSString stringWithFormat:@"%@ deleted group preset named '%s'", remoteIP, a.msg.c_str()] ID:@"ServerDeletedPreset" priority:1];
+		}break;
+
 		case SERVER_SENT_FULL_PARAMS_UPDATE:
 			//NSLog(@"## Callback: PARAMS_UPDATED");
 			if(me->needFullParamsUpdate){ //a bit ugly here...
@@ -517,10 +530,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		arg.action == SERVER_SENT_FULL_PARAMS_UPDATE ||
 		arg.action == SERVER_PRESETS_LIST_UPDATED ||
 		arg.action == NEIGHBORS_UPDATED ||
-		arg.action == NEIGHBOR_JUST_LAUNCHED_SERVER ||
-		arg.action == SERVER_GROUP_SAVED_PRESET ||
-		arg.action == SERVER_DID_SET_GROUP_PRESET ||
-		arg.action == SERVER_DELETED_GROUP_PRESET 
+		arg.action == NEIGHBOR_JUST_LAUNCHED_SERVER 
 		){
 			return; //this stuff is not worth logging
 	}
@@ -533,6 +543,9 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		case SERVER_PRESETS_LIST_UPDATED: action = @"Server Presets lists updated!"; break;
 		case SERVER_DELETED_PRESET: action = [NSString stringWithFormat:@"Server Deleted Preset named '%s'", arg.msg.c_str()]; break;
 		case SERVER_SAVED_PRESET:  action = [NSString stringWithFormat:@"Server Saved Preset named '%s'", arg.msg.c_str()]; break;
+		case SERVER_DID_SET_GROUP_PRESET: action = [NSString stringWithFormat:@"Server did set Group Preset named '%s'", arg.msg.c_str()]; break;
+		case SERVER_DELETED_GROUP_PRESET: action = [NSString stringWithFormat:@"Server Deleted Group Preset named '%s'", arg.msg.c_str()]; break;
+		case SERVER_SAVED_GROUP_PRESET:  action = [NSString stringWithFormat:@"Server Saved Group Preset named '%s'", arg.msg.c_str()]; break;
 		case SERVER_DID_SET_PRESET: action = [NSString stringWithFormat:@"Server did set Preset named '%s'", arg.msg.c_str()]; break;
 		case SERVER_CONFIRMED_SAVE: action = @"Server Did Save to Default XML"; break;
 		case SERVER_DID_RESET_TO_XML: action = @"Server Did Reset Params to Server-Launch Default XML"; break;

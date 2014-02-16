@@ -303,7 +303,7 @@ void ofxRemoteUIClient::update(float dt){
 					if(verbose_) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SAVE_GROUP_PRESET_ACTION!" << endl;
 					vector<string> a;
 					sendPREL(a); //request preset list to server, send empty vector
-					cbArg.action = SERVER_GROUP_SAVED_PRESET;
+					cbArg.action = SERVER_SAVED_GROUP_PRESET;
 					cbArg.msg = m.getArgAsString(0);
 					cbArg.group = m.getArgAsString(1);
 					if(callBack != NULL) callBack(cbArg);
