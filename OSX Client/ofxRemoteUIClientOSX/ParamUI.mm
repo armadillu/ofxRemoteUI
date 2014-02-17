@@ -7,6 +7,7 @@
 @implementation ParamUI
 
 -(void)dealloc{
+	deleting = true;
 	[ui removeFromSuperviewWithoutNeedingDisplay];
 	[ui release];
 	[super dealloc];
@@ -19,8 +20,22 @@
 	numberID = n;
 	widget = nil;
 	param = p;
+	deleting = false;
 	paramName = name;
-	BOOL didLoad = [NSBundle loadNibNamed:@"View" owner:self];
+	AppDelegate * delegate = [NSApp delegate];
+	RowHeightSize rowH = [delegate getRowHeight];
+	BOOL didLoad = FALSE;
+	switch (rowH) {
+		case LARGE_34:
+			 didLoad = [NSBundle loadNibNamed:@"View34" owner:self];
+			break;
+		case SMALL_26:
+			didLoad = [NSBundle loadNibNamed:@"View26" owner:self];
+			break;
+
+		default:
+			break;
+	}
 	if(!didLoad){
 		NSLog(@"can't load Nib for Parameter View!");
 		return nil;
@@ -164,13 +179,16 @@
 		float w = [s frame].size.width;
 		int numTicks = w / 7;
 
-		if ([s allowsTickMarkValuesOnly]){ // for int sliders, lets make sure there arent more marks than possible values
-			int range = 1 + [s maxValue] - [s minValue];
-			if (numTicks > range){
-				numTicks = range;
+		RowHeightSize rowH = [[NSApp delegate] getRowHeight];
+		if(rowH == LARGE_34){
+			if ([s allowsTickMarkValuesOnly]){ // for int sliders, lets make sure there arent more marks than possible values
+				int range = 1 + [s maxValue] - [s minValue];
+				if (numTicks > range){
+					numTicks = range;
+				}
 			}
+			[s setNumberOfTickMarks: numTicks];
 		}
-		[s setNumberOfTickMarks: numTicks];
 	}
 }
 
@@ -343,7 +361,6 @@
 			[sliderVal removeFromSuperviewWithoutNeedingDisplay];
 			[colorWell removeFromSuperviewWithoutNeedingDisplay];
 			[enumeratorMenu removeFromSuperviewWithoutNeedingDisplay];
-			[paramGroup removeFromSuperviewWithoutNeedingDisplay];
 			[paramLabel setHidden:YES];
 			break;
 
@@ -359,11 +376,6 @@
 	}
 	[paramLabel sizeToFit];
 	
-	if (param.group != OFXREMOTEUI_DEFAULT_PARAM_GROUP){
-		paramGroup.stringValue = [self stringFromString:param.group];
-	}else{
-		paramGroup.stringValue = @"";
-	}
 	[widget setTarget:self];
 }
 

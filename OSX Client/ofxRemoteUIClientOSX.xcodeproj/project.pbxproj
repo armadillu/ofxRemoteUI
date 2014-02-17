@@ -50,7 +50,7 @@
 		BB7EA611184B89DC00048F7A /* RestartXcodeApp.scptd in Resources */ = {isa = PBXBuildFile; fileRef = BB7EA610184B89DC00048F7A /* RestartXcodeApp.scptd */; };
 		BB7EA613184B91CD00048F7A /* openAccessibility.scpt in Resources */ = {isa = PBXBuildFile; fileRef = BB7EA612184B91CD00048F7A /* openAccessibility.scpt */; };
 		BB8776E917C99B3700CC74B8 /* NSColorStringExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = BB8776E817C99B3700CC74B8 /* NSColorStringExtension.m */; };
-		BB94E57F17464E1800A7A3CC /* View.xib in Resources */ = {isa = PBXBuildFile; fileRef = BB94E57D17464E1800A7A3CC /* View.xib */; };
+		BB94E57F17464E1800A7A3CC /* View26.xib in Resources */ = {isa = PBXBuildFile; fileRef = BB94E57D17464E1800A7A3CC /* View26.xib */; };
 		BB94E5AE17468EAE00A7A3CC /* ColorView.m in Sources */ = {isa = PBXBuildFile; fileRef = BB94E5AD17468EAE00A7A3CC /* ColorView.m */; };
 		BBAF53C41800C9CC0055A481 /* warning@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BBAF53C21800C9CC0055A481 /* warning@2x.png */; };
 		BBAF53C51800C9CC0055A481 /* warning.png in Resources */ = {isa = PBXBuildFile; fileRef = BBAF53C31800C9CC0055A481 /* warning.png */; };
@@ -65,6 +65,7 @@
 		BBC385861797377C007E2DD1 /* Growl Registration Ticket.growlRegDict in Resources */ = {isa = PBXBuildFile; fileRef = BBC385851797377C007E2DD1 /* Growl Registration Ticket.growlRegDict */; };
 		BBC385881797385C007E2DD1 /* Growl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBC38583179736CB007E2DD1 /* Growl.framework */; };
 		BBD3270F173BFFF200D59359 /* ofxRemoteUIClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */; };
+		BBD475FD18B1C0970095F324 /* View34.xib in Resources */ = {isa = PBXBuildFile; fileRef = BBD475FB18B1C0970095F324 /* View34.xib */; };
 		BBDCBDE416A0512300F1C5EC /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = BBDCBDDE16A0512300F1C5EC /* Credits.rtf */; };
 		BBDCBDE516A0512300F1C5EC /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = BBDCBDE016A0512300F1C5EC /* InfoPlist.strings */; };
 		BBDCBDE616A0512300F1C5EC /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = BBDCBDE216A0512300F1C5EC /* MainMenu.xib */; };
@@ -169,7 +170,7 @@
 		BB7EA612184B91CD00048F7A /* openAccessibility.scpt */ = {isa = PBXFileReference; lastKnownFileType = file; path = openAccessibility.scpt; sourceTree = "<group>"; };
 		BB8776E717C99B3700CC74B8 /* NSColorStringExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSColorStringExtension.h; sourceTree = "<group>"; };
 		BB8776E817C99B3700CC74B8 /* NSColorStringExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSColorStringExtension.m; sourceTree = "<group>"; };
-		BB94E57E17464E1800A7A3CC /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = View.xib; sourceTree = "<group>"; };
+		BB94E57E17464E1800A7A3CC /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = View26.xib; sourceTree = "<group>"; };
 		BB94E5AC17468EAE00A7A3CC /* ColorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ColorView.h; sourceTree = "<group>"; };
 		BB94E5AD17468EAE00A7A3CC /* ColorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ColorView.m; sourceTree = "<group>"; };
 		BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUIClient.cpp; sourceTree = "<group>"; };
@@ -183,6 +184,7 @@
 		BBB1F6FD174900D100992119 /* offline@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "offline@2x.png"; path = "ofxRemoteUIClientOSX/offline@2x.png"; sourceTree = SOURCE_ROOT; };
 		BBC38583179736CB007E2DD1 /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Growl.framework; sourceTree = "<group>"; };
 		BBC385851797377C007E2DD1 /* Growl Registration Ticket.growlRegDict */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "Growl Registration Ticket.growlRegDict"; sourceTree = SOURCE_ROOT; };
+		BBD475FC18B1C0970095F324 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = View34.xib; sourceTree = "<group>"; };
 		BBDCBDDF16A0512300F1C5EC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = Credits.rtf; sourceTree = "<group>"; };
 		BBDCBDE116A0512300F1C5EC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = InfoPlist.strings; sourceTree = "<group>"; };
 		BBDCBDE316A0512300F1C5EC /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = MainMenu.xib; sourceTree = "<group>"; };
@@ -496,7 +498,8 @@
 				BBDCBDDE16A0512300F1C5EC /* Credits.rtf */,
 				BBDCBDE016A0512300F1C5EC /* InfoPlist.strings */,
 				BBDCBDE216A0512300F1C5EC /* MainMenu.xib */,
-				BB94E57D17464E1800A7A3CC /* View.xib */,
+				BBD475FB18B1C0970095F324 /* View34.xib */,
+				BB94E57D17464E1800A7A3CC /* View26.xib */,
 			);
 			name = en.lproj;
 			path = ofxRemoteUIClientOSX/en.lproj;
@@ -580,13 +583,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				BBAF53C51800C9CC0055A481 /* warning.png in Resources */,
+				BBD475FD18B1C0970095F324 /* View34.xib in Resources */,
 				BBDCBDE416A0512300F1C5EC /* Credits.rtf in Resources */,
 				BBDCBDE516A0512300F1C5EC /* InfoPlist.strings in Resources */,
 				BB7EA611184B89DC00048F7A /* RestartXcodeApp.scptd in Resources */,
 				BBDCBDE616A0512300F1C5EC /* MainMenu.xib in Resources */,
 				BB65837B16A315B2000B45F0 /* icon.icns in Resources */,
 				BBE6075A16A466A7002F1707 /* offline.png in Resources */,
-				BB94E57F17464E1800A7A3CC /* View.xib in Resources */,
+				BB94E57F17464E1800A7A3CC /* View26.xib in Resources */,
 				BBB1F6FB1749003B00992119 /* connected.png in Resources */,
 				BBB1F6FC1749003B00992119 /* connected@2x.png in Resources */,
 				BB7EA613184B91CD00048F7A /* openAccessibility.scpt in Resources */,
@@ -664,12 +668,20 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		BB94E57D17464E1800A7A3CC /* View.xib */ = {
+		BB94E57D17464E1800A7A3CC /* View26.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				BB94E57E17464E1800A7A3CC /* en */,
 			);
-			name = View.xib;
+			name = View26.xib;
+			sourceTree = "<group>";
+		};
+		BBD475FB18B1C0970095F324 /* View34.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BBD475FC18B1C0970095F324 /* en */,
+			);
+			name = View34.xib;
 			sourceTree = "<group>";
 		};
 		BBDCBDDE16A0512300F1C5EC /* Credits.rtf */ = {

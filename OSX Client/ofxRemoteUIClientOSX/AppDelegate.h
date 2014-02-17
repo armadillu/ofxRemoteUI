@@ -18,7 +18,7 @@
 
 #define REFRESH_RATE			1.0f/15.0f
 #define STATUS_REFRESH_RATE		0.333f
-#define ROW_HEIGHT				34.0f
+#define ROW_HEIGHT				(rowHeight == LARGE_34 ? 34.0f : 26.0f) 
 #define ROW_WIDTH				260.0f
 #define ALL_PARAMS_GROUP		@"*All Params"
 #define DIRTY_PRESET_NAME		@"*No Preset"
@@ -29,6 +29,8 @@
 
 #define CONNECT_STRING		@"Connect"
 #define DISCONNECT_STRING	@"Disconnect"
+
+enum RowHeightSize{ SMALL_26 = 0, LARGE_34 = 1};
 
 struct LayoutConfig{
 	NSPoint colsRows;
@@ -61,11 +63,13 @@ void clientCallback(RemoteUIClientCallBackArg a);
 	IBOutlet NSTextField *			neigbhorsField;
 	IBOutlet NSMenu *				groupsMenuBar;
 
+	//prefs
 	IBOutlet NSColorWell *			colorWell;
 	IBOutlet NSButton *				alwaysOnTopCheckbox;
 	IBOutlet NSButton *				showNotificationsCheckbox;
 	IBOutlet NSButton *				externalButtonsBehaveAsToggleCheckbox;
 	IBOutlet NSButton *				autoConnectCheckbox;
+	IBOutlet NSPopUpButton *		rowHeightMenu;
 
 	IBOutlet NSTextView *			logView;
 
@@ -102,6 +106,8 @@ void clientCallback(RemoteUIClientCallBackArg a);
 	ParamUI							*upcomingMidiParam;
 	map<string, string>				bindingsMap; //table of bindings for midi and joystick
 	IBOutlet NSTableView			*midiBindingsTable;
+
+	RowHeightSize					rowHeight;
 }
 
 -(ofxRemoteUIClient *)getClient;
@@ -137,6 +143,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 -(IBAction)copySpecial:(id)sender;
 -(IBAction)applyPrefs:(id)sender;
 
+
 -(void)log:(RemoteUIClientCallBackArg) arg;
 -(IBAction)clearLog:(id)sender;
 -(void)updateNeighbors;
@@ -159,6 +166,8 @@ void clientCallback(RemoteUIClientCallBackArg a);
 -(void)updateGroupPresetMenus;
 
 -(void)clearSelectionPresetMenu;
+
+-(RowHeightSize)getRowHeight;
 
 -(vector<string>)getParamsInGroup:(string)group;
 -(vector<string>)getAllGroupsInParams;

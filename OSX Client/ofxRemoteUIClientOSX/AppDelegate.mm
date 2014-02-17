@@ -609,6 +609,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 }
 
 
+-(RowHeightSize)getRowHeight{
+	return rowHeight;
+}
+
 -(ofxRemoteUIClient *)getClient;{
 	return client;
 }
@@ -617,6 +621,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 - (void)applicationDidFinishLaunching:(NSNotification *)note {
 
+	rowHeight = LARGE_34;
 	launched = FALSE;
 	connecting = FALSE;
 	currentNeighbors = [[NSMutableArray alloc] initWithCapacity:1];
@@ -1482,11 +1487,28 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	autoConnectToggle = (int)[d integerForKey:@"autoConnectToJustLaunchedApps"];
 	[autoConnectCheckbox setState: autoConnectToggle];
+
+	rowHeight = (RowHeightSize)[d integerForKey:@"rowHeightSize"];
+	[rowHeightMenu selectItemAtIndex:(int)rowHeight];
+
 }
 
 
 -(IBAction)applyPrefs:(id)sender{
 
+	if(sender == rowHeightMenu){
+		int sel = (int)[rowHeightMenu indexOfSelectedItem];
+		switch (sel) {
+			case 0: rowHeight = SMALL_26; break;
+			case 1: rowHeight = LARGE_34; break;
+			default: NSLog(@"wait what?"); break;
+		}
+		//reconnect to see results
+		if ([[connectButton title] isEqualToString:DISCONNECT_STRING]){
+			[self connect];
+			[self performSelector:@selector(connect) withObject:Nil afterDelay:0.3];
+		}
+	}
 	int onTop = (int)[alwaysOnTopCheckbox state];
 	if (onTop > 0) [window setLevel:NSScreenSaverWindowLevel];
 	else [window setLevel:NSNormalWindowLevel];
@@ -1505,6 +1527,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[d setInteger: showNotifications  forKey:@"showNotifications"];
 	[d setInteger: externalButtonsBehaveAsToggle  forKey:@"externalButtonsBehaveAsToggle"];
 	[d setInteger: autoConnectToggle forKey:@"autoConnectToJustLaunchedApps"];
+	[d setInteger: (int)rowHeight forKey:@"rowHeightSize"];
 	[d synchronize];
 }
 
@@ -1544,7 +1567,10 @@ int weJustDisconnected = 0;
 		client->sendUntrackedParamUpdate(p, name);
 
 		if (spacerGroups.count(p.group) == 1){ //if the group of the param is there
-			[spacerGroups[p.group] resetSelectedPreset];
+			ParamUI* pp = spacerGroups[p.group];
+			if (!pp->deleting){
+				[pp resetSelectedPreset];
+			}
 		}
 	}
 }

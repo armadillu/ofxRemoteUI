@@ -19,7 +19,7 @@
 	IBOutlet NSTextField *		textView;
 	IBOutlet NSButton *			button;
 	IBOutlet NSButton *			paramLabel;
-	IBOutlet NSTextField *		paramGroup;
+	//IBOutlet NSTextField *		paramGroup;
 	IBOutlet NSTextField *		sliderVal;
 	IBOutlet NSTextField *		sliderMin;
 	IBOutlet NSTextField *		sliderMax;
@@ -34,6 +34,7 @@
 	int numberID; // to handle alternating rows in table draw
 	bool shouldBeFlashing;
 
+	bool deleting; //we are about to dealloc this param!
 	//midi
 	bool midiHighlightAnim;
 	NSTimer * waitingForMidiTimer;
