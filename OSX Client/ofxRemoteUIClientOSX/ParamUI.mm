@@ -244,6 +244,7 @@
 			[widget setAction:@selector(updateFloat:)];
 			[sliderVal setAction:@selector(updateFloatManually:)];
 			[sliderVal setTarget:self];
+			//[[sliderVal cell] setBackgroundStyle:NSBackgroundStyleRaised];
 			[slider setMaxValue:param.maxFloat];
 			[slider setMinValue:param.minFloat];
 			[button removeFromSuperviewWithoutNeedingDisplay];
@@ -259,6 +260,7 @@
 
 		case REMOTEUI_PARAM_INT:
 			widget = slider;
+			//[[sliderVal cell] setBackgroundStyle:NSBackgroundStyleRaised];
 			[slider setMaxValue:param.maxInt];
 			[slider setMinValue:param.minInt];
 			[sliderVal setAction:@selector(updateIntManually:)];
@@ -346,6 +348,7 @@
 		case REMOTEUI_PARAM_SPACER:
 			widget = spacerTitle;
 			[spacerTitle setStringValue:[self stringFromString: param.stringVal]];
+			[[spacerTitle cell] setBackgroundStyle:NSBackgroundStyleLowered];
 			[spacerTitle setTextColor:[NSColor whiteColor]];
 			[groupPresetAddButton setAction:@selector(userPressedAddGroupPreset:)];
 			[groupPresetAddButton setTarget:self];
@@ -370,9 +373,9 @@
 	paramLabel.title = [self stringFromString:paramName];
 	int t = param.type;
 	if (t == REMOTEUI_PARAM_FLOAT || t == REMOTEUI_PARAM_INT || t == REMOTEUI_PARAM_BOOL || t == REMOTEUI_PARAM_ENUM ){
-		[paramLabel setToolTip: [paramLabel.title stringByAppendingString:@" Parameter\nPress Button to bind to controller"]];
+		[paramLabel setToolTip: [NSString stringWithFormat:@"\"%@\" Parameter\nPress Button to start controller binding process", paramLabel.title]];
 	}else{
-		[paramLabel setToolTip: [paramLabel.title stringByAppendingString:@" Parameter\nCan't bind to controller"]];
+		[paramLabel setToolTip: [NSString stringWithFormat:@"\"%@\" Parameter\nNot bindable to a controller", paramLabel.title]];
 	}
 	[paramLabel sizeToFit];
 	

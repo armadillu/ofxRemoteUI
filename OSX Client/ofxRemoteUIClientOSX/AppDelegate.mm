@@ -12,6 +12,8 @@
 #import "Joystick.h"
 #import "JoystickManager.h"
 
+int weJustDisconnected = 0;
+
 
 //ofxRemoteUIClient callback entry point
 #pragma mark - CALLBACKS
@@ -717,7 +719,6 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	int num = hh / ROW_HEIGHT;
 	r.size.height = 284 + num * ROW_HEIGHT;
 	[window setFrame:r display:NO];
-	[window setResizeIncrements:NSMakeSize(1, ROW_HEIGHT)];
 
 	[self updateGroupPopup];
 	currentGroup = ""; //empty group means show all params
@@ -731,6 +732,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[self parseMidiBindingsFromFile:[NSURL fileURLWithPath:[DEFAULT_BINDINGS_FOLDER stringByAppendingString:DEFAULT_BINDINGS_FILE]]];//load last used midi bindings
 
 	[self loadPrefs];
+
+	[self recalcWindowSize];
 	[window setAllowsToolTipsWhenApplicationIsInactive:YES];
 	[[NSUserDefaults standardUserDefaults] setObject: [NSNumber numberWithInt: 1]
 											  forKey: @"NSInitialToolTipDelay"];
@@ -1490,6 +1493,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	rowHeight = (RowHeightSize)[d integerForKey:@"rowHeightSize"];
 	[rowHeightMenu selectItemAtIndex:(int)rowHeight];
+	[self recalcWindowSize];
 
 }
 
@@ -1508,6 +1512,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 			[self connect];
 			[self performSelector:@selector(connect) withObject:Nil afterDelay:0.3];
 		}
+		[self recalcWindowSize];
 	}
 	int onTop = (int)[alwaysOnTopCheckbox state];
 	if (onTop > 0) [window setLevel:NSScreenSaverWindowLevel];
@@ -1531,7 +1536,21 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[d synchronize];
 }
 
-int weJustDisconnected = 0;
+
+bool resizeWindowUpDown = false; //if you keep changing paramUI size, with this we keep track if win should grow or shrink, so that it alternates
+
+-(void)recalcWindowSize{
+
+	[window setResizeIncrements:NSMakeSize(1, 1)];
+	float listH = [window frame].size.height - MAIN_WINDOW_NON_LIST_H;
+	float newWinH = MAIN_WINDOW_NON_LIST_H + listH + (resizeWindowUpDown ?  ROW_HEIGHT - fmodf(listH, ROW_HEIGHT) : -fmodf(listH, ROW_HEIGHT)) ;
+	NSRect frame = [window frame];
+	frame.size.height = newWinH;
+	[window setFrame:frame display:YES];
+	[window setResizeIncrements:NSMakeSize(1, ROW_HEIGHT)];
+	resizeWindowUpDown ^= true;
+}
+
 
 -(void)update{
 
@@ -1553,7 +1572,7 @@ int weJustDisconnected = 0;
 		}
 		weJustDisconnected--;
 		if(weJustDisconnected <= 0) weJustDisconnected = 0;
-}
+	}
 }
 
 

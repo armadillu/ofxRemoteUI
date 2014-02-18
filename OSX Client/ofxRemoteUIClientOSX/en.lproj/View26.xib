@@ -51,7 +51,7 @@
 					<object class="NSButton" id="602763378">
 						<reference key="NSNextResponder" ref="743967783"/>
 						<int key="NSvFlags">297</int>
-						<string key="NSFrame">{{289, 4}, {18, 17}}</string>
+						<string key="NSFrame">{{289, 3}, {18, 19}}</string>
 						<reference key="NSSuperview" ref="743967783"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="764417768"/>
@@ -59,19 +59,19 @@
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="474869638">
 							<int key="NSCellFlags">67108864</int>
-							<int key="NSCellFlags2">134479872</int>
+							<int key="NSCellFlags2">134348800</int>
 							<string key="NSContents">-</string>
-							<object class="NSFont" key="NSSupport" id="22">
+							<object class="NSFont" key="NSSupport" id="26">
 								<string key="NSName">.LucidaGrandeUI</string>
-								<double key="NSSize">9</double>
-								<int key="NSfFlags">3614</int>
+								<double key="NSSize">11</double>
+								<int key="NSfFlags">3100</int>
 							</object>
 							<reference key="NSControlView" ref="602763378"/>
 							<int key="NSButtonFlags">-2038284288</int>
 							<int key="NSButtonFlags2">32</int>
-							<object class="NSFont" key="NSAlternateImage" id="369709573">
+							<object class="NSFont" key="NSAlternateImage" id="239578387">
 								<string key="NSName">.LucidaGrandeUI</string>
-								<double key="NSSize">9</double>
+								<double key="NSSize">11</double>
 								<int key="NSfFlags">16</int>
 							</object>
 							<string key="NSAlternateContents"/>
@@ -84,7 +84,7 @@
 					<object class="NSButton" id="925928125">
 						<reference key="NSNextResponder" ref="743967783"/>
 						<int key="NSvFlags">297</int>
-						<string key="NSFrame">{{269, 4}, {18, 17}}</string>
+						<string key="NSFrame">{{269, 3}, {18, 19}}</string>
 						<reference key="NSSuperview" ref="743967783"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="602763378"/>
@@ -92,13 +92,13 @@
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="805288677">
 							<int key="NSCellFlags">67108864</int>
-							<int key="NSCellFlags2">134479872</int>
+							<int key="NSCellFlags2">134348800</int>
 							<string key="NSContents">+</string>
-							<reference key="NSSupport" ref="22"/>
+							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="925928125"/>
 							<int key="NSButtonFlags">-2038284288</int>
 							<int key="NSButtonFlags2">32</int>
-							<reference key="NSAlternateImage" ref="369709573"/>
+							<reference key="NSAlternateImage" ref="239578387"/>
 							<string key="NSAlternateContents"/>
 							<string key="NSKeyEquivalent"/>
 							<int key="NSPeriodicDelay">400</int>
@@ -109,7 +109,7 @@
 					<object class="NSPopUpButton" id="764417768">
 						<reference key="NSNextResponder" ref="743967783"/>
 						<int key="NSvFlags">297</int>
-						<string key="NSFrame">{{309, 4}, {66, 17}}</string>
+						<string key="NSFrame">{{309, 3}, {66, 19}}</string>
 						<reference key="NSSuperview" ref="743967783"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView"/>
@@ -117,13 +117,13 @@
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSPopUpButtonCell" key="NSCell" id="955969984">
 							<int key="NSCellFlags">-2079326144</int>
-							<int key="NSCellFlags2">134480896</int>
-							<reference key="NSSupport" ref="22"/>
+							<int key="NSCellFlags2">134349824</int>
+							<reference key="NSSupport" ref="26"/>
 							<string key="NSCellIdentifier">_NS:9</string>
 							<reference key="NSControlView" ref="764417768"/>
 							<int key="NSButtonFlags">-2035138560</int>
 							<int key="NSButtonFlags2">160</int>
-							<reference key="NSAlternateImage" ref="369709573"/>
+							<reference key="NSAlternateImage" ref="239578387"/>
 							<string key="NSAlternateContents"/>
 							<string key="NSKeyEquivalent"/>
 							<int key="NSPeriodicDelay">400</int>
@@ -190,7 +190,7 @@
 					<object class="NSTextField" id="49430787">
 						<reference key="NSNextResponder" ref="743967783"/>
 						<int key="NSvFlags">290</int>
-						<string key="NSFrame">{{6, 1}, {259, 21}}</string>
+						<string key="NSFrame">{{4, -3}, {263, 26}}</string>
 						<reference key="NSSuperview" ref="743967783"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="521005238"/>
@@ -202,13 +202,12 @@
 							<int key="NSCellFlags2">138418176</int>
 							<string key="NSContents">SPACER NAME</string>
 							<object class="NSFont" key="NSSupport">
-								<string key="NSName">LucidaGrande-Bold</string>
-								<double key="NSSize">16</double>
-								<int key="NSfFlags">16</int>
+								<string key="NSName">.LucidaGrandeUI-Bold</string>
+								<double key="NSSize">17</double>
+								<int key="NSfFlags">2072</int>
 							</object>
 							<string key="NSCellIdentifier">_NS:397</string>
 							<reference key="NSControlView" ref="49430787"/>
-							<bool key="NSDrawsBackground">YES</bool>
 							<object class="NSColor" key="NSBackgroundColor">
 								<int key="NSColorSpace">4</int>
 								<bytes key="NSWhite">MC44IDAAA</bytes>
@@ -244,19 +243,11 @@
 									<int key="NSCellFlags">-2080374784</int>
 									<int key="NSCellFlags2">134348800</int>
 									<string key="NSContents">ON</string>
-									<object class="NSFont" key="NSSupport" id="26">
-										<string key="NSName">.LucidaGrandeUI</string>
-										<double key="NSSize">11</double>
-										<int key="NSfFlags">3100</int>
-									</object>
+									<reference key="NSSupport" ref="26"/>
 									<reference key="NSControlView" ref="156382756"/>
 									<int key="NSButtonFlags">-1232977920</int>
 									<int key="NSButtonFlags2">32</int>
-									<object class="NSFont" key="NSAlternateImage">
-										<string key="NSName">.LucidaGrandeUI</string>
-										<double key="NSSize">11</double>
-										<int key="NSfFlags">16</int>
-									</object>
+									<reference key="NSAlternateImage" ref="239578387"/>
 									<string key="NSAlternateContents"/>
 									<string key="NSKeyEquivalent"/>
 									<int key="NSPeriodicDelay">400</int>
@@ -267,7 +258,8 @@
 							<object class="NSTextField" id="892768833">
 								<reference key="NSNextResponder" ref="718633621"/>
 								<int key="NSvFlags">266</int>
-								<string key="NSFrame">{{17, 4}, {222, 18}}</string>
+								<array class="NSMutableArray" key="NSSubviews"/>
+								<string key="NSFrame">{{17, 3}, {222, 20}}</string>
 								<reference key="NSSuperview" ref="718633621"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="1068792140"/>
@@ -302,7 +294,7 @@
 							<object class="NSTextField" id="41486622">
 								<reference key="NSNextResponder" ref="718633621"/>
 								<int key="NSvFlags">265</int>
-								<string key="NSFrame">{{202, -1}, {43, 11}}</string>
+								<string key="NSFrame">{{202, 0}, {43, 11}}</string>
 								<reference key="NSSuperview" ref="718633621"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="49430787"/>
@@ -334,7 +326,7 @@
 							<object class="NSTextField" id="1068792140">
 								<reference key="NSNextResponder" ref="718633621"/>
 								<int key="NSvFlags">268</int>
-								<string key="NSFrame">{{17, -1}, {43, 11}}</string>
+								<string key="NSFrame">{{17, 0}, {43, 11}}</string>
 								<reference key="NSSuperview" ref="718633621"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="45428359"/>
@@ -354,7 +346,7 @@
 							<object class="NSSlider" id="45428359">
 								<reference key="NSNextResponder" ref="718633621"/>
 								<int key="NSvFlags">266</int>
-								<string key="NSFrame">{{20, 6}, {222, 15}}</string>
+								<string key="NSFrame">{{20, 8}, {222, 15}}</string>
 								<reference key="NSSuperview" ref="718633621"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="983862097"/>
@@ -377,19 +369,19 @@
 							<object class="NSPopUpButton" id="983862097">
 								<reference key="NSNextResponder" ref="718633621"/>
 								<int key="NSvFlags">271</int>
-								<string key="NSFrame">{{23, 4}, {220, 15}}</string>
+								<string key="NSFrame">{{21, 1}, {223, 22}}</string>
 								<reference key="NSSuperview" ref="718633621"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="467196906"/>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSPopUpButtonCell" key="NSCell" id="440512323">
 									<int key="NSCellFlags">-2076180416</int>
-									<int key="NSCellFlags2">264192</int>
-									<reference key="NSSupport" ref="22"/>
+									<int key="NSCellFlags2">133120</int>
+									<reference key="NSSupport" ref="26"/>
 									<reference key="NSControlView" ref="983862097"/>
 									<int key="NSButtonFlags">109199360</int>
 									<int key="NSButtonFlags2">129</int>
-									<reference key="NSAlternateImage" ref="369709573"/>
+									<reference key="NSAlternateImage" ref="239578387"/>
 									<string key="NSAlternateContents"/>
 									<string key="NSKeyEquivalent"/>
 									<int key="NSPeriodicDelay">400</int>
@@ -463,7 +455,7 @@
 							<object class="NSTextField" id="467196906">
 								<reference key="NSNextResponder" ref="718633621"/>
 								<int key="NSvFlags">269</int>
-								<string key="NSFrame">{{83, -3}, {88, 13}}</string>
+								<string key="NSFrame">{{83, 0}, {88, 13}}</string>
 								<reference key="NSSuperview" ref="718633621"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="70925910"/>
@@ -472,11 +464,15 @@
 									<int key="NSCellFlags">337641473</int>
 									<int key="NSCellFlags2">138579968</int>
 									<string key="NSContents">0</string>
-									<reference key="NSSupport" ref="581014379"/>
+									<object class="NSFont" key="NSSupport">
+										<string key="NSName">LucidaGrande</string>
+										<double key="NSSize">8</double>
+										<int key="NSfFlags">16</int>
+									</object>
 									<reference key="NSControlView" ref="467196906"/>
-									<object class="NSColor" key="NSBackgroundColor" id="618190971">
+									<object class="NSColor" key="NSBackgroundColor">
 										<int key="NSColorSpace">3</int>
-										<bytes key="NSWhite">MCAwAA</bytes>
+										<bytes key="NSWhite">MSAwLjUAA</bytes>
 									</object>
 									<reference key="NSTextColor" ref="460488847"/>
 								</object>
@@ -498,16 +494,15 @@
 								<reference key="NSNextResponder" ref="521005238"/>
 								<int key="NSvFlags">268</int>
 								<array class="NSMutableArray" key="NSSubviews"/>
-								<string key="NSFrame">{{3, 3}, {112, 19}}</string>
+								<string key="NSFrame">{{3, 4}, {112, 17}}</string>
 								<reference key="NSSuperview" ref="521005238"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView"/>
 								<bool key="NSViewIsLayerTreeHost">YES</bool>
 								<string key="NSReuseIdentifierKey">_NS:22</string>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSButtonCell" key="NSCell" id="88517854">
 									<int key="NSCellFlags">67108864</int>
-									<int key="NSCellFlags2">0</int>
+									<int key="NSCellFlags2">134348800</int>
 									<string key="NSContents">Label</string>
 									<object class="NSFont" key="NSSupport">
 										<string key="NSName">LucidaGrande</string>
@@ -516,59 +511,9 @@
 									</object>
 									<string key="NSCellIdentifier">_NS:22</string>
 									<reference key="NSControlView" ref="919059071"/>
-									<int key="NSButtonFlags">146030592</int>
+									<int key="NSButtonFlags">146161664</int>
 									<int key="NSButtonFlags2">173</int>
-									<object class="NSImage" key="NSNormalImage">
-										<int key="NSImageFlags">549650432</int>
-										<string key="NSSize">{1, 1}</string>
-										<array class="NSMutableArray" key="NSReps">
-											<array>
-												<integer value="0"/>
-												<object class="NSBitmapImageRep">
-													<object class="NSData" key="NSTIFFRepresentation">
-														<bytes key="NS.bytes">TU0AKgAAAAoAAAAOAQAAAwAAAAEAAQAAAQEAAwAAAAEAAQAAAQIAAwAAAAIACAAIAQMAAwAAAAEAAQAA
-AQYAAwAAAAEAAQAAAREABAAAAAEAAAAIARIAAwAAAAEAAQAAARUAAwAAAAEAAgAAARYAAwAAAAEAAQAA
-ARcABAAAAAEAAAACARwAAwAAAAEAAQAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABh3MABwAAB7wAAAC4
-AAAAAAAAB7xhcHBsAiAAAG1udHJHUkFZWFlaIAfQAAIADgAMAAAAAGFjc3BBUFBMAAAAAG5vbmUAAAAA
-AAAAAAAAAAAAAAAAAAD21gABAAAAANMtYXBwbAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAABWRlc2MAAADAAAAAb2RzY20AAAEwAAAGLmNwcnQAAAdgAAAAOHd0cHQAAAeY
-AAAAFGtUUkMAAAesAAAADmRlc2MAAAAAAAAAFUdlbmVyaWMgR3JheSBQcm9maWxlAAAAAAAAAAAAAAAV
-R2VuZXJpYyBHcmF5IFByb2ZpbGUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAABtbHVjAAAAAAAAAB4AAAAMc2tTSwAAACoAAAF4ZGFESwAAADQAAAGiY2FFUwAAACwAAAHW
-cHRCUgAAACoAAAICdWtVQQAAACwAAAIsZnJGVQAAACoAAAJYaHVIVQAAAC4AAAKCemhUVwAAABAAAAKw
-bmJOTwAAACwAAALAY3NDWgAAACQAAALsaGVJTAAAACAAAAMQaXRJVAAAAC4AAAMwcm9STwAAACQAAANe
-ZGVERQAAADoAAAOCa29LUgAAABgAAAO8c3ZTRQAAAC4AAAPUemhDTgAAABAAAAQCamFKUAAAABYAAAQS
-ZWxHUgAAACQAAAQocHRQTwAAADgAAARMbmxOTAAAACoAAASEZXNFUwAAACgAAASudGhUSAAAACQAAATW
-dHJUUgAAACIAAAT6ZmlGSQAAACwAAAUcaHJIUgAAADoAAAVIcGxQTAAAADYAAAWCcnVSVQAAACYAAAW4
-YXJFRwAAACgAAAXeZW5VUwAAACgAAAYGAFYBYQBlAG8AYgBlAGMAbgD9ACAAcwBpAHYA/QAgAHAAcgBv
-AGYAaQBsAEcAZQBuAGUAcgBlAGwAIABnAHIA5QB0AG8AbgBlAGIAZQBzAGsAcgBpAHYAZQBsAHMAZQBQ
-AGUAcgBmAGkAbAAgAGQAZQAgAGcAcgBpAHMAIABnAGUAbgDoAHIAaQBjAFAAZQByAGYAaQBsACAAQwBp
-AG4AegBhACAARwBlAG4A6QByAGkAYwBvBBcEMAQzBDAEOwRMBD0EOAQ5ACAEPwRABD4ERAQwBDkEOwAg
-AEcAcgBhAHkAUAByAG8AZgBpAGwAIABnAOkAbgDpAHIAaQBxAHUAZQAgAGcAcgBpAHMAwQBsAHQAYQBs
-AOEAbgBvAHMAIABzAHoA/AByAGsAZQAgAHAAcgBvAGYAaQBskBp1KHBwlo6Ccl9pY8+P8ABHAGUAbgBl
-AHIAaQBzAGsAIABnAHIA5QB0AG8AbgBlAHAAcgBvAGYAaQBsAE8AYgBlAGMAbgD9ACABYQBlAGQA/QAg
-AHAAcgBvAGYAaQBsBeQF6AXVBeQF2QXcACAARwByAGEAeQAgBdsF3AXcBdkAUAByAG8AZgBpAGwAbwAg
-AGcAcgBpAGcAaQBvACAAZwBlAG4AZQByAGkAYwBvAFAAcgBvAGYAaQBsACAAZwByAGkAIABnAGUAbgBl
-AHIAaQBjAEEAbABsAGcAZQBtAGUAaQBuAGUAcwAgAEcAcgBhAHUAcwB0AHUAZgBlAG4ALQBQAHIAbwBm
-AGkAbMd8vBgAIABHAHIAYQB5ACDVBLhc0wzHfABHAGUAbgBlAHIAaQBzAGsAIABnAHIA5QBzAGsAYQBs
-AGUAcAByAG8AZgBpAGxmbpAacHBepmPPj/Blh072TgCCLDCwMOwwpDDXMO0w1TChMKQw6wOTA7UDvQO5
-A7oDzAAgA8ADwQO/A8YDrwO7ACADswO6A8EDuQBQAGUAcgBmAGkAbAAgAGcAZQBuAOkAcgBpAGMAbwAg
-AGQAZQAgAGMAaQBuAHoAZQBuAHQAbwBzAEEAbABnAGUAbQBlAGUAbgAgAGcAcgBpAGoAcwBwAHIAbwBm
-AGkAZQBsAFAAZQByAGYAaQBsACAAZwByAGkAcwAgAGcAZQBuAOkAcgBpAGMAbw5CDhsOIw5EDh8OJQ5M
-DioONQ5ADhcOMg4XDjEOSA4nDkQOGwBHAGUAbgBlAGwAIABHAHIAaQAgAFAAcgBvAGYAaQBsAGkAWQBs
-AGUAaQBuAGUAbgAgAGgAYQByAG0AYQBhAHAAcgBvAGYAaQBpAGwAaQBHAGUAbgBlAHIAaQENAGsAaQAg
-AHAAcgBvAGYAaQBsACAAcwBpAHYAaQBoACAAdABvAG4AbwB2AGEAVQBuAGkAdwBlAHIAcwBhAGwAbgB5
-ACAAcAByAG8AZgBpAGwAIABzAHoAYQByAG8BWwBjAGkEHgQxBEkEOAQ5ACAEQQQ1BEAESwQ5ACAEPwRA
-BD4ERAQ4BDsETAZFBkQGQQAgBioGOQYxBkoGQQAgAEcAcgBhAHkAIAYnBkQGOQYnBkUARwBlAG4AZQBy
-AGkAYwAgAEcAcgBhAHkAIABQAHIAbwBmAGkAbABlAAB0ZXh0AAAAAENvcHlyaWdodCAyMDA3IEFwcGxl
-IEluYy4sIGFsbCByaWdodHMgcmVzZXJ2ZWQuAFhZWiAAAAAAAADzUQABAAAAARbMY3VydgAAAAAAAAAB
-Ac0AAA</bytes>
-													</object>
-												</object>
-											</array>
-										</array>
-										<reference key="NSColor" ref="618190971"/>
-									</object>
+									<reference key="NSAlternateImage" ref="239578387"/>
 									<string key="NSAlternateContents"/>
 									<string key="NSKeyEquivalent"/>
 									<int key="NSPeriodicDelay">400</int>

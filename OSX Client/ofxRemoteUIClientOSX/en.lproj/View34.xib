@@ -112,6 +112,7 @@
 						<string key="NSFrame">{{309, 6}, {66, 19}}</string>
 						<reference key="NSSuperview" ref="743967783"/>
 						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSPopUpButtonCell" key="NSCell" id="955969984">
@@ -189,7 +190,7 @@
 					<object class="NSTextField" id="49430787">
 						<reference key="NSNextResponder" ref="743967783"/>
 						<int key="NSvFlags">290</int>
-						<string key="NSFrame">{{6, 6}, {259, 21}}</string>
+						<string key="NSFrame">{{4, 6}, {263, 21}}</string>
 						<reference key="NSSuperview" ref="743967783"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="521005238"/>
@@ -202,12 +203,11 @@
 							<string key="NSContents">SPACER NAME</string>
 							<object class="NSFont" key="NSSupport">
 								<string key="NSName">LucidaGrande-Bold</string>
-								<double key="NSSize">15</double>
+								<double key="NSSize">19</double>
 								<int key="NSfFlags">16</int>
 							</object>
 							<string key="NSCellIdentifier">_NS:397</string>
 							<reference key="NSControlView" ref="49430787"/>
-							<bool key="NSDrawsBackground">YES</bool>
 							<object class="NSColor" key="NSBackgroundColor">
 								<int key="NSColorSpace">4</int>
 								<bytes key="NSWhite">MC44IDAAA</bytes>
@@ -232,10 +232,10 @@
 							<object class="NSButton" id="156382756">
 								<reference key="NSNextResponder" ref="718633621"/>
 								<int key="NSvFlags">269</int>
-								<string key="NSFrame">{{105, 6}, {55, 25}}</string>
+								<string key="NSFrame">{{105, 5}, {55, 25}}</string>
 								<reference key="NSSuperview" ref="718633621"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="70925910"/>
+								<reference key="NSNextKeyView" ref="41486622"/>
 								<string key="NSHuggingPriority">{250, 750}</string>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSButtonCell" key="NSCell" id="554917531">
@@ -441,10 +441,10 @@
 								<set class="NSMutableSet" key="NSDragTypes">
 									<string>NSColor pasteboard type</string>
 								</set>
-								<string key="NSFrame">{{105, 4}, {55, 26}}</string>
+								<string key="NSFrame">{{105, 5}, {55, 26}}</string>
 								<reference key="NSSuperview" ref="718633621"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="41486622"/>
+								<reference key="NSNextKeyView" ref="156382756"/>
 								<bool key="NSEnabled">YES</bool>
 								<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 								<bool key="NSIsBordered">YES</bool>
@@ -459,7 +459,7 @@
 								<string key="NSFrame">{{88, 0}, {88, 13}}</string>
 								<reference key="NSSuperview" ref="718633621"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="156382756"/>
+								<reference key="NSNextKeyView" ref="70925910"/>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSTextFieldCell" key="NSCell" id="171307492">
 									<int key="NSCellFlags">337641473</int>
@@ -498,6 +498,7 @@
 								<string key="NSFrame">{{3, 7}, {112, 19}}</string>
 								<reference key="NSSuperview" ref="521005238"/>
 								<reference key="NSWindow"/>
+								<reference key="NSNextKeyView"/>
 								<bool key="NSViewIsLayerTreeHost">YES</bool>
 								<string key="NSReuseIdentifierKey">_NS:22</string>
 								<bool key="NSEnabled">YES</bool>
@@ -607,7 +608,7 @@ Ac0AAA</bytes>
 						<string key="NSFrame">{{254, -1}, {125, 34}}</string>
 						<reference key="NSSuperview" ref="743967783"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView"/>
+						<reference key="NSNextKeyView" ref="919059071"/>
 						<bool key="NSViewIsLayerTreeHost">YES</bool>
 						<bool key="NSViewCanDrawConcurrently">YES</bool>
 						<string key="NSClassName">NSView</string>
@@ -1253,7 +1254,6 @@ Ac0AAA</bytes>
 						<string key="groupPresetAddButton">NSButton</string>
 						<string key="groupPresetDeleteButton">NSButton</string>
 						<string key="groupPresetMenu">NSPopUpButton</string>
-						<string key="paramGroup">NSTextField</string>
 						<string key="paramLabel">NSButton</string>
 						<string key="slider">NSSlider</string>
 						<string key="sliderMax">NSTextField</string>
@@ -1292,10 +1292,6 @@ Ac0AAA</bytes>
 						<object class="IBToOneOutletInfo" key="groupPresetMenu">
 							<string key="name">groupPresetMenu</string>
 							<string key="candidateClassName">NSPopUpButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="paramGroup">
-							<string key="name">paramGroup</string>
-							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="paramLabel">
 							<string key="name">paramLabel</string>

@@ -23,6 +23,7 @@
 #define ALL_PARAMS_GROUP		@"*All Params"
 #define DIRTY_PRESET_NAME		@"*No Preset"
 #define NUM_FLASH_WARNING		5
+#define MAIN_WINDOW_NON_LIST_H (82 + 66)
 
 #define DEFAULT_BINDINGS_FOLDER ([NSString stringWithFormat:@"%@/Library/Application Support/ofxRemoteUIClient/",NSHomeDirectory()])
 #define DEFAULT_BINDINGS_FILE (@"lastUsedBindings.ctrlrBind")
@@ -147,6 +148,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 -(void)log:(RemoteUIClientCallBackArg) arg;
 -(IBAction)clearLog:(id)sender;
 -(void)updateNeighbors;
+-(void)recalcWindowSize;
 
 -(void)saveMidiBindingsToFile:(NSURL*)path;
 
