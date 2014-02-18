@@ -190,7 +190,7 @@
 					<object class="NSTextField" id="49430787">
 						<reference key="NSNextResponder" ref="743967783"/>
 						<int key="NSvFlags">290</int>
-						<string key="NSFrame">{{4, -3}, {263, 26}}</string>
+						<string key="NSFrame">{{4, -4}, {263, 26}}</string>
 						<reference key="NSSuperview" ref="743967783"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="521005238"/>
@@ -203,7 +203,7 @@
 							<string key="NSContents">SPACER NAME</string>
 							<object class="NSFont" key="NSSupport">
 								<string key="NSName">.LucidaGrandeUI-Bold</string>
-								<double key="NSSize">17</double>
+								<double key="NSSize">15</double>
 								<int key="NSfFlags">2072</int>
 							</object>
 							<string key="NSCellIdentifier">_NS:397</string>
@@ -497,6 +497,7 @@
 								<string key="NSFrame">{{3, 4}, {112, 17}}</string>
 								<reference key="NSSuperview" ref="521005238"/>
 								<reference key="NSWindow"/>
+								<reference key="NSNextKeyView"/>
 								<bool key="NSViewIsLayerTreeHost">YES</bool>
 								<string key="NSReuseIdentifierKey">_NS:22</string>
 								<bool key="NSEnabled">YES</bool>

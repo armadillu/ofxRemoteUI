@@ -1479,7 +1479,7 @@
 										<object class="NSSearchField" id="61192859">
 											<reference key="NSNextResponder" ref="960467535"/>
 											<int key="NSvFlags">267</int>
-											<string key="NSFrame">{{103, 13}, {67.000000063377101, 19}}</string>
+											<string key="NSFrame">{{103.0000000633771, 13}, {67, 19}}</string>
 											<reference key="NSSuperview" ref="960467535"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="746396792"/>
@@ -1830,7 +1830,7 @@
 									<reference key="NSDocView" ref="459942669"/>
 									<reference key="NSBGColor" ref="631047369"/>
 									<object class="NSCursor" key="NSCursor">
-										<string key="NSHotSpot">{1, -1}</string>
+										<string key="NSHotSpot">{5, 5}</string>
 										<int key="NSCursorType">0</int>
 									</object>
 									<int key="NScvFlags">4</int>
@@ -2061,7 +2061,7 @@
 											<string key="NSFrame">{{15, 68}, {257, 20}}</string>
 											<reference key="NSSuperview" ref="933717995"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView"/>
+											<reference key="NSNextKeyView" ref="265084003"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="495423700">
 												<int key="NSCellFlags">67108864</int>
@@ -2086,7 +2086,7 @@
 											<string key="NSFrame">{{121, 11}, {101, 22}}</string>
 											<reference key="NSSuperview" ref="933717995"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="265084003"/>
+											<reference key="NSNextKeyView"/>
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSPopUpButtonCell" key="NSCell" id="221924059">
@@ -2170,7 +2170,7 @@
 											<string key="NSFrame">{{18, 59}, {240, 5}}</string>
 											<reference key="NSSuperview" ref="933717995"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="909134735"/>
+											<reference key="NSNextKeyView" ref="795858447"/>
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<string key="NSOffsets">{0, 0}</string>
 											<object class="NSTextFieldCell" key="NSTitleCell">
@@ -2193,7 +2193,7 @@
 									<string key="NSFrame">{{1, 1}, {272, 153}}</string>
 									<reference key="NSSuperview" ref="962428149"/>
 									<reference key="NSWindow"/>
-									<reference key="NSNextKeyView" ref="795858447"/>
+									<reference key="NSNextKeyView" ref="909134735"/>
 								</object>
 							</array>
 							<string key="NSFrame">{{17, 16}, {274, 155}}</string>
