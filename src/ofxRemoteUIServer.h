@@ -169,12 +169,8 @@ private:
 	~ofxRemoteUIServer();
 
 	struct XmlCounter{ //used to hold xml save counts when saving to xml
-		int numFloats = 0;
-		int numInts = 0;
-		int numStrings = 0;
-		int numBools = 0;
-		int numEnums = 0;
-		int numColors = 0;
+		XmlCounter(){ numFloats = numInts = numStrings = numBools = numEnums = numColors = 0; }
+		int numFloats, numInts, numStrings, numBools, numEnums, numColors;
 	};
 
 	void			restoreAllParamsToInitialXML();
