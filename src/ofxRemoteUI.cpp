@@ -373,9 +373,15 @@ vector<string> ofxRemoteUI::scanForUpdatedParamsAndSync(){
 void ofxRemoteUI::sendUpdateForParamsInList(vector<string>list){
 
 	for(int i = 0; i < list.size(); i++){
-		RemoteUIParam p = params[list[i]];
-		//cout << "ofxRemoteUIServer: sending updated param " + list[i]; p.print();
-		sendParam(list[i], p);
+		string name = list[i];
+		map<string, RemoteUIParam>::const_iterator it = params.find(name);
+		if(it!=params.end()){
+			RemoteUIParam p = params[list[i]];
+			//cout << "ofxRemoteUIServer: sending updated param " + list[i]; p.print();
+			sendParam(list[i], p);
+		}else{
+			cout << "param not found??!" << endl;
+		}
 	}
 }
 

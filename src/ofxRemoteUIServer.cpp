@@ -796,12 +796,8 @@ void ofxRemoteUIServer::updateServer(float dt){
 
 			case REQUEST_ACTION:{ //send all params to client
 				if(verbose_) cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " sends REQU!"  << endl;
-				vector<string>paramsList = getAllParamNamesList();
-				syncAllParamsToPointers();
-				sendUpdateForParamsInList(paramsList);
-				sendREQU(true); //once all send, confirm to close the REQU
-			}
-				break;
+				pushParamsToClient();
+				}break;
 
 			case SEND_PARAM_ACTION:{ //client is sending us an updated val
 				if(verbose_) cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " sends SEND!"  << endl;
