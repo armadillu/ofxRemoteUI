@@ -5,7 +5,7 @@
 #import "ColorView.h"
 
 
-@interface ParamUI : NSObject{
+@interface ParamUI : NSObject <NSTextFieldDelegate>{
 
 	@public
 	RemoteUIParam param;
@@ -77,4 +77,10 @@
 -(IBAction)userChoseGroupPreset:(id)sender;
 
 -(IBAction)clickOnLabel:(id)sender;
+
+//textField delegate notifications <NSTextFieldDelegate>
+- (void)controlTextDidBeginEditing:(NSNotification *)obj;
+- (void)controlTextDidEndEditing:(NSNotification *)obj;
+- (void)controlTextDidChange:(NSNotification *)aNotification;
+
 @end

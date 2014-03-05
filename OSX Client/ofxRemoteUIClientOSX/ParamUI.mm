@@ -232,6 +232,12 @@
 	}
 }
 
+- (void)controlTextDidBeginEditing:(NSNotification *)obj;{}
+- (void)controlTextDidEndEditing:(NSNotification *)obj;{}
+- (void)controlTextDidChange:(NSNotification *)aNotification{
+	[self updateString:textView]; //send an update on each typed character
+}
+
 
 -(void)setupUI{
 
@@ -332,6 +338,7 @@
 		case REMOTEUI_PARAM_STRING:
 			widget = textView;
 			[textView setAction:@selector(updateString:)];
+			[textView setDelegate:self];
 			[slider removeFromSuperviewWithoutNeedingDisplay];
 			[button removeFromSuperviewWithoutNeedingDisplay];
 			[sliderMax removeFromSuperviewWithoutNeedingDisplay];
