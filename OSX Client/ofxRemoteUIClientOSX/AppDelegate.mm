@@ -1461,10 +1461,11 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 -(void)loadPrefs{
 
-	if([[NSUserDefaults standardUserDefaults] objectForKey: @"ApplePersistenceIgnoreState"] == nil)
-		[[NSUserDefaults standardUserDefaults] setBool: YES forKey:@"ApplePersistenceIgnoreState"];
-
 	NSUserDefaults * d = [NSUserDefaults standardUserDefaults];
+
+	if([d objectForKey: @"ApplePersistenceIgnoreState"] == nil)
+		[d setBool: YES forKey:@"ApplePersistenceIgnoreState"];
+
 	int onTop = (int)[d integerForKey:@"alwaysOnTop"] ;
 	if (onTop > 0) [window setLevel:NSScreenSaverWindowLevel];
 	else [window setLevel:NSNormalWindowLevel];
