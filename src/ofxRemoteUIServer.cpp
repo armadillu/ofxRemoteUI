@@ -402,7 +402,7 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 			int numStrings = s.getNumTags("REMOTEUI_PARAM_STRING");
 			for (int i=0; i< numStrings; i++){
 				string paramName = s.getAttribute("REMOTEUI_PARAM_STRING", "paramName", "", i);
-				string val = s.getValue("REMOTEUI_PARAM_STRING", "NULL STRING", i);
+				string val = s.getValue("REMOTEUI_PARAM_STRING", "", i);
 
 				map<string,RemoteUIParam>::iterator it = params.find(paramName);
 				if ( it != params.end() ){	// found!
