@@ -593,8 +593,6 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 	if(e.key == '\t'){
 		showValuesOnScreen = !showValuesOnScreen;
 	}
-
-
 }
 
 void ofxRemoteUIServer::startInBackgroundThread(){
@@ -1169,5 +1167,24 @@ void ofxRemoteUIServer::connect(string ipAddress, int port){
 	//params.clear();
 	oscSender.setup(ipAddress, port);
 	readyToSend = true;
+}
+
+void ofxRemoteUIServer::sendLogToClient(char* format, ...){
+
+	if(readyToSend){
+		char line[1024]; //this will crash (or worse, make a memory mess) if you try to log >= 1024 chars
+		va_list args;
+		va_start(args, format);
+		vsprintf(line, format,  args);
+
+		ofxOscMessage m;
+		m.setAddress("LOG_");
+		m.addStringArg(string(line));
+		try{
+			oscSender.sendMessage(m);
+		}catch(exception e){
+			cout << "exception" << endl;
+		}
+	}
 }
 

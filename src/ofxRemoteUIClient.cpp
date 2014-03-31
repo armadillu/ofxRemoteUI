@@ -165,7 +165,18 @@ void ofxRemoteUIClient::update(float dt){
 			DecodedMessage dm = decode(m);
 			RemoteUIClientCallBackArg cbArg; // to notify our "delegate"
 			cbArg.host = m.getRemoteIp();
+
 			switch (dm.action) {
+
+				case SEND_LOG_LINE_ACTION:{
+					cbArg.msg = m.getArgAsString(0); //only one arg for the log msg
+					if(callBack != NULL){
+						cbArg.action = SERVER_SENT_LOG_LINE;
+						callBack(cbArg);
+					}else{
+						cout << cbArg.msg << endl;
+					}
+				}break;
 
 				case HELO_ACTION:{ //server says hi back, we ask for a big update
 					requestCompleteUpdate();

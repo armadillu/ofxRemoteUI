@@ -114,6 +114,13 @@ void clientCallback(RemoteUIClientCallBackArg a){
 			[me updateNeighbors];
 		}break;
 
+		case SERVER_SENT_LOG_LINE:{
+			NSString * date = [[NSDate date] descriptionWithCalendarFormat:@"%H:%M:%S" timeZone:nil locale:nil];
+			NSString * logLine = [NSString stringWithFormat:@"%@ >> %s\n", date,  a.msg.c_str() ];
+			[me performSelectorOnMainThread:@selector(appendToServerLog:) withObject:logLine
+							  waitUntilDone:NO];
+		}break;
+
 		case NEIGHBOR_JUST_LAUNCHED_SERVER:
 			[me autoConnectToNeighbor:a.host port:a.port];
 			break;
@@ -532,7 +539,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		arg.action == SERVER_SENT_FULL_PARAMS_UPDATE ||
 		arg.action == SERVER_PRESETS_LIST_UPDATED ||
 		arg.action == NEIGHBORS_UPDATED ||
-		arg.action == NEIGHBOR_JUST_LAUNCHED_SERVER 
+		arg.action == NEIGHBOR_JUST_LAUNCHED_SERVER ||
+		arg.action == SERVER_SENT_LOG_LINE
 		){
 			return; //this stuff is not worth logging
 	}
@@ -610,6 +618,18 @@ void clientCallback(RemoteUIClientCallBackArg a){
     [[logView textStorage] endEditing];
 }
 
+-(IBAction)clearServerLog:(id)sender{
+	[[serverLogView textStorage] beginEditing];
+    [[[serverLogView textStorage] mutableString] setString:@""];
+    [[serverLogView textStorage] endEditing];
+}
+
+-(void)appendToServerLog:(NSString*)line{
+
+	[[serverLogView textStorage] beginEditing];
+    [[[serverLogView textStorage] mutableString] appendString:line];
+    [[serverLogView textStorage] endEditing];
+}
 
 -(RowHeightSize)getRowHeight{
 	return rowHeight;
