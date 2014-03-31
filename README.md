@@ -6,7 +6,7 @@ OF addon allows you to serve any variables you want (bool, float, int, enum, str
 Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 
 
-![MultiPlatform Client](http://farm8.staticflickr.com/7374/12552022143_1cb696052a_o.png "WIP MultiPlatform Client") (OSX Client and multipatform client side by side.)
+![MultiPlatform Client](https://farm4.staticflickr.com/3779/13538469924_bf3e571119_o.png "WIP MultiPlatform Client") OSX Client(left), multipatform client(right), in-app client (below)
 
 
 ---
@@ -20,14 +20,15 @@ Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 * MIDI and Joystick controller bindings. Bind any parameter to any MIDI controller knob/slider or HID Joystick.
 * Parameter values are saved in your app's data folder, in xml format.
 * Allows creation/deletion of Presets, variable states that you can switch from and to quickly.
-* Presets can be created globally ()saving all paramater values), or for indiviual params inside a groups.
+* Presets can be created globally (saving all paramater values at once), or for a subset of params (param group).
 * Easily create Parameter Groups, and access them through keyboard shortcuts from the OSX Client.
 * Colorize your variables to visually group them in the OSX client.
 * Realtime Filter your params by name to find things quickly.
 * Automatic discovery of servers in the network; easily control multiple apps from one Client interface.
-* Press "tab" on server app to see your params inside your app, allows you to do clientless edits.
+* Press "tab" your app (ofxRemoteUIServer) to see/edit your params from inside your OF app, allows you to do quick clientless edits.
 * Event notifications in both OSX client (through growl) and on your OF app.
-* Restore parameters to the "previous launch" state or to the default values.
+* You can always restore your parameters to the "previous launch" state, or to the default values.
+* Send Log lines remotelly, ofxRemoteUIServer allows you to log messages to you client.
 * ofxRemoteUI Can be used outside OF in any C++ project, and in Processing thx to [@kritzikratzi](http://github.com/kirtzikratzi)
 * Easy to use C++ Macros hide complexity away, very easy to plug into any existing project.
 
