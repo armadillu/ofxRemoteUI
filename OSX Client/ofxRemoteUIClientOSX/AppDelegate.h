@@ -73,6 +73,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 	IBOutlet NSPopUpButton *		rowHeightMenu;
 
 	IBOutlet NSTextView *			logView;
+	IBOutlet NSTextView *			serverLogView;
 
 	bool							updateContinuosly;
 
@@ -147,6 +148,8 @@ void clientCallback(RemoteUIClientCallBackArg a);
 
 -(void)log:(RemoteUIClientCallBackArg) arg;
 -(IBAction)clearLog:(id)sender;
+-(IBAction)clearServerLog:(id)sender;
+-(void)appendToServerLog:(NSString*)line ;
 -(void)updateNeighbors;
 -(void)recalcWindowSize;
 

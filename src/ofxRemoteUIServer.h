@@ -83,6 +83,9 @@
 /*get a pointer to the server, not usually needed*/
 #define OFX_REMOTEUI_SERVER_GET_INSTANCE()											( ofxRemoteUIServer::instance() )
 
+#define OFX_REMOTEUI_SERVER_LOG(format,...)											( ofxRemoteUIServer::instance()->sendLogToClient( format, ##__VA_ARGS__ ) )
+
+
 #ifdef OF_AVAILABLE
 /*run the server on a back thread. Useful for apps with very low framerate.
  default is disabled in OF; only works in OF! */
@@ -161,6 +164,7 @@ public:
 	void setDrawsNotificationsAutomaticallly(bool draw);
 	void setNetworkInterface(string iface);
 	void pushParamsToClient(); //pushes all param values to client, updating its UI
+	void sendLogToClient(char* format, ...);
 
 
 private:

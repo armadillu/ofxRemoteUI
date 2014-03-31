@@ -113,6 +113,7 @@ DecodedMessage ofxRemoteUI::decode(ofxOscMessage m){
 		else if (action == "DELp") dm.action = DELETE_GROUP_PRESET_ACTION;
 		else if (action == "SAVp") dm.action = SAVE_GROUP_PRESET_ACTION;
 		else if (action == "SETp") dm.action = SET_GROUP_PRESET_ACTION;
+		else if (action == "LOG_") dm.action = SEND_LOG_LINE_ACTION;
 	}
 
 	if (msgAddress.length() >= 8) {
@@ -127,11 +128,15 @@ DecodedMessage ofxRemoteUI::decode(ofxOscMessage m){
 		else if (arg1 == "ENU") dm.argument = ENUM_ARG;
 		else if (arg1 == "COL") dm.argument = COLOR_ARG;
 		else if (arg1 == "SPA") dm.argument = SPACER_ARG;
+	}else{
+		//must be a LOG_ action
 	}
 
 	if (msgAddress.length() >= 9) {
 		string paramName = msgAddress.substr(9, msgAddress.length() - 9);
 		dm.paramName = paramName;
+	}else{
+		//must be a LOG_ action
 	}
 
 	return dm;
