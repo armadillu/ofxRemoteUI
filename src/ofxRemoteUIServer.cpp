@@ -440,8 +440,10 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 void ofxRemoteUIServer::restoreAllParamsToInitialXML(){
 	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		string key = (*ii).first;
-		params[key] = paramsFromXML[key];
-		syncPointerToParam(key);
+		if (params[key].type != REMOTEUI_PARAM_SPACER){
+			params[key] = paramsFromXML[key];
+			syncPointerToParam(key);
+		}
 	}
 }
 
