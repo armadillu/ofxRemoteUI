@@ -568,9 +568,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	NSString * date = [[NSDate date] descriptionWithCalendarFormat:@"%H:%M:%S" timeZone:nil locale:nil];
 	NSString * logLine = [NSString stringWithFormat:@"[%@@%s] %@\n", date, arg.host.c_str(), action ];
 
-	[[logView textStorage] beginEditing];
-    [[[logView textStorage] mutableString] appendString:logLine];
-    [[logView textStorage] endEditing];
+	[self appendToLog:logLine];
 }
 
 -(void)clearSelectionPresetMenu{
@@ -631,6 +629,12 @@ void clientCallback(RemoteUIClientCallBackArg a){
     [[serverLogView textStorage] endEditing];
 }
 
+-(void)appendToLog:(NSString*)line{
+	[[logView textStorage] beginEditing];
+	[[[logView textStorage] mutableString] appendString:line];
+	[[logView textStorage] endEditing];
+}
+
 -(RowHeightSize)getRowHeight{
 	return rowHeight;
 }
@@ -689,6 +693,13 @@ void clientCallback(RemoteUIClientCallBackArg a){
     [searchCell setSearchMenuTemplate:cellMenu];
 
 	[progress setUsesThreadedAnimation: YES];
+
+	NSFont * font = [NSFont fontWithName:@"Monaco" size:10];
+	[[serverLogView textStorage] setFont:font];
+	[[logView  textStorage] setFont:font];
+	[self appendToServerLog:@"\n"];
+	[self appendToLog:@"\n"];
+
 	///////////////////////////////////////////////
 
 	client = new ofxRemoteUIClient();
@@ -757,10 +768,6 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[window setAllowsToolTipsWhenApplicationIsInactive:YES];
 	[[NSUserDefaults standardUserDefaults] setObject: [NSNumber numberWithInt: 1]
 											  forKey: @"NSInitialToolTipDelay"];
-
-	NSFont * font = [NSFont fontWithName:@"Monaco" size:10];
-	[[serverLogView textStorage]setFont:font];
-	[[logView  textStorage] setFont:font];
 
 	//midi
 	midiManager = [[VVMIDIManager alloc] init];

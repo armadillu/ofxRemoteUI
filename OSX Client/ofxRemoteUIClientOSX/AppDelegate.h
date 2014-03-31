@@ -150,6 +150,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 -(IBAction)clearLog:(id)sender;
 -(IBAction)clearServerLog:(id)sender;
 -(void)appendToServerLog:(NSString*)line ;
+-(void)appendToLog:(NSString*) line;
 -(void)updateNeighbors;
 -(void)recalcWindowSize;
 
