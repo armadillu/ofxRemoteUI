@@ -758,6 +758,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[[NSUserDefaults standardUserDefaults] setObject: [NSNumber numberWithInt: 1]
 											  forKey: @"NSInitialToolTipDelay"];
 
+	NSFont * font = [NSFont fontWithName:@"Monaco" size:10];
+	[[serverLogView textStorage]setFont:font];
+	[[logView  textStorage] setFont:font];
+
 	//midi
 	midiManager = [[VVMIDIManager alloc] init];
 	[midiManager setDelegate:self];
@@ -1378,6 +1382,9 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[df setObject: addressField.stringValue forKey:@"lastAddress"];
 	[df setObject: portField.stringValue forKey:@"lastPort"];
 
+	NSString * date = [[NSDate date] descriptionWithCalendarFormat:@"%H:%M:%S" timeZone:nil locale:nil];
+
+
 	if ([[connectButton title] isEqualToString:CONNECT_STRING]){ //we are not connected, let's connect
 
 		int port = [portField.stringValue intValue];
@@ -1390,7 +1397,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 								   priority:2];
 			return;
 		}
-		//NSLog(@"connecting");
+
 		[addressField setEnabled:false];
 		[portField setEnabled:false];
 		connectButton.title = DISCONNECT_STRING;
@@ -1407,9 +1414,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		//lagField.stringValue = @"";
 		needFullParamsUpdate = YES;
 		client->connect();
+		[self appendToServerLog:[NSString stringWithFormat:@"%@ >> ## CLIENT CONNECTED ######\n", date]];
 
 	}else{ // let's disconnect
-		//NSLog(@"disconnecting");
+
 		RemoteUIClientCallBackArg arg;
 		arg.action = SERVER_DISCONNECTED;
 		arg.host = [addressField.stringValue UTF8String];
@@ -1432,6 +1440,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		connectButton.state = 0;
 		connectButton.title = CONNECT_STRING;
 		[self layoutWidgetsWithConfig: [self calcLayoutParams]]; //update scrollbar
+		[self appendToServerLog:[NSString stringWithFormat:@"%@ >> ## CLIENT DISCONNECTED ######\n", date]];
 	}
 }
 

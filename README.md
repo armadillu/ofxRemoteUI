@@ -28,8 +28,8 @@ Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 * Press "tab" your app (ofxRemoteUIServer) to see/edit your params from inside your OF app, allows you to do quick clientless edits.
 * Event notifications in both OSX client (through growl) and on your OF app.
 * You can always restore your parameters to the "previous launch" state, or to the default values.
-* Send Log lines remotelly, ofxRemoteUIServer allows you to log messages to you client.
-* ofxRemoteUI Can be used outside OF in any C++ project, and in Processing thx to [@kritzikratzi](http://github.com/kirtzikratzi)
+* Log remotely - ofxRemoteUIServer allows you to log messages to you client with OFX_REMOTEUI_SERVER_LOG(); which accepts printf-like formatted writing.
+* ofxRemoteUI can be used outside OF in any C++ project, and in Processing thx to [@kritzikratzi](http://github.com/kirtzikratzi)
 * Easy to use C++ Macros hide complexity away, very easy to plug into any existing project.
 
 

@@ -1776,14 +1776,24 @@
 												<object class="NSLayoutManager" key="NSLayoutManager">
 													<object class="NSTextStorage" key="NSTextStorage">
 														<object class="NSMutableString" key="NSString">
-															<characters key="NS.bytes"/>
+															<characters key="NS.bytes"> </characters>
 														</object>
+														<dictionary key="NSAttributes" id="87948811">
+															<object class="NSFont" key="NSFont">
+																<string key="NSName">.LucidaGrandeUI</string>
+																<double key="NSSize">11</double>
+																<int key="NSfFlags">2329</int>
+															</object>
+															<object class="NSMutableParagraphStyle" key="NSParagraphStyle">
+																<nil key="NSTabStops"/>
+															</object>
+														</dictionary>
 														<nil key="NSDelegate"/>
 													</object>
 													<array class="NSMutableArray" key="NSTextContainers">
 														<reference ref="545008335"/>
 													</array>
-													<int key="NSLMFlags">134</int>
+													<int key="NSLMFlags">6</int>
 													<nil key="NSDelegate"/>
 												</object>
 												<reference key="NSTextView" ref="459942669"/>
@@ -1791,7 +1801,7 @@
 												<int key="NSTCFlags">1</int>
 											</object>
 											<object class="NSTextViewSharedData" key="NSSharedData">
-												<int key="NSFlags">67119365</int>
+												<int key="NSFlags">10497</int>
 												<int key="NSTextCheckingTypes">0</int>
 												<nil key="NSMarkedAttributes"/>
 												<reference key="NSBackgroundColor" ref="631047369"/>
@@ -2621,14 +2631,15 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 												<object class="NSLayoutManager" key="NSLayoutManager">
 													<object class="NSTextStorage" key="NSTextStorage">
 														<object class="NSMutableString" key="NSString">
-															<characters key="NS.bytes"/>
+															<characters key="NS.bytes"> </characters>
 														</object>
+														<reference key="NSAttributes" ref="87948811"/>
 														<nil key="NSDelegate"/>
 													</object>
 													<array class="NSMutableArray" key="NSTextContainers">
 														<reference ref="740685437"/>
 													</array>
-													<int key="NSLMFlags">134</int>
+													<int key="NSLMFlags">6</int>
 													<nil key="NSDelegate"/>
 												</object>
 												<reference key="NSTextView" ref="907712363"/>
@@ -2636,7 +2647,7 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 												<int key="NSTCFlags">1</int>
 											</object>
 											<object class="NSTextViewSharedData" key="NSSharedData">
-												<int key="NSFlags">67119365</int>
+												<int key="NSFlags">10497</int>
 												<int key="NSTextCheckingTypes">0</int>
 												<nil key="NSMarkedAttributes"/>
 												<reference key="NSBackgroundColor" ref="631047369"/>
