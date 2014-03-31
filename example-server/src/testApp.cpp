@@ -75,6 +75,7 @@ void testApp::setup(){
 											//potentially leading to problems. String params are
 											//especially very likely to cause crashes!
 											//so don't use this unless you know you need it!
+
 }
 
 //--------------------------------------------------------------
@@ -142,4 +143,5 @@ void testApp::serverCallback(RemoteUIServerCallBackArg arg){
 void testApp::keyPressed( int key ){
 	//force an update in the client side (same as pressing sync button on osx client)
 	OFX_REMOTEUI_SERVER_PUSH_TO_CLIENT();
+	OFX_REMOTEUI_SERVER_LOG("key pressed at %f", ofGetElapsedTimef());
 }

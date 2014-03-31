@@ -402,7 +402,7 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 			int numStrings = s.getNumTags("REMOTEUI_PARAM_STRING");
 			for (int i=0; i< numStrings; i++){
 				string paramName = s.getAttribute("REMOTEUI_PARAM_STRING", "paramName", "", i);
-				string val = s.getValue("REMOTEUI_PARAM_STRING", "NULL STRING", i);
+				string val = s.getValue("REMOTEUI_PARAM_STRING", "", i);
 
 				map<string,RemoteUIParam>::iterator it = params.find(paramName);
 				if ( it != params.end() ){	// found!
@@ -440,8 +440,10 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 void ofxRemoteUIServer::restoreAllParamsToInitialXML(){
 	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		string key = (*ii).first;
-		params[key] = paramsFromXML[key];
-		syncPointerToParam(key);
+		if (params[key].type != REMOTEUI_PARAM_SPACER){
+			params[key] = paramsFromXML[key];
+			syncPointerToParam(key);
+		}
 	}
 }
 
@@ -593,8 +595,6 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 	if(e.key == '\t'){
 		showValuesOnScreen = !showValuesOnScreen;
 	}
-
-
 }
 
 void ofxRemoteUIServer::startInBackgroundThread(){
@@ -1169,5 +1169,24 @@ void ofxRemoteUIServer::connect(string ipAddress, int port){
 	//params.clear();
 	oscSender.setup(ipAddress, port);
 	readyToSend = true;
+}
+
+void ofxRemoteUIServer::sendLogToClient(char* format, ...){
+
+	if(readyToSend){
+		char line[1024]; //this will crash (or worse, make a memory mess) if you try to log >= 1024 chars
+		va_list args;
+		va_start(args, format);
+		vsprintf(line, format,  args);
+
+		ofxOscMessage m;
+		m.setAddress("LOG_");
+		m.addStringArg(string(line));
+		try{
+			oscSender.sendMessage(m);
+		}catch(exception e){
+			cout << "exception" << endl;
+		}
+	}
 }
 

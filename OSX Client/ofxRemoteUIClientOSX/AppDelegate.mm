@@ -114,6 +114,13 @@ void clientCallback(RemoteUIClientCallBackArg a){
 			[me updateNeighbors];
 		}break;
 
+		case SERVER_SENT_LOG_LINE:{
+			NSString * date = [[NSDate date] descriptionWithCalendarFormat:@"%H:%M:%S" timeZone:nil locale:nil];
+			NSString * logLine = [NSString stringWithFormat:@"%@ >> %s\n", date,  a.msg.c_str() ];
+			[me performSelectorOnMainThread:@selector(appendToServerLog:) withObject:logLine
+							  waitUntilDone:NO];
+		}break;
+
 		case NEIGHBOR_JUST_LAUNCHED_SERVER:
 			[me autoConnectToNeighbor:a.host port:a.port];
 			break;
@@ -532,7 +539,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		arg.action == SERVER_SENT_FULL_PARAMS_UPDATE ||
 		arg.action == SERVER_PRESETS_LIST_UPDATED ||
 		arg.action == NEIGHBORS_UPDATED ||
-		arg.action == NEIGHBOR_JUST_LAUNCHED_SERVER 
+		arg.action == NEIGHBOR_JUST_LAUNCHED_SERVER ||
+		arg.action == SERVER_SENT_LOG_LINE
 		){
 			return; //this stuff is not worth logging
 	}
@@ -610,6 +618,18 @@ void clientCallback(RemoteUIClientCallBackArg a){
     [[logView textStorage] endEditing];
 }
 
+-(IBAction)clearServerLog:(id)sender{
+	[[serverLogView textStorage] beginEditing];
+    [[[serverLogView textStorage] mutableString] setString:@""];
+    [[serverLogView textStorage] endEditing];
+}
+
+-(void)appendToServerLog:(NSString*)line{
+
+	[[serverLogView textStorage] beginEditing];
+    [[[serverLogView textStorage] mutableString] appendString:line];
+    [[serverLogView textStorage] endEditing];
+}
 
 -(RowHeightSize)getRowHeight{
 	return rowHeight;
@@ -737,6 +757,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[window setAllowsToolTipsWhenApplicationIsInactive:YES];
 	[[NSUserDefaults standardUserDefaults] setObject: [NSNumber numberWithInt: 1]
 											  forKey: @"NSInitialToolTipDelay"];
+
+	NSFont * font = [NSFont fontWithName:@"Monaco" size:10];
+	[[serverLogView textStorage]setFont:font];
+	[[logView  textStorage] setFont:font];
 
 	//midi
 	midiManager = [[VVMIDIManager alloc] init];
@@ -1358,6 +1382,9 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[df setObject: addressField.stringValue forKey:@"lastAddress"];
 	[df setObject: portField.stringValue forKey:@"lastPort"];
 
+	NSString * date = [[NSDate date] descriptionWithCalendarFormat:@"%H:%M:%S" timeZone:nil locale:nil];
+
+
 	if ([[connectButton title] isEqualToString:CONNECT_STRING]){ //we are not connected, let's connect
 
 		int port = [portField.stringValue intValue];
@@ -1370,7 +1397,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 								   priority:2];
 			return;
 		}
-		//NSLog(@"connecting");
+
 		[addressField setEnabled:false];
 		[portField setEnabled:false];
 		connectButton.title = DISCONNECT_STRING;
@@ -1387,9 +1414,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		//lagField.stringValue = @"";
 		needFullParamsUpdate = YES;
 		client->connect();
+		[self appendToServerLog:[NSString stringWithFormat:@"%@ >> ## CLIENT CONNECTED ######\n", date]];
 
 	}else{ // let's disconnect
-		//NSLog(@"disconnecting");
+
 		RemoteUIClientCallBackArg arg;
 		arg.action = SERVER_DISCONNECTED;
 		arg.host = [addressField.stringValue UTF8String];
@@ -1412,6 +1440,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		connectButton.state = 0;
 		connectButton.title = CONNECT_STRING;
 		[self layoutWidgetsWithConfig: [self calcLayoutParams]]; //update scrollbar
+		[self appendToServerLog:[NSString stringWithFormat:@"%@ >> ## CLIENT DISCONNECTED ######\n", date]];
 	}
 }
 
