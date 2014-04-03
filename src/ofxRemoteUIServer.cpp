@@ -60,6 +60,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	drawNotifications = true;
 	showValuesOnScreen = false;
 	loadedFromXML = false;
+	clearXmlOnSaving = true;
 	//add random colors to table
 	colorTableIndex = 0;
 	broadcastCount = 0;
@@ -263,7 +264,9 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 	cout << "ofxRemoteUIServer: saving to xml '" << fileName << "'" << endl;
 	ofxXmlSettings s;
 	s.loadFile(fileName);
-	s.clear();
+	if(clearXmlOnSaving){
+		s.clear();
+	}
 	s.addTag(OFXREMOTEUI_XML_TAG);
 	s.pushTag(OFXREMOTEUI_XML_TAG);
 

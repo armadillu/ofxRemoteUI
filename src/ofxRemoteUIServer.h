@@ -165,7 +165,7 @@ public:
 	void setNetworkInterface(string iface);
 	void pushParamsToClient(); //pushes all param values to client, updating its UI
 	void sendLogToClient(char* format, ...);
-
+	void setClearXMLonSave(bool clear){clearXmlOnSaving = clear;}
 
 private:
 
@@ -217,6 +217,7 @@ private:
 	bool			threadedUpdate;
 	bool			showValuesOnScreen; //displays all params on screen
 	bool			updatedThisFrame;
+	bool			clearXmlOnSaving;  //if false, allows you to keep defaults for old params that you are not sharing anymore
 
 #ifdef OF_AVAILABLE
 	ofxRemoteUISimpleNotifications onScreenNotifications;
