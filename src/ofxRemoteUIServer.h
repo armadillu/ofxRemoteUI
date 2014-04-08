@@ -85,6 +85,8 @@
 
 #define OFX_REMOTEUI_SERVER_LOG(format,...)											( ofxRemoteUIServer::instance()->sendLogToClient( format, ##__VA_ARGS__ ) )
 
+#define OFX_REMOTEUI_SERVER_REMOVE_PARAM(paramName)									( ofxRemoteUIServer::instance()->removeParamFromDB(#paramName) )
+
 
 #ifdef OF_AVAILABLE
 /*run the server on a back thread. Useful for apps with very low framerate.
@@ -166,6 +168,10 @@ public:
 	void pushParamsToClient(); //pushes all param values to client, updating its UI
 	void sendLogToClient(char* format, ...);
 	void setClearXMLonSave(bool clear){clearXmlOnSaving = clear;}
+
+	void removeParamFromDB(string paramName);	//useful for params its value is kinda set,
+												//to load from xml and then remove from the list to
+												//avoid crowding it too much
 
 private:
 

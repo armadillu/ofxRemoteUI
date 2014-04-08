@@ -170,6 +170,33 @@ void ofxRemoteUIServer::setNewParamColor(int num){
 	}
 }
 
+
+void ofxRemoteUIServer::removeParamFromDB(string paramName){
+
+	params.erase(params.find(paramName));
+	paramsFromCode.erase(paramsFromCode.find(paramName));
+	paramsFromXML.erase(paramsFromXML.find(paramName));
+
+	//vector<int> positionsToDelete;
+	vector<string> myOrderedKeys;
+	std::map<int, string>::iterator iterator;
+
+	for(iterator = orderedKeys.begin(); iterator != orderedKeys.end(); iterator++) {
+
+		if (iterator->second != paramName){
+			//positionsToDelete.push_back(iterator->first);
+			myOrderedKeys.push_back(iterator->second);
+		}
+	}
+
+	orderedKeys.clear();
+	for(int i = 0; i < myOrderedKeys.size(); i++){
+		orderedKeys[i] = myOrderedKeys[i];
+	}
+
+}
+
+
 void ofxRemoteUIServer::saveParamToXmlSettings(RemoteUIParam t, string key, ofxXmlSettings & s, XmlCounter & c){
 
 	switch (t.type) {
