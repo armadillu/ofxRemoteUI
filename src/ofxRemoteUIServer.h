@@ -29,6 +29,11 @@
 
 //use this macro to share floats, ints, bools
 #define OFX_REMOTEUI_SERVER_SHARE_PARAM(val,...)									( ofxRemoteUIServer::instance()->shareParam( #val, &val, ##__VA_ARGS__ ) )
+
+//WN - with custom name
+#define OFX_REMOTEUI_SERVER_SHARE_PARAM_WCN(pName, val,...)							( ofxRemoteUIServer::instance()->shareParam( pName, &val, ##__VA_ARGS__ ) )
+
+
 //use this macro to share enums + enumList
 #define OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM(val,enumMin,enumMax,menuList,...)		( ofxRemoteUIServer::instance()->shareParam( #val, (int*)&val,enumMin, enumMax,menuList, ##__VA_ARGS__ ) )
 //use this macro to share ofColors

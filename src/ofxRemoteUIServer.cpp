@@ -685,8 +685,8 @@ void ofxRemoteUIServer::draw(int x, int y){
 			RemoteUIParam p = params[key];
 			int chars = key.size();
 			int charw = 9;
-			int stringw = chars*charw;
-			if (chars*charw > valOffset){
+			int stringw = chars * charw;
+			if (stringw > valOffset){
 				key = key.substr(0, (valOffset) / charw );
 			}
 			if (selectedItem != i) ofSetColor(p.r, p.g, p.b);

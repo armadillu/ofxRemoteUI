@@ -53,6 +53,7 @@ vector<string> ofxRemoteUI::getPresetsList(){
 	return presetNames;
 }
 
+
 void ofxRemoteUI::addParamToDB(RemoteUIParam p, string paramName){
 
 	//see if we already had it, if we didnt, set its add order #
@@ -67,6 +68,7 @@ void ofxRemoteUI::addParamToDB(RemoteUIParam p, string paramName){
 		cout << "already have a Param with that name on the DB : " << paramName <<"!!" << endl;
 	}
 }
+
 
 void ofxRemoteUI::clearOscReceiverMsgQueue(){
 	ofxOscMessage tempM;
