@@ -28,16 +28,16 @@
 #define OFX_REMOTEUI_SERVER_SETUP(port, ...)										( ofxRemoteUIServer::instance()->setup(port, ##__VA_ARGS__) )
 
 //use this macro to share floats, ints, bools
-#define OFX_REMOTEUI_SERVER_SHARE_PARAM(val,...)									( ofxRemoteUIServer::instance()->shareParam( #val, &val, ##__VA_ARGS__ ) )
+#define OFX_REMOTEUI_SERVER_SHARE_PARAM(val, ...)									( ofxRemoteUIServer::instance()->shareParam( #val, &val, ##__VA_ARGS__ ) )
 
-//WN - with custom name
-#define OFX_REMOTEUI_SERVER_SHARE_PARAM_WCN(pName, val,...)							( ofxRemoteUIServer::instance()->shareParam( pName, &val, ##__VA_ARGS__ ) )
+//WCN - with custom name
+#define OFX_REMOTEUI_SERVER_SHARE_PARAM_WCN(pName, val, ...)						( ofxRemoteUIServer::instance()->shareParam( pName, &val, ##__VA_ARGS__ ) )
 
 
 //use this macro to share enums + enumList
-#define OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM(val,enumMin,enumMax,menuList,...)		( ofxRemoteUIServer::instance()->shareParam( #val, (int*)&val,enumMin, enumMax,menuList, ##__VA_ARGS__ ) )
+#define OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM(val, enumMin, enumMax, menuList, ...)	( ofxRemoteUIServer::instance()->shareParam( #val, (int*)&val,enumMin, enumMax,menuList, ##__VA_ARGS__ ) )
 //use this macro to share ofColors
-#define OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color,...)							( ofxRemoteUIServer::instance()->shareParam( #color, (unsigned char*)&color.v[0], ##__VA_ARGS__ ) )
+#define OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color, ...)							( ofxRemoteUIServer::instance()->shareParam( #color, (unsigned char*)&color.v[0], ##__VA_ARGS__ ) )
 
 /*set a new group for the upcoming params, this also sets a new color*/
 #define OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP(g)								( ofxRemoteUIServer::instance()->setParamGroup( g ) )
@@ -45,6 +45,9 @@
 /*set a new small 'hue' change for upcoming params, to create alternating rows inside a group*/
 #define OFX_REMOTEUI_SERVER_SET_NEW_COLOR()											( ofxRemoteUIServer::instance()->setNewParamColorVariation() )
 #define OFX_REMOTEUI_SERVER_SET_NEW_TONE()											( ofxRemoteUIServer::instance()->setNewParamColorVariation() )
+
+/*allows you to get a param from anywhere in your code*/
+#define OFX_REMOTEUI_SERVER_GET_PARAM(pname)										( ofxRemoteUIServer::instance()->getParamForName(pname) )
 
 /*setup the server-client callback. This will be called on important events
  and param updates from the UI. Supplied method should look like:
@@ -88,10 +91,13 @@
 /*get a pointer to the server, not usually needed*/
 #define OFX_REMOTEUI_SERVER_GET_INSTANCE()											( ofxRemoteUIServer::instance() )
 
+/*send any text as a log line your remote client*/
 #define OFX_REMOTEUI_SERVER_LOG(format,...)											( ofxRemoteUIServer::instance()->sendLogToClient( format, ##__VA_ARGS__ ) )
 
+/*untested! the idea behind this is to share a param, load for xml, and then unload it so that it
+ doesnt clutter the client UI, but you still get to load from xml.
+ its meant to be a nice way to phase out params which are kind settled down*/
 #define OFX_REMOTEUI_SERVER_REMOVE_PARAM(paramName)									( ofxRemoteUIServer::instance()->removeParamFromDB(#paramName) )
-
 
 #ifdef OF_AVAILABLE
 /*run the server on a back thread. Useful for apps with very low framerate.
