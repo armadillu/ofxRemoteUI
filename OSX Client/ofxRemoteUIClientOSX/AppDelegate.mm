@@ -1421,7 +1421,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		//lagField.stringValue = @"";
 		needFullParamsUpdate = YES;
 		client->connect();
-		[self appendToServerLog:[NSString stringWithFormat:@"%@ >> ## CLIENT CONNECTED ######\n", date]];
+		[self appendToServerLog:[NSString stringWithFormat:@"%@ >> ## CLIENT CONNECTED ###################\n", date]];
 
 	}else{ // let's disconnect
 
@@ -1447,7 +1447,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		connectButton.state = 0;
 		connectButton.title = CONNECT_STRING;
 		[self layoutWidgetsWithConfig: [self calcLayoutParams]]; //update scrollbar
-		[self appendToServerLog:[NSString stringWithFormat:@"%@ >> ## CLIENT DISCONNECTED ######\n", date]];
+		[self appendToServerLog:[NSString stringWithFormat:@"%@ >> ## CLIENT DISCONNECTED ###################\n", date]];
 	}
 }
 

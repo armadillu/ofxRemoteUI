@@ -33,9 +33,9 @@
 //WCN - with custom name
 #define OFX_REMOTEUI_SERVER_SHARE_PARAM_WCN(pName, val, ...)						( ofxRemoteUIServer::instance()->shareParam( pName, &val, ##__VA_ARGS__ ) )
 
-
 //use this macro to share enums + enumList
 #define OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM(val, enumMin, enumMax, menuList, ...)	( ofxRemoteUIServer::instance()->shareParam( #val, (int*)&val,enumMin, enumMax,menuList, ##__VA_ARGS__ ) )
+
 //use this macro to share ofColors
 #define OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color, ...)							( ofxRemoteUIServer::instance()->shareParam( #color, (unsigned char*)&color.v[0], ##__VA_ARGS__ ) )
 
@@ -96,8 +96,9 @@
 
 /*untested! the idea behind this is to share a param, load for xml, and then unload it so that it
  doesnt clutter the client UI, but you still get to load from xml.
- its meant to be a nice way to phase out params which are kind settled down*/
+ its meant to be a nice way to phase out params which are kind settled down and dont need editing*/
 #define OFX_REMOTEUI_SERVER_REMOVE_PARAM(paramName)									( ofxRemoteUIServer::instance()->removeParamFromDB(#paramName) )
+
 
 #ifdef OF_AVAILABLE
 /*run the server on a back thread. Useful for apps with very low framerate.

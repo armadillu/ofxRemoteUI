@@ -21,6 +21,7 @@ public:
 		bool drawOutlines;
 		int numCircles;
 		float circleSize;
+		string unloadTest; 
 
 		ofColor color;
 		MenuItems menu;

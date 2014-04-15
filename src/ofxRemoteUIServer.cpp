@@ -60,7 +60,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	drawNotifications = true;
 	showValuesOnScreen = false;
 	loadedFromXML = false;
-	clearXmlOnSaving = true;
+	clearXmlOnSaving = false;
 	//add random colors to table
 	colorTableIndex = 0;
 	broadcastCount = 0;
@@ -173,27 +173,42 @@ void ofxRemoteUIServer::setNewParamColor(int num){
 
 void ofxRemoteUIServer::removeParamFromDB(string paramName){
 
-	params.erase(params.find(paramName));
-	paramsFromCode.erase(paramsFromCode.find(paramName));
-	paramsFromXML.erase(paramsFromXML.find(paramName));
+	map<string, RemoteUIParam>::iterator it = params.find(paramName);
 
-	//vector<int> positionsToDelete;
-	vector<string> myOrderedKeys;
-	std::map<int, string>::iterator iterator;
+	if (it != params.end()){
 
-	for(iterator = orderedKeys.begin(); iterator != orderedKeys.end(); iterator++) {
+		params.erase(params.find(paramName));
 
-		if (iterator->second != paramName){
-			//positionsToDelete.push_back(iterator->first);
-			myOrderedKeys.push_back(iterator->second);
+		it = paramsFromCode.find(paramName);
+		if (it != paramsFromCode.end()){
+			paramsFromCode.erase(paramsFromCode.find(paramName));
 		}
-	}
 
-	orderedKeys.clear();
-	for(int i = 0; i < myOrderedKeys.size(); i++){
-		orderedKeys[i] = myOrderedKeys[i];
-	}
+		it = paramsFromXML.find(paramName);
+		if (it != paramsFromXML.end()){
+			paramsFromXML.erase(paramsFromXML.find(paramName));
+		}
 
+
+		//re-create orderedKeys
+		vector<string> myOrderedKeys;
+		std::map<int, string>::iterator iterator;
+
+		for(iterator = orderedKeys.begin(); iterator != orderedKeys.end(); iterator++) {
+
+			if (iterator->second != paramName){
+				//positionsToDelete.push_back(iterator->first);
+				myOrderedKeys.push_back(iterator->second);
+			}
+		}
+
+		orderedKeys.clear();
+		for(int i = 0; i < myOrderedKeys.size(); i++){
+			orderedKeys[i] = myOrderedKeys[i];
+		}
+	}else{
+		cout << "ofxRemoteUIServer::removeParamFromDB >> trying to delete an unexistant param (" << paramName << ")" << endl;
+	}
 }
 
 
@@ -202,48 +217,46 @@ void ofxRemoteUIServer::saveParamToXmlSettings(RemoteUIParam t, string key, ofxX
 	switch (t.type) {
 		case REMOTEUI_PARAM_FLOAT:
 			if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.floatValAddr <<") to XML" << endl;
-			s.setValue("REMOTEUI_PARAM_FLOAT", (double)*t.floatValAddr, c.numFloats);
-			s.setAttribute("REMOTEUI_PARAM_FLOAT", "paramName", key, c.numFloats);
+			s.setValue(OFXREMOTEUI_FLOAT_PARAM_XML_TAG, (double)*t.floatValAddr, c.numFloats);
+			s.setAttribute(OFXREMOTEUI_FLOAT_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, key, c.numFloats);
 			c.numFloats++;
 			break;
 		case REMOTEUI_PARAM_INT:
 			if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.intValAddr <<") to XML" << endl;
-			s.setValue("REMOTEUI_PARAM_INT", (int)*t.intValAddr, c.numInts);
-			s.setAttribute("REMOTEUI_PARAM_INT", "paramName", key, c.numInts);
+			s.setValue(OFXREMOTEUI_INT_PARAM_XML_TAG, (int)*t.intValAddr, c.numInts);
+			s.setAttribute(OFXREMOTEUI_INT_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, key, c.numInts);
 			c.numInts++;
 			break;
 		case REMOTEUI_PARAM_COLOR:
-			s.addTag("REMOTEUI_PARAM_COLOR");
-			s.setAttribute("REMOTEUI_PARAM_COLOR", "paramName", key, c.numColors);
-			s.pushTag("REMOTEUI_PARAM_COLOR", c.numColors);
 			if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" << (int)*t.redValAddr << " " << (int)*(t.redValAddr+1) << " " << (int)*(t.redValAddr+2) << " " << (int)*(t.redValAddr+3) << ") to XML" << endl;
-			s.setValue("R", (int)*t.redValAddr);
-			s.setValue("G", (int)*(t.redValAddr+1));
-			s.setValue("B", (int)*(t.redValAddr+2));
-			s.setValue("A", (int)*(t.redValAddr+3));
-			s.popTag();
+			s.setValue(string(OFXREMOTEUI_COLOR_PARAM_XML_TAG) + ":R", (int)*t.redValAddr, c.numColors);
+			s.setValue(string(OFXREMOTEUI_COLOR_PARAM_XML_TAG) + ":G", (int)*(t.redValAddr+1), c.numColors);
+			s.setValue(string(OFXREMOTEUI_COLOR_PARAM_XML_TAG) + ":B", (int)*(t.redValAddr+2), c.numColors);
+			s.setValue(string(OFXREMOTEUI_COLOR_PARAM_XML_TAG) + ":A", (int)*(t.redValAddr+3), c.numColors);
+			s.setAttribute(OFXREMOTEUI_COLOR_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, key, c.numColors);
 			c.numColors++;
 			break;
 		case REMOTEUI_PARAM_ENUM:
 			if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.intValAddr <<") to XML" << endl;
-			s.setValue("REMOTEUI_PARAM_ENUM", (int)*t.intValAddr, c.numEnums);
-			s.setAttribute("REMOTEUI_PARAM_ENUM", "paramName", key, c.numEnums);
+			s.setValue(OFXREMOTEUI_ENUM_PARAM_XML_TAG, (int)*t.intValAddr, c.numEnums);
+			s.setAttribute(OFXREMOTEUI_ENUM_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, key, c.numEnums);
 			c.numEnums++;
 			break;
 		case REMOTEUI_PARAM_BOOL:
 			if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.boolValAddr <<") to XML" << endl;
-			s.setValue("REMOTEUI_PARAM_BOOL", (bool)*t.boolValAddr, c.numBools);
-			s.setAttribute("REMOTEUI_PARAM_BOOL", "paramName", key, c.numBools);
+			s.setValue(OFXREMOTEUI_BOOL_PARAM_XML_TAG, (bool)*t.boolValAddr, c.numBools);
+			s.setAttribute(OFXREMOTEUI_BOOL_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, key, c.numBools);
 			c.numBools++;
 			break;
 		case REMOTEUI_PARAM_STRING:
 			if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.stringValAddr <<") to XML" << endl;
-			s.setValue("REMOTEUI_PARAM_STRING", (string)*t.stringValAddr, c.numStrings);
-			s.setAttribute("REMOTEUI_PARAM_STRING", "paramName", key, c.numStrings);
+			s.setValue(OFXREMOTEUI_STRING_PARAM_XML_TAG, (string)*t.stringValAddr, c.numStrings);
+			s.setAttribute(OFXREMOTEUI_STRING_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, key, c.numStrings);
 			c.numStrings++;
 			break;
 
 		case REMOTEUI_PARAM_SPACER:
+			if(verbose_) cout << "ofxRemoteUIServer skipping save of spacer '" << key << "' to XML" << endl;
 			break;
 
 		default:
@@ -294,19 +307,22 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 	if(clearXmlOnSaving){
 		s.clear();
 	}
-	s.addTag(OFXREMOTEUI_XML_TAG);
+	if (s.getNumTags(OFXREMOTEUI_XML_TAG) == 0){
+		s.addTag(OFXREMOTEUI_XML_TAG);
+	}
+
 	s.pushTag(OFXREMOTEUI_XML_TAG);
 
 	XmlCounter counters;
-
 	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		string key = (*ii).first;
 		RemoteUIParam t = params[key];
 		saveParamToXmlSettings(t, key, s, counters);
 	}
 
+	s.popTag(); //pop OFXREMOTEUI_XML_TAG
+
 	if(!portIsSet){
-		s.popTag();
 		s.setValue(OFXREMOTEUI_XML_PORT, port, 0);
 	}
 	s.saveFile(fileName);
@@ -323,10 +339,10 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 		if( s.getNumTags(OFXREMOTEUI_XML_TAG) > 0 ){
 			s.pushTag(OFXREMOTEUI_XML_TAG, 0);
 
-			int numFloats = s.getNumTags("REMOTEUI_PARAM_FLOAT");
+			int numFloats = s.getNumTags(OFXREMOTEUI_FLOAT_PARAM_XML_TAG);
 			for (int i=0; i< numFloats; i++){
-				string paramName = s.getAttribute("REMOTEUI_PARAM_FLOAT", "paramName", "", i);
-				float val = s.getValue("REMOTEUI_PARAM_FLOAT", 0.0, i);
+				string paramName = s.getAttribute(OFXREMOTEUI_FLOAT_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, OFXREMOTEUI_UNKNOWN_PARAM_NAME_XML_KEY, i);
+				float val = s.getValue(OFXREMOTEUI_FLOAT_PARAM_XML_TAG, 0.0, i);
 				map<string,RemoteUIParam>::iterator it = params.find(paramName);
 				if ( it != params.end() ){	// found!
 					loadedParams.push_back(paramName);
@@ -339,13 +355,15 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 					}else{
 						cout << "ofxRemoteUIServer ERROR at loading FLOAT (" << paramName << ")" << endl;
 					}
+				}else{
+					cout << "ofxRemoteUIServer: float param '" <<paramName << "' defined in xml not found in DB!" << endl;
 				}
 			}
 
-			int numInts = s.getNumTags("REMOTEUI_PARAM_INT");
+			int numInts = s.getNumTags(OFXREMOTEUI_INT_PARAM_XML_TAG);
 			for (int i=0; i< numInts; i++){
-				string paramName = s.getAttribute("REMOTEUI_PARAM_INT", "paramName", "", i);
-				float val = s.getValue("REMOTEUI_PARAM_INT", 0, i);
+				string paramName = s.getAttribute(OFXREMOTEUI_INT_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, OFXREMOTEUI_UNKNOWN_PARAM_NAME_XML_KEY, i);
+				float val = s.getValue(OFXREMOTEUI_INT_PARAM_XML_TAG, 0, i);
 				map<string,RemoteUIParam>::iterator it = params.find(paramName);
 				if ( it != params.end() ){	// found!
 					loadedParams.push_back(paramName);
@@ -358,13 +376,15 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 					}else{
 						cout << "ofxRemoteUIServer ERROR at loading INT (" << paramName << ")" << endl;
 					}
+				}else{
+					cout << "ofxRemoteUIServer: int param '" <<paramName << "' defined in xml not found in DB!" << endl;
 				}
 			}
 
-			int numColors = s.getNumTags("REMOTEUI_PARAM_COLOR");
+			int numColors = s.getNumTags(OFXREMOTEUI_COLOR_PARAM_XML_TAG);
 			for (int i=0; i< numColors; i++){
-				string paramName = s.getAttribute("REMOTEUI_PARAM_COLOR", "paramName", "", i);
-				s.pushTag("REMOTEUI_PARAM_COLOR", i);
+				string paramName = s.getAttribute(OFXREMOTEUI_COLOR_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, "OFXREMOTEUI_UNKNOWN_PARAM_NAME_XML_KEY", i);
+				s.pushTag(OFXREMOTEUI_COLOR_PARAM_XML_TAG, i);
 				int r = s.getValue("R", 0);
 				int g = s.getValue("G", 0);
 				int b = s.getValue("B", 0);
@@ -386,14 +406,16 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 					}else{
 						cout << "ofxRemoteUIServer ERROR at loading COLOR (" << paramName << ")" << endl;
 					}
+				}else{
+					cout << "ofxRemoteUIServer: color param '" <<paramName << "' defined in xml not found in DB!" << endl;
 				}
 				s.popTag();
 			}
 
-			int numEnums = s.getNumTags("REMOTEUI_PARAM_ENUM");
+			int numEnums = s.getNumTags(OFXREMOTEUI_ENUM_PARAM_XML_TAG);
 			for (int i=0; i< numEnums; i++){
-				string paramName = s.getAttribute("REMOTEUI_PARAM_ENUM", "paramName", "", i);
-				float val = s.getValue("REMOTEUI_PARAM_ENUM", 0, i);
+				string paramName = s.getAttribute(OFXREMOTEUI_ENUM_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, OFXREMOTEUI_UNKNOWN_PARAM_NAME_XML_KEY, i);
+				float val = s.getValue(OFXREMOTEUI_ENUM_PARAM_XML_TAG, 0, i);
 				map<string,RemoteUIParam>::iterator it = params.find(paramName);
 				if ( it != params.end() ){	// found!
 					loadedParams.push_back(paramName);
@@ -406,14 +428,16 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 					}else{
 						cout << "ofxRemoteUIServer ERROR at loading ENUM (" << paramName << ")" << endl;
 					}
+				}else{
+					cout << "ofxRemoteUIServer: enum param '" << paramName << "' defined in xml not found in DB!" << endl;
 				}
 			}
 
 
-			int numBools = s.getNumTags("REMOTEUI_PARAM_BOOL");
+			int numBools = s.getNumTags(OFXREMOTEUI_BOOL_PARAM_XML_TAG);
 			for (int i=0; i< numBools; i++){
-				string paramName = s.getAttribute("REMOTEUI_PARAM_BOOL", "paramName", "", i);
-				float val = s.getValue("REMOTEUI_PARAM_BOOL", false, i);
+				string paramName = s.getAttribute(OFXREMOTEUI_BOOL_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, OFXREMOTEUI_UNKNOWN_PARAM_NAME_XML_KEY, i);
+				float val = s.getValue(OFXREMOTEUI_BOOL_PARAM_XML_TAG, false, i);
 
 				map<string,RemoteUIParam>::iterator it = params.find(paramName);
 				if ( it != params.end() ){	// found!
@@ -426,13 +450,15 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 					}else{
 						cout << "ofxRemoteUIServer ERROR at loading BOOL (" << paramName << ")" << endl;
 					}
+				}else{
+					cout << "ofxRemoteUIServer: bool param '" << paramName << "' defined in xml not found in DB!" << endl;
 				}
 			}
 
-			int numStrings = s.getNumTags("REMOTEUI_PARAM_STRING");
+			int numStrings = s.getNumTags(OFXREMOTEUI_STRING_PARAM_XML_TAG);
 			for (int i=0; i< numStrings; i++){
-				string paramName = s.getAttribute("REMOTEUI_PARAM_STRING", "paramName", "", i);
-				string val = s.getValue("REMOTEUI_PARAM_STRING", "", i);
+				string paramName = s.getAttribute(OFXREMOTEUI_STRING_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, OFXREMOTEUI_UNKNOWN_PARAM_NAME_XML_KEY, i);
+				string val = s.getValue(OFXREMOTEUI_STRING_PARAM_XML_TAG, "", i);
 
 				map<string,RemoteUIParam>::iterator it = params.find(paramName);
 				if ( it != params.end() ){	// found!
@@ -444,6 +470,8 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 						if(verbose_) cout << "ofxRemoteUIServer loading a STRING '" << paramName <<"' (" << (string) *params[paramName].stringValAddr << ") from XML" << endl;
 					}
 					else cout << "ofxRemoteUIServer ERROR at loading STRING (" << paramName << ")" << endl;
+				}else{
+					cout << "ofxRemoteUIServer: string param '" << paramName << "' defined in xml not found in DB!" << endl;
 				}
 			}
 		}

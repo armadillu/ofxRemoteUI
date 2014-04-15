@@ -1,7 +1,7 @@
 #include "testApp.h"
 
 
-//--------------------------------------------------------------
+
 void testApp::setup(){
 
 	ofBackground(22);
@@ -16,6 +16,7 @@ void testApp::setup(){
 	x = y = 66;
 	numCircles = 30;
 	menu = MENU_OPTION_1;
+	unloadTest = "inited from source";
 
 	// START THE SERVER ///////////////////////////////////////////
 	OFX_REMOTEUI_SERVER_SETUP(); 	//specify a port if you want a specific one
@@ -23,7 +24,7 @@ void testApp::setup(){
 									//the first time you launch it, and will use it forever
 
 	// SETUP A CALLBACK ///////////////////////////////////////////
-	OFX_REMOTEUI_SERVER_SET_CALLBACK(testApp::serverCallback); // (optional!)
+	OFX_REMOTEUI_SERVER_SET_CALLBACK(testApp::serverCallback); // (optional!) get notified when things happen in the client
 
 	// SET PARAM GROUPS / COLORS //////////////////////////////////
 	OFX_REMOTEUI_SERVER_SET_NEW_COLOR(); // set a bg color for all the upcoming params (optional)
@@ -48,28 +49,44 @@ void testApp::setup(){
 
 	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP("OTHER"); //make a new group
 
-	// SHARE AN STRING PARAM //////////////////////////////////////
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentSentence, ofColor(0,0,255,64));	// you can also set a color on a per-param basis
+	// SHARE A STRING PARAM ////////////////////////////////
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentSentence, ofColor(255,0,0,64));	// you can also set a color on a per-param basis
 
 	// SHARE A FLOAT //////////////////////////////////////
 	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentMouseX, 0, ofGetWidth());
 
-	// SHARE AN ENUM PARAM //////////////////////////////////////
+	// SHARE AN ENUM PARAM ////////////////////////////////
 	vector<string> menuItems;
 	menuItems.push_back("MENU_OPTION_0");menuItems.push_back("MENU_OPTION_1");
 	menuItems.push_back("MENU_OPTION_2"); menuItems.push_back("MENU_OPTION_3");
 	OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM(menu, MENU_OPTION_0, MENU_OPTION_3, menuItems);
 
-	// SHARE A COLOR PARAM //////////////////////////////////////
+	// SHARE A COLOR PARAM ////////////////////////////////
 	OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color);
 
+	// SHARE A string PARAM to unload it later;
+	//this is useful in cases where a variable used to be shared,
+	//but its value is now on the xml and you still want it loaded
+	//but you dont want it to show on the client interface
+	//to do so, you first share the param, then load from XML, then remove the param
+	OFX_REMOTEUI_SERVER_SHARE_PARAM(unloadTest);
 
 	OFX_REMOTEUI_SERVER_LOAD_FROM_XML();	//load values from XML, if you want to do so
 											//this will result on the UI showing the params
-											//as they were when last saved (on quit in this case)
+											//as they were when last saved (saved on app quit by default)
+
+	//this efectively removes all remoteUI references to this param
+	//but bc it's been loaded from xml in the previous step before,
+	//the end result is that you get to load its value from XML
+	//but it doesnt show in the client.
+	//This is meant to be a way to reduce clutter in the client,
+	//allowing you to phase out params that have settled down and dont
+	//need further editing, but still allowing you to load its value from the xml.
+	OFX_REMOTEUI_SERVER_REMOVE_PARAM(unloadTest);
+	cout << "unloadTest: '" << unloadTest << "'" << endl;
 
 
-	//OFX_REMOTEUI_SERVER_START_THREADED();   //if you want all the communication to happen on a different
+	//OFX_REMOTEUI_SERVER_START_THREADED(); //if you want all the osc communication to happen on a different
 											//thread, call this. This has implications though.
 											//your params can be changed at anytime by the client,
 											//potentially leading to problems. String params are
@@ -78,7 +95,7 @@ void testApp::setup(){
 
 }
 
-//--------------------------------------------------------------
+
 void testApp::update(){
 
 	float dt = 0.016666;
@@ -87,7 +104,7 @@ void testApp::update(){
 }
 
 
-//--------------------------------------------------------------
+
 void testApp::draw(){
 
 	if (drawOutlines == 1) ofNoFill();
@@ -121,6 +138,16 @@ void testApp::draw(){
 								);
 }
 
+
+void testApp::keyPressed( int key ){
+	//force an update in the client side (same as pressing sync button on osx client)
+	OFX_REMOTEUI_SERVER_PUSH_TO_CLIENT();
+
+	//and also send a text log line to the client
+	OFX_REMOTEUI_SERVER_LOG("key pressed at %f", ofGetElapsedTimef());
+}
+
+
 //define a callback method to get notifications of client actions
 void testApp::serverCallback(RemoteUIServerCallBackArg arg){
 
@@ -140,8 +167,3 @@ void testApp::serverCallback(RemoteUIServerCallBackArg arg){
 	}
 }
 
-void testApp::keyPressed( int key ){
-	//force an update in the client side (same as pressing sync button on osx client)
-	OFX_REMOTEUI_SERVER_PUSH_TO_CLIENT();
-	OFX_REMOTEUI_SERVER_LOG("key pressed at %f", ofGetElapsedTimef());
-}

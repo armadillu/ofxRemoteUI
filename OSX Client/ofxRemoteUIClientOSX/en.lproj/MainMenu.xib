@@ -727,7 +727,7 @@
 							<array class="NSMutableArray" key="NSMenuItems">
 								<object class="NSMenuItem" id="728868173">
 									<reference key="NSMenu" ref="662185258"/>
-									<string key="NSTitle">this will list param groups</string>
+									<string key="NSTitle">this will list param groups and provide auto shorcuts</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="465035805"/>
@@ -814,7 +814,7 @@
 								</object>
 								<object class="NSMenuItem" id="960490542">
 									<reference key="NSMenu" ref="1013760949"/>
-									<string key="NSTitle">ofxRemoteUI</string>
+									<string key="NSTitle">Main Window</string>
 									<string key="NSKeyEquiv">m</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -823,7 +823,7 @@
 								</object>
 								<object class="NSMenuItem" id="278663174">
 									<reference key="NSMenu" ref="1013760949"/>
-									<string key="NSTitle">Log View</string>
+									<string key="NSTitle">Actions Log View</string>
 									<string key="NSKeyEquiv">l</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -1801,7 +1801,7 @@
 												<int key="NSTCFlags">1</int>
 											</object>
 											<object class="NSTextViewSharedData" key="NSSharedData">
-												<int key="NSFlags">10497</int>
+												<int key="NSFlags">67119361</int>
 												<int key="NSTextCheckingTypes">0</int>
 												<nil key="NSMarkedAttributes"/>
 												<reference key="NSBackgroundColor" ref="631047369"/>
@@ -1847,7 +1847,7 @@
 									<reference key="NSDocView" ref="459942669"/>
 									<reference key="NSBGColor" ref="631047369"/>
 									<object class="NSCursor" key="NSCursor" id="310972196">
-										<string key="NSHotSpot">{5, 5}</string>
+										<string key="NSHotSpot">{1, -1}</string>
 										<int key="NSCursorType">0</int>
 									</object>
 									<int key="NScvFlags">4</int>
@@ -2647,7 +2647,7 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 												<int key="NSTCFlags">1</int>
 											</object>
 											<object class="NSTextViewSharedData" key="NSSharedData">
-												<int key="NSFlags">10497</int>
+												<int key="NSFlags">67119361</int>
 												<int key="NSTextCheckingTypes">0</int>
 												<nil key="NSMarkedAttributes"/>
 												<reference key="NSBackgroundColor" ref="631047369"/>
@@ -5848,24 +5848,6 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">./Classes/MyScrollView.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSTextView</string>
-					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">toggleQuickLookPreviewPanel:</string>
-						<string key="NS.object.0">id</string>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<string key="NS.key.0">toggleQuickLookPreviewPanel:</string>
-						<object class="IBActionInfo" key="NS.object.0">
-							<string key="name">toggleQuickLookPreviewPanel:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/NSTextView.h</string>
 					</object>
 				</object>
 			</array>
