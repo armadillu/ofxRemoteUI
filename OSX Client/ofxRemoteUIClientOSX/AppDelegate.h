@@ -110,7 +110,10 @@ void clientCallback(RemoteUIClientCallBackArg a);
 	IBOutlet NSTableView			*midiBindingsTable;
 
 	RowHeightSize					rowHeight;
+	int								weJustDisconnected;
+
 }
+
 
 -(ofxRemoteUIClient *)getClient;
 

@@ -12,8 +12,6 @@
 #import "Joystick.h"
 #import "JoystickManager.h"
 
-int weJustDisconnected = 0;
-
 
 //ofxRemoteUIClient callback entry point
 #pragma mark - CALLBACKS
@@ -647,6 +645,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 - (void)applicationDidFinishLaunching:(NSNotification *)note {
 
+	weJustDisconnected = 0;
 	rowHeight = LARGE_34;
 	launched = FALSE;
 	connecting = FALSE;
@@ -1577,7 +1576,6 @@ void clientCallback(RemoteUIClientCallBackArg a){
 bool resizeWindowUpDown = false; //if you keep changing paramUI size, with this we keep track if win should grow or shrink, so that it alternates
 
 -(void)recalcWindowSize{
-
 	[window setResizeIncrements:NSMakeSize(1, 1)];
 	float listH = [window frame].size.height - MAIN_WINDOW_NON_LIST_H;
 	float newWinH = MAIN_WINDOW_NON_LIST_H + listH + (resizeWindowUpDown ?  ROW_HEIGHT - fmodf(listH, ROW_HEIGHT) : -fmodf(listH, ROW_HEIGHT)) ;
