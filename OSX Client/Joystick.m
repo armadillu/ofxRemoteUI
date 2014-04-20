@@ -136,7 +136,6 @@
     
     if (elementType != kIOHIDElementTypeInput_Axis && elementType != kIOHIDElementTypeInput_Misc) {
         
-        
         for (i=0; i<delegates.count; ++i) {
             id <JoystickNotificationDelegate> delegate = [delegates objectAtIndex:i];
 			[delegate joystickButton: [self getElementIndex:theElement] state:(BOOL)(value==1) onJoystick:self];

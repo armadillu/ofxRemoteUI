@@ -341,14 +341,14 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[externalDevices parseMidiBindingsFromFile:[NSURL fileURLWithPath:[DEFAULT_BINDINGS_FOLDER stringByAppendingString:DEFAULT_BINDINGS_FILE]]];//load last used midi bindings
 
 	[self loadPrefs];
-
 	[self recalcWindowSize];
+
 	[window setAllowsToolTipsWhenApplicationIsInactive:YES];
-	[[NSUserDefaults standardUserDefaults] setObject: [NSNumber numberWithInt: 1]
-											  forKey: @"NSInitialToolTipDelay"];
+
 
 	[externalDevices initWithWidgets:&widgets andClient:client];
 	launched = TRUE;
+
 	NSLog(@"Launched ofxRemoteUI version %@", GIT_COMMIT_NUMBER);
 }
 
@@ -519,8 +519,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	}
 
 	if(didTweak){
-
-		howManyPerCol = numParams / (float)numUsedColumns;
+		howManyPerCol = ceil(numParams / (float)numUsedColumns);
 		//NSLog(@" -- TWEAK -- numUsedColumns: %d", numUsedColumns);
 		//NSLog(@" -- TWEAK -- howManyPerCol: %d", howManyPerCol);
 	}
@@ -539,6 +538,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 			h = 0;
 		}
 	}
+
 	if (maxPerCol == 0){
 		maxPerCol = (scrollH / ROW_HEIGHT);
 	}
@@ -593,6 +593,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	}
 	return v;
 }
+
 
 -(void)layoutWidgetsWithConfig:(LayoutConfig) p{
 
@@ -936,7 +937,6 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 
 -(IBAction)pressedConnect:(id)sender{
-	//NSLog(@"pressedConnect");
 	[self connect];
 }
 
@@ -954,7 +954,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 }
 
 -(void) connect{
-	//NSLog(@"connect!");
+
 	NSUserDefaults * df = [NSUserDefaults standardUserDefaults];
 	[df setObject: addressField.stringValue forKey:@"lastAddress"];
 	[df setObject: portField.stringValue forKey:@"lastPort"];
@@ -988,7 +988,6 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		[self performSelector:@selector(pressedSync:) withObject:nil afterDelay:REFRESH_RATE];
 		[progress startAnimation:self];
 		connecting = TRUE;
-		//lagField.stringValue = @"";
 		needFullParamsUpdate = YES;
 		client->connect();
 		[logs appendToServerLog:[NSString stringWithFormat:@"%@ >> ## CLIENT CONNECTED ###################\n", date]];
@@ -1010,10 +1009,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 			[statusImage setImage:[NSImage imageNamed:@"offline"]];
 		[progress stopAnimation:self];
 		connecting = FALSE;
-		//lagField.stringValue = @"";
 		[self cleanUpGUIParams];
 		client->disconnect();
-		//client->update(REFRESH_RATE);
 		connectButton.state = 0;
 		connectButton.title = CONNECT_STRING;
 		[self layoutWidgetsWithConfig: [self calcLayoutParams]]; //update scrollbar
@@ -1068,6 +1065,12 @@ void clientCallback(RemoteUIClientCallBackArg a){
 -(void)loadPrefs{
 
 	NSUserDefaults * d = [NSUserDefaults standardUserDefaults];
+
+	//set some defaults of ours
+	[[NSUserDefaults standardUserDefaults] setObject: [NSNumber numberWithInt: 1]
+											  forKey: @"NSInitialToolTipDelay"];
+	[[NSUserDefaults standardUserDefaults] setObject: [NSNumber numberWithBool:NO]
+											  forKey: @"ApplePersistenceIgnoreState"];
 
 	if([d objectForKey: @"ApplePersistenceIgnoreState"] == nil)
 		[d setBool: YES forKey:@"ApplePersistenceIgnoreState"];
