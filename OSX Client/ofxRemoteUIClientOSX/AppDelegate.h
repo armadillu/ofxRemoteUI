@@ -14,7 +14,8 @@
 #import "GitCommitNumber.h"
 #import <Growl/Growl.h>
 #import <VVMIDI/VVMIDI.h>
-#import "JoystickNotificationDelegate.h"
+#import "ExternalDevices.h"
+#import "LogWindows.h"
 
 #define REFRESH_RATE			1.0f/15.0f
 #define STATUS_REFRESH_RATE		0.333f
@@ -43,7 +44,7 @@ struct LayoutConfig{
 //declare callback method 
 void clientCallback(RemoteUIClientCallBackArg a);
 
-@interface AppDelegate : NSObject <NSApplicationDelegate, VVMIDIDelegateProtocol, JoystickNotificationDelegate>{
+@interface AppDelegate : NSObject <NSApplicationDelegate>{
 
 @public
 
@@ -68,12 +69,12 @@ void clientCallback(RemoteUIClientCallBackArg a);
 	IBOutlet NSColorWell *			colorWell;
 	IBOutlet NSButton *				alwaysOnTopCheckbox;
 	IBOutlet NSButton *				showNotificationsCheckbox;
-	IBOutlet NSButton *				externalButtonsBehaveAsToggleCheckbox;
 	IBOutlet NSButton *				autoConnectCheckbox;
 	IBOutlet NSPopUpButton *		rowHeightMenu;
 
-	IBOutlet NSTextView *			logView;
-	IBOutlet NSTextView *			serverLogView;
+
+	IBOutlet ExternalDevices*		externalDevices;
+	IBOutlet LogWindows*			logs;
 
 	bool							updateContinuosly;
 
@@ -95,19 +96,12 @@ void clientCallback(RemoteUIClientCallBackArg a);
 	BOOL							launched;
 	BOOL							alwaysOnTop;
 	BOOL							showNotifications;
-	BOOL							externalButtonsBehaveAsToggle;	//if true, one press on midi or joystick toggles a bool;
 																	//otherwise, it is true for as long as its pressed
 	BOOL							autoConnectToggle;
 
 	bool							needFullParamsUpdate;
 
 	bool							connecting;
-
-	//MIDI
-	VVMIDIManager					*midiManager;
-	ParamUI							*upcomingMidiParam;
-	map<string, string>				bindingsMap; //table of bindings for midi and joystick
-	IBOutlet NSTableView			*midiBindingsTable;
 
 	RowHeightSize					rowHeight;
 	int								weJustDisconnected;
@@ -136,11 +130,6 @@ void clientCallback(RemoteUIClientCallBackArg a);
 
 -(IBAction)userPressedSave:(id)sender;
 
--(IBAction)saveMidiBindings:(id)who;
--(IBAction)loadMidiBindings:(id)who;
--(IBAction)clearMidiBindings:(id)sender;
--(IBAction)deleteSelectedMidiBinding:(id)sender;
-
 -(IBAction)userWantsRestoreXML:(id)sender;
 -(IBAction)userWantsRestoreDefaults:(id)sender;
 
@@ -148,16 +137,12 @@ void clientCallback(RemoteUIClientCallBackArg a);
 -(IBAction)copySpecial:(id)sender;
 -(IBAction)applyPrefs:(id)sender;
 
-
--(void)log:(RemoteUIClientCallBackArg) arg;
--(IBAction)clearLog:(id)sender;
--(IBAction)clearServerLog:(id)sender;
--(void)appendToServerLog:(NSString*)line ;
--(void)appendToLog:(NSString*) line;
 -(void)updateNeighbors;
 -(void)recalcWindowSize;
 
 -(void)saveMidiBindingsToFile:(NSURL*)path;
+
+-(LogWindows*)getLogWindows;
 
 -(void)connect;
 -(void)autoConnectToNeighbor:(string) host port:(int)p;
@@ -182,22 +167,11 @@ void clientCallback(RemoteUIClientCallBackArg a);
 -(vector<string>)getAllGroupsInParams;
 -(map<string, ParamUI*>)getAllGroupSpacerParams;
 
-//midi
--(void)userClickedOnParamForMidiBinding:(ParamUI*)param;
-
-//midi delegate
-- (void) setupChanged;
-- (void) receivedMIDI:(NSArray *)a fromNode:(VVMIDINode *)n;
-
-//joystick delegates
-- (void)joystickAdded:(Joystick *)joystick ;
-- (void)joystickAxisChanged:(Joystick *)joystick atAxisIndex:(int)axis;
-- (void)joystickButton:(int)buttonIndex state:(BOOL)pressed onJoystick:(Joystick*)joystick;
-
 
 //growl
 -(void)showNotificationWithTitle:(NSString*)title description:(NSString*)desc ID:(NSString*)key priority:(int)p;
 
 //alert
 -(NSString *)showAlertWithInput: (NSString *)prompt defaultValue: (NSString *)defaultValue ;
+
 @end

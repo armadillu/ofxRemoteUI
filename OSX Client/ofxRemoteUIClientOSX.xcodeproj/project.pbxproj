@@ -66,6 +66,8 @@
 		BBC385881797385C007E2DD1 /* Growl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBC38583179736CB007E2DD1 /* Growl.framework */; };
 		BBD3270F173BFFF200D59359 /* ofxRemoteUIClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */; };
 		BBD475FD18B1C0970095F324 /* View34.xib in Resources */ = {isa = PBXBuildFile; fileRef = BBD475FB18B1C0970095F324 /* View34.xib */; };
+		BBD9D914190336ED00C553D7 /* ExternalDevices.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBD9D913190336ED00C553D7 /* ExternalDevices.mm */; };
+		BBD9D91719036BD700C553D7 /* LogWindows.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBD9D91619036BD700C553D7 /* LogWindows.mm */; };
 		BBDCBDE416A0512300F1C5EC /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = BBDCBDDE16A0512300F1C5EC /* Credits.rtf */; };
 		BBDCBDE516A0512300F1C5EC /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = BBDCBDE016A0512300F1C5EC /* InfoPlist.strings */; };
 		BBDCBDE616A0512300F1C5EC /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = BBDCBDE216A0512300F1C5EC /* MainMenu.xib */; };
@@ -185,6 +187,10 @@
 		BBC38583179736CB007E2DD1 /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Growl.framework; sourceTree = "<group>"; };
 		BBC385851797377C007E2DD1 /* Growl Registration Ticket.growlRegDict */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "Growl Registration Ticket.growlRegDict"; sourceTree = SOURCE_ROOT; };
 		BBD475FC18B1C0970095F324 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = View34.xib; sourceTree = "<group>"; };
+		BBD9D912190336ED00C553D7 /* ExternalDevices.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExternalDevices.h; sourceTree = "<group>"; };
+		BBD9D913190336ED00C553D7 /* ExternalDevices.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ExternalDevices.mm; sourceTree = "<group>"; };
+		BBD9D91519036BD700C553D7 /* LogWindows.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogWindows.h; sourceTree = "<group>"; };
+		BBD9D91619036BD700C553D7 /* LogWindows.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = LogWindows.mm; sourceTree = "<group>"; };
 		BBDCBDDF16A0512300F1C5EC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = Credits.rtf; sourceTree = "<group>"; };
 		BBDCBDE116A0512300F1C5EC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = InfoPlist.strings; sourceTree = "<group>"; };
 		BBDCBDE316A0512300F1C5EC /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = MainMenu.xib; sourceTree = "<group>"; };
@@ -321,7 +327,7 @@
 		BB4E4413169F291B00A94935 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				BB37FC96185E0FC0008DA8DD /* joystick */,
+				BBD9D9111903369500C553D7 /* ExternalDevices */,
 				BBDCBDED16A0513D00F1C5EC /* main.m */,
 				BBDCBDE716A0513D00F1C5EC /* AppDelegate.h */,
 				BBDCBDE816A0513D00F1C5EC /* AppDelegate.mm */,
@@ -331,6 +337,8 @@
 				BB94E5AD17468EAE00A7A3CC /* ColorView.m */,
 				BB6CC35B174698DE0043F523 /* MyScrollView.h */,
 				BB6CC35C174698DE0043F523 /* MyScrollView.m */,
+				BBD9D91519036BD700C553D7 /* LogWindows.h */,
+				BBD9D91619036BD700C553D7 /* LogWindows.mm */,
 				BB8776ED17C9A39100CC74B8 /* ColoredWindow */,
 			);
 			name = src;
@@ -492,6 +500,16 @@
 			name = ColoredWindow;
 			sourceTree = "<group>";
 		};
+		BBD9D9111903369500C553D7 /* ExternalDevices */ = {
+			isa = PBXGroup;
+			children = (
+				BBD9D912190336ED00C553D7 /* ExternalDevices.h */,
+				BBD9D913190336ED00C553D7 /* ExternalDevices.mm */,
+				BB37FC96185E0FC0008DA8DD /* joystick */,
+			);
+			name = ExternalDevices;
+			sourceTree = "<group>";
+		};
 		BBDCBDDD16A0512300F1C5EC /* en.lproj */ = {
 			isa = PBXGroup;
 			children = (
@@ -624,6 +642,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBD9D914190336ED00C553D7 /* ExternalDevices.mm in Sources */,
 				BBDCBDF716A051B000F1C5EC /* ofxRemoteUI.cpp in Sources */,
 				BBDCBDF816A0523200F1C5EC /* AppDelegate.mm in Sources */,
 				BBD3270F173BFFF200D59359 /* ofxRemoteUIClient.cpp in Sources */,
@@ -643,6 +662,7 @@
 				BB5CC614177E49D500B595F8 /* OscTypes.cpp in Sources */,
 				BB5CC616177E49D500B595F8 /* ofxOscBundle.cpp in Sources */,
 				BB5CC617177E49D500B595F8 /* ofxOscMessage.cpp in Sources */,
+				BBD9D91719036BD700C553D7 /* LogWindows.mm in Sources */,
 				BB37FCA1185E0FE6008DA8DD /* JoystickHatswitch.m in Sources */,
 				BB5CC618177E49D500B595F8 /* ofxOscReceiver.cpp in Sources */,
 				BB5CC619177E49D500B595F8 /* ofxOscSender.cpp in Sources */,
