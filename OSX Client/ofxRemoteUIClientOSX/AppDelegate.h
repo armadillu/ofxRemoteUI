@@ -140,8 +140,6 @@ void clientCallback(RemoteUIClientCallBackArg a);
 -(void)updateNeighbors;
 -(void)recalcWindowSize;
 
--(void)saveMidiBindingsToFile:(NSURL*)path;
-
 -(LogWindows*)getLogWindows;
 
 -(void)connect;

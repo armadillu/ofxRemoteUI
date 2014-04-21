@@ -35,7 +35,9 @@
 -(void)loadPrefs;
 
 -(BOOL)parseMidiBindingsFromFile:(NSURL*) file;
+-(void)saveMidiBindingsToFile:(NSURL*) path;
 -(IBAction)saveMidiBindings:(id)who;
+
 
 //midi
 -(void)userClickedOnParamForMidiBinding:(ParamUI*)param;
