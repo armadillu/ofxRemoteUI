@@ -185,6 +185,8 @@ public:
 												//to load from xml and then remove from the list to
 												//avoid crowding it too much
 
+	void setShowInterfaceKey(char k);
+
 private:
 
 	ofxRemoteUIServer(); // use ofxRemoteUIServer::instance() instead! Use the MACROS defined above!
@@ -236,6 +238,8 @@ private:
 	bool			showValuesOnScreen; //displays all params on screen
 	bool			updatedThisFrame;
 	bool			clearXmlOnSaving;  //if false, allows you to keep defaults for old params that you are not sharing anymore
+
+	char			showInterfaceKey;
 
 #ifdef OF_AVAILABLE
 	ofxRemoteUISimpleNotifications onScreenNotifications;

@@ -43,6 +43,10 @@ void ofxRemoteUIServer::setDrawsNotificationsAutomaticallly(bool draw){
 	drawNotifications = draw;
 }
 
+void ofxRemoteUIServer::setShowInterfaceKey(char k){
+	showInterfaceKey = k;
+}
+
 ofxRemoteUIServer::ofxRemoteUIServer(){
 
 	//cout << "serving at: " << getMyIP() << endl;
@@ -65,6 +69,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	colorTableIndex = 0;
 	broadcastCount = 0;
 	newColorInGroupCounter = 0;
+	showInterfaceKey = '\t';
 	int a = 80;
 #ifdef OF_AVAILABLE
 	selectedItem = 0;
@@ -650,7 +655,7 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 
 		}
 	}
-	if(e.key == '\t'){
+	if(e.key == showInterfaceKey){
 		showValuesOnScreen = !showValuesOnScreen;
 	}
 }
