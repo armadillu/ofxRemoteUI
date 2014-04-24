@@ -528,7 +528,7 @@
 	[formatter setDecimalSeparator:@"."];
 	[formatter setMinimumIntegerDigits:1];
 	[formatter setGroupingSeparator:@"."];
-	[formatter setMaximumFractionDigits:5];
+	[formatter setMaximumFractionDigits:2];
 	NSString *formattedNumber = [formatter stringFromNumber:num];
 	[formatter release];
 	return formattedNumber;

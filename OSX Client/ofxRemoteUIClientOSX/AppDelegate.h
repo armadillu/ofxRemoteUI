@@ -20,7 +20,7 @@
 #define REFRESH_RATE			1.0f/15.0f
 #define STATUS_REFRESH_RATE		0.333f
 #define ROW_HEIGHT				(rowHeight == LARGE_34 ? 34.0f : 26.0f) 
-#define ROW_WIDTH				260.0f
+#define ROW_WIDTH				220.0f
 #define ALL_PARAMS_GROUP		@"*All Params"
 #define DIRTY_PRESET_NAME		@"*No Preset"
 #define NUM_FLASH_WARNING		5
