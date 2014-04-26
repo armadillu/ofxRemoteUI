@@ -14,7 +14,7 @@ Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 ## Features
 
 * Edit & Track variables remotely through UDP/OSC (bool, int, float, string, Enum, ofColor).
-* Client provieds a native OSX interface.
+* Client provieds a native OSX interface, with different visualization sizes.
 * Alternative mutliplatform (iOS/win) client built on top of ofxUI (with less features for now)
 * Allows to save/load your variable states across app launches.
 * MIDI and Joystick controller bindings. Bind any parameter to any MIDI controller knob/slider or HID Joystick.
