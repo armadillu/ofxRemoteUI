@@ -1311,7 +1311,6 @@
 									<string key="NSFrame">{{305, 13}, {58, 18}}</string>
 									<reference key="NSSuperview" ref="4517047"/>
 									<reference key="NSWindow"/>
-									<reference key="NSNextKeyView"/>
 									<bool key="NSEnabled">YES</bool>
 									<object class="NSButtonCell" key="NSCell" id="443113037">
 										<int key="NSCellFlags">67108864</int>
@@ -1743,7 +1742,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="203420949"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1366, 746}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
 				<string key="NSMinSize">{372, 272}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<string key="NSFrameAutosaveName">mainwin</string>
@@ -1902,7 +1901,6 @@
 							<string key="NSFrame">{{233, 0}, {42, 19}}</string>
 							<reference key="NSSuperview" ref="182307548"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<string key="NSHuggingPriority">{250, 750}</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="346864163">
@@ -1931,7 +1929,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="765726733"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1366, 746}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<string key="NSFrameAutosaveName">logView</string>
 				<bool key="NSWindowIsRestorable">NO</bool>
@@ -2109,7 +2107,6 @@
 											<string key="NSFrame">{{121, 11}, {101, 22}}</string>
 											<reference key="NSSuperview" ref="933717995"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView"/>
 											<string key="NSReuseIdentifierKey">_NS:9</string>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSPopUpButtonCell" key="NSCell" id="221924059">
@@ -2124,9 +2121,9 @@
 												<string key="NSKeyEquivalent"/>
 												<int key="NSPeriodicDelay">400</int>
 												<int key="NSPeriodicInterval">75</int>
-												<object class="NSMenuItem" key="NSMenuItem" id="762593398">
+												<object class="NSMenuItem" key="NSMenuItem" id="594561763">
 													<reference key="NSMenu" ref="48159430"/>
-													<string key="NSTitle">Small (26px)</string>
+													<string key="NSTitle">Large (34px)</string>
 													<string key="NSKeyEquiv"/>
 													<int key="NSKeyEquivModMask">1048576</int>
 													<int key="NSMnemonicLoc">2147483647</int>
@@ -2134,16 +2131,28 @@
 													<reference key="NSOnImage" ref="465035805"/>
 													<reference key="NSMixedImage" ref="56238410"/>
 													<string key="NSAction">_popUpItemAction:</string>
+													<int key="NSTag">1</int>
 													<reference key="NSTarget" ref="221924059"/>
 												</object>
 												<bool key="NSMenuItemRespectAlignment">YES</bool>
 												<object class="NSMenu" key="NSMenu" id="48159430">
 													<string key="NSTitle">OtherViews</string>
 													<array class="NSMutableArray" key="NSMenuItems">
-														<reference ref="762593398"/>
-														<object class="NSMenuItem" id="594561763">
+														<object class="NSMenuItem" id="964313164">
 															<reference key="NSMenu" ref="48159430"/>
-															<string key="NSTitle">Large (34px)</string>
+															<string key="NSTitle">Tiny (20px)</string>
+															<string key="NSKeyEquiv"/>
+															<int key="NSKeyEquivModMask">1048576</int>
+															<int key="NSMnemonicLoc">2147483647</int>
+															<reference key="NSOnImage" ref="465035805"/>
+															<reference key="NSMixedImage" ref="56238410"/>
+															<string key="NSAction">_popUpItemAction:</string>
+															<int key="NSTag">2</int>
+															<reference key="NSTarget" ref="221924059"/>
+														</object>
+														<object class="NSMenuItem" id="762593398">
+															<reference key="NSMenu" ref="48159430"/>
+															<string key="NSTitle">Small (26px)</string>
 															<string key="NSKeyEquiv"/>
 															<int key="NSKeyEquivModMask">1048576</int>
 															<int key="NSMnemonicLoc">2147483647</int>
@@ -2152,9 +2161,11 @@
 															<string key="NSAction">_popUpItemAction:</string>
 															<reference key="NSTarget" ref="221924059"/>
 														</object>
+														<reference ref="594561763"/>
 													</array>
 													<reference key="NSMenuFont" ref="72202591"/>
 												</object>
+												<int key="NSSelectedIndex">2</int>
 												<int key="NSPreferredEdge">1</int>
 												<bool key="NSUsesItemFromMenu">YES</bool>
 												<bool key="NSAltersState">YES</bool>
@@ -2251,7 +2262,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="962428149"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1366, 746}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
 				<string key="NSMinSize">{333, 202}</string>
 				<string key="NSMaxSize">{333, 203}</string>
 				<string key="NSFrameAutosaveName">prefs</string>
@@ -2471,7 +2482,6 @@
 							<string key="NSFrame">{{249, 6}, {65, 19}}</string>
 							<reference key="NSSuperview" ref="354912816"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<string key="NSReuseIdentifierKey">_NS:22</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="232602527">
@@ -2599,7 +2609,7 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 					<reference key="NSNextKeyView" ref="860569294"/>
 					<string key="NSReuseIdentifierKey">_NS:21</string>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1366, 746}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
 				<string key="NSMinSize">{320, 396}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<string key="NSFrameAutosaveName">midi</string>
@@ -2632,7 +2642,7 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 											<string key="NSFrameSize">{276, 357}</string>
 											<reference key="NSSuperview" ref="468812416"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="143533001"/>
+											<reference key="NSNextKeyView" ref="388649143"/>
 											<object class="NSTextContainer" key="NSTextContainer" id="740685437">
 												<object class="NSLayoutManager" key="NSLayoutManager">
 													<object class="NSTextStorage" key="NSTextStorage">
@@ -2714,7 +2724,7 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 							<string key="NSFrame">{{-1, 20}, {278, 359}}</string>
 							<reference key="NSSuperview" ref="851466524"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="468812416"/>
+							<reference key="NSNextKeyView" ref="143533001"/>
 							<int key="NSsFlags">133650</int>
 							<reference key="NSVScroller" ref="388649143"/>
 							<reference key="NSHScroller" ref="143533001"/>
@@ -2757,7 +2767,7 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="36144448"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1366, 746}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<string key="NSFrameAutosaveName">ServerLogView</string>
 				<bool key="NSWindowIsRestorable">NO</bool>
@@ -5002,6 +5012,7 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 						<array class="NSMutableArray" key="children">
 							<reference ref="762593398"/>
 							<reference ref="594561763"/>
+							<reference ref="964313164"/>
 						</array>
 						<reference key="parent" ref="221924059"/>
 					</object>
@@ -5103,6 +5114,11 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 						<reference key="object" ref="791042371"/>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">LogWindows</string>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">dcg-nO-c5z</string>
+						<reference key="object" ref="964313164"/>
+						<reference key="parent" ref="48159430"/>
 					</object>
 				</array>
 			</object>
@@ -5568,6 +5584,7 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 				<string key="YH0-36-EGb.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="Z6E-sL-1K0.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="azz-ad-DaK.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="dcg-nO-c5z.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<object class="NSMutableDictionary" key="dvw-BD-lfZ.IBAttributePlaceholdersKey">
 					<string key="NS.key.0">ToolTip</string>
 					<object class="IBToolTipAttribute" key="NS.object.0">

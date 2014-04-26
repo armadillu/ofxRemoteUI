@@ -1098,7 +1098,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[autoConnectCheckbox setState: autoConnectToggle];
 
 	rowHeight = (RowHeightSize)[d integerForKey:@"rowHeightSize"];
-	[rowHeightMenu selectItemAtIndex:(int)rowHeight];
+	[rowHeightMenu selectItemWithTag:(int)rowHeight];
 	[externalDevices loadPrefs];
 	[self recalcWindowSize];
 
@@ -1110,9 +1110,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	if(sender == rowHeightMenu){
 		int sel = (int)[rowHeightMenu indexOfSelectedItem];
 		switch (sel) {
-			case 0: rowHeight = SMALL_26; break;
-			case 1: rowHeight = LARGE_34; break;
-			default: NSLog(@"wait what?"); break;
+			case 0: rowHeight = TINY_20; break;
+			case 1: rowHeight = SMALL_26; break;
+			case 2: rowHeight = LARGE_34; break;
+			default: NSLog(@"wait, what?"); break;
 		}
 		//reconnect to see results
 		if ([[connectButton title] isEqualToString:DISCONNECT_STRING]){

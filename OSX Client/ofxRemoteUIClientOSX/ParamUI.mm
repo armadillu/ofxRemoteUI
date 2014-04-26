@@ -26,11 +26,11 @@
 	RowHeightSize rowH = [delegate getRowHeight];
 	BOOL didLoad = FALSE;
 	switch (rowH) {
-		case LARGE_34:
-			 didLoad = [NSBundle loadNibNamed:@"View34" owner:self];
+		case LARGE_34: didLoad = [NSBundle loadNibNamed:@"View34" owner:self];
 			break;
-		case SMALL_26:
-			didLoad = [NSBundle loadNibNamed:@"View26" owner:self];
+		case SMALL_26: didLoad = [NSBundle loadNibNamed:@"View26" owner:self];
+			break;
+		case TINY_20: didLoad = [NSBundle loadNibNamed:@"View20" owner:self];
 			break;
 
 		default:
@@ -354,6 +354,7 @@
 
 		case REMOTEUI_PARAM_SPACER:
 			widget = spacerTitle;
+			[spacerTitle setToolTip:[self stringFromString: param.stringVal]];
 			[spacerTitle setStringValue:[self stringFromString: param.stringVal]];
 			[[spacerTitle cell] setBackgroundStyle:NSBackgroundStyleLowered];
 			[spacerTitle setTextColor:[NSColor whiteColor]];

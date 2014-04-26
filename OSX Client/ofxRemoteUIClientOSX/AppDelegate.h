@@ -19,7 +19,7 @@
 
 #define REFRESH_RATE			1.0f/15.0f
 #define STATUS_REFRESH_RATE		0.333f
-#define ROW_HEIGHT				(rowHeight == LARGE_34 ? 34.0f : 26.0f) 
+#define ROW_HEIGHT				(rowHeight == LARGE_34 ? 34.0f : (rowHeight == TINY_20 ? 20.0f : 26.0f))
 #define ROW_WIDTH				220.0f
 #define ALL_PARAMS_GROUP		@"*All Params"
 #define DIRTY_PRESET_NAME		@"*No Preset"
@@ -32,7 +32,7 @@
 #define CONNECT_STRING		@"Connect"
 #define DISCONNECT_STRING	@"Disconnect"
 
-enum RowHeightSize{ SMALL_26 = 0, LARGE_34 = 1};
+enum RowHeightSize{ SMALL_26 = 0, LARGE_34 = 1, TINY_20 = 2};
 
 struct LayoutConfig{
 	NSPoint colsRows;

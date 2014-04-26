@@ -49,6 +49,7 @@
 		BB6CC35D174698DE0043F523 /* MyScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = BB6CC35C174698DE0043F523 /* MyScrollView.m */; };
 		BB7EA611184B89DC00048F7A /* RestartXcodeApp.scptd in Resources */ = {isa = PBXBuildFile; fileRef = BB7EA610184B89DC00048F7A /* RestartXcodeApp.scptd */; };
 		BB7EA613184B91CD00048F7A /* openAccessibility.scpt in Resources */ = {isa = PBXBuildFile; fileRef = BB7EA612184B91CD00048F7A /* openAccessibility.scpt */; };
+		BB8394BE190B7E3A0058EAF3 /* View20.xib in Resources */ = {isa = PBXBuildFile; fileRef = BB8394BC190B7E3A0058EAF3 /* View20.xib */; };
 		BB8776E917C99B3700CC74B8 /* NSColorStringExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = BB8776E817C99B3700CC74B8 /* NSColorStringExtension.m */; };
 		BB94E57F17464E1800A7A3CC /* View26.xib in Resources */ = {isa = PBXBuildFile; fileRef = BB94E57D17464E1800A7A3CC /* View26.xib */; };
 		BB94E5AE17468EAE00A7A3CC /* ColorView.m in Sources */ = {isa = PBXBuildFile; fileRef = BB94E5AD17468EAE00A7A3CC /* ColorView.m */; };
@@ -170,6 +171,7 @@
 		BB6CC35C174698DE0043F523 /* MyScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyScrollView.m; sourceTree = "<group>"; };
 		BB7EA610184B89DC00048F7A /* RestartXcodeApp.scptd */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = RestartXcodeApp.scptd; sourceTree = "<group>"; };
 		BB7EA612184B91CD00048F7A /* openAccessibility.scpt */ = {isa = PBXFileReference; lastKnownFileType = file; path = openAccessibility.scpt; sourceTree = "<group>"; };
+		BB8394BD190B7E3A0058EAF3 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = View20.xib; sourceTree = "<group>"; };
 		BB8776E717C99B3700CC74B8 /* NSColorStringExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSColorStringExtension.h; sourceTree = "<group>"; };
 		BB8776E817C99B3700CC74B8 /* NSColorStringExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSColorStringExtension.m; sourceTree = "<group>"; };
 		BB94E57E17464E1800A7A3CC /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = View26.xib; sourceTree = "<group>"; };
@@ -518,6 +520,7 @@
 				BBDCBDE216A0512300F1C5EC /* MainMenu.xib */,
 				BBD475FB18B1C0970095F324 /* View34.xib */,
 				BB94E57D17464E1800A7A3CC /* View26.xib */,
+				BB8394BC190B7E3A0058EAF3 /* View20.xib */,
 			);
 			name = en.lproj;
 			path = ofxRemoteUIClientOSX/en.lproj;
@@ -610,6 +613,7 @@
 				BBE6075A16A466A7002F1707 /* offline.png in Resources */,
 				BB94E57F17464E1800A7A3CC /* View26.xib in Resources */,
 				BBB1F6FB1749003B00992119 /* connected.png in Resources */,
+				BB8394BE190B7E3A0058EAF3 /* View20.xib in Resources */,
 				BBB1F6FC1749003B00992119 /* connected@2x.png in Resources */,
 				BB7EA613184B91CD00048F7A /* openAccessibility.scpt in Resources */,
 				BBAF53C41800C9CC0055A481 /* warning@2x.png in Resources */,
@@ -688,6 +692,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		BB8394BC190B7E3A0058EAF3 /* View20.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BB8394BD190B7E3A0058EAF3 /* en */,
+			);
+			name = View20.xib;
+			sourceTree = "<group>";
+		};
 		BB94E57D17464E1800A7A3CC /* View26.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
