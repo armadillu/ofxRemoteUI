@@ -22,7 +22,7 @@
 	//midi
 	midiManager = [[VVMIDIManager alloc] init];
 	[midiManager setDelegate:self];
-	upcomingMidiParam = nil;
+	upcomingDeviceParam = nil;
 
 	//joystick
     [[JoystickManager sharedInstance] setJoystickAddedDelegate:self];
@@ -32,6 +32,10 @@
 -(void)savePrefs:(id)sender{
 	NSUserDefaults * d = [NSUserDefaults standardUserDefaults];
 	[d setInteger: externalButtonsBehaveAsToggle  forKey:@"externalButtonsBehaveAsToggle"];
+}
+
+-(void)updateParamUIOnMainThread:(ParamUI*)item{
+	[item updateUI];
 }
 
 
@@ -49,18 +53,18 @@
 
 
 #pragma mark - MIDI
--(void)userClickedOnParamForMidiBinding:(ParamUI*)param{
+-(void)userClickedOnParamForDeviceBinding:(ParamUI*)param{
 
-	if( upcomingMidiParam == nil ){ //no current param waiting to be set
-		upcomingMidiParam = param;
+	if( upcomingDeviceParam == nil ){ //no current param waiting to be set
+		upcomingDeviceParam = param;
 		//[window setTitle:@"ofxRemoteUI (Waiting for External Device Input)"];
 	}else{ //already have one waiting param, wtf is the user doing?
-		[upcomingMidiParam stopMidiAnim];
-		if (upcomingMidiParam == param){ //user cliked on blinking param, most likely wants to cancel
-			upcomingMidiParam = nil;
+		[upcomingDeviceParam stopMidiAnim];
+		if (upcomingDeviceParam == param){ //user cliked on blinking param, most likely wants to cancel
+			upcomingDeviceParam = nil;
 			//[window setTitle:@"ofxRemoteUI"];
 		}else{ //usr clicked on another param, lets make that one the selected one
-			upcomingMidiParam = param;
+			upcomingDeviceParam = param;
 		}
 	}
 }
@@ -88,7 +92,7 @@
 			string channel = [ [NSString stringWithFormat:@"[%d#%d]", [msgPtr data1], [msgPtr channel]] UTF8String];
 			string controllerUniqueAddress = channel + "@" + desc;
 
-			if( upcomingMidiParam == nil ){ //we are not setting a midi binding
+			if( upcomingDeviceParam == nil ){ //we are not setting a midi binding
 
 				map<string,string>::iterator ii = bindingsMap.find(controllerUniqueAddress);
 				if ( ii != bindingsMap.end() ){ //found a param linked to that controller
@@ -112,15 +116,15 @@
 									p.intVal = p.minInt + (p.maxInt - p.minInt) * [msgPtr doubleValue];
 									break;
 								case REMOTEUI_PARAM_COLOR:{
-									NSColor * c = [NSColor colorWithDeviceRed:p.redVal/255. green:p.greenVal/255. blue:p.blueVal/255. alpha:p.alphaVal/255.];
+									NSColor * c = [NSColor colorWithDeviceRed:p.redVal/255.0f green:p.greenVal/255.0f blue:p.blueVal/255.0f alpha:p.alphaVal/255.0f];
 									float sat = [c saturationComponent];
 									float bri = [c brightnessComponent];
 									float a = [c alphaComponent];
 									NSColor * c2 = [NSColor colorWithDeviceHue:[msgPtr doubleValue] saturation:sat brightness:bri alpha:a];
-									p.redVal = [c2 redComponent] * 255.f;
-									p.greenVal = [c2 greenComponent] * 255.f;
-									p.blueVal = [c2 blueComponent] * 255.f;
-									p.alphaVal = [c2 alphaComponent] * 255.f;
+									p.redVal = [c2 redComponent] * 255.0f;
+									p.greenVal = [c2 greenComponent] * 255.0f;
+									p.blueVal = [c2 blueComponent] * 255.0f;
+									p.alphaVal = [c2 alphaComponent] * 255.0f;
 								}break;
 								default:
 									break;//ignore other types
@@ -145,15 +149,15 @@
 			}else{ // we are setting a midi binding
 
 				if (
-					( upcomingMidiParam->param.type == REMOTEUI_PARAM_BOOL && (noteOn || noteOff ) ) //piano keys only for bools
+					( upcomingDeviceParam->param.type == REMOTEUI_PARAM_BOOL && (noteOn || noteOff ) ) //piano keys only for bools
 					||
 					slider //slider midi msg for any valid param
 					){
-					string paramN = [upcomingMidiParam getParamName];
+					string paramN = [upcomingDeviceParam getParamName];
 					bindingsMap[controllerUniqueAddress] = paramN;
 					[midiBindingsTable reloadData];
-					[upcomingMidiParam stopMidiAnim];
-					upcomingMidiParam = nil;
+					[upcomingDeviceParam stopMidiAnim];
+					upcomingDeviceParam = nil;
 					//[window setTitle:@"ofxRemoteUI"];
 				}
 			}
@@ -162,7 +166,7 @@
 }
 
 
--(IBAction)saveMidiBindings:(id)who{
+-(IBAction)saveDeviceBindings:(id)who{
 
 	NSSavePanel *panel = [NSSavePanel savePanel];
 	[panel setExtensionHidden:YES];
@@ -172,11 +176,11 @@
 
 	NSInteger ret = [panel runModal];
 	if (ret == NSFileHandlingPanelOKButton) {
-		[self saveMidiBindingsToFile:[panel URL]];
+		[self saveDeviceBindingsToFile:[panel URL]];
 	}
 }
 
--(void)saveMidiBindingsToFile:(NSURL*)path;{
+-(void)saveDeviceBindingsToFile:(NSURL*)path;{
 	//fill in a NSDict to save as plist
 	NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithCapacity:5];
 	for(int i = 0; i < bindingsMap.size(); i++){
@@ -201,7 +205,7 @@
 	[openPanel setTitle:@"Locate your bindingsMap file"];
 	[openPanel beginWithCompletionHandler:^(NSInteger result) {
 		if(result == NSFileHandlingPanelOKButton) {
-			[self parseMidiBindingsFromFile: [[openPanel URLs] objectAtIndex:0]];
+			[self parseDeviceBindingsFromFile: [[openPanel URLs] objectAtIndex:0]];
 		}
 	}];
 }
@@ -225,7 +229,7 @@
 }
 
 
--(BOOL)parseMidiBindingsFromFile:(NSURL*) file{
+-(BOOL)parseDeviceBindingsFromFile:(NSURL*) file{
 	NSDictionary * d = [NSDictionary dictionaryWithContentsOfURL:file];
 	if(d){
 		NSArray * keys = [d allKeys];
@@ -301,7 +305,7 @@
 	sprintf(numstr, "%d", axisIndex);
 	string controllerAddress = "Axis_" + (string)numstr + "@" + desc;
 
-	if( upcomingMidiParam == nil ){ //we are not setting a midi binding
+	if( upcomingDeviceParam == nil ){ //we are not setting a midi binding
 
 		map<string,string>::iterator ii = bindingsMap.find(controllerAddress);
 		if ( ii != bindingsMap.end() ){ //found a param linked to that controller
@@ -323,15 +327,15 @@
 						p.intVal = p.minInt + (p.maxInt - p.minInt) * value;
 						break;
 					case REMOTEUI_PARAM_COLOR:{
-						NSColor * c = [NSColor colorWithDeviceRed:p.redVal/255. green:p.greenVal/255. blue:p.blueVal/255. alpha:p.alphaVal/255.];
+						NSColor * c = [NSColor colorWithDeviceRed:p.redVal/255.0f green:p.greenVal/255.0f blue:p.blueVal/255.0f alpha:p.alphaVal/255.0f];
 						float sat = [c saturationComponent];
 						float bri = [c brightnessComponent];
 						float a = [c alphaComponent];
 						NSColor * c2 = [NSColor colorWithDeviceHue:value saturation:sat brightness:bri alpha:a];
-						p.redVal = [c2 redComponent] * 255.f;
-						p.greenVal = [c2 greenComponent] * 255.f;
-						p.blueVal = [c2 blueComponent] * 255.f;
-						p.alphaVal = [c2 alphaComponent] * 255.f;
+						p.redVal = [c2 redComponent] * 255.0f;
+						p.greenVal = [c2 greenComponent] * 255.0f;
+						p.blueVal = [c2 blueComponent] * 255.0f;
+						p.alphaVal = [c2 alphaComponent] * 255.0f;
 					}break;
 					default:
 						break;//ignore other types
@@ -343,17 +347,21 @@
 			}
 		}
 	}else{
-		if (	upcomingMidiParam->param.type == REMOTEUI_PARAM_FLOAT ||
-			upcomingMidiParam->param.type == REMOTEUI_PARAM_INT ||
-			upcomingMidiParam->param.type == REMOTEUI_PARAM_COLOR ||
-			upcomingMidiParam->param.type == REMOTEUI_PARAM_ENUM
+		if (upcomingDeviceParam->param.type == REMOTEUI_PARAM_FLOAT ||
+			upcomingDeviceParam->param.type == REMOTEUI_PARAM_INT ||
+			upcomingDeviceParam->param.type == REMOTEUI_PARAM_COLOR ||
+			upcomingDeviceParam->param.type == REMOTEUI_PARAM_ENUM
 			){
-			string paramN = [upcomingMidiParam getParamName];
-			bindingsMap[controllerAddress] = paramN;
-			[midiBindingsTable reloadData];
-			[upcomingMidiParam stopMidiAnim];
-			upcomingMidiParam = nil;
-			//[window setTitle:@"ofxRemoteUI"];
+			float value = [joystick getRelativeValueOfAxesIndex:axisIndex];
+
+			if(value > 0.9 || value < 0.1){ //only accept values where the user is really pushing
+				string paramN = [upcomingDeviceParam getParamName];
+				bindingsMap[controllerAddress] = paramN;
+				[midiBindingsTable reloadData];
+				[upcomingDeviceParam stopMidiAnim];
+				upcomingDeviceParam = nil;
+				//[window setTitle:@"ofxRemoteUI"];
+			}
 		}
 	}
 }
@@ -365,7 +373,7 @@
 	sprintf(numstr, "%d", buttonIndex);
 	string controllerAddress = "Button_" + (string)numstr + "@" + desc;
 
-	if( upcomingMidiParam == nil ){ //we are not setting a midi binding
+	if( upcomingDeviceParam == nil ){ //we are not setting a midi binding
 
 		map<string,string>::iterator ii = bindingsMap.find(controllerAddress);
 		if ( ii != bindingsMap.end() ){ //found a param linked to that controller
@@ -394,12 +402,12 @@
 		}
 
 	}else{
-		if (upcomingMidiParam->param.type == REMOTEUI_PARAM_BOOL){
-			string paramN = [upcomingMidiParam getParamName];
+		if (upcomingDeviceParam->param.type == REMOTEUI_PARAM_BOOL){
+			string paramN = [upcomingDeviceParam getParamName];
 			bindingsMap[controllerAddress] = paramN;
 			[midiBindingsTable reloadData];
-			[upcomingMidiParam stopMidiAnim];
-			upcomingMidiParam = nil;
+			[upcomingDeviceParam stopMidiAnim];
+			upcomingDeviceParam = nil;
 			//[window setTitle:@"ofxRemoteUI"];
 		}
 	}

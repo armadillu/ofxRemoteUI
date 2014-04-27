@@ -20,7 +20,7 @@
 
 	//MIDI
 	VVMIDIManager					*midiManager;
-	ParamUI							*upcomingMidiParam;
+	ParamUI							*upcomingDeviceParam;
 	map<string, string>				bindingsMap; //table of bindings for midi and joystick
 
 	map<string, ParamUI*> *			widgets;
@@ -34,13 +34,14 @@
 -(IBAction)applyPrefs:(id)sender;
 -(void)loadPrefs;
 
--(BOOL)parseMidiBindingsFromFile:(NSURL*) file;
--(void)saveMidiBindingsToFile:(NSURL*) path;
--(IBAction)saveMidiBindings:(id)who;
+-(BOOL)parseDeviceBindingsFromFile:(NSURL*) file;
+-(void)saveDeviceBindingsToFile:(NSURL*) path;
+-(IBAction)saveDeviceBindings:(id)who;
 
+-(void)updateParamUIOnMainThread:(ParamUI*)item;
 
 //midi
--(void)userClickedOnParamForMidiBinding:(ParamUI*)param;
+-(void)userClickedOnParamForDeviceBinding:(ParamUI*)param;
 
 //midi delegate
 - (void) setupChanged;
@@ -50,6 +51,5 @@
 - (void)joystickAdded:(Joystick *)joystick ;
 - (void)joystickAxisChanged:(Joystick *)joystick atAxisIndex:(int)axis;
 - (void)joystickButton:(int)buttonIndex state:(BOOL)pressed onJoystick:(Joystick*)joystick;
-
 
 @end

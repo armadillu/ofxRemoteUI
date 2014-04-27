@@ -228,7 +228,7 @@
 		}else{
 			midiHighlightAnim = false; //stop anim
 		}
-		[[NSApp delegate] userClickedOnParamForMidiBinding: self]; //ugly! TODO
+		[[[NSApp delegate] getExternalDevices] userClickedOnParamForDeviceBinding: self]; //ugly! TODO
 	}
 }
 

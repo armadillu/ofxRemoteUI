@@ -112,7 +112,6 @@
 						<string key="NSFrame">{{339, 2}, {34, 17}}</string>
 						<reference key="NSSuperview" ref="743967783"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSPopUpButtonCell" key="NSCell" id="955969984">
@@ -439,7 +438,7 @@
 								<set class="NSMutableSet" key="NSDragTypes">
 									<string>NSColor pasteboard type</string>
 								</set>
-								<string key="NSFrame">{{105, 1}, {55, 17}}</string>
+								<string key="NSFrame">{{105, 2}, {55, 17}}</string>
 								<reference key="NSSuperview" ref="718633621"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="156382756"/>
@@ -492,7 +491,6 @@
 								<string key="NSFrame">{{3, 0}, {112, 17}}</string>
 								<reference key="NSSuperview" ref="521005238"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView"/>
 								<bool key="NSViewIsLayerTreeHost">YES</bool>
 								<string key="NSReuseIdentifierKey">_NS:22</string>
 								<bool key="NSEnabled">YES</bool>

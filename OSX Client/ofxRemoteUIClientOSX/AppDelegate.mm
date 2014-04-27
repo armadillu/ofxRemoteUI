@@ -136,14 +136,15 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	return logs;
 }
 
+-(ExternalDevices*)getExternalDevices;{
+	return externalDevices;
+}
+
 - (BOOL)application:(NSApplication *)sender openFile:(NSString *)fileName{
-	return [externalDevices parseMidiBindingsFromFile: [NSURL fileURLWithPath:fileName]];
+	return [externalDevices parseDeviceBindingsFromFile: [NSURL fileURLWithPath:fileName]];
 }
 
 
--(void)updateParamUIOnMainThread:(ParamUI*)item{
-	[item updateUI];
-}
 
 
 #pragma mark applescript
@@ -338,7 +339,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	//[scroll setScrollerStyle:NSScrollerStyleOverlay];
 	//[scroll setScrollerKnobStyle:NSScrollerKnobStyleDefault];
 
-	[externalDevices parseMidiBindingsFromFile:[NSURL fileURLWithPath:[DEFAULT_BINDINGS_FOLDER stringByAppendingString:DEFAULT_BINDINGS_FILE]]];//load last used midi bindings
+	[externalDevices parseDeviceBindingsFromFile:[NSURL fileURLWithPath:[DEFAULT_BINDINGS_FOLDER stringByAppendingString:DEFAULT_BINDINGS_FILE]]];//load last used midi bindings
 
 	[self loadPrefs];
 	[self recalcWindowSize];
@@ -374,7 +375,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	NSFileManager * fm = [NSFileManager defaultManager];
 	[fm createDirectoryAtPath:DEFAULT_BINDINGS_FOLDER withIntermediateDirectories:YES attributes:Nil error:nil];
 	NSString * fullPath = [DEFAULT_BINDINGS_FOLDER stringByAppendingString:DEFAULT_BINDINGS_FILE];
-	[externalDevices saveMidiBindingsToFile: [NSURL fileURLWithPath:fullPath]];
+	[externalDevices saveDeviceBindingsToFile: [NSURL fileURLWithPath:fullPath]];
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender{

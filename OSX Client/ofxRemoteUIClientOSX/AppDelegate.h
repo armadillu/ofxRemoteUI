@@ -141,6 +141,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 -(void)recalcWindowSize;
 
 -(LogWindows*)getLogWindows;
+-(ExternalDevices*)getExternalDevices;
 
 -(void)connect;
 -(void)autoConnectToNeighbor:(string) host port:(int)p;
