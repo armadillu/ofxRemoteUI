@@ -26,7 +26,7 @@
 #endif
 
 void split(vector<string> &tokens, const string &text, char separator) {
-	int start = 0, end = 0;
+	unsigned long start = 0, end = 0;
 	while ((end = text.find(separator, start)) != string::npos) {
 		tokens.push_back(text.substr(start, end - start));
 		start = end + 1;

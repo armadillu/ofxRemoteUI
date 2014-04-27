@@ -3607,19 +3607,19 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">saveMidiBindings:</string>
+						<string key="label">saveDeviceBindings:</string>
 						<reference key="source" ref="971834215"/>
-						<reference key="destination" ref="112298439"/>
+						<reference key="destination" ref="453130816"/>
 					</object>
-					<string key="id">HyB-Fk-lFm</string>
+					<string key="id">9Y0-XG-Fkn</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">saveDeviceBindings:</string>
 						<reference key="source" ref="971834215"/>
-						<reference key="destination" ref="453130816"/>
+						<reference key="destination" ref="112298439"/>
 					</object>
-					<string key="id">v6P-Tf-PaY</string>
+					<string key="id">y7b-ks-iqP</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -5668,7 +5668,7 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 						<string key="nextPreset:">id</string>
 						<string key="pasteSpecial:">id</string>
 						<string key="pressedConnect:">id</string>
-						<string key="pressedContinuously:">NSButton</string>
+						<string key="pressedContinuously:">id</string>
 						<string key="pressedSync:">id</string>
 						<string key="previousPreset:">id</string>
 						<string key="restartXcodeApp:">id</string>
@@ -5708,7 +5708,7 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 						</object>
 						<object class="IBActionInfo" key="pressedContinuously:">
 							<string key="name">pressedContinuously:</string>
-							<string key="candidateClassName">NSButton</string>
+							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="pressedSync:">
 							<string key="name">pressedSync:</string>
@@ -5891,7 +5891,6 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 						<string key="deleteSelectedMidiBinding:">id</string>
 						<string key="loadMidiBindings:">id</string>
 						<string key="saveDeviceBindings:">id</string>
-						<string key="saveMidiBindings:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
 						<object class="IBActionInfo" key="applyPrefs:">
@@ -5912,10 +5911,6 @@ b250cm9sbGVyJ3Mga25vYi9idXR0b24vam95c3RpY2sKMyAtIERvbmUhA</string>
 						</object>
 						<object class="IBActionInfo" key="saveDeviceBindings:">
 							<string key="name">saveDeviceBindings:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="saveMidiBindings:">
-							<string key="name">saveMidiBindings:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 					</dictionary>
