@@ -636,7 +636,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "gitCommitNum=$(git rev-list HEAD --count)\nif [ -z \"$gitCommitNum\" ]; then\ngitCommitNum=\"Unknown Version\"\nfi\ndefaults write \"$SRCROOT/ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist\" \"CFBundleVersion\" $gitCommitNum\necho \"#define GIT_COMMIT_NUMBER @\\\"$gitCommitNum\\\"\" > $SRCROOT/GitCommitNumber.h\necho 'GIT_COMMIT_NUMBER is '$gitCommitNum\n";
+			shellScript = "gitCommitNum=$(git rev-list HEAD --count)\nif [ -z \"$gitCommitNum\" ]; then\ngitCommitNum=\"Unknown Version\"\nfi\ndefaults write \"$SRCROOT/ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist\" \"CFBundleShortVersionString\" \"Git Commit $gitCommitNum\"\n\necho \"#define GIT_COMMIT_NUMBER @\\\"$gitCommitNum\\\"\" > $SRCROOT/GitCommitNumber.h\necho 'GIT_COMMIT_NUMBER is '$gitCommitNum\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
