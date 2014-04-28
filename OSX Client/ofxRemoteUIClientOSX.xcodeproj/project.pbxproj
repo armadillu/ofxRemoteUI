@@ -203,7 +203,7 @@
 		BBDCBDED16A0513D00F1C5EC /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = main.m; path = ofxRemoteUIClientOSX/main.m; sourceTree = "<group>"; };
 		BBDCBDF516A051B000F1C5EC /* ofxRemoteUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUI.cpp; sourceTree = "<group>"; };
 		BBDCBDF616A051B000F1C5EC /* ofxRemoteUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUI.h; sourceTree = "<group>"; };
-		BBDCBDFC16A0526C00F1C5EC /* ofxRemoteUIClientOSX-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "ofxRemoteUIClientOSX-Info.plist"; path = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist"; sourceTree = SOURCE_ROOT; };
+		BBDCBDFC16A0526C00F1C5EC /* ofxRemoteUIClientOSX-Info.plist */ = {isa = PBXFileReference; explicitFileType = text.plist.xml; name = "ofxRemoteUIClientOSX-Info.plist"; path = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist"; sourceTree = SOURCE_ROOT; };
 		BBDCBDFD16A0526C00F1C5EC /* ofxRemoteUIClientOSX-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "ofxRemoteUIClientOSX-Prefix.pch"; path = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch"; sourceTree = SOURCE_ROOT; };
 		BBDCBE2716A063A400F1C5EC /* ReadMe.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ReadMe.txt; sourceTree = "<group>"; };
 		BBE6075716A466A7002F1707 /* offline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = offline.png; path = ofxRemoteUIClientOSX/offline.png; sourceTree = SOURCE_ROOT; };
