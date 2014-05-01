@@ -1142,7 +1142,7 @@ void ofxRemoteUIServer::addSpacer(string title){
 	p.group = upcomingGroup; //to ignore those in the client app later when grouping
 	p.a = 255; //spacer has full alpha
 	addParamToDB(p, title + " - " + ofToString((int)ofRandom(10000)));
-	cout << "ofxRemoteUIServer Adding Spacer '" << title << "'" << endl;
+	cout << "ofxRemoteUIServer Adding Group '" << title << "' #######################" << endl;
 }
 
 
