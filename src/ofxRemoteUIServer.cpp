@@ -1142,7 +1142,7 @@ void ofxRemoteUIServer::addSpacer(string title){
 	p.group = upcomingGroup; //to ignore those in the client app later when grouping
 	p.a = 255; //spacer has full alpha
 	addParamToDB(p, title + " - " + ofToString((int)ofRandom(10000)));
-	cout << "ofxRemoteUIServer Adding Group '" << title << "' #######################" << endl;
+	if(verbose_) cout << "ofxRemoteUIServer Adding Group '" << title << "' #######################" << endl;
 }
 
 
@@ -1156,7 +1156,7 @@ void ofxRemoteUIServer::shareParam(string paramName, float* param, float min, fl
 	p.group = upcomingGroup;
 	setColorForParam(p, c);
 	addParamToDB(p, paramName);
-	cout << "ofxRemoteUIServer Sharing Float Param '" << paramName << "'" << endl;
+	if(verbose_) cout << "ofxRemoteUIServer Sharing Float Param '" << paramName << "'" << endl;
 }
 
 
@@ -1168,7 +1168,7 @@ void ofxRemoteUIServer::shareParam(string paramName, bool* param, ofColor c, int
 	p.group = upcomingGroup;
 	setColorForParam(p, c);
 	addParamToDB(p, paramName);
-	cout << "ofxRemoteUIServer Sharing Bool Param '" << paramName << "'" << endl;
+	if(verbose_) cout << "ofxRemoteUIServer Sharing Bool Param '" << paramName << "'" << endl;
 }
 
 
@@ -1182,7 +1182,7 @@ void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int ma
 	setColorForParam(p, c);
 	p.intVal = *param = ofClamp(*param, min, max);
 	addParamToDB(p, paramName);
-	cout << "ofxRemoteUIServer Sharing Int Param '" << paramName << "'" << endl;
+	if(verbose_) cout << "ofxRemoteUIServer Sharing Int Param '" << paramName << "'" << endl;
 }
 
 void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int max, vector<string> names, ofColor c ){
@@ -1196,7 +1196,7 @@ void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int ma
 	setColorForParam(p, c);
 	p.intVal = *param = ofClamp(*param, min, max);
 	addParamToDB(p, paramName);
-	cout << "ofxRemoteUIServer Sharing Enum Param '" << paramName << "'" << endl;
+	if(verbose_) cout << "ofxRemoteUIServer Sharing Enum Param '" << paramName << "'" << endl;
 }
 
 
@@ -1208,7 +1208,7 @@ void ofxRemoteUIServer::shareParam(string paramName, string* param, ofColor c, i
 	p.group = upcomingGroup;
 	setColorForParam(p, c);
 	addParamToDB(p, paramName);
-	cout << "ofxRemoteUIServer Sharing String Param '" << paramName << "'" <<endl;
+	if(verbose_) cout << "ofxRemoteUIServer Sharing String Param '" << paramName << "'" <<endl;
 }
 
 void ofxRemoteUIServer::shareParam(string paramName, unsigned char* param, ofColor bgColor, int nothingUseful){
@@ -1222,7 +1222,7 @@ void ofxRemoteUIServer::shareParam(string paramName, unsigned char* param, ofCol
 	p.group = upcomingGroup;
 	setColorForParam(p, bgColor);
 	addParamToDB(p, paramName);
-	cout << "ofxRemoteUIServer Sharing Color Param '" << paramName << "'" <<endl;
+	if(verbose_) cout << "ofxRemoteUIServer Sharing Color Param '" << paramName << "'" <<endl;
 }
 
 
@@ -1248,7 +1248,7 @@ void ofxRemoteUIServer::sendLogToClient(char* format, ...){
 		try{
 			oscSender.sendMessage(m);
 		}catch(exception e){
-			cout << "exception" << endl;
+			cout << "exception " << e.what() << endl;
 		}
 	}
 }

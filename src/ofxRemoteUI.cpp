@@ -174,18 +174,18 @@ string ofxRemoteUI::getMyIP(string userChosenInteface){
 				printf("%s: inet_ntop failed!\n", ifa->ifa_name);
 			}else{
 				string interface = string(ifa->ifa_name);
-				cout << "ofxRemoteUI found interface: " << interface << endl;
+				if(verbose_) cout << "ofxRemoteUI found interface: " << interface << endl;
 				if( interface.length() > 2 || interface == userSuppliedNetInterface ){
 					if (userSuppliedNetInterface.length() > 0){
 						if (interface == userSuppliedNetInterface){
 							output = string(buf);
-							cout << "ofxRemoteUI using user chosen interface: " << interface << endl;
+							if(verbose_) cout << "ofxRemoteUI using user chosen interface: " << interface << endl;
 							break;
 						}
 					}else{
 						if ( interface[0] == 'e' && interface[1] == 'n'){
 							output = string(buf);
-							cout << "ofxRemoteUI using interface: " << interface << endl;
+							if(verbose_) cout << "ofxRemoteUI using interface: " << interface << endl;
 							break;
 						}
 					}
