@@ -1179,7 +1179,9 @@ bool resizeWindowUpDown = false; //if you keep changing paramUI size, with this 
 			}
 		}
 		weJustDisconnected--;
-		if(weJustDisconnected <= 0) weJustDisconnected = 0;
+		if(weJustDisconnected <= 0){
+			weJustDisconnected = 0;
+		}
 	}
 }
 

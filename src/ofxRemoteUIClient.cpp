@@ -144,15 +144,19 @@ void ofxRemoteUIClient::update(float dt){
 		timeSinceLastReply += dt;
 
 		if (timeCounter > OFXREMOTEUI_LATENCY_TEST_RATE){
-			if (!waitingForReply){
+			if (!waitingForReply || timeCounter > 3 * OFXREMOTEUI_LATENCY_TEST_RATE){
+				//if(waitingForReply) cout << "we saved the day! " << timeCounter << endl;
 				timeCounter = 0.0f;
 				sendTEST();
 			}else{
 				if (timeCounter > OFXREMOTEUI_CONNECTION_TIMEOUT){
+					cout << "ofxRemoteUIClient: disconnecting bc server connection timed out!" << endl;
 					avgTimeSinceLastReply = -1;
 					disconnect(); // testing here
 					params.clear();
 					orderedKeys.clear();
+				}else{
+					if(verbose_) cout << "ofxRemoteUIClient: lag!" << endl;
 				}
 			}
 		}
