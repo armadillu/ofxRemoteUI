@@ -19,6 +19,7 @@ ofxRemoteUIClient::ofxRemoteUIClient(){
 	callBack = NULL;
 	verbose_ = false;
 	broadcastReceiver.setup(OFXREMOTEUI_BROADCAST_PORT);
+	disconnectStrikes = OFXREMOTEUI_DISCONNECTION_STRIKES;
 
 }
 
@@ -74,6 +75,7 @@ void ofxRemoteUIClient::connect(){
 		sendHELLO();	//on first connect, send HI!
 		sendTEST();		//and a lag test
 		readyToSend = true;
+		disconnectStrikes = OFXREMOTEUI_DISCONNECTION_STRIKES;
 	}else{
 		if(verbose_) cout << "ofxRemoteUIClient: can't connect() now, we are already connected!" << endl;
 	}
@@ -144,20 +146,24 @@ void ofxRemoteUIClient::update(float dt){
 		timeSinceLastReply += dt;
 
 		if (timeCounter > OFXREMOTEUI_LATENCY_TEST_RATE){
-			if (!waitingForReply || timeCounter > 3 * OFXREMOTEUI_LATENCY_TEST_RATE){
-				//if(waitingForReply) cout << "we saved the day! " << timeCounter << endl;
-				timeCounter = 0.0f;
-				sendTEST();
+
+			if(waitingForReply){ //we never heard back from the client, keep count of how many we missed
+				cout << "ofxRemoteUIClient: missed one TEST Packet... (" << disconnectStrikes << " left)" << endl;
+				disconnectStrikes--;
 			}else{
-				if (timeCounter > OFXREMOTEUI_CONNECTION_TIMEOUT){
-					cout << "ofxRemoteUIClient: disconnecting bc server connection timed out!" << endl;
-					avgTimeSinceLastReply = -1;
-					disconnect(); // testing here
-					params.clear();
-					orderedKeys.clear();
-				}else{
-					if(verbose_) cout << "ofxRemoteUIClient: lag!" << endl;
-				}
+				disconnectStrikes = OFXREMOTEUI_DISCONNECTION_STRIKES; //reset the strike count, we heard back from server
+			}
+
+			if(disconnectStrikes >= 0){ //we got a reply, time to send another test pkt
+
+				timeCounter = 0.0f; //reset timer
+				sendTEST();
+			}else{ //we tried for too long, out of strikes! assume server is gone
+				cout << "ofxRemoteUIClient: disconnecting bc server connection timed out!" << endl;
+				avgTimeSinceLastReply = -1;
+				disconnect(); // testing here
+				params.clear();
+				orderedKeys.clear();
 			}
 		}
 

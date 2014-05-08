@@ -24,9 +24,9 @@ using namespace std;
 #define OFXREMOTEUI_PARAM_UPDATE_NOTIFICATION_SCREENTIME	6.0
 #define OFXREMOTEUI_EVENT_NOTIFICATION_SCREENTIME			5.0
 
-
 #define OFXREMOTEUI_LATENCY_TEST_RATE						0.3333
-#define OFXREMOTEUI_CONNECTION_TIMEOUT						3.0f
+#define OFXREMOTEUI_DISCONNECTION_STRIKES					4
+#define OFXREMOTEUI_CONNECTION_TIMEOUT						OFXREMOTEUI_LATENCY_TEST_RATE * OFXREMOTEUI_DISCONNECTION_STRIKES
 #define OFXREMOTEUI_SETTINGS_FILENAME						"ofxRemoteUISettings.xml"
 #define OFXREMOTEUI_XML_TAG									"OFX_REMOTE_UI_PARAMS"
 #define OFXREMOTEUI_XML_PORT								"OFX_REMOTE_UI_SERVER_PORT"
@@ -251,6 +251,7 @@ protected:
 	float							timeSinceLastReply;
 	float							avgTimeSinceLastReply;
 	bool							waitingForReply;
+	int								disconnectStrikes; 
 
 	float							updateInterval;
 	int								port;
