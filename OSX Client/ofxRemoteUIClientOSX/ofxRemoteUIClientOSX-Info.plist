@@ -36,11 +36,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>Git Commit 326</string>
+	<string>Git Commit 327</string>
 	<key>CFBundleSignature</key>
 	<string>RTUI</string>
 	<key>CFBundleVersion</key>
-	<string>develop - 7dbee59</string>
+	<string>master - eba6ec6</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>${MACOSX_DEPLOYMENT_TARGET}</string>
 	<key>NSHumanReadableCopyright</key>

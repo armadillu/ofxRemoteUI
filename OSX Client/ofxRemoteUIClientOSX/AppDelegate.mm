@@ -76,7 +76,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 		case SERVER_DISCONNECTED:{
 			//NSLog(@"## Callback: SERVER_DISCONNECTED");
-			//[me connect];
+			[me connect];
 			me->client->disconnect();
 			[me showNotificationWithTitle:@"Server Exited, Disconnected!" description:remoteIP ID:@"ServerDisconnected" priority:-1];
 			[me updateGroupPopup];
@@ -283,7 +283,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	client = new ofxRemoteUIClient();
 	client->setCallback(clientCallback);
-	//client->setVerbose(true);
+	client->setVerbose(false);
 
 	timer = [NSTimer scheduledTimerWithTimeInterval:REFRESH_RATE target:self selector:@selector(update) userInfo:nil repeats:YES];
 	statusTimer = [NSTimer scheduledTimerWithTimeInterval:STATUS_REFRESH_RATE target:self selector:@selector(statusUpdate) userInfo:nil repeats:YES];
@@ -1043,7 +1043,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	if (connectButton.state == 1){
 		float lag = client->connectionLag();
-		//printf("lag: %f\n", lag);
+
 		if (lag > OFXREMOTEUI_CONNECTION_TIMEOUT || lag < 0.0f){
 			[self connect]; //force disconnect if lag is too large
 			[progress stopAnimation:self];
@@ -1174,7 +1174,7 @@ bool resizeWindowUpDown = false; //if you keep changing paramUI size, with this 
 
 			if(!client->isReadyToSend() && weJustDisconnected <= 0){	//if the other side disconnected, or error
 				//NSLog(@"disconnect cos its NOT isReadyToSend");
-				[self connect]; //this disconnects if we were connectd
+				//[self connect]; //this disconnects if we were connectd
 				weJustDisconnected = 10;
 			}
 		}
