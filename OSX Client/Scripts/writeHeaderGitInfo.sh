@@ -18,3 +18,4 @@ gitCommitHash="Unknown Commit"
 fi
 
 echo "#define GIT_COMMIT_NUMBER @\"$gitCommitNum\"" > $SRCROOT/src/GitCommitNumber.h
+

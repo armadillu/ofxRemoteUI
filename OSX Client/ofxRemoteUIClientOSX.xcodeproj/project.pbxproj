@@ -27,14 +27,12 @@
 		BB5CC61B177E49D500B595F8 /* tinyxmlerror.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC606177E49D500B595F8 /* tinyxmlerror.cpp */; };
 		BB5CC61C177E49D500B595F8 /* tinyxmlparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC607177E49D500B595F8 /* tinyxmlparser.cpp */; };
 		BB5CC61E177E49D500B595F8 /* ofxXmlSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC60A177E49D500B595F8 /* ofxXmlSettings.cpp */; };
-		BBB627AE191C4BD1005F95BF /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = BBB627AD191C4BD1005F95BF /* icon.icns */; };
 		BBB627B7191C4C2B005F95BF /* Joystick.m in Sources */ = {isa = PBXBuildFile; fileRef = BBB627B1191C4C2B005F95BF /* Joystick.m */; };
 		BBB627B8191C4C2B005F95BF /* JoystickHatswitch.m in Sources */ = {isa = PBXBuildFile; fileRef = BBB627B3191C4C2B005F95BF /* JoystickHatswitch.m */; };
 		BBB627B9191C4C2B005F95BF /* JoystickManager.m in Sources */ = {isa = PBXBuildFile; fileRef = BBB627B5191C4C2B005F95BF /* JoystickManager.m */; };
 		BBB627BC191C4C36005F95BF /* ExternalDevices.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBB627BB191C4C36005F95BF /* ExternalDevices.mm */; };
 		BBB627C1191C4C4B005F95BF /* ColoredNSWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = BBB627BE191C4C4B005F95BF /* ColoredNSWindow.m */; };
 		BBB627C2191C4C4B005F95BF /* NSColorStringExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = BBB627C0191C4C4B005F95BF /* NSColorStringExtension.m */; };
-		BBB627C4191C4C61005F95BF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = BBB627C3191C4C61005F95BF /* main.m */; };
 		BBB627C7191C4C69005F95BF /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBB627C6191C4C69005F95BF /* AppDelegate.mm */; };
 		BBB627CC191C4C7B005F95BF /* ColorView.m in Sources */ = {isa = PBXBuildFile; fileRef = BBB627C9191C4C7B005F95BF /* ColorView.m */; };
 		BBB627CD191C4C7B005F95BF /* ParamUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBB627CB191C4C7B005F95BF /* ParamUI.mm */; };
@@ -65,6 +63,8 @@
 		BBB6280A191C4EC9005F95BF /* ofxRemoteUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBB62808191C4EC9005F95BF /* ofxRemoteUI.cpp */; };
 		BBD3270F173BFFF200D59359 /* ofxRemoteUIClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */; };
 		BBEE7856182302FF00D93161 /* ofxRemoteUINeigbors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBEE7854182302FF00D93161 /* ofxRemoteUINeigbors.cpp */; };
+		BBF0A82B191C55F30048DB4F /* ofxRemoteUIClientOSX-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BBF0A82A191C55F30048DB4F /* ofxRemoteUIClientOSX-Info.plist */; };
+		BBF0A82D191C56030048DB4F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = BBF0A82C191C56030048DB4F /* main.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -135,7 +135,6 @@
 		BB5F5EB01769462600F1FA92 /* uriencode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = uriencode.h; sourceTree = "<group>"; };
 		BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUIClient.cpp; sourceTree = "<group>"; };
 		BBAAAFA8173BF54B00FE94C4 /* ofxRemoteUIClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUIClient.h; sourceTree = "<group>"; };
-		BBB627AD191C4BD1005F95BF /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = icon.icns; path = Resources/icon.icns; sourceTree = "<group>"; };
 		BBB627AF191C4BEA005F95BF /* GitCommitNumber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GitCommitNumber.h; path = src/GitCommitNumber.h; sourceTree = "<group>"; };
 		BBB627B0191C4C2B005F95BF /* Joystick.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Joystick.h; path = src/Joystick.h; sourceTree = "<group>"; };
 		BBB627B1191C4C2B005F95BF /* Joystick.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Joystick.m; path = src/Joystick.m; sourceTree = "<group>"; };
@@ -150,7 +149,6 @@
 		BBB627BE191C4C4B005F95BF /* ColoredNSWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ColoredNSWindow.m; path = src/ColoredNSWindow.m; sourceTree = "<group>"; };
 		BBB627BF191C4C4B005F95BF /* NSColorStringExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSColorStringExtension.h; path = src/NSColorStringExtension.h; sourceTree = "<group>"; };
 		BBB627C0191C4C4B005F95BF /* NSColorStringExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSColorStringExtension.m; path = src/NSColorStringExtension.m; sourceTree = "<group>"; };
-		BBB627C3191C4C61005F95BF /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = src/main.m; sourceTree = "<group>"; };
 		BBB627C5191C4C69005F95BF /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = src/AppDelegate.h; sourceTree = SOURCE_ROOT; };
 		BBB627C6191C4C69005F95BF /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = src/AppDelegate.mm; sourceTree = SOURCE_ROOT; };
 		BBB627C8191C4C7B005F95BF /* ColorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ColorView.h; path = src/ColorView.h; sourceTree = "<group>"; };
@@ -186,6 +184,8 @@
 		BBDCBE2716A063A400F1C5EC /* ReadMe.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ReadMe.txt; sourceTree = "<group>"; };
 		BBEE7854182302FF00D93161 /* ofxRemoteUINeigbors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUINeigbors.cpp; sourceTree = "<group>"; };
 		BBEE7855182302FF00D93161 /* ofxRemoteUINeigbors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUINeigbors.h; sourceTree = "<group>"; };
+		BBF0A82A191C55F30048DB4F /* ofxRemoteUIClientOSX-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "ofxRemoteUIClientOSX-Info.plist"; path = "Resources/ofxRemoteUIClientOSX-Info.plist"; sourceTree = SOURCE_ROOT; };
+		BBF0A82C191C56030048DB4F /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = src/main.m; sourceTree = SOURCE_ROOT; };
 		BBFB932A17785ECC00A5E741 /* RemoteParam.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RemoteParam.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -212,9 +212,9 @@
 				BB4B54F0177FAD5D004838E4 /* ToDo.txt */,
 				BBDCBE2716A063A400F1C5EC /* ReadMe.txt */,
 				BB5CC5D6177E49D500B595F8 /* noOFLibs */,
-				BBB627AD191C4BD1005F95BF /* icon.icns */,
 				BBDCBDF216A051A900F1C5EC /* ofxRemoteUI */,
 				BBB627CE191C4C8F005F95BF /* ofxRemoteUIClientOSX */,
+				73002CE1140ABCF60035299A /* Supporting Files */,
 				BB089AC11799C437009C4BC7 /* Resources */,
 				73002CD9140ABCF60035299A /* Frameworks */,
 				73002CD7140ABCF60035299A /* Products */,
@@ -254,6 +254,8 @@
 		73002CE1140ABCF60035299A /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				BBF0A82C191C56030048DB4F /* main.m */,
+				BBF0A82A191C55F30048DB4F /* ofxRemoteUIClientOSX-Info.plist */,
 				BBB627FD191C4D27005F95BF /* ofxRemoteUIClientOSX-Prefix.pch */,
 			);
 			name = "Supporting Files";
@@ -263,13 +265,12 @@
 		BB089AC11799C437009C4BC7 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				BBB627EA191C4D1A005F95BF /* en.lproj */,
 				BBB627E2191C4D06005F95BF /* Growl Registration Ticket.growlRegDict */,
 				BBB627E3191C4D06005F95BF /* icon.icns */,
-				BBB627EA191C4D1A005F95BF /* en.lproj */,
 				BBB627E6191C4D0C005F95BF /* openAccessibility.scpt */,
 				BBB627E7191C4D0C005F95BF /* RestartXcodeApp.scptd */,
 				BBB627D5191C4CFB005F95BF /* Images */,
-				73002CE1140ABCF60035299A /* Supporting Files */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -448,7 +449,6 @@
 			isa = PBXGroup;
 			children = (
 				BBB627AF191C4BEA005F95BF /* GitCommitNumber.h */,
-				BBB627C3191C4C61005F95BF /* main.m */,
 				BBB627C5191C4C69005F95BF /* AppDelegate.h */,
 				BBB627C6191C4C69005F95BF /* AppDelegate.mm */,
 				BBB627C8191C4C7B005F95BF /* ColorView.h */,
@@ -590,11 +590,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BBB627AE191C4BD1005F95BF /* icon.icns in Resources */,
 				BBB627E8191C4D0C005F95BF /* openAccessibility.scpt in Resources */,
 				BBB627DE191C4CFB005F95BF /* offline.png in Resources */,
 				BBB627FC191C4D1A005F95BF /* View34.xib in Resources */,
 				BBB627F8191C4D1A005F95BF /* InfoPlist.strings in Resources */,
+				BBF0A82B191C55F30048DB4F /* ofxRemoteUIClientOSX-Info.plist in Resources */,
 				BBB627DF191C4CFB005F95BF /* offline@2x.png in Resources */,
 				BBB627F9191C4D1A005F95BF /* MainMenu.xib in Resources */,
 				BBB627DC191C4CFB005F95BF /* connected.png in Resources */,
@@ -630,7 +630,7 @@
 		};
 		BBB6280C191C50F4005F95BF /* plist Git Versioning Script */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			files = (
 			);
 			inputPaths = (
@@ -640,7 +640,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"$SRCROOT/Scripts/writePlistGitInfo.sh\"\n";
+			shellScript = "\"$SRCROOT/Scripts/writePlistGitInfo.sh\"";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -679,8 +679,8 @@
 				BB5CC61C177E49D500B595F8 /* tinyxmlparser.cpp in Sources */,
 				BBB627C2191C4C4B005F95BF /* NSColorStringExtension.m in Sources */,
 				BB5CC61E177E49D500B595F8 /* ofxXmlSettings.cpp in Sources */,
-				BBB627C4191C4C61005F95BF /* main.m in Sources */,
 				BBEE7856182302FF00D93161 /* ofxRemoteUINeigbors.cpp in Sources */,
+				BBF0A82D191C56030048DB4F /* main.m in Sources */,
 				BBB627D4191C4CD0005F95BF /* LogWindows.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
