@@ -84,7 +84,7 @@ std::string UriEncode(const std::string & sSrc)
 
 	const char DEC2HEX[16 + 1] = "0123456789ABCDEF";
 	const unsigned char * pSrc = (const unsigned char *)sSrc.c_str();
-	const int SRC_LEN = sSrc.length();
+	const int SRC_LEN = (int) sSrc.length();
 	unsigned char * const pStart = new unsigned char[SRC_LEN * 3];
 	unsigned char * pEnd = pStart;
 	const unsigned char * const SRC_END = pSrc + SRC_LEN;
@@ -116,7 +116,7 @@ std::string UriDecode(const std::string & sSrc)
 	// (0-9, A-F) are reserved for future extension"
 
 	const unsigned char * pSrc = (const unsigned char *)sSrc.c_str();
-	const int SRC_LEN = sSrc.length();
+	const int SRC_LEN = (int)sSrc.length();
 	const unsigned char * const SRC_END = pSrc + SRC_LEN;
 	// last decodable '%'
 	const unsigned char * const SRC_LAST_DEC = SRC_END - 2;

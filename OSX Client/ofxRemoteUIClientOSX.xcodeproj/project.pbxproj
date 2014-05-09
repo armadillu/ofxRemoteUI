@@ -6,28 +6,10 @@
 	objectVersion = 46;
 	objects = {
 
-/* Begin PBXAggregateTarget section */
-		BBF2EB8A182B972B0030BCF1 /* Versioning */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = BBF2EB8B182B972C0030BCF1 /* Build configuration list for PBXAggregateTarget "Versioning" */;
-			buildPhases = (
-				BBF2EB90182B97720030BCF1 /* ShellScript */,
-			);
-			dependencies = (
-			);
-			name = Versioning;
-			productName = Versioning;
-		};
-/* End PBXAggregateTarget section */
-
 /* Begin PBXBuildFile section */
 		73002CDB140ABCF60035299A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73002CDA140ABCF60035299A /* Cocoa.framework */; };
 		BB37FC98185E0FDB008DA8DD /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB37FC97185E0FDB008DA8DD /* IOKit.framework */; };
-		BB37FCA0185E0FE6008DA8DD /* Joystick.m in Sources */ = {isa = PBXBuildFile; fileRef = BB37FC9A185E0FE6008DA8DD /* Joystick.m */; };
-		BB37FCA1185E0FE6008DA8DD /* JoystickHatswitch.m in Sources */ = {isa = PBXBuildFile; fileRef = BB37FC9C185E0FE6008DA8DD /* JoystickHatswitch.m */; };
-		BB37FCA2185E0FE6008DA8DD /* JoystickManager.m in Sources */ = {isa = PBXBuildFile; fileRef = BB37FC9F185E0FE6008DA8DD /* JoystickManager.m */; };
 		BB395E96173E6326002FA815 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB395E95173E6326002FA815 /* QuartzCore.framework */; };
-		BB3AACC417BD647300401E86 /* ColoredNSWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = BB3AACC317BD647300401E86 /* ColoredNSWindow.m */; };
 		BB5CC60C177E49D500B595F8 /* IpEndpointName.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5DD177E49D500B595F8 /* IpEndpointName.cpp */; };
 		BB5CC60D177E49D500B595F8 /* NetworkingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5E2177E49D500B595F8 /* NetworkingUtils.cpp */; };
 		BB5CC60E177E49D500B595F8 /* UdpSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5E3177E49D500B595F8 /* UdpSocket.cpp */; };
@@ -45,50 +27,45 @@
 		BB5CC61B177E49D500B595F8 /* tinyxmlerror.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC606177E49D500B595F8 /* tinyxmlerror.cpp */; };
 		BB5CC61C177E49D500B595F8 /* tinyxmlparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC607177E49D500B595F8 /* tinyxmlparser.cpp */; };
 		BB5CC61E177E49D500B595F8 /* ofxXmlSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC60A177E49D500B595F8 /* ofxXmlSettings.cpp */; };
-		BB65837B16A315B2000B45F0 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = BB65837A16A315B2000B45F0 /* icon.icns */; };
-		BB6CC35D174698DE0043F523 /* MyScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = BB6CC35C174698DE0043F523 /* MyScrollView.m */; };
-		BB7EA611184B89DC00048F7A /* RestartXcodeApp.scptd in Resources */ = {isa = PBXBuildFile; fileRef = BB7EA610184B89DC00048F7A /* RestartXcodeApp.scptd */; };
-		BB7EA613184B91CD00048F7A /* openAccessibility.scpt in Resources */ = {isa = PBXBuildFile; fileRef = BB7EA612184B91CD00048F7A /* openAccessibility.scpt */; };
-		BB8394BE190B7E3A0058EAF3 /* View20.xib in Resources */ = {isa = PBXBuildFile; fileRef = BB8394BC190B7E3A0058EAF3 /* View20.xib */; };
-		BB8776E917C99B3700CC74B8 /* NSColorStringExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = BB8776E817C99B3700CC74B8 /* NSColorStringExtension.m */; };
-		BB94E57F17464E1800A7A3CC /* View26.xib in Resources */ = {isa = PBXBuildFile; fileRef = BB94E57D17464E1800A7A3CC /* View26.xib */; };
-		BB94E5AE17468EAE00A7A3CC /* ColorView.m in Sources */ = {isa = PBXBuildFile; fileRef = BB94E5AD17468EAE00A7A3CC /* ColorView.m */; };
-		BBAF53C41800C9CC0055A481 /* warning@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BBAF53C21800C9CC0055A481 /* warning@2x.png */; };
-		BBAF53C51800C9CC0055A481 /* warning.png in Resources */ = {isa = PBXBuildFile; fileRef = BBAF53C31800C9CC0055A481 /* warning.png */; };
-		BBB1D0021851E54B0015D282 /* VVMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBB1D0011851E54B0015D282 /* VVMIDI.framework */; };
-		BBB1D0031851E59D0015D282 /* VVMIDI.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBB1D0011851E54B0015D282 /* VVMIDI.framework */; };
-		BBB1D0051851E7FC0015D282 /* VVBasics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBB1D0041851E7FC0015D282 /* VVBasics.framework */; };
-		BBB1D0061851E8020015D282 /* VVBasics.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBB1D0041851E7FC0015D282 /* VVBasics.framework */; };
-		BBB1F6FB1749003B00992119 /* connected.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB1F6F91749003B00992119 /* connected.png */; };
-		BBB1F6FC1749003B00992119 /* connected@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB1F6FA1749003B00992119 /* connected@2x.png */; };
-		BBB1F6FE174900D100992119 /* offline@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB1F6FD174900D100992119 /* offline@2x.png */; };
-		BBC38584179736CB007E2DD1 /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBC38583179736CB007E2DD1 /* Growl.framework */; };
-		BBC385861797377C007E2DD1 /* Growl Registration Ticket.growlRegDict in Resources */ = {isa = PBXBuildFile; fileRef = BBC385851797377C007E2DD1 /* Growl Registration Ticket.growlRegDict */; };
-		BBC385881797385C007E2DD1 /* Growl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBC38583179736CB007E2DD1 /* Growl.framework */; };
+		BBB627AE191C4BD1005F95BF /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = BBB627AD191C4BD1005F95BF /* icon.icns */; };
+		BBB627B7191C4C2B005F95BF /* Joystick.m in Sources */ = {isa = PBXBuildFile; fileRef = BBB627B1191C4C2B005F95BF /* Joystick.m */; };
+		BBB627B8191C4C2B005F95BF /* JoystickHatswitch.m in Sources */ = {isa = PBXBuildFile; fileRef = BBB627B3191C4C2B005F95BF /* JoystickHatswitch.m */; };
+		BBB627B9191C4C2B005F95BF /* JoystickManager.m in Sources */ = {isa = PBXBuildFile; fileRef = BBB627B5191C4C2B005F95BF /* JoystickManager.m */; };
+		BBB627BC191C4C36005F95BF /* ExternalDevices.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBB627BB191C4C36005F95BF /* ExternalDevices.mm */; };
+		BBB627C1191C4C4B005F95BF /* ColoredNSWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = BBB627BE191C4C4B005F95BF /* ColoredNSWindow.m */; };
+		BBB627C2191C4C4B005F95BF /* NSColorStringExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = BBB627C0191C4C4B005F95BF /* NSColorStringExtension.m */; };
+		BBB627C4191C4C61005F95BF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = BBB627C3191C4C61005F95BF /* main.m */; };
+		BBB627C7191C4C69005F95BF /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBB627C6191C4C69005F95BF /* AppDelegate.mm */; };
+		BBB627CC191C4C7B005F95BF /* ColorView.m in Sources */ = {isa = PBXBuildFile; fileRef = BBB627C9191C4C7B005F95BF /* ColorView.m */; };
+		BBB627CD191C4C7B005F95BF /* ParamUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBB627CB191C4C7B005F95BF /* ParamUI.mm */; };
+		BBB627D1191C4CC9005F95BF /* MyScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = BBB627D0191C4CC9005F95BF /* MyScrollView.m */; };
+		BBB627D4191C4CD0005F95BF /* LogWindows.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBB627D3191C4CD0005F95BF /* LogWindows.mm */; };
+		BBB627DC191C4CFB005F95BF /* connected.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB627D6191C4CFB005F95BF /* connected.png */; };
+		BBB627DD191C4CFB005F95BF /* connected@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB627D7191C4CFB005F95BF /* connected@2x.png */; };
+		BBB627DE191C4CFB005F95BF /* offline.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB627D8191C4CFB005F95BF /* offline.png */; };
+		BBB627DF191C4CFB005F95BF /* offline@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB627D9191C4CFB005F95BF /* offline@2x.png */; };
+		BBB627E0191C4CFB005F95BF /* warning.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB627DA191C4CFB005F95BF /* warning.png */; };
+		BBB627E1191C4CFB005F95BF /* warning@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB627DB191C4CFB005F95BF /* warning@2x.png */; };
+		BBB627E4191C4D06005F95BF /* Growl Registration Ticket.growlRegDict in Resources */ = {isa = PBXBuildFile; fileRef = BBB627E2191C4D06005F95BF /* Growl Registration Ticket.growlRegDict */; };
+		BBB627E5191C4D06005F95BF /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = BBB627E3191C4D06005F95BF /* icon.icns */; };
+		BBB627E8191C4D0C005F95BF /* openAccessibility.scpt in Resources */ = {isa = PBXBuildFile; fileRef = BBB627E6191C4D0C005F95BF /* openAccessibility.scpt */; };
+		BBB627E9191C4D0C005F95BF /* RestartXcodeApp.scptd in Resources */ = {isa = PBXBuildFile; fileRef = BBB627E7191C4D0C005F95BF /* RestartXcodeApp.scptd */; };
+		BBB627F7191C4D1A005F95BF /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = BBB627EB191C4D1A005F95BF /* Credits.rtf */; };
+		BBB627F8191C4D1A005F95BF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = BBB627ED191C4D1A005F95BF /* InfoPlist.strings */; };
+		BBB627F9191C4D1A005F95BF /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = BBB627EF191C4D1A005F95BF /* MainMenu.xib */; };
+		BBB627FA191C4D1A005F95BF /* View20.xib in Resources */ = {isa = PBXBuildFile; fileRef = BBB627F1191C4D1A005F95BF /* View20.xib */; };
+		BBB627FB191C4D1A005F95BF /* View26.xib in Resources */ = {isa = PBXBuildFile; fileRef = BBB627F3191C4D1A005F95BF /* View26.xib */; };
+		BBB627FC191C4D1A005F95BF /* View34.xib in Resources */ = {isa = PBXBuildFile; fileRef = BBB627F5191C4D1A005F95BF /* View34.xib */; };
+		BBB62801191C4D3B005F95BF /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBB627FE191C4D3B005F95BF /* Growl.framework */; };
+		BBB62802191C4D3B005F95BF /* VVBasics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBB627FF191C4D3B005F95BF /* VVBasics.framework */; };
+		BBB62803191C4D3B005F95BF /* VVMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBB62800191C4D3B005F95BF /* VVMIDI.framework */; };
+		BBB62805191C4D72005F95BF /* Growl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBB627FE191C4D3B005F95BF /* Growl.framework */; };
+		BBB62806191C4D73005F95BF /* VVBasics.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBB627FF191C4D3B005F95BF /* VVBasics.framework */; };
+		BBB62807191C4D75005F95BF /* VVMIDI.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBB62800191C4D3B005F95BF /* VVMIDI.framework */; };
+		BBB6280A191C4EC9005F95BF /* ofxRemoteUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBB62808191C4EC9005F95BF /* ofxRemoteUI.cpp */; };
 		BBD3270F173BFFF200D59359 /* ofxRemoteUIClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */; };
-		BBD475FD18B1C0970095F324 /* View34.xib in Resources */ = {isa = PBXBuildFile; fileRef = BBD475FB18B1C0970095F324 /* View34.xib */; };
-		BBD9D914190336ED00C553D7 /* ExternalDevices.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBD9D913190336ED00C553D7 /* ExternalDevices.mm */; };
-		BBD9D91719036BD700C553D7 /* LogWindows.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBD9D91619036BD700C553D7 /* LogWindows.mm */; };
-		BBDCBDE416A0512300F1C5EC /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = BBDCBDDE16A0512300F1C5EC /* Credits.rtf */; };
-		BBDCBDE516A0512300F1C5EC /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = BBDCBDE016A0512300F1C5EC /* InfoPlist.strings */; };
-		BBDCBDE616A0512300F1C5EC /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = BBDCBDE216A0512300F1C5EC /* MainMenu.xib */; };
-		BBDCBDF716A051B000F1C5EC /* ofxRemoteUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBDCBDF516A051B000F1C5EC /* ofxRemoteUI.cpp */; };
-		BBDCBDF816A0523200F1C5EC /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBDCBDE816A0513D00F1C5EC /* AppDelegate.mm */; };
-		BBDCBDF916A0523500F1C5EC /* ParamUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBDCBDEA16A0513D00F1C5EC /* ParamUI.mm */; };
-		BBDCBDFB16A0523A00F1C5EC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = BBDCBDED16A0513D00F1C5EC /* main.m */; };
-		BBE6075A16A466A7002F1707 /* offline.png in Resources */ = {isa = PBXBuildFile; fileRef = BBE6075716A466A7002F1707 /* offline.png */; };
 		BBEE7856182302FF00D93161 /* ofxRemoteUINeigbors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBEE7854182302FF00D93161 /* ofxRemoteUINeigbors.cpp */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		BBF2EB8E182B975D0030BCF1 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 73002CCD140ABCF60035299A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BBF2EB8A182B972B0030BCF1;
-			remoteInfo = Versioning;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		BBC3858717973857007E2DD1 /* CopyFiles */ = {
@@ -97,9 +74,9 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				BBC385881797385C007E2DD1 /* Growl.framework in CopyFiles */,
-				BBB1D0061851E8020015D282 /* VVBasics.framework in CopyFiles */,
-				BBB1D0031851E59D0015D282 /* VVMIDI.framework in CopyFiles */,
+				BBB62807191C4D75005F95BF /* VVMIDI.framework in CopyFiles */,
+				BBB62805191C4D72005F95BF /* Growl.framework in CopyFiles */,
+				BBB62806191C4D73005F95BF /* VVBasics.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -111,18 +88,8 @@
 		73002CDD140ABCF60035299A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		73002CDE140ABCF60035299A /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		73002CDF140ABCF60035299A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		BB0C16FC18292645008C7D8B /* GitCommitNumber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GitCommitNumber.h; sourceTree = "<group>"; };
 		BB37FC97185E0FDB008DA8DD /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = ../../../../../../../../Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/IOKit.framework; sourceTree = "<group>"; };
-		BB37FC99185E0FE6008DA8DD /* Joystick.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Joystick.h; sourceTree = "<group>"; };
-		BB37FC9A185E0FE6008DA8DD /* Joystick.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Joystick.m; sourceTree = "<group>"; };
-		BB37FC9B185E0FE6008DA8DD /* JoystickHatswitch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JoystickHatswitch.h; sourceTree = "<group>"; };
-		BB37FC9C185E0FE6008DA8DD /* JoystickHatswitch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JoystickHatswitch.m; sourceTree = "<group>"; };
-		BB37FC9D185E0FE6008DA8DD /* JoystickNotificationDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JoystickNotificationDelegate.h; sourceTree = "<group>"; };
-		BB37FC9E185E0FE6008DA8DD /* JoystickManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JoystickManager.h; sourceTree = "<group>"; };
-		BB37FC9F185E0FE6008DA8DD /* JoystickManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JoystickManager.m; sourceTree = "<group>"; };
 		BB395E95173E6326002FA815 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
-		BB3AACC217BD647300401E86 /* ColoredNSWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ColoredNSWindow.h; sourceTree = "<group>"; };
-		BB3AACC317BD647300401E86 /* ColoredNSWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ColoredNSWindow.m; sourceTree = "<group>"; };
 		BB4B54F0177FAD5D004838E4 /* ToDo.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ToDo.txt; sourceTree = "<group>"; };
 		BB5CC5D7177E49D500B595F8 /* ofStolenUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofStolenUtils.h; sourceTree = "<group>"; };
 		BB5CC5DD177E49D500B595F8 /* IpEndpointName.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IpEndpointName.cpp; sourceTree = "<group>"; };
@@ -166,47 +133,57 @@
 		BB5CC60A177E49D500B595F8 /* ofxXmlSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxXmlSettings.cpp; sourceTree = "<group>"; };
 		BB5CC60B177E49D500B595F8 /* ofxXmlSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxXmlSettings.h; sourceTree = "<group>"; };
 		BB5F5EB01769462600F1FA92 /* uriencode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = uriencode.h; sourceTree = "<group>"; };
-		BB65837A16A315B2000B45F0 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = icon.icns; sourceTree = "<group>"; };
-		BB6CC35B174698DE0043F523 /* MyScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyScrollView.h; sourceTree = "<group>"; };
-		BB6CC35C174698DE0043F523 /* MyScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyScrollView.m; sourceTree = "<group>"; };
-		BB7EA610184B89DC00048F7A /* RestartXcodeApp.scptd */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = RestartXcodeApp.scptd; sourceTree = "<group>"; };
-		BB7EA612184B91CD00048F7A /* openAccessibility.scpt */ = {isa = PBXFileReference; lastKnownFileType = file; path = openAccessibility.scpt; sourceTree = "<group>"; };
-		BB8394BD190B7E3A0058EAF3 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = View20.xib; sourceTree = "<group>"; };
-		BB8776E717C99B3700CC74B8 /* NSColorStringExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSColorStringExtension.h; sourceTree = "<group>"; };
-		BB8776E817C99B3700CC74B8 /* NSColorStringExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSColorStringExtension.m; sourceTree = "<group>"; };
-		BB94E57E17464E1800A7A3CC /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = View26.xib; sourceTree = "<group>"; };
-		BB94E5AC17468EAE00A7A3CC /* ColorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ColorView.h; sourceTree = "<group>"; };
-		BB94E5AD17468EAE00A7A3CC /* ColorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ColorView.m; sourceTree = "<group>"; };
 		BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUIClient.cpp; sourceTree = "<group>"; };
 		BBAAAFA8173BF54B00FE94C4 /* ofxRemoteUIClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUIClient.h; sourceTree = "<group>"; };
-		BBAF53C21800C9CC0055A481 /* warning@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "warning@2x.png"; sourceTree = "<group>"; };
-		BBAF53C31800C9CC0055A481 /* warning.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = warning.png; sourceTree = "<group>"; };
-		BBB1D0011851E54B0015D282 /* VVMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VVMIDI.framework; path = ofxRemoteUIClientOSX/VVMIDI.framework; sourceTree = "<group>"; };
-		BBB1D0041851E7FC0015D282 /* VVBasics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VVBasics.framework; path = ofxRemoteUIClientOSX/VVBasics.framework; sourceTree = "<group>"; };
-		BBB1F6F91749003B00992119 /* connected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = connected.png; path = ofxRemoteUIClientOSX/connected.png; sourceTree = SOURCE_ROOT; };
-		BBB1F6FA1749003B00992119 /* connected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "connected@2x.png"; path = "ofxRemoteUIClientOSX/connected@2x.png"; sourceTree = SOURCE_ROOT; };
-		BBB1F6FD174900D100992119 /* offline@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "offline@2x.png"; path = "ofxRemoteUIClientOSX/offline@2x.png"; sourceTree = SOURCE_ROOT; };
-		BBC38583179736CB007E2DD1 /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Growl.framework; sourceTree = "<group>"; };
-		BBC385851797377C007E2DD1 /* Growl Registration Ticket.growlRegDict */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "Growl Registration Ticket.growlRegDict"; sourceTree = SOURCE_ROOT; };
-		BBD475FC18B1C0970095F324 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = View34.xib; sourceTree = "<group>"; };
-		BBD9D912190336ED00C553D7 /* ExternalDevices.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExternalDevices.h; sourceTree = "<group>"; };
-		BBD9D913190336ED00C553D7 /* ExternalDevices.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ExternalDevices.mm; sourceTree = "<group>"; };
-		BBD9D91519036BD700C553D7 /* LogWindows.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogWindows.h; sourceTree = "<group>"; };
-		BBD9D91619036BD700C553D7 /* LogWindows.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = LogWindows.mm; sourceTree = "<group>"; };
-		BBDCBDDF16A0512300F1C5EC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = Credits.rtf; sourceTree = "<group>"; };
-		BBDCBDE116A0512300F1C5EC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = InfoPlist.strings; sourceTree = "<group>"; };
-		BBDCBDE316A0512300F1C5EC /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = MainMenu.xib; sourceTree = "<group>"; };
-		BBDCBDE716A0513D00F1C5EC /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = ofxRemoteUIClientOSX/AppDelegate.h; sourceTree = "<group>"; };
-		BBDCBDE816A0513D00F1C5EC /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = ofxRemoteUIClientOSX/AppDelegate.mm; sourceTree = "<group>"; };
-		BBDCBDE916A0513D00F1C5EC /* ParamUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ParamUI.h; path = ofxRemoteUIClientOSX/ParamUI.h; sourceTree = "<group>"; };
-		BBDCBDEA16A0513D00F1C5EC /* ParamUI.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = ParamUI.mm; path = ofxRemoteUIClientOSX/ParamUI.mm; sourceTree = "<group>"; };
-		BBDCBDED16A0513D00F1C5EC /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = main.m; path = ofxRemoteUIClientOSX/main.m; sourceTree = "<group>"; };
-		BBDCBDF516A051B000F1C5EC /* ofxRemoteUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUI.cpp; sourceTree = "<group>"; };
-		BBDCBDF616A051B000F1C5EC /* ofxRemoteUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUI.h; sourceTree = "<group>"; };
-		BBDCBDFC16A0526C00F1C5EC /* ofxRemoteUIClientOSX-Info.plist */ = {isa = PBXFileReference; explicitFileType = text.plist.xml; name = "ofxRemoteUIClientOSX-Info.plist"; path = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist"; sourceTree = SOURCE_ROOT; };
-		BBDCBDFD16A0526C00F1C5EC /* ofxRemoteUIClientOSX-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "ofxRemoteUIClientOSX-Prefix.pch"; path = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch"; sourceTree = SOURCE_ROOT; };
+		BBB627AD191C4BD1005F95BF /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = icon.icns; path = Resources/icon.icns; sourceTree = "<group>"; };
+		BBB627AF191C4BEA005F95BF /* GitCommitNumber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GitCommitNumber.h; path = src/GitCommitNumber.h; sourceTree = "<group>"; };
+		BBB627B0191C4C2B005F95BF /* Joystick.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Joystick.h; path = src/Joystick.h; sourceTree = "<group>"; };
+		BBB627B1191C4C2B005F95BF /* Joystick.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Joystick.m; path = src/Joystick.m; sourceTree = "<group>"; };
+		BBB627B2191C4C2B005F95BF /* JoystickHatswitch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JoystickHatswitch.h; path = src/JoystickHatswitch.h; sourceTree = "<group>"; };
+		BBB627B3191C4C2B005F95BF /* JoystickHatswitch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JoystickHatswitch.m; path = src/JoystickHatswitch.m; sourceTree = "<group>"; };
+		BBB627B4191C4C2B005F95BF /* JoystickManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JoystickManager.h; path = src/JoystickManager.h; sourceTree = "<group>"; };
+		BBB627B5191C4C2B005F95BF /* JoystickManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JoystickManager.m; path = src/JoystickManager.m; sourceTree = "<group>"; };
+		BBB627B6191C4C2B005F95BF /* JoystickNotificationDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JoystickNotificationDelegate.h; path = src/JoystickNotificationDelegate.h; sourceTree = "<group>"; };
+		BBB627BA191C4C36005F95BF /* ExternalDevices.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ExternalDevices.h; path = src/ExternalDevices.h; sourceTree = "<group>"; };
+		BBB627BB191C4C36005F95BF /* ExternalDevices.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ExternalDevices.mm; path = src/ExternalDevices.mm; sourceTree = "<group>"; };
+		BBB627BD191C4C4B005F95BF /* ColoredNSWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ColoredNSWindow.h; path = src/ColoredNSWindow.h; sourceTree = "<group>"; };
+		BBB627BE191C4C4B005F95BF /* ColoredNSWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ColoredNSWindow.m; path = src/ColoredNSWindow.m; sourceTree = "<group>"; };
+		BBB627BF191C4C4B005F95BF /* NSColorStringExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSColorStringExtension.h; path = src/NSColorStringExtension.h; sourceTree = "<group>"; };
+		BBB627C0191C4C4B005F95BF /* NSColorStringExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSColorStringExtension.m; path = src/NSColorStringExtension.m; sourceTree = "<group>"; };
+		BBB627C3191C4C61005F95BF /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = src/main.m; sourceTree = "<group>"; };
+		BBB627C5191C4C69005F95BF /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = src/AppDelegate.h; sourceTree = SOURCE_ROOT; };
+		BBB627C6191C4C69005F95BF /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = src/AppDelegate.mm; sourceTree = SOURCE_ROOT; };
+		BBB627C8191C4C7B005F95BF /* ColorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ColorView.h; path = src/ColorView.h; sourceTree = "<group>"; };
+		BBB627C9191C4C7B005F95BF /* ColorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ColorView.m; path = src/ColorView.m; sourceTree = "<group>"; };
+		BBB627CA191C4C7B005F95BF /* ParamUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ParamUI.h; path = src/ParamUI.h; sourceTree = "<group>"; };
+		BBB627CB191C4C7B005F95BF /* ParamUI.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ParamUI.mm; path = src/ParamUI.mm; sourceTree = "<group>"; };
+		BBB627CF191C4CC9005F95BF /* MyScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MyScrollView.h; path = src/MyScrollView.h; sourceTree = "<group>"; };
+		BBB627D0191C4CC9005F95BF /* MyScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MyScrollView.m; path = src/MyScrollView.m; sourceTree = "<group>"; };
+		BBB627D2191C4CD0005F95BF /* LogWindows.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LogWindows.h; path = src/LogWindows.h; sourceTree = "<group>"; };
+		BBB627D3191C4CD0005F95BF /* LogWindows.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = LogWindows.mm; path = src/LogWindows.mm; sourceTree = "<group>"; };
+		BBB627D6191C4CFB005F95BF /* connected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = connected.png; sourceTree = "<group>"; };
+		BBB627D7191C4CFB005F95BF /* connected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "connected@2x.png"; sourceTree = "<group>"; };
+		BBB627D8191C4CFB005F95BF /* offline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = offline.png; sourceTree = "<group>"; };
+		BBB627D9191C4CFB005F95BF /* offline@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "offline@2x.png"; sourceTree = "<group>"; };
+		BBB627DA191C4CFB005F95BF /* warning.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = warning.png; sourceTree = "<group>"; };
+		BBB627DB191C4CFB005F95BF /* warning@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "warning@2x.png"; sourceTree = "<group>"; };
+		BBB627E2191C4D06005F95BF /* Growl Registration Ticket.growlRegDict */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = "Growl Registration Ticket.growlRegDict"; path = "Resources/Growl Registration Ticket.growlRegDict"; sourceTree = "<group>"; };
+		BBB627E3191C4D06005F95BF /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = icon.icns; path = Resources/icon.icns; sourceTree = "<group>"; };
+		BBB627E6191C4D0C005F95BF /* openAccessibility.scpt */ = {isa = PBXFileReference; lastKnownFileType = file; name = openAccessibility.scpt; path = Resources/openAccessibility.scpt; sourceTree = "<group>"; };
+		BBB627E7191C4D0C005F95BF /* RestartXcodeApp.scptd */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = RestartXcodeApp.scptd; path = Resources/RestartXcodeApp.scptd; sourceTree = "<group>"; };
+		BBB627EC191C4D1A005F95BF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = Credits.rtf; sourceTree = "<group>"; };
+		BBB627EE191C4D1A005F95BF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = InfoPlist.strings; sourceTree = "<group>"; };
+		BBB627F0191C4D1A005F95BF /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = MainMenu.xib; sourceTree = "<group>"; };
+		BBB627F2191C4D1A005F95BF /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = View20.xib; sourceTree = "<group>"; };
+		BBB627F4191C4D1A005F95BF /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = View26.xib; sourceTree = "<group>"; };
+		BBB627F6191C4D1A005F95BF /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = View34.xib; sourceTree = "<group>"; };
+		BBB627FD191C4D27005F95BF /* ofxRemoteUIClientOSX-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "ofxRemoteUIClientOSX-Prefix.pch"; path = "src/ofxRemoteUIClientOSX-Prefix.pch"; sourceTree = SOURCE_ROOT; };
+		BBB627FE191C4D3B005F95BF /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Growl.framework; path = Frameworks/Growl.framework; sourceTree = "<group>"; };
+		BBB627FF191C4D3B005F95BF /* VVBasics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VVBasics.framework; path = Frameworks/VVBasics.framework; sourceTree = "<group>"; };
+		BBB62800191C4D3B005F95BF /* VVMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VVMIDI.framework; path = Frameworks/VVMIDI.framework; sourceTree = "<group>"; };
+		BBB62808191C4EC9005F95BF /* ofxRemoteUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUI.cpp; sourceTree = "<group>"; };
+		BBB62809191C4EC9005F95BF /* ofxRemoteUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUI.h; sourceTree = "<group>"; };
 		BBDCBE2716A063A400F1C5EC /* ReadMe.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ReadMe.txt; sourceTree = "<group>"; };
-		BBE6075716A466A7002F1707 /* offline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = offline.png; path = ofxRemoteUIClientOSX/offline.png; sourceTree = SOURCE_ROOT; };
 		BBEE7854182302FF00D93161 /* ofxRemoteUINeigbors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUINeigbors.cpp; sourceTree = "<group>"; };
 		BBEE7855182302FF00D93161 /* ofxRemoteUINeigbors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUINeigbors.h; sourceTree = "<group>"; };
 		BBFB932A17785ECC00A5E741 /* RemoteParam.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RemoteParam.h; sourceTree = "<group>"; };
@@ -219,10 +196,10 @@
 			files = (
 				BB37FC98185E0FDB008DA8DD /* IOKit.framework in Frameworks */,
 				BB395E96173E6326002FA815 /* QuartzCore.framework in Frameworks */,
+				BBB62803191C4D3B005F95BF /* VVMIDI.framework in Frameworks */,
+				BBB62801191C4D3B005F95BF /* Growl.framework in Frameworks */,
 				73002CDB140ABCF60035299A /* Cocoa.framework in Frameworks */,
-				BBC38584179736CB007E2DD1 /* Growl.framework in Frameworks */,
-				BBB1D0051851E7FC0015D282 /* VVBasics.framework in Frameworks */,
-				BBB1D0021851E54B0015D282 /* VVMIDI.framework in Frameworks */,
+				BBB62802191C4D3B005F95BF /* VVBasics.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -233,11 +210,11 @@
 			isa = PBXGroup;
 			children = (
 				BB4B54F0177FAD5D004838E4 /* ToDo.txt */,
-				BB5CC5D6177E49D500B595F8 /* noOFLibs */,
 				BBDCBE2716A063A400F1C5EC /* ReadMe.txt */,
-				BB65837A16A315B2000B45F0 /* icon.icns */,
+				BB5CC5D6177E49D500B595F8 /* noOFLibs */,
+				BBB627AD191C4BD1005F95BF /* icon.icns */,
 				BBDCBDF216A051A900F1C5EC /* ofxRemoteUI */,
-				BB4E4413169F291B00A94935 /* src */,
+				BBB627CE191C4C8F005F95BF /* ofxRemoteUIClientOSX */,
 				BB089AC11799C437009C4BC7 /* Resources */,
 				73002CD9140ABCF60035299A /* Frameworks */,
 				73002CD7140ABCF60035299A /* Products */,
@@ -255,10 +232,8 @@
 		73002CD9140ABCF60035299A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BBB62804191C4D42005F95BF /* 3rd Party */,
 				BB37FC97185E0FDB008DA8DD /* IOKit.framework */,
-				BBB1D0041851E7FC0015D282 /* VVBasics.framework */,
-				BBB1D0011851E54B0015D282 /* VVMIDI.framework */,
-				BBC38583179736CB007E2DD1 /* Growl.framework */,
 				BB395E95173E6326002FA815 /* QuartzCore.framework */,
 				73002CDA140ABCF60035299A /* Cocoa.framework */,
 				73002CDC140ABCF60035299A /* Other Frameworks */,
@@ -279,7 +254,7 @@
 		73002CE1140ABCF60035299A /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				BBDCBDFD16A0526C00F1C5EC /* ofxRemoteUIClientOSX-Prefix.pch */,
+				BBB627FD191C4D27005F95BF /* ofxRemoteUIClientOSX-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			path = LionTableViewTesting;
@@ -288,62 +263,29 @@
 		BB089AC11799C437009C4BC7 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				BB7EA612184B91CD00048F7A /* openAccessibility.scpt */,
-				BB7EA610184B89DC00048F7A /* RestartXcodeApp.scptd */,
-				BBDCBDDD16A0512300F1C5EC /* en.lproj */,
-				BBC385851797377C007E2DD1 /* Growl Registration Ticket.growlRegDict */,
-				BBDCBDFC16A0526C00F1C5EC /* ofxRemoteUIClientOSX-Info.plist */,
-				BB089AC21799C45C009C4BC7 /* Images */,
+				BBB627E2191C4D06005F95BF /* Growl Registration Ticket.growlRegDict */,
+				BBB627E3191C4D06005F95BF /* icon.icns */,
+				BBB627EA191C4D1A005F95BF /* en.lproj */,
+				BBB627E6191C4D0C005F95BF /* openAccessibility.scpt */,
+				BBB627E7191C4D0C005F95BF /* RestartXcodeApp.scptd */,
+				BBB627D5191C4CFB005F95BF /* Images */,
 				73002CE1140ABCF60035299A /* Supporting Files */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
 		};
-		BB089AC21799C45C009C4BC7 /* Images */ = {
-			isa = PBXGroup;
-			children = (
-				BBAF53C21800C9CC0055A481 /* warning@2x.png */,
-				BBAF53C31800C9CC0055A481 /* warning.png */,
-				BBB1F6F91749003B00992119 /* connected.png */,
-				BBB1F6FA1749003B00992119 /* connected@2x.png */,
-				BBE6075716A466A7002F1707 /* offline.png */,
-				BBB1F6FD174900D100992119 /* offline@2x.png */,
-			);
-			name = Images;
-			sourceTree = "<group>";
-		};
 		BB37FC96185E0FC0008DA8DD /* joystick */ = {
 			isa = PBXGroup;
 			children = (
-				BB37FC99185E0FE6008DA8DD /* Joystick.h */,
-				BB37FC9A185E0FE6008DA8DD /* Joystick.m */,
-				BB37FC9B185E0FE6008DA8DD /* JoystickHatswitch.h */,
-				BB37FC9C185E0FE6008DA8DD /* JoystickHatswitch.m */,
-				BB37FC9D185E0FE6008DA8DD /* JoystickNotificationDelegate.h */,
-				BB37FC9E185E0FE6008DA8DD /* JoystickManager.h */,
-				BB37FC9F185E0FE6008DA8DD /* JoystickManager.m */,
+				BBB627B0191C4C2B005F95BF /* Joystick.h */,
+				BBB627B1191C4C2B005F95BF /* Joystick.m */,
+				BBB627B2191C4C2B005F95BF /* JoystickHatswitch.h */,
+				BBB627B3191C4C2B005F95BF /* JoystickHatswitch.m */,
+				BBB627B4191C4C2B005F95BF /* JoystickManager.h */,
+				BBB627B5191C4C2B005F95BF /* JoystickManager.m */,
+				BBB627B6191C4C2B005F95BF /* JoystickNotificationDelegate.h */,
 			);
 			name = joystick;
-			sourceTree = "<group>";
-		};
-		BB4E4413169F291B00A94935 /* src */ = {
-			isa = PBXGroup;
-			children = (
-				BBD9D9111903369500C553D7 /* ExternalDevices */,
-				BBDCBDED16A0513D00F1C5EC /* main.m */,
-				BBDCBDE716A0513D00F1C5EC /* AppDelegate.h */,
-				BBDCBDE816A0513D00F1C5EC /* AppDelegate.mm */,
-				BBDCBDE916A0513D00F1C5EC /* ParamUI.h */,
-				BBDCBDEA16A0513D00F1C5EC /* ParamUI.mm */,
-				BB94E5AC17468EAE00A7A3CC /* ColorView.h */,
-				BB94E5AD17468EAE00A7A3CC /* ColorView.m */,
-				BB6CC35B174698DE0043F523 /* MyScrollView.h */,
-				BB6CC35C174698DE0043F523 /* MyScrollView.m */,
-				BBD9D91519036BD700C553D7 /* LogWindows.h */,
-				BBD9D91619036BD700C553D7 /* LogWindows.mm */,
-				BB8776ED17C9A39100CC74B8 /* ColoredWindow */,
-			);
-			name = src;
 			sourceTree = "<group>";
 		};
 		BB5CC5D6177E49D500B595F8 /* noOFLibs */ = {
@@ -494,42 +436,86 @@
 		BB8776ED17C9A39100CC74B8 /* ColoredWindow */ = {
 			isa = PBXGroup;
 			children = (
-				BB8776E717C99B3700CC74B8 /* NSColorStringExtension.h */,
-				BB8776E817C99B3700CC74B8 /* NSColorStringExtension.m */,
-				BB3AACC217BD647300401E86 /* ColoredNSWindow.h */,
-				BB3AACC317BD647300401E86 /* ColoredNSWindow.m */,
+				BBB627BD191C4C4B005F95BF /* ColoredNSWindow.h */,
+				BBB627BE191C4C4B005F95BF /* ColoredNSWindow.m */,
+				BBB627BF191C4C4B005F95BF /* NSColorStringExtension.h */,
+				BBB627C0191C4C4B005F95BF /* NSColorStringExtension.m */,
 			);
 			name = ColoredWindow;
+			sourceTree = "<group>";
+		};
+		BBB627CE191C4C8F005F95BF /* ofxRemoteUIClientOSX */ = {
+			isa = PBXGroup;
+			children = (
+				BBB627AF191C4BEA005F95BF /* GitCommitNumber.h */,
+				BBB627C3191C4C61005F95BF /* main.m */,
+				BBB627C5191C4C69005F95BF /* AppDelegate.h */,
+				BBB627C6191C4C69005F95BF /* AppDelegate.mm */,
+				BBB627C8191C4C7B005F95BF /* ColorView.h */,
+				BBB627C9191C4C7B005F95BF /* ColorView.m */,
+				BBB627CA191C4C7B005F95BF /* ParamUI.h */,
+				BBB627CB191C4C7B005F95BF /* ParamUI.mm */,
+				BBB627D2191C4CD0005F95BF /* LogWindows.h */,
+				BBB627D3191C4CD0005F95BF /* LogWindows.mm */,
+				BBB627CF191C4CC9005F95BF /* MyScrollView.h */,
+				BBB627D0191C4CC9005F95BF /* MyScrollView.m */,
+				BB8776ED17C9A39100CC74B8 /* ColoredWindow */,
+				BBD9D9111903369500C553D7 /* ExternalDevices */,
+			);
+			name = ofxRemoteUIClientOSX;
+			sourceTree = "<group>";
+		};
+		BBB627D5191C4CFB005F95BF /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				BBB627D6191C4CFB005F95BF /* connected.png */,
+				BBB627D7191C4CFB005F95BF /* connected@2x.png */,
+				BBB627D8191C4CFB005F95BF /* offline.png */,
+				BBB627D9191C4CFB005F95BF /* offline@2x.png */,
+				BBB627DA191C4CFB005F95BF /* warning.png */,
+				BBB627DB191C4CFB005F95BF /* warning@2x.png */,
+			);
+			name = Images;
+			path = Resources/Images;
+			sourceTree = "<group>";
+		};
+		BBB627EA191C4D1A005F95BF /* en.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				BBB627EB191C4D1A005F95BF /* Credits.rtf */,
+				BBB627ED191C4D1A005F95BF /* InfoPlist.strings */,
+				BBB627EF191C4D1A005F95BF /* MainMenu.xib */,
+				BBB627F1191C4D1A005F95BF /* View20.xib */,
+				BBB627F3191C4D1A005F95BF /* View26.xib */,
+				BBB627F5191C4D1A005F95BF /* View34.xib */,
+			);
+			name = en.lproj;
+			path = Resources/en.lproj;
+			sourceTree = "<group>";
+		};
+		BBB62804191C4D42005F95BF /* 3rd Party */ = {
+			isa = PBXGroup;
+			children = (
+				BBB627FE191C4D3B005F95BF /* Growl.framework */,
+				BBB627FF191C4D3B005F95BF /* VVBasics.framework */,
+				BBB62800191C4D3B005F95BF /* VVMIDI.framework */,
+			);
+			name = "3rd Party";
 			sourceTree = "<group>";
 		};
 		BBD9D9111903369500C553D7 /* ExternalDevices */ = {
 			isa = PBXGroup;
 			children = (
-				BBD9D912190336ED00C553D7 /* ExternalDevices.h */,
-				BBD9D913190336ED00C553D7 /* ExternalDevices.mm */,
 				BB37FC96185E0FC0008DA8DD /* joystick */,
+				BBB627BA191C4C36005F95BF /* ExternalDevices.h */,
+				BBB627BB191C4C36005F95BF /* ExternalDevices.mm */,
 			);
 			name = ExternalDevices;
 			sourceTree = "<group>";
 		};
-		BBDCBDDD16A0512300F1C5EC /* en.lproj */ = {
-			isa = PBXGroup;
-			children = (
-				BBDCBDDE16A0512300F1C5EC /* Credits.rtf */,
-				BBDCBDE016A0512300F1C5EC /* InfoPlist.strings */,
-				BBDCBDE216A0512300F1C5EC /* MainMenu.xib */,
-				BBD475FB18B1C0970095F324 /* View34.xib */,
-				BB94E57D17464E1800A7A3CC /* View26.xib */,
-				BB8394BC190B7E3A0058EAF3 /* View20.xib */,
-			);
-			name = en.lproj;
-			path = ofxRemoteUIClientOSX/en.lproj;
-			sourceTree = SOURCE_ROOT;
-		};
 		BBDCBDF216A051A900F1C5EC /* ofxRemoteUI */ = {
 			isa = PBXGroup;
 			children = (
-				BB0C16FC18292645008C7D8B /* GitCommitNumber.h */,
 				BBDCBDF416A051B000F1C5EC /* src */,
 			);
 			name = ofxRemoteUI;
@@ -538,12 +524,12 @@
 		BBDCBDF416A051B000F1C5EC /* src */ = {
 			isa = PBXGroup;
 			children = (
+				BBB62808191C4EC9005F95BF /* ofxRemoteUI.cpp */,
+				BBB62809191C4EC9005F95BF /* ofxRemoteUI.h */,
 				BBEE7854182302FF00D93161 /* ofxRemoteUINeigbors.cpp */,
 				BBEE7855182302FF00D93161 /* ofxRemoteUINeigbors.h */,
 				BBFB932A17785ECC00A5E741 /* RemoteParam.h */,
 				BB5F5EB01769462600F1FA92 /* uriencode.h */,
-				BBDCBDF516A051B000F1C5EC /* ofxRemoteUI.cpp */,
-				BBDCBDF616A051B000F1C5EC /* ofxRemoteUI.h */,
 				BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */,
 				BBAAAFA8173BF54B00FE94C4 /* ofxRemoteUIClient.h */,
 			);
@@ -558,15 +544,16 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 73002CF4140ABCF60035299A /* Build configuration list for PBXNativeTarget "ofxRemoteUIClientOSX" */;
 			buildPhases = (
+				BBB6280B191C4F53005F95BF /* Generate Git header Script */,
 				73002CD2140ABCF60035299A /* Sources */,
 				73002CD3140ABCF60035299A /* Frameworks */,
 				73002CD4140ABCF60035299A /* Resources */,
 				BBC3858717973857007E2DD1 /* CopyFiles */,
+				BBB6280C191C50F4005F95BF /* plist Git Versioning Script */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				BBF2EB8F182B975D0030BCF1 /* PBXTargetDependency */,
 			);
 			name = ofxRemoteUIClientOSX;
 			productName = LionTableViewTesting;
@@ -579,6 +566,7 @@
 		73002CCD140ABCF60035299A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastUpgradeCheck = 0510;
 			};
 			buildConfigurationList = 73002CD0140ABCF60035299A /* Build configuration list for PBXProject "ofxRemoteUIClientOSX" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -592,7 +580,6 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				BBF2EB8A182B972B0030BCF1 /* Versioning */,
 				73002CD5140ABCF60035299A /* ofxRemoteUIClientOSX */,
 			);
 		};
@@ -603,40 +590,57 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BBAF53C51800C9CC0055A481 /* warning.png in Resources */,
-				BBD475FD18B1C0970095F324 /* View34.xib in Resources */,
-				BBDCBDE416A0512300F1C5EC /* Credits.rtf in Resources */,
-				BBDCBDE516A0512300F1C5EC /* InfoPlist.strings in Resources */,
-				BB7EA611184B89DC00048F7A /* RestartXcodeApp.scptd in Resources */,
-				BBDCBDE616A0512300F1C5EC /* MainMenu.xib in Resources */,
-				BB65837B16A315B2000B45F0 /* icon.icns in Resources */,
-				BBE6075A16A466A7002F1707 /* offline.png in Resources */,
-				BB94E57F17464E1800A7A3CC /* View26.xib in Resources */,
-				BBB1F6FB1749003B00992119 /* connected.png in Resources */,
-				BB8394BE190B7E3A0058EAF3 /* View20.xib in Resources */,
-				BBB1F6FC1749003B00992119 /* connected@2x.png in Resources */,
-				BB7EA613184B91CD00048F7A /* openAccessibility.scpt in Resources */,
-				BBAF53C41800C9CC0055A481 /* warning@2x.png in Resources */,
-				BBB1F6FE174900D100992119 /* offline@2x.png in Resources */,
-				BBC385861797377C007E2DD1 /* Growl Registration Ticket.growlRegDict in Resources */,
+				BBB627AE191C4BD1005F95BF /* icon.icns in Resources */,
+				BBB627E8191C4D0C005F95BF /* openAccessibility.scpt in Resources */,
+				BBB627DE191C4CFB005F95BF /* offline.png in Resources */,
+				BBB627FC191C4D1A005F95BF /* View34.xib in Resources */,
+				BBB627F8191C4D1A005F95BF /* InfoPlist.strings in Resources */,
+				BBB627DF191C4CFB005F95BF /* offline@2x.png in Resources */,
+				BBB627F9191C4D1A005F95BF /* MainMenu.xib in Resources */,
+				BBB627DC191C4CFB005F95BF /* connected.png in Resources */,
+				BBB627E0191C4CFB005F95BF /* warning.png in Resources */,
+				BBB627DD191C4CFB005F95BF /* connected@2x.png in Resources */,
+				BBB627F7191C4D1A005F95BF /* Credits.rtf in Resources */,
+				BBB627E9191C4D0C005F95BF /* RestartXcodeApp.scptd in Resources */,
+				BBB627E1191C4CFB005F95BF /* warning@2x.png in Resources */,
+				BBB627FA191C4D1A005F95BF /* View20.xib in Resources */,
+				BBB627E4191C4D06005F95BF /* Growl Registration Ticket.growlRegDict in Resources */,
+				BBB627FB191C4D1A005F95BF /* View26.xib in Resources */,
+				BBB627E5191C4D06005F95BF /* icon.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		BBF2EB90182B97720030BCF1 /* ShellScript */ = {
+		BBB6280B191C4F53005F95BF /* Generate Git header Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = "Generate Git header Script";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"$SRCROOT/Scripts/writeVerionInfo.sh\"";
+			shellScript = "\"$SRCROOT/Scripts/writeHeaderGitInfo.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BBB6280C191C50F4005F95BF /* plist Git Versioning Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "plist Git Versioning Script";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/Scripts/writePlistGitInfo.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -646,98 +650,90 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BBD9D914190336ED00C553D7 /* ExternalDevices.mm in Sources */,
-				BBDCBDF716A051B000F1C5EC /* ofxRemoteUI.cpp in Sources */,
-				BBDCBDF816A0523200F1C5EC /* AppDelegate.mm in Sources */,
+				BBB627CD191C4C7B005F95BF /* ParamUI.mm in Sources */,
+				BBB627D1191C4CC9005F95BF /* MyScrollView.m in Sources */,
 				BBD3270F173BFFF200D59359 /* ofxRemoteUIClient.cpp in Sources */,
-				BB37FCA2185E0FE6008DA8DD /* JoystickManager.m in Sources */,
-				BBDCBDF916A0523500F1C5EC /* ParamUI.mm in Sources */,
-				BBDCBDFB16A0523A00F1C5EC /* main.m in Sources */,
-				BB94E5AE17468EAE00A7A3CC /* ColorView.m in Sources */,
-				BB6CC35D174698DE0043F523 /* MyScrollView.m in Sources */,
+				BBB627BC191C4C36005F95BF /* ExternalDevices.mm in Sources */,
+				BBB627B9191C4C2B005F95BF /* JoystickManager.m in Sources */,
+				BBB627C7191C4C69005F95BF /* AppDelegate.mm in Sources */,
 				BB5CC60C177E49D500B595F8 /* IpEndpointName.cpp in Sources */,
 				BB5CC60D177E49D500B595F8 /* NetworkingUtils.cpp in Sources */,
 				BB5CC60E177E49D500B595F8 /* UdpSocket.cpp in Sources */,
 				BB5CC60F177E49D500B595F8 /* NetworkingUtilsWin.cpp in Sources */,
 				BB5CC610177E49D500B595F8 /* UdpSocketWin.cpp in Sources */,
 				BB5CC611177E49D500B595F8 /* OscOutboundPacketStream.cpp in Sources */,
+				BBB627B8191C4C2B005F95BF /* JoystickHatswitch.m in Sources */,
 				BB5CC612177E49D500B595F8 /* OscPrintReceivedElements.cpp in Sources */,
 				BB5CC613177E49D500B595F8 /* OscReceivedElements.cpp in Sources */,
 				BB5CC614177E49D500B595F8 /* OscTypes.cpp in Sources */,
+				BBB627C1191C4C4B005F95BF /* ColoredNSWindow.m in Sources */,
 				BB5CC616177E49D500B595F8 /* ofxOscBundle.cpp in Sources */,
+				BBB627CC191C4C7B005F95BF /* ColorView.m in Sources */,
 				BB5CC617177E49D500B595F8 /* ofxOscMessage.cpp in Sources */,
-				BBD9D91719036BD700C553D7 /* LogWindows.mm in Sources */,
-				BB37FCA1185E0FE6008DA8DD /* JoystickHatswitch.m in Sources */,
 				BB5CC618177E49D500B595F8 /* ofxOscReceiver.cpp in Sources */,
 				BB5CC619177E49D500B595F8 /* ofxOscSender.cpp in Sources */,
 				BB5CC61A177E49D500B595F8 /* tinyxml.cpp in Sources */,
-				BB37FCA0185E0FE6008DA8DD /* Joystick.m in Sources */,
+				BBB6280A191C4EC9005F95BF /* ofxRemoteUI.cpp in Sources */,
+				BBB627B7191C4C2B005F95BF /* Joystick.m in Sources */,
 				BB5CC61B177E49D500B595F8 /* tinyxmlerror.cpp in Sources */,
 				BB5CC61C177E49D500B595F8 /* tinyxmlparser.cpp in Sources */,
+				BBB627C2191C4C4B005F95BF /* NSColorStringExtension.m in Sources */,
 				BB5CC61E177E49D500B595F8 /* ofxXmlSettings.cpp in Sources */,
-				BB3AACC417BD647300401E86 /* ColoredNSWindow.m in Sources */,
-				BB8776E917C99B3700CC74B8 /* NSColorStringExtension.m in Sources */,
+				BBB627C4191C4C61005F95BF /* main.m in Sources */,
 				BBEE7856182302FF00D93161 /* ofxRemoteUINeigbors.cpp in Sources */,
+				BBB627D4191C4CD0005F95BF /* LogWindows.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXTargetDependency section */
-		BBF2EB8F182B975D0030BCF1 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BBF2EB8A182B972B0030BCF1 /* Versioning */;
-			targetProxy = BBF2EB8E182B975D0030BCF1 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin PBXVariantGroup section */
-		BB8394BC190B7E3A0058EAF3 /* View20.xib */ = {
+		BBB627EB191C4D1A005F95BF /* Credits.rtf */ = {
 			isa = PBXVariantGroup;
 			children = (
-				BB8394BD190B7E3A0058EAF3 /* en */,
-			);
-			name = View20.xib;
-			sourceTree = "<group>";
-		};
-		BB94E57D17464E1800A7A3CC /* View26.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				BB94E57E17464E1800A7A3CC /* en */,
-			);
-			name = View26.xib;
-			sourceTree = "<group>";
-		};
-		BBD475FB18B1C0970095F324 /* View34.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				BBD475FC18B1C0970095F324 /* en */,
-			);
-			name = View34.xib;
-			sourceTree = "<group>";
-		};
-		BBDCBDDE16A0512300F1C5EC /* Credits.rtf */ = {
-			isa = PBXVariantGroup;
-			children = (
-				BBDCBDDF16A0512300F1C5EC /* en */,
+				BBB627EC191C4D1A005F95BF /* en */,
 			);
 			name = Credits.rtf;
 			sourceTree = "<group>";
 		};
-		BBDCBDE016A0512300F1C5EC /* InfoPlist.strings */ = {
+		BBB627ED191C4D1A005F95BF /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				BBDCBDE116A0512300F1C5EC /* en */,
+				BBB627EE191C4D1A005F95BF /* en */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		BBDCBDE216A0512300F1C5EC /* MainMenu.xib */ = {
+		BBB627EF191C4D1A005F95BF /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				BBDCBDE316A0512300F1C5EC /* en */,
+				BBB627F0191C4D1A005F95BF /* en */,
 			);
 			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+		BBB627F1191C4D1A005F95BF /* View20.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BBB627F2191C4D1A005F95BF /* en */,
+			);
+			name = View20.xib;
+			sourceTree = "<group>";
+		};
+		BBB627F3191C4D1A005F95BF /* View26.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BBB627F4191C4D1A005F95BF /* en */,
+			);
+			name = View26.xib;
+			sourceTree = "<group>";
+		};
+		BBB627F5191C4D1A005F95BF /* View34.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BBB627F6191C4D1A005F95BF /* en */,
+			);
+			name = View34.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -753,6 +749,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREFIX_HEADER = "src/ofxRemoteUIClientOSX-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -773,6 +770,8 @@
 					../noOFLibs/ofxOsc/libs/oscpack/src/osc,
 					../noOFLibs/ofxOsc/src,
 				);
+				INFOPLIST_FILE = "Resources/ofxRemoteUIClientOSX-Info.plist";
+				INFOPLIST_OUTPUT_FORMAT = XML;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx10.8;
@@ -788,6 +787,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PREFIX_HEADER = "src/ofxRemoteUIClientOSX-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
@@ -803,6 +803,8 @@
 					../noOFLibs/ofxOsc/libs/oscpack/src/osc,
 					../noOFLibs/ofxOsc/src,
 				);
+				INFOPLIST_FILE = "Resources/ofxRemoteUIClientOSX-Info.plist";
+				INFOPLIST_OUTPUT_FORMAT = XML;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				SDKROOT = macosx10.8;
 			};
@@ -820,12 +822,11 @@
 					"$(inherited)",
 					"$(SRCROOT)",
 					ofxRemoteUIClientOSX,
+					"$(PROJECT_DIR)/Frameworks",
 				);
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch";
 				GCC_VERSION = "";
-				INFOPLIST_FILE = "$(SRCROOT)/ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = ofxRemoteUIClientOSX;
@@ -846,32 +847,17 @@
 					"$(inherited)",
 					"$(SRCROOT)",
 					ofxRemoteUIClientOSX,
+					"$(PROJECT_DIR)/Frameworks",
 				);
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_OPTIMIZATION_LEVEL = fast;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Prefix.pch";
 				GCC_VERSION = "";
-				INFOPLIST_FILE = "$(SRCROOT)/ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = ofxRemoteUIClientOSX;
 				STRIP_INSTALLED_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
-			};
-			name = Release;
-		};
-		BBF2EB8C182B972C0030BCF1 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		BBF2EB8D182B972C0030BCF1 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -892,15 +878,6 @@
 			buildConfigurations = (
 				73002CF5140ABCF60035299A /* Debug */,
 				73002CF6140ABCF60035299A /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		BBF2EB8B182B972C0030BCF1 /* Build configuration list for PBXAggregateTarget "Versioning" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				BBF2EB8C182B972C0030BCF1 /* Debug */,
-				BBF2EB8D182B972C0030BCF1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

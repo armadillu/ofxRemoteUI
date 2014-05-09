@@ -1,7 +1,6 @@
 #/bin/bash
 
-INFOPLIST_OUTPUT_FORMAT="<unspecified>";
-
+echo "path=$INFOPLIST_PATH"
 
 gitCommitNum=$(git rev-list HEAD --count)
 gitBranch=$(git rev-parse --abbrev-ref HEAD)
@@ -22,8 +21,3 @@ fi
 
 defaults write "$INFOPLIST_PATH" "CFBundleShortVersionString" "Git Commit $gitCommitNum"
 defaults write "$INFOPLIST_PATH" "CFBundleVersion" "$gitBranch - $gitCommitHash"
-
-plutil -convert xml1 "$SRCROOT/ofxRemoteUIClientOSX/ofxRemoteUIClientOSX-Info.plist"
-
-echo "#define GIT_COMMIT_NUMBER @\"$gitCommitNum\"" > $SRCROOT/GitCommitNumber.h
-echo 'GIT_COMMIT_NUMBER is '$gitCommitNum
