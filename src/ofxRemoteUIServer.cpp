@@ -651,6 +651,18 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				params[key] = p;
 				syncPointerToParam(key);
 				pushParamsToClient();
+				if(callBack != NULL){ //send "param modified" callback to ourselves!
+					RemoteUIServerCallBackArg cbArg;
+					cbArg.action = CLIENT_DID_RESET_TO_XML;
+					cbArg.host = "localhost";
+					cbArg.action =  CLIENT_UPDATED_PARAM;
+					cbArg.paramName = key;
+					cbArg.param = params[key];  //copy the updated param to the callbakc arg
+					#ifdef OF_AVAILABLE
+					onScreenNotifications.addParamUpdate(key, cbArg.param.getValueAsString());
+					#endif
+					callBack(cbArg);
+				}
 				}break;
 
 		}
