@@ -135,7 +135,6 @@
 		BB5F5EB01769462600F1FA92 /* uriencode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = uriencode.h; sourceTree = "<group>"; };
 		BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUIClient.cpp; sourceTree = "<group>"; };
 		BBAAAFA8173BF54B00FE94C4 /* ofxRemoteUIClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUIClient.h; sourceTree = "<group>"; };
-		BBB627AF191C4BEA005F95BF /* GitCommitNumber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GitCommitNumber.h; path = src/GitCommitNumber.h; sourceTree = "<group>"; };
 		BBB627B0191C4C2B005F95BF /* Joystick.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Joystick.h; path = src/Joystick.h; sourceTree = "<group>"; };
 		BBB627B1191C4C2B005F95BF /* Joystick.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Joystick.m; path = src/Joystick.m; sourceTree = "<group>"; };
 		BBB627B2191C4C2B005F95BF /* JoystickHatswitch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JoystickHatswitch.h; path = src/JoystickHatswitch.h; sourceTree = "<group>"; };
@@ -448,7 +447,6 @@
 		BBB627CE191C4C8F005F95BF /* ofxRemoteUIClientOSX */ = {
 			isa = PBXGroup;
 			children = (
-				BBB627AF191C4BEA005F95BF /* GitCommitNumber.h */,
 				BBB627C5191C4C69005F95BF /* AppDelegate.h */,
 				BBB627C6191C4C69005F95BF /* AppDelegate.mm */,
 				BBB627C8191C4C7B005F95BF /* ColorView.h */,
