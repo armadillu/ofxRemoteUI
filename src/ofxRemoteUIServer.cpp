@@ -39,6 +39,10 @@ ofxRemoteUIServer* ofxRemoteUIServer::instance(){
 	return singleton;
 }
 
+void ofxRemoteUIServer::setEnabled(bool enabled_){
+	enabled = enabled_;
+}
+
 void ofxRemoteUIServer::setDrawsNotificationsAutomaticallly(bool draw){
 	drawNotifications = draw;
 }
@@ -50,6 +54,7 @@ void ofxRemoteUIServer::setShowInterfaceKey(char k){
 ofxRemoteUIServer::ofxRemoteUIServer(){
 
 	//cout << "serving at: " << getMyIP() << endl;
+	enabled = true;
 	readyToSend = false;
 	saveToXmlOnExit = true;
 	broadcastTime = OFXREMOTEUI_BORADCAST_INTERVAL + 0.05;
@@ -68,7 +73,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	//add random colors to table
 	colorTableIndex = 0;
 	broadcastCount = 0;
-	newColorInGroupCounter = 0;
+	newColorInGroupCounter = 1;
 	showInterfaceKey = '\t';
 	int a = 80;
 #ifdef OF_AVAILABLE
@@ -76,14 +81,13 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	ofSeedRandom(1979);
 	ofColor prevColor = ofColor::fromHsb(0, 255, 200, BG_COLOR_ALPHA);
 	for(int i = 0; i < 30; i++){
-		ofColor c = prevColor;
-		c.setHue(  ((int) (prevColor.getHue() + 25) ) % 255 );
-		//c.setSaturation(prevColor.getSaturation() + ofRandom(-0.1,0.1) );
+		ofColor c = ofColor::fromHsb(prevColor.getHue() + 10, 255, 210, BG_COLOR_ALPHA);
 		colorTables.push_back( c );
 		prevColor = c;
 	}
 	//shuffle
-	//std::random_shuffle ( colorTables.begin(), colorTables.end() );
+	std::srand(1979);
+	std::random_shuffle ( colorTables.begin(), colorTables.end() );
 	ofSeedRandom();
 #else
 	colorTables.push_back(ofColor(194,144,221,a) );
@@ -144,22 +148,25 @@ void ofxRemoteUIServer::close(){
 
 void ofxRemoteUIServer::setParamGroup(string g){
 	upcomingGroup = g;
-	newColorInGroupCounter = 0;
-	setNewParamColor(2);
-	setNewParamColorVariation();
+	newColorInGroupCounter = 1;
+	setNewParamColor(1);
+	setNewParamColorVariation(true);
 	addSpacer(g);
 }
+
 
 void ofxRemoteUIServer::unsetParamColor(){
 	colorSet = false;
 }
 
 
-void ofxRemoteUIServer::setNewParamColorVariation(){
+void ofxRemoteUIServer::setNewParamColorVariation(bool dontChangeVariation){
 	paramColorCurrentVariation = paramColor;
+	if(!dontChangeVariation){
+		newColorInGroupCounter++;
+	}
 	int offset = newColorInGroupCounter%2;
 	paramColorCurrentVariation.a = BG_COLOR_ALPHA + offset * BG_COLOR_ALPHA * 0.75;
-	newColorInGroupCounter++;
 }
 
 
@@ -547,6 +554,16 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		doBroadcast = false;
 	}
 
+	//check for enabled
+	ofxXmlSettings s;
+	bool exists = s.loadFile(OFXREMOTEUI_SETTINGS_FILENAME);
+	if(exists){
+		if( s.getNumTags(OFXREMOTEUI_XML_ENABLED) > 0 ){
+			enabled = ("true" == s.getValue(OFXREMOTEUI_XML_ENABLED, "true"));
+			if (!enabled) cout << "ofxRemoteUIServer launching disabled!" << endl;
+		}
+	}
+
 	if(port_ == -1){ //if no port specified, pick a random one, but only the very first time we get launched!
 		portIsSet = false;
 		ofxXmlSettings s;
@@ -596,6 +613,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 
 #ifdef OF_AVAILABLE
 void ofxRemoteUIServer::_appExited(ofEventArgs &e){
+	if(!enabled) return;
 	OFX_REMOTEUI_SERVER_CLOSE();		//stop the server
 	if(saveToXmlOnExit){
 		OFX_REMOTEUI_SERVER_SAVE_TO_XML();	//save values to XML
@@ -603,6 +621,7 @@ void ofxRemoteUIServer::_appExited(ofEventArgs &e){
 }
 
 void ofxRemoteUIServer::_draw(ofEventArgs &e){
+	if(!enabled) return;
 	ofSetupScreen(); //mmm this is a bit scary //TODO!
 	draw( 20, ofGetHeight() - 20);
 }
@@ -612,6 +631,8 @@ void ofxRemoteUIServer::_update(ofEventArgs &e){
 }
 
 void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
+
+	if(!enabled) return;
 
 	if (showValuesOnScreen){
 		switch(e.key){ //you can save current config from tab screen by pressing s
@@ -672,7 +693,7 @@ void ofxRemoteUIServer::update(float dt){
 	if(!threadedUpdate && !updatedThisFrame){
 		updateServer(dt);
 	}
-	updatedThisFrame = true; //this only makes sense when
+	updatedThisFrame = true; //this only makes sense when running threaded
 	#else
 	updateServer(dt);
 	#endif
@@ -691,6 +712,8 @@ void ofxRemoteUIServer::threadedFunction(){
 
 
 void ofxRemoteUIServer::draw(int x, int y){
+
+	if(!enabled) return;
 
 	#ifdef OF_AVAILABLE
 	ofPushStyle();
@@ -811,6 +834,8 @@ void ofxRemoteUIServer::handleBroadcast(){
 }
 
 void ofxRemoteUIServer::updateServer(float dt){
+
+	if(!enabled) return;
 
 	timeCounter += dt;
 	broadcastTime += dt;

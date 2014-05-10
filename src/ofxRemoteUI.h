@@ -30,6 +30,7 @@ using namespace std;
 #define OFXREMOTEUI_SETTINGS_FILENAME						"ofxRemoteUISettings.xml"
 #define OFXREMOTEUI_XML_TAG									"OFX_REMOTE_UI_PARAMS"
 #define OFXREMOTEUI_XML_PORT								"OFX_REMOTE_UI_SERVER_PORT"
+#define OFXREMOTEUI_XML_ENABLED								"OFX_REMOTE_UI_SERVER_ENABLED"
 #define OFXREMOTEUI_DEFAULT_PARAM_GROUP						"defaultGroup"
 #define OFXREMOTEUI_PRESET_DIR								"ofxRemoteUIPresets"
 #define OFXREMOTEUI_NO_PRESETS								"NO_PRESETS"

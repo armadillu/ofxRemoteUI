@@ -107,7 +107,7 @@
 #endif
 
 
-#define BG_COLOR_ALPHA			50
+#define BG_COLOR_ALPHA			55
 
 class ofxRemoteUIServer: public ofxRemoteUI
 #ifdef OF_AVAILABLE
@@ -155,7 +155,7 @@ public:
 	void setParamGroup(string g);		//set for all the upcoming params
 
 	void setNewParamColor(int num); //randomly sets a new param color for all upcoming params
-	void setNewParamColorVariation(); //set a slight change to the new param, inside the same group hue
+	void setNewParamColorVariation(bool dontChangeVariation = false); //set a slight change to the new param, inside the same group hue
 	void unsetParamColor();  //back to un-colored params (shows alternating rows on OSX client)
 
 	//get notified when a client changes something remotelly
@@ -174,6 +174,7 @@ public:
 	//		}
 	//	}
 
+	void setEnabled(bool enabled);
 	void setSaveToXMLOnExit(bool save);
 	void setDrawsNotificationsAutomaticallly(bool draw);
 	void setNetworkInterface(string iface);
@@ -240,6 +241,8 @@ private:
 	bool			clearXmlOnSaving;  //if false, allows you to keep defaults for old params that you are not sharing anymore
 
 	char			showInterfaceKey;
+
+	bool			enabled;
 
 #ifdef OF_AVAILABLE
 	ofxRemoteUISimpleNotifications onScreenNotifications;
