@@ -4,7 +4,7 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ParamView">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ParamUI">
             <connections>
                 <outlet property="paramNameLabel" destination="dKI-Mh-8sd" id="2yT-rg-VoG"/>
                 <outlet property="slider" destination="3at-Ws-mFa" id="Q9m-wK-6vo"/>
@@ -12,15 +12,15 @@
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="iN0-l3-epB">
-            <rect key="frame" x="0.0" y="0.0" width="297" height="63"/>
+            <rect key="frame" x="0.0" y="0.0" width="256" height="50"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" id="d2H-hf-4ro" userLabel="name">
-                    <rect key="frame" x="200" y="0.0" width="97" height="63"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <rect key="frame" x="172" y="-7" width="84" height="63"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                     <subviews>
                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="dKI-Mh-8sd">
-                            <rect key="frame" x="0.0" y="21" width="97" height="21"/>
+                            <rect key="frame" x="8" y="22" width="84" height="21"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="13"/>
                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -30,12 +30,12 @@
                     <color key="backgroundColor" red="1" green="0.13025489239999999" blue="0.0" alpha="0.32000000000000001" colorSpace="calibratedRGB"/>
                 </view>
                 <view contentMode="scaleToFill" id="8oQ-v1-60l" userLabel="widgets">
-                    <rect key="frame" x="0.0" y="0.0" width="202" height="63"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <rect key="frame" x="0.0" y="0.0" width="174" height="63"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
                         <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" id="3at-Ws-mFa">
-                            <rect key="frame" x="8" y="16" width="176" height="31"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <rect key="frame" x="10" y="8" width="155" height="31"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                         </slider>
                     </subviews>
                     <color key="backgroundColor" red="0.26593070723435053" green="1" blue="0.48737622259583258" alpha="0.32000000000000001" colorSpace="calibratedRGB"/>

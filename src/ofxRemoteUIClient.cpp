@@ -144,6 +144,7 @@ void ofxRemoteUIClient::update(float dt){
 
 	//cout << "ofxRemoteUIClient::update readyToSend = " << readyToSend << endl;
 
+
 	if (readyToSend){ // if connected
 
 		OSC_CHECK;

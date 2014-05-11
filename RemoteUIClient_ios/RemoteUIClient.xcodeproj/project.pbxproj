@@ -46,7 +46,7 @@
 		BBAFDA2A191FD11800FF7733 /* ReadMe.txt in Resources */ = {isa = PBXBuildFile; fileRef = BBAFDA14191FD11800FF7733 /* ReadMe.txt */; };
 		BBAFDA2B191FD11800FF7733 /* ofxXmlSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBAFDA16191FD11800FF7733 /* ofxXmlSettings.cpp */; };
 		BBAFDA2D191FD8A200FF7733 /* ParamView_ipad.xib in Resources */ = {isa = PBXBuildFile; fileRef = BBAFDA2C191FD8A200FF7733 /* ParamView_ipad.xib */; };
-		BBAFDA30191FDC2F00FF7733 /* ParamView.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBAFDA2F191FDC2F00FF7733 /* ParamView.mm */; };
+		BBAFDA30191FDC2F00FF7733 /* ParamUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBAFDA2F191FDC2F00FF7733 /* ParamUI.mm */; };
 		BBAFDA331920084700FF7733 /* NSStringAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBAFDA321920084700FF7733 /* NSStringAdditions.mm */; };
 /* End PBXBuildFile section */
 
@@ -133,8 +133,8 @@
 		BBAFDA16191FD11800FF7733 /* ofxXmlSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxXmlSettings.cpp; sourceTree = "<group>"; };
 		BBAFDA17191FD11800FF7733 /* ofxXmlSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxXmlSettings.h; sourceTree = "<group>"; };
 		BBAFDA2C191FD8A200FF7733 /* ParamView_ipad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ParamView_ipad.xib; sourceTree = "<group>"; };
-		BBAFDA2E191FDC2F00FF7733 /* ParamView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParamView.h; sourceTree = "<group>"; };
-		BBAFDA2F191FDC2F00FF7733 /* ParamView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ParamView.mm; sourceTree = "<group>"; };
+		BBAFDA2E191FDC2F00FF7733 /* ParamUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParamUI.h; sourceTree = "<group>"; };
+		BBAFDA2F191FDC2F00FF7733 /* ParamUI.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ParamUI.mm; sourceTree = "<group>"; };
 		BBAFDA311920084700FF7733 /* NSStringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSStringAdditions.h; sourceTree = "<group>"; };
 		BBAFDA321920084700FF7733 /* NSStringAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = NSStringAdditions.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -201,8 +201,8 @@
 				BBAFDA3419200A3300FF7733 /* utils */,
 				BBAFD913191FCD0000FF7733 /* FirstViewController.h */,
 				BBAFD914191FCD0000FF7733 /* FirstViewController.mm */,
-				BBAFDA2E191FDC2F00FF7733 /* ParamView.h */,
-				BBAFDA2F191FDC2F00FF7733 /* ParamView.mm */,
+				BBAFDA2E191FDC2F00FF7733 /* ParamUI.h */,
+				BBAFDA2F191FDC2F00FF7733 /* ParamUI.mm */,
 				BBAFD90D191FCD0000FF7733 /* Main_iPhone.storyboard */,
 				BBAFD910191FCD0000FF7733 /* Main_iPad.storyboard */,
 				BBAFDA2C191FD8A200FF7733 /* ParamView_ipad.xib */,
@@ -462,6 +462,9 @@
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = "Oriol Ferrer Mesià";
 				TargetAttributes = {
+					BBAFD8F7191FCD0000FF7733 = {
+						DevelopmentTeam = W2H3W29D9P;
+					};
 					BBAFD91E191FCD0000FF7733 = {
 						TestTargetID = BBAFD8F7191FCD0000FF7733;
 					};
@@ -540,7 +543,7 @@
 				BBAFDA1C191FD11800FF7733 /* NetworkingUtilsWin.cpp in Sources */,
 				BBAFDA28191FD11800FF7733 /* tinyxmlerror.cpp in Sources */,
 				BBAFD9DF191FD11100FF7733 /* ofxRemoteUI.cpp in Sources */,
-				BBAFDA30191FDC2F00FF7733 /* ParamView.mm in Sources */,
+				BBAFDA30191FDC2F00FF7733 /* ParamUI.mm in Sources */,
 				BBAFDA1D191FD11800FF7733 /* UdpSocketWin.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -676,6 +679,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RemoteUIClient/RemoteUIClient-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
@@ -691,6 +696,7 @@
 				);
 				INFOPLIST_FILE = "RemoteUIClient/RemoteUIClient-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -700,6 +706,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RemoteUIClient/RemoteUIClient-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
@@ -715,6 +723,7 @@
 				);
 				INFOPLIST_FILE = "RemoteUIClient/RemoteUIClient-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

@@ -1,5 +1,5 @@
 //
-//  ParamView.h
+//  ParamUI.h
 //  RemoteUIClient
 //
 //  Created by Oriol Ferrer Mesià on 11/05/14.
@@ -16,18 +16,20 @@ using namespace std;
 /////////////////////////////////////////////////////////////////
 
 
-@interface ParamView : UIView {
+@interface ParamUI : UIView {
 
 	IBOutlet UISlider * slider;
 	IBOutlet UILabel * paramNameLabel;
-	UIView * view;
+	UIView *			view;
+	ofxRemoteUI*		client;
 
 	RemoteUIParam		param;
 	string				name;
+	int					numberID;
 
 }
 
--(id)initWithParam:(RemoteUIParam)p name:(string)name;
+-(id)initWithParam:(RemoteUIParam)p name:(string)name ID:(int)ID client:(ofxRemoteUI*) client;
 -(IBAction)sliderChanged:(id)sender;
 -(void)setup;
 -(UIView*) getView;
