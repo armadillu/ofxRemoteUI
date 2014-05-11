@@ -19,8 +19,8 @@ ofxRemoteUIClient::ofxRemoteUIClient(){
 	callBack = NULL;
 	verbose_ = false;
 	broadcastReceiver.setup(OFXREMOTEUI_BROADCAST_PORT);
+	OSCsetup = false;
 	disconnectStrikes = OFXREMOTEUI_DISCONNECTION_STRIKES;
-
 }
 
 void ofxRemoteUIClient::setCallback( void (*callb)(RemoteUIClientCallBackArg) ){
@@ -52,9 +52,11 @@ bool ofxRemoteUIClient::setup(string address, int port_){
 	return OSCsetup;
 }
 
+
 vector<Neighbor> ofxRemoteUIClient::getNeighbors(){
 	return closebyServers.getNeighbors();
 }
+
 
 void ofxRemoteUIClient::disconnect(){
 
@@ -67,6 +69,7 @@ void ofxRemoteUIClient::disconnect(){
 		if(verbose_) cout << "ofxRemoteUIClient: can't disconnect(); we arent connected!" << endl;
 	}
 }
+
 
 void ofxRemoteUIClient::connect(){
 	OSC_CHECK;
@@ -87,15 +90,18 @@ void ofxRemoteUIClient::saveCurrentStateToDefaultXML(){
 	sendSAVE();
 }
 
+
 void ofxRemoteUIClient::restoreAllParamsToInitialXML(){
 	OSC_CHECK;
 	sendRESX();
 }
 
+
 void ofxRemoteUIClient::restoreAllParamsToDefaultValues(){
 	OSC_CHECK;
 	sendRESD();
 }
+
 
 void ofxRemoteUIClient::updateAutoDiscovery(float dt){
 

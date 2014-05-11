@@ -43,6 +43,10 @@ void ofxRemoteUIServer::setEnabled(bool enabled_){
 	enabled = enabled_;
 }
 
+void ofxRemoteUIServer::setAutomaticBackupsEnabled(bool enabled){
+	autoBackups = enabled;
+}
+
 void ofxRemoteUIServer::setDrawsNotificationsAutomaticallly(bool draw){
 	drawNotifications = draw;
 }
@@ -57,6 +61,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	enabled = true;
 	readyToSend = false;
 	saveToXmlOnExit = true;
+	autoBackups = true;
 	broadcastTime = OFXREMOTEUI_BORADCAST_INTERVAL + 0.05;
 	timeSinceLastReply = avgTimeSinceLastReply = 0;
 	waitingForReply = false;
@@ -313,6 +318,8 @@ void ofxRemoteUIServer::saveGroupToXML(string fileName, string groupName){
 
 void ofxRemoteUIServer::saveToXML(string fileName){
 
+	saveSettingsBackup();
+
 	cout << "ofxRemoteUIServer: saving to xml '" << fileName << "'" << endl;
 	ofxXmlSettings s;
 	s.loadFile(fileName);
@@ -539,6 +546,36 @@ void ofxRemoteUIServer::setNetworkInterface(string iface){
 	userSuppliedNetInterface = iface;
 }
 
+
+void ofxRemoteUIServer::saveSettingsBackup(){
+
+	#ifdef OF_AVAILABLE
+	if(autoBackups){
+		ofDirectory::createDirectory(OFXREMOTEUI_SETTINGS_BACKUP_FOLDER);
+		string basePath = OFXREMOTEUI_SETTINGS_BACKUP_FOLDER + string("/") + ofFilePath::removeExt(OFXREMOTEUI_SETTINGS_FILENAME) + ".";
+		for (int i = OFXREMOTEUI_NUM_BACKUPS - 1; i >= 0; i--){
+			string originalPath = basePath + ofToString(i) + ".xml";
+			string destPath = basePath + ofToString(i+1) + ".xml";
+			ofFile og;
+			og.open(originalPath);
+			if ( og.exists() ){
+				ofFile::moveFromTo(originalPath, destPath, true, true);
+			}
+			og.close();
+		}
+		ofFile f;
+		f.open(OFXREMOTEUI_SETTINGS_FILENAME);
+		if(f.exists()){
+			ofFile::copyFromTo(OFXREMOTEUI_SETTINGS_FILENAME, basePath + "0.xml");
+		}
+		f.close();
+		if(verbose_) cout << "ofxRemoteUIServer saving a backup of the current " << OFXREMOTEUI_SETTINGS_FILENAME << " in " << OFXREMOTEUI_SETTINGS_BACKUP_FOLDER << endl;
+	}
+	#endif
+}
+
+
+
 void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 
 	//setup the broadcasting
@@ -564,6 +601,8 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		}
 	}
 
+	saveSettingsBackup();
+
 	if(port_ == -1){ //if no port specified, pick a random one, but only the very first time we get launched!
 		portIsSet = false;
 		ofxXmlSettings s;
@@ -579,13 +618,13 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 			portNeedsToBePicked = true;
 		}
 		if(portNeedsToBePicked){
-#ifdef OF_AVAILABLE
+			#ifdef OF_AVAILABLE
 			ofSeedRandom();
 			port_ = ofRandom(5000, 60000);
-#else
+			#else
 			srand (time(NULL));
 			port_ = 5000 + rand()%55000;
-#endif
+			#endif
 			ofxXmlSettings s2;
 			s2.loadFile(OFXREMOTEUI_SETTINGS_FILENAME);
 			s2.setValue(OFXREMOTEUI_XML_PORT, port_, 0);
@@ -601,14 +640,15 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	port = port_;
 	cout << "ofxRemoteUIServer listening at port " << port << " ... " << endl;
 	oscReceiver.setup(port);
-#ifdef OF_AVAILABLE
-	ofAddListener(ofEvents().exit, this, &ofxRemoteUIServer::_appExited);
+
+	#ifdef OF_AVAILABLE
+	ofAddListener(ofEvents().exit, this, &ofxRemoteUIServer::_appExited); //to save to xml, disconnect, etc
 	ofAddListener(ofEvents().keyPressed, this, &ofxRemoteUIServer::_keyPressed);
 	ofAddListener(ofEvents().update, this, &ofxRemoteUIServer::_update);
 	if(drawNotifications){
 		ofAddListener(ofEvents().draw, this, &ofxRemoteUIServer::_draw);
 	}
-#endif
+	#endif
 }
 
 #ifdef OF_AVAILABLE

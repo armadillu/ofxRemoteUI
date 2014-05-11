@@ -11,7 +11,6 @@
 @implementation LogWindows
 
 -(id)init{
-
 	NSLog(@"Init LogWindows");
 
 	NSFont * font = [NSFont fontWithName:@"Monaco" size:10];
@@ -22,6 +21,8 @@
 
 	return self;
 }
+
+
 -(void)log:(RemoteUIClientCallBackArg) arg{
 
 	if (

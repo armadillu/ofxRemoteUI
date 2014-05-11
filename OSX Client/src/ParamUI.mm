@@ -234,6 +234,7 @@
 
 - (void)controlTextDidBeginEditing:(NSNotification *)obj;{}
 - (void)controlTextDidEndEditing:(NSNotification *)obj;{}
+
 - (void)controlTextDidChange:(NSNotification *)aNotification{
 	[self updateString:textView]; //send an update on each typed character
 }
@@ -243,6 +244,7 @@
 
 	[paramLabel setAction:@selector(clickOnLabel:)];
 	[paramLabel setTarget:self];
+	[paramLabel setBezelStyle:NSSmallSquareBezelStyle];
 
 	switch (param.type) {
 		case REMOTEUI_PARAM_FLOAT:
