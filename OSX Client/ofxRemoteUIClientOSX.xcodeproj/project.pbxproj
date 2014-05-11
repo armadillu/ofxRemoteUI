@@ -57,27 +57,27 @@
 		BBB62801191C4D3B005F95BF /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBB627FE191C4D3B005F95BF /* Growl.framework */; };
 		BBB62802191C4D3B005F95BF /* VVBasics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBB627FF191C4D3B005F95BF /* VVBasics.framework */; };
 		BBB62803191C4D3B005F95BF /* VVMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBB62800191C4D3B005F95BF /* VVMIDI.framework */; };
-		BBB62805191C4D72005F95BF /* Growl.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBB627FE191C4D3B005F95BF /* Growl.framework */; };
-		BBB62806191C4D73005F95BF /* VVBasics.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBB627FF191C4D3B005F95BF /* VVBasics.framework */; };
-		BBB62807191C4D75005F95BF /* VVMIDI.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBB62800191C4D3B005F95BF /* VVMIDI.framework */; };
+		BBB62805191C4D72005F95BF /* Growl.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = BBB627FE191C4D3B005F95BF /* Growl.framework */; };
+		BBB62806191C4D73005F95BF /* VVBasics.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = BBB627FF191C4D3B005F95BF /* VVBasics.framework */; };
+		BBB62807191C4D75005F95BF /* VVMIDI.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = BBB62800191C4D3B005F95BF /* VVMIDI.framework */; };
 		BBB6280A191C4EC9005F95BF /* ofxRemoteUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBB62808191C4EC9005F95BF /* ofxRemoteUI.cpp */; };
 		BBD3270F173BFFF200D59359 /* ofxRemoteUIClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */; };
 		BBEE7856182302FF00D93161 /* ofxRemoteUINeigbors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBEE7854182302FF00D93161 /* ofxRemoteUINeigbors.cpp */; };
-		BBF0A82B191C55F30048DB4F /* ofxRemoteUIClientOSX-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BBF0A82A191C55F30048DB4F /* ofxRemoteUIClientOSX-Info.plist */; };
 		BBF0A82D191C56030048DB4F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = BBF0A82C191C56030048DB4F /* main.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		BBC3858717973857007E2DD1 /* CopyFiles */ = {
+		BBC3858717973857007E2DD1 /* Copy Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				BBB62807191C4D75005F95BF /* VVMIDI.framework in CopyFiles */,
-				BBB62805191C4D72005F95BF /* Growl.framework in CopyFiles */,
-				BBB62806191C4D73005F95BF /* VVBasics.framework in CopyFiles */,
+				BBB62807191C4D75005F95BF /* VVMIDI.framework in Copy Frameworks */,
+				BBB62805191C4D72005F95BF /* Growl.framework in Copy Frameworks */,
+				BBB62806191C4D73005F95BF /* VVBasics.framework in Copy Frameworks */,
 			);
+			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -546,7 +546,7 @@
 				73002CD2140ABCF60035299A /* Sources */,
 				73002CD3140ABCF60035299A /* Frameworks */,
 				73002CD4140ABCF60035299A /* Resources */,
-				BBC3858717973857007E2DD1 /* CopyFiles */,
+				BBC3858717973857007E2DD1 /* Copy Frameworks */,
 				BBB6280C191C50F4005F95BF /* plist Git Versioning Script */,
 			);
 			buildRules = (
@@ -592,7 +592,6 @@
 				BBB627DE191C4CFB005F95BF /* offline.png in Resources */,
 				BBB627FC191C4D1A005F95BF /* View34.xib in Resources */,
 				BBB627F8191C4D1A005F95BF /* InfoPlist.strings in Resources */,
-				BBF0A82B191C55F30048DB4F /* ofxRemoteUIClientOSX-Info.plist in Resources */,
 				BBB627DF191C4CFB005F95BF /* offline@2x.png in Resources */,
 				BBB627F9191C4D1A005F95BF /* MainMenu.xib in Resources */,
 				BBB627DC191C4CFB005F95BF /* connected.png in Resources */,
