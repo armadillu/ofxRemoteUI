@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "ParamView.h"
 
 @interface FirstViewController : UICollectionViewController{
 	NSMutableArray *recipeImages;

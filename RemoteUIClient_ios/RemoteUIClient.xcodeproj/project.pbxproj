@@ -12,10 +12,10 @@
 		BBAFD900191FCD0000FF7733 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBAFD8FF191FCD0000FF7733 /* UIKit.framework */; };
 		BBAFD906191FCD0000FF7733 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = BBAFD904191FCD0000FF7733 /* InfoPlist.strings */; };
 		BBAFD908191FCD0000FF7733 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = BBAFD907191FCD0000FF7733 /* main.m */; };
-		BBAFD90C191FCD0000FF7733 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = BBAFD90B191FCD0000FF7733 /* AppDelegate.m */; };
+		BBAFD90C191FCD0000FF7733 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBAFD90B191FCD0000FF7733 /* AppDelegate.mm */; };
 		BBAFD90F191FCD0000FF7733 /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BBAFD90D191FCD0000FF7733 /* Main_iPhone.storyboard */; };
 		BBAFD912191FCD0000FF7733 /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BBAFD910191FCD0000FF7733 /* Main_iPad.storyboard */; };
-		BBAFD915191FCD0000FF7733 /* FirstViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BBAFD914191FCD0000FF7733 /* FirstViewController.m */; };
+		BBAFD915191FCD0000FF7733 /* FirstViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBAFD914191FCD0000FF7733 /* FirstViewController.mm */; };
 		BBAFD91A191FCD0000FF7733 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BBAFD919191FCD0000FF7733 /* Images.xcassets */; };
 		BBAFD921191FCD0000FF7733 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBAFD920191FCD0000FF7733 /* XCTest.framework */; };
 		BBAFD922191FCD0000FF7733 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBAFD8FB191FCD0000FF7733 /* Foundation.framework */; };
@@ -46,7 +46,8 @@
 		BBAFDA2A191FD11800FF7733 /* ReadMe.txt in Resources */ = {isa = PBXBuildFile; fileRef = BBAFDA14191FD11800FF7733 /* ReadMe.txt */; };
 		BBAFDA2B191FD11800FF7733 /* ofxXmlSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBAFDA16191FD11800FF7733 /* ofxXmlSettings.cpp */; };
 		BBAFDA2D191FD8A200FF7733 /* ParamView_ipad.xib in Resources */ = {isa = PBXBuildFile; fileRef = BBAFDA2C191FD8A200FF7733 /* ParamView_ipad.xib */; };
-		BBAFDA30191FDC2F00FF7733 /* ParamView.m in Sources */ = {isa = PBXBuildFile; fileRef = BBAFDA2F191FDC2F00FF7733 /* ParamView.m */; };
+		BBAFDA30191FDC2F00FF7733 /* ParamView.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBAFDA2F191FDC2F00FF7733 /* ParamView.mm */; };
+		BBAFDA331920084700FF7733 /* NSStringAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = BBAFDA321920084700FF7733 /* NSStringAdditions.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,11 +70,11 @@
 		BBAFD907191FCD0000FF7733 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		BBAFD909191FCD0000FF7733 /* RemoteUIClient-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RemoteUIClient-Prefix.pch"; sourceTree = "<group>"; };
 		BBAFD90A191FCD0000FF7733 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		BBAFD90B191FCD0000FF7733 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		BBAFD90B191FCD0000FF7733 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
 		BBAFD90E191FCD0000FF7733 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
 		BBAFD911191FCD0000FF7733 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
 		BBAFD913191FCD0000FF7733 /* FirstViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FirstViewController.h; sourceTree = "<group>"; };
-		BBAFD914191FCD0000FF7733 /* FirstViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FirstViewController.m; sourceTree = "<group>"; };
+		BBAFD914191FCD0000FF7733 /* FirstViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FirstViewController.mm; sourceTree = "<group>"; };
 		BBAFD919191FCD0000FF7733 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		BBAFD91F191FCD0000FF7733 /* RemoteUIClientTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RemoteUIClientTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBAFD920191FCD0000FF7733 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
@@ -133,7 +134,9 @@
 		BBAFDA17191FD11800FF7733 /* ofxXmlSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxXmlSettings.h; sourceTree = "<group>"; };
 		BBAFDA2C191FD8A200FF7733 /* ParamView_ipad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ParamView_ipad.xib; sourceTree = "<group>"; };
 		BBAFDA2E191FDC2F00FF7733 /* ParamView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParamView.h; sourceTree = "<group>"; };
-		BBAFDA2F191FDC2F00FF7733 /* ParamView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ParamView.m; sourceTree = "<group>"; };
+		BBAFDA2F191FDC2F00FF7733 /* ParamView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ParamView.mm; sourceTree = "<group>"; };
+		BBAFDA311920084700FF7733 /* NSStringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSStringAdditions.h; sourceTree = "<group>"; };
+		BBAFDA321920084700FF7733 /* NSStringAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = NSStringAdditions.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -195,17 +198,16 @@
 		BBAFD901191FCD0000FF7733 /* RemoteUIClient */ = {
 			isa = PBXGroup;
 			children = (
-				BBAFD90A191FCD0000FF7733 /* AppDelegate.h */,
-				BBAFD90B191FCD0000FF7733 /* AppDelegate.m */,
+				BBAFDA3419200A3300FF7733 /* utils */,
+				BBAFD913191FCD0000FF7733 /* FirstViewController.h */,
+				BBAFD914191FCD0000FF7733 /* FirstViewController.mm */,
+				BBAFDA2E191FDC2F00FF7733 /* ParamView.h */,
+				BBAFDA2F191FDC2F00FF7733 /* ParamView.mm */,
 				BBAFD90D191FCD0000FF7733 /* Main_iPhone.storyboard */,
 				BBAFD910191FCD0000FF7733 /* Main_iPad.storyboard */,
-				BBAFD913191FCD0000FF7733 /* FirstViewController.h */,
-				BBAFD914191FCD0000FF7733 /* FirstViewController.m */,
 				BBAFDA2C191FD8A200FF7733 /* ParamView_ipad.xib */,
 				BBAFD919191FCD0000FF7733 /* Images.xcassets */,
 				BBAFD902191FCD0000FF7733 /* Supporting Files */,
-				BBAFDA2E191FDC2F00FF7733 /* ParamView.h */,
-				BBAFDA2F191FDC2F00FF7733 /* ParamView.m */,
 			);
 			path = RemoteUIClient;
 			sourceTree = "<group>";
@@ -402,6 +404,17 @@
 			path = src;
 			sourceTree = "<group>";
 		};
+		BBAFDA3419200A3300FF7733 /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				BBAFDA311920084700FF7733 /* NSStringAdditions.h */,
+				BBAFDA321920084700FF7733 /* NSStringAdditions.mm */,
+				BBAFD90A191FCD0000FF7733 /* AppDelegate.h */,
+				BBAFD90B191FCD0000FF7733 /* AppDelegate.mm */,
+			);
+			name = utils;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -512,11 +525,12 @@
 				BBAFDA27191FD11800FF7733 /* tinyxml.cpp in Sources */,
 				BBAFDA1E191FD11800FF7733 /* OscOutboundPacketStream.cpp in Sources */,
 				BBAFDA25191FD11800FF7733 /* ofxOscReceiver.cpp in Sources */,
-				BBAFD90C191FCD0000FF7733 /* AppDelegate.m in Sources */,
+				BBAFD90C191FCD0000FF7733 /* AppDelegate.mm in Sources */,
 				BBAFD9E0191FD11100FF7733 /* ofxRemoteUIClient.cpp in Sources */,
 				BBAFD9E1191FD11100FF7733 /* ofxRemoteUINeigbors.cpp in Sources */,
 				BBAFDA23191FD11800FF7733 /* ofxOscBundle.cpp in Sources */,
-				BBAFD915191FCD0000FF7733 /* FirstViewController.m in Sources */,
+				BBAFDA331920084700FF7733 /* NSStringAdditions.mm in Sources */,
+				BBAFD915191FCD0000FF7733 /* FirstViewController.mm in Sources */,
 				BBAFDA26191FD11800FF7733 /* ofxOscSender.cpp in Sources */,
 				BBAFDA18191FD11800FF7733 /* ofStolenUtils.cpp in Sources */,
 				BBAFDA24191FD11800FF7733 /* ofxOscMessage.cpp in Sources */,
@@ -526,7 +540,7 @@
 				BBAFDA1C191FD11800FF7733 /* NetworkingUtilsWin.cpp in Sources */,
 				BBAFDA28191FD11800FF7733 /* tinyxmlerror.cpp in Sources */,
 				BBAFD9DF191FD11100FF7733 /* ofxRemoteUI.cpp in Sources */,
-				BBAFDA30191FDC2F00FF7733 /* ParamView.m in Sources */,
+				BBAFDA30191FDC2F00FF7733 /* ParamView.mm in Sources */,
 				BBAFDA1D191FD11800FF7733 /* UdpSocketWin.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

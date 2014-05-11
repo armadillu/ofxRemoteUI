@@ -22,12 +22,17 @@
 - (void)viewDidLoad{
 	NSLog(@"viewDidLoad");
     [super viewDidLoad];
-	recipeImages = [[NSMutableArray alloc] initWithCapacity:10];
-	for(int i = 0; i < 10; i++){
-		UIView* paramview = [[[NSBundle mainBundle] loadNibNamed:@"ParamView_ipad" owner:self options:nil] firstObject];
-		[recipeImages addObject:paramview];
+	recipeImages = [[NSMutableArray alloc] initWithCapacity:50];
+	for(int i = 0; i < 50; i++){
+		//UIView* paramview = [[[NSBundle mainBundle] loadNibNamed:@"ParamView_ipad" owner:self options:nil] firstObject];
+		RemoteUIParam p;
+		NSString * name = [NSString stringWithFormat:@"param %d", i];
+		ParamView *paramView = [[ParamView alloc] initWithParam:p name: [name UTF8String] ];
+		NSLog(@"%@", paramView);
+		if (paramView){
+			[recipeImages addObject:paramView];
+		}
 	}
-
 }
 
 
@@ -51,10 +56,14 @@
 		[view removeFromSuperview ];
 		NSLog(@"remove %@ from %d",view, indexPath.row);
 	}
-    [cell addSubview:[recipeImages objectAtIndex:indexPath.row] ];
-	NSLog(@"addSubview %@ from %d",[recipeImages objectAtIndex:indexPath.row], indexPath.row);
+	ParamView * paramView = [recipeImages objectAtIndex:indexPath.row];
+	//[paramView setNeedsLayout];
+	[cell addSubview: [paramView getView]];
 
-    return cell;
+	[paramView setup];
+	//NSLog(@"addSubview %@ from %d",[recipeImages objectAtIndex:indexPath.row], indexPath.row);
+
+	return cell;
 }
 
 @end
