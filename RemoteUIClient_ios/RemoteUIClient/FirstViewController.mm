@@ -62,10 +62,9 @@ void clientCallback(RemoteUIClientCallBackArg a){
 			break;
 
 		case SERVER_PRESETS_LIST_UPDATED:{
-//			//NSLog(@"## Callback: PRESETS_UPDATED");
-//			vector<string> presetsList = [me getClient]->getPresetsList();
+			vector<string> presetsList = [me getClient]->getPresetsList();
 //			if ( presetsList.size() > 0 ){
-//				[me updatePresetsPopup];
+				[me updatePresets];
 //				[me updateGroupPresetMenus];
 //			}
 //			for(int i = 0; i < a.paramList.size(); i++){ //notify the missing params
@@ -134,106 +133,32 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 @implementation FirstViewController
 
-- (void)viewWillLayoutSubviews{
-	CGRect bounds = [[UIScreen mainScreen] bounds]; // portrait bounds
-	if (UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation])) {
-		bounds.size = CGSizeMake(bounds.size.height, bounds.size.width);
-	}
-	bounds.size.height -= TOOLBAR_H;
-	[self.collectionView setFrame:bounds];
-}
-
--(IBAction)pressedConnectButton{
-	NSLog(@"pressedConnectButton");
-
-	vector<Neighbor> ns = client->getNeighbors();
-	NSMutableArray *arr = [NSMutableArray arrayWithCapacity:1];
-	[currentNeighbors removeAllObjects];
-
-	for(int i = 0; i < ns.size(); i++){
-		[currentNeighbors addObject:[NSString stringWithFormat:@"%s:%d",  ns[i].IP.c_str(), ns[i].port]];
-		//[arr addObject:[NSString stringWithFormat:@"%s@%s", ns[i].binary.c_str(), ns[i].name.c_str()]];
-		[arr addObject:[NSString stringWithFormat:@"%s@%s (%s:%d)", ns[i].binary.c_str(), ns[i].name.c_str(), ns[i].IP.c_str(), ns[i].port]];
-	}
-
-    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"ofxRemoteUI Nearby Servers"
-                                                             delegate:self
-                                                    cancelButtonTitle:nil
-                                               destructiveButtonTitle:nil
-                                                    otherButtonTitles:nil];
-    for (NSString *title in arr) {
-        [actionSheet addButtonWithTitle:title];
-    }
-
-    [actionSheet addButtonWithTitle:@"Cancel"];
-    actionSheet.cancelButtonIndex = [arr count];
-	actionSheet.actionSheetStyle = UIActionSheetStyleBlackTranslucent;
-    [actionSheet showFromToolbar:toolbar];
-}
-
-
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex;{
-	NSLog(@"pressed %d", buttonIndex);
-	if(buttonIndex >= [currentNeighbors count]){
-		//cancel
-	}else{
-		NSString * server_port = [currentNeighbors objectAtIndex:buttonIndex];
-		NSArray * info = [server_port componentsSeparatedByString:@":"];
-		port = [info objectAtIndex:1];
-		address = [info objectAtIndex:0];
-		[self disconnect];
-		[self connect];
-	}
-}
-
-
-//tweak font size on action sheet
-- (void)willPresentActionSheet:(UIActionSheet *)actionSheet {
-    [actionSheet.subviews enumerateObjectsUsingBlock:^(id _currentView, NSUInteger idx, BOOL *stop) {
-        if ([_currentView isKindOfClass:[UIButton class]]) {
-			if ([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortrait ||
-				[[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortraitUpsideDown
-				){ //make labels smaller if in portrait mode && iphone
-				[((UIButton *)_currentView).titleLabel setFont:[UIFont boldSystemFontOfSize:12.5f]];
-			}
-        }
-    }];
-}
-
-
 
 - (void)viewDidLoad{
 
-	NSLog(@"viewDidLoad");
     [super viewDidLoad];
 	paramsController = self;
 	connected = NO;
 
+	//toolbar creation
 	toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - TOOLBAR_H, self.view.bounds.size.width, TOOLBAR_H)];
-	//toolbar.translucent = NO;
 	toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
 	[self.view addSubview:toolbar];
 
-	connectB = [[UIBarButtonItem alloc] initWithTitle:@"Connect" style:UIBarButtonItemStyleBordered
+	connectB = [[UIBarButtonItem alloc] initWithTitle:[NSString stringWithFormat:@"%@(0)", CONNECT_EMOJI]
+												style:UIBarButtonItemStyleBordered
 											   target:self
-												action:@selector(pressedConnectButton)];
+											   action:@selector(pressedConnectButton)];
 
-	toolbar.items = @[connectB];
+	//connect button
+	presetsButton = [[UIBarButtonItem alloc] initWithTitle:[NSString stringWithFormat:@"%@(0)", PRESET_EMOJI]
+													 style:UIBarButtonItemStyleBordered
+													target:self
+													action:@selector(pressedPresetsButton)];
+	toolbar.items = @[connectB, presetsButton];
 
 	paramViews = [[NSMutableArray alloc] initWithCapacity:50];
-
 	currentNeighbors = [[NSMutableArray alloc] initWithCapacity:1];
-
-	//	for(int i = 0; i < 50; i++){
-	//		//UIView* paramview = [[[NSBundle mainBundle] loadNibNamed:@"ParamUI_ipad" owner:self options:nil] firstObject];
-	//		RemoteUIParam p;
-	//		NSString * name = [NSString stringWithFormat:@"param %d", i];
-	//		ParamUI *paramView = [[ParamUI alloc] initWithParam:p name: [name UTF8String] ID:i];
-	//		NSLog(@"%@", paramView);
-	//		if (paramView){
-	//			[paramViews addObject:paramView];
-	//		}
-	//	}
 
 	client = new ofxRemoteUIClient();
 	client->setCallback(clientCallback);
@@ -246,17 +171,133 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	//client->connect();
 
 	timer = [NSTimer scheduledTimerWithTimeInterval:REFRESH_RATE target:self selector:@selector(update) userInfo:nil repeats:YES];
-
 }
 
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
+- (void)viewWillLayoutSubviews{
+	CGRect bounds = [[UIScreen mainScreen] bounds]; // portrait bounds
+	if (UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation])) {
+		bounds.size = CGSizeMake(bounds.size.height, bounds.size.width);
+	}
+	bounds.size.height -= TOOLBAR_H;
+	[self.collectionView setFrame:bounds];
+}
+
+
+-(IBAction)pressedConnectButton{
+
+	vector<Neighbor> ns = client->getNeighbors();
+	NSMutableArray *arr = [NSMutableArray arrayWithCapacity:1];
+	[currentNeighbors removeAllObjects];
+
+	for(int i = 0; i < ns.size(); i++){
+		[currentNeighbors addObject:[NSString stringWithFormat:@"%s:%d",  ns[i].IP.c_str(), ns[i].port]];
+		//[arr addObject:[NSString stringWithFormat:@"%s@%s", ns[i].binary.c_str(), ns[i].name.c_str()]];
+		[arr addObject:[NSString stringWithFormat:@"%s@%s (%s:%d)", ns[i].binary.c_str(), ns[i].name.c_str(), ns[i].IP.c_str(), ns[i].port]];
+	}
+
+    connectSheet = [[UIActionSheet alloc] initWithTitle:@"ofxRemoteUI Nearby Servers"
+                                                             delegate:self
+                                                    cancelButtonTitle:nil
+                                               destructiveButtonTitle:nil
+                                                    otherButtonTitles:nil];
+    for (NSString *title in arr) {
+        [connectSheet addButtonWithTitle:title];
     }
-    return self;
+
+    [connectSheet addButtonWithTitle:@"Cancel"];
+    connectSheet.cancelButtonIndex = [arr count];
+	connectSheet.actionSheetStyle = UIActionSheetStyleDefault;
+    [connectSheet showFromToolbar:toolbar];
 }
+
+
+-(IBAction)pressedPresetsButton{
+
+	if(connected){
+		NSMutableArray *arr = [NSMutableArray arrayWithCapacity:1];
+		int numPresets = 0;
+		for(int i = 0; i < presets.size(); i++){
+			bool isGroupPreset = presets[i].find_first_of("/") != std::string::npos;
+			if ( presets[i] != OFXREMOTEUI_NO_PRESETS && !isGroupPreset){
+				[arr addObject:[NSString stringWithFormat:@"%s",presets[i].c_str()]];
+				numPresets++;
+			}
+		}
+
+		if(numPresets > 0){
+			presetsSheet = [[UIActionSheet alloc] initWithTitle:@"Preset List"
+													   delegate:self
+											  cancelButtonTitle:nil
+										 destructiveButtonTitle:nil
+											  otherButtonTitles:nil];
+			for (NSString *title in arr) {
+				[presetsSheet addButtonWithTitle:title];
+			}
+
+			[presetsSheet addButtonWithTitle:@"Cancel"];
+			presetsSheet.cancelButtonIndex = [arr count];
+			presetsSheet.actionSheetStyle = UIActionSheetStyleDefault;
+			[presetsSheet showFromToolbar:toolbar];
+		}
+	}
+}
+
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex;{
+
+	if (actionSheet == connectSheet){
+
+		if(buttonIndex >= [currentNeighbors count]){
+			//cancel
+		}else{
+			NSString * server_port = [currentNeighbors objectAtIndex:buttonIndex];
+			NSArray * info = [server_port componentsSeparatedByString:@":"];
+			port = [info objectAtIndex:1];
+			address = [info objectAtIndex:0];
+			[self disconnect];
+			[self connect];
+		}
+		connectSheet = nil;
+	}
+
+	if (actionSheet == presetsSheet){
+
+	}
+}
+
+
+//tweak font size on action sheet
+- (void)willPresentActionSheet:(UIActionSheet *)actionSheet {
+    [actionSheet.subviews enumerateObjectsUsingBlock:^(id _currentView, NSUInteger idx, BOOL *stop) {
+        if ([_currentView isKindOfClass:[UIButton class]]) {
+//			if ([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortrait ||
+//				[[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortraitUpsideDown
+//				){ //make labels smaller if in portrait mode && iphone
+//				[((UIButton *)_currentView).titleLabel setFont:[UIFont boldSystemFontOfSize:12.5f]];
+//			}
+			((UIButton *)_currentView).titleLabel.adjustsFontSizeToFitWidth = true;
+			((UIButton *)_currentView).titleLabel.minimumScaleFactor = 0.5;
+			//((UIButton *)_currentView).titleLabel.lineBreakMode = NSLineBreakByTruncatingTail;
+
+        }
+    }];
+}
+
+-(void)updatePresets{
+
+	presets = client->getPresetsList();
+	int numPresets = 0;
+	for(int i = 0; i < presets.size(); i++){
+		bool isGroupPreset = presets[i].find_first_of("/") != std::string::npos;
+		if ( presets[i] != OFXREMOTEUI_NO_PRESETS && !isGroupPreset){
+			numPresets++;
+		}
+	}
+
+	presetsButton.title = [NSString stringWithFormat:[NSString stringWithFormat:@"%@(%d)", PRESET_EMOJI, numPresets]];
+}
+
 
 -(void)cleanUpGUIParams{
 
@@ -350,18 +391,18 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 -(void)updateNeighbors{
 	vector<Neighbor> ns = client->getNeighbors();
-	connectB.title = [NSString stringWithFormat:@"Connect (%d)", (int)ns.size() ];
+	connectB.title = [NSString stringWithFormat:[NSString stringWithFormat:@"%@(%d)", CONNECT_EMOJI, (int)ns.size()]];
 }
-
 
 
 
 -(void)disconnect{
 
-		//[presetsMenu removeAllItems];
-		//[groupsMenu removeAllItems];
-		[self cleanUpGUIParams];
-		client->disconnect();
+	//[presetsMenu removeAllItems];
+	//[groupsMenu removeAllItems];
+	[self cleanUpGUIParams];
+	client->disconnect();
+	connected = false;
 }
 
 -(void) connect{
@@ -369,7 +410,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	bool OK = client->setup([address UTF8String], [port intValue]); //test
 	client->connect();
 	needFullParamsUpdate = YES; //before connect, always!
-
+	connected = TRUE;
 
 //	NSString * date = [[NSDate date] descriptionWithCalendarFormat:@"%H:%M:%S" timeZone:nil locale:nil];
 

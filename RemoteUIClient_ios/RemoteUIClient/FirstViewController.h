@@ -13,6 +13,8 @@
 
 #define REFRESH_RATE			1.0f/15.0f
 #define TOOLBAR_H				44
+#define CONNECT_EMOJI			@"🌍"
+#define PRESET_EMOJI			@"📖"
 
 @interface FirstViewController : UICollectionViewController <UIActionSheetDelegate>{
 
@@ -27,32 +29,39 @@
 
 	NSMutableArray	*				paramViews;
 	NSMutableArray*					currentNeighbors;
+	vector<string>					presets;
 
 	bool							needFullParamsUpdate;
 	BOOL							connected;
 
+	//toolbar
 	UIToolbar *						toolbar;
 	UIBarButtonItem *				connectB;
+	UIBarButtonItem *				presetsButton;
+	UIBarButtonItem *				saveButton;
+
 
 	//current or upcoming connection
 	NSString *						address;
 	NSString *						port;
+
+	//actionSheets
+	UIActionSheet *					connectSheet;
+	UIActionSheet *					presetsSheet;
 }
 
 -(ofxRemoteUIClient *)getClient;
 -(void)fullParamsUpdate;
--(void) partialParamsUpdate;
+-(void)partialParamsUpdate;
 -(void)cleanUpGUIParams;
 
 -(void)updateNeighbors;
+-(void)updatePresets;
 
 -(IBAction)pressedConnectButton;
+-(IBAction)pressedPresetsButton;
 -(void)connect;
 
-// Called when a button is clicked. The view will be automatically dismissed after this call returns
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex;
 
-// Called when we cancel a view (eg. the user clicks the Home button). This is not called when the user clicks the cancel button.
-// If not defined in the delegate, we simulate a click in the cancel button
-- (void)actionSheetCancel:(UIActionSheet *)actionSheet;
 @end
