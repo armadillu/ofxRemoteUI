@@ -19,7 +19,23 @@ using namespace std;
 @interface ParamUI : UIView {
 
 	IBOutlet UISlider * slider;
-	IBOutlet UILabel * paramNameLabel;
+	IBOutlet UILabel *	paramLabel;
+
+	IBOutlet UIView *	rightView;
+	IBOutlet UIView *	leftView;
+
+
+	IBOutlet UITextField *		textView;
+	IBOutlet UISwitch *			button;
+	IBOutlet UILabel *			sliderVal;
+	IBOutlet UILabel *			sliderMin;
+	IBOutlet UILabel *			sliderMax;
+	//IBOutlet NSPopUpButton *	enumeratorMenu;
+	//IBOutlet NSColorWell *		colorWell;
+	IBOutlet UILabel *		spacerTitle;
+
+	UIControl *			widget; //wildcard
+
 	UIView *			view;
 	ofxRemoteUI*		client;
 
@@ -30,7 +46,20 @@ using namespace std;
 }
 
 -(id)initWithParam:(RemoteUIParam)p name:(string)name ID:(int)ID client:(ofxRemoteUI*) client;
+
+-(void)updateUI;
+-(void)updateParam:(RemoteUIParam)p;
+
 -(IBAction)sliderChanged:(id)sender;
+-(IBAction)switchChanged:(id)sender;
+-(IBAction)textChanged:(id)sender;
+
 -(void)setup;
 -(UIView*) getView;
+
+-(IBAction)updateFloat:(id)sender;
+-(IBAction)updateInt:(id)sender;
+-(IBAction)updateBool:(id)sender;
+-(IBAction)updateString:(id)sender;
+
 @end

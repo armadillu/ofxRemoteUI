@@ -175,11 +175,9 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	client->setCallback(clientCallback);
 	client->setVerbose(false);
 
-	bool OK = client->setup("127.0.0.1", 58477); //test
-	//bool OK = client->setup("192.168.5.145", 13840); //test
+	bool OK = client->setup("0.0.0.0", 10000); //test
 
 	needFullParamsUpdate = YES; //before connect, always!
-	//client->connect();
 
 	timer = [NSTimer scheduledTimerWithTimeInterval:REFRESH_RATE target:self selector:@selector(update) userInfo:nil repeats:YES];
 }
@@ -422,15 +420,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		}else{
 			RemoteUIParam p = client->getParamForName(paramName);
 			ParamUI * item = widgets[paramName];
-			//[item updateParam:p];
-			//[item updateUI];
+			[item updateParam:p];
+			[item updateUI];
 		}
 	}
-	//	for( map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
-	//		string key = (*ii).first;
-	//		ParamUI* t = widgets[key];
-	//		[t disableChanges];
-	//	}
 
 	[self.collectionView reloadData];
 }
@@ -546,7 +539,38 @@ void clientCallback(RemoteUIClientCallBackArg a){
     return paramViews.count;
 }
 
+- (CGSize)collectionView:(UICollectionView *)collectionView
+                  layout:(UICollectionViewLayout *)collectionViewLayout
+  sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
 
+	CGRect bounds = [[UIScreen mainScreen] bounds]; // portrait bounds
+	if (UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation])) {
+		bounds.size = CGSizeMake(bounds.size.height, bounds.size.width);
+	}
+
+
+	float minW = 240;
+	int nc = 0;
+	float w = FLT_MAX;
+	while (w > minW) {
+		nc++;
+		w = bounds.size.width / nc;
+	}
+	nc--;
+	w = bounds.size.width / nc ;
+	float ww = w;
+	if (nc == 1){
+		ww = bounds.size.width;
+	}
+
+	NSLog(@"sw: %f w: %f nc: %d >> ww: %f",bounds.size.width, w, nc, ww);
+    return CGSizeMake(ww , 50.0f);
+}
+
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{
+    [self.collectionView performBatchUpdates:nil completion:nil];
+}
 
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
@@ -561,9 +585,15 @@ void clientCallback(RemoteUIClientCallBackArg a){
 //	}
 
 	if ([[cell subviews] count] > 0){
+
 		ParamUI * paramView = [paramViews objectAtIndex:indexPath.row];
 		//[paramView setNeedsLayout];
 		[cell addSubview: [paramView getView]];
+		//[cell setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+		CGRect f = [cell frame];
+		f.origin = CGPointMake(0, 0);
+		[[paramView getView] setFrame: f ];
+
 
 		[paramView setup];
 	}
