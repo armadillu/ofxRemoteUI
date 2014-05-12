@@ -134,6 +134,37 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 @implementation FirstViewController
 
+- (void)viewWillLayoutSubviews NS_AVAILABLE_IOS(5_0){
+	CGRect bounds = [[UIScreen mainScreen] bounds]; // portrait bounds
+	if (UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation])) {
+		bounds.size = CGSizeMake(bounds.size.height, bounds.size.width);
+	}
+	bounds.size.height -= TOOLBAR_H;
+	[self.collectionView setFrame:bounds];
+}
+
+-(IBAction)pressedConnectButton{
+	NSLog(@"pressedConnectButton");
+	UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Title"
+															 delegate:self
+													cancelButtonTitle:@"Cancel"
+											   destructiveButtonTitle:@"Okay"
+													otherButtonTitles:@"One", @"Two", @"Three", @"Four", @"Five", @"Six", nil];
+
+	actionSheet.actionSheetStyle = UIActionSheetStyleBlackTranslucent;
+    [actionSheet showInView:toolbar];
+}
+
+// Called when a button is clicked. The view will be automatically dismissed after this call returns
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex;{
+
+}
+
+// Called when we cancel a view (eg. the user clicks the Home button). This is not called when the user clicks the cancel button.
+// If not defined in the delegate, we simulate a click in the cancel button
+- (void)actionSheetCancel:(UIActionSheet *)actionSheet;{
+
+}
 
 - (void)viewDidLoad{
 
@@ -142,6 +173,16 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	paramsController = self;
 	connected = NO;
 
+	toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - TOOLBAR_H, self.view.bounds.size.width, TOOLBAR_H)];
+	//toolbar.translucent = NO;
+	toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
+	[self.view addSubview:toolbar];
+
+	connectB = [[UIBarButtonItem alloc] initWithTitle:@"Connect" style:UIBarButtonItemStyleBordered
+											   target:self
+												action:@selector(pressedConnectButton)];
+
+	toolbar.items = @[connectB];
 
 	paramViews = [[NSMutableArray alloc] initWithCapacity:50];
 
@@ -163,11 +204,11 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	bool OK = client->setup("127.0.0.1", 58477); //test
 	//bool OK = client->setup("192.168.5.145", 13840); //test
 
-
 	needFullParamsUpdate = YES; //before connect, always!
 	client->connect();
 
 	timer = [NSTimer scheduledTimerWithTimeInterval:REFRESH_RATE target:self selector:@selector(update) userInfo:nil repeats:YES];
+
 }
 
 
@@ -360,10 +401,13 @@ void clientCallback(RemoteUIClientCallBackArg a){
 }
 
 
+
+
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
 
     static NSString *identifier = @"Cell";
 	UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:identifier forIndexPath:indexPath];
+
 
 //	for(id view in [cell subviews]){
 //		[view removeFromSuperview ];

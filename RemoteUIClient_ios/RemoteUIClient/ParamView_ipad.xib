@@ -34,7 +34,7 @@
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
                         <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" id="3at-Ws-mFa">
-                            <rect key="frame" x="10" y="8" width="155" height="31"/>
+                            <rect key="frame" x="10" y="8" width="154.99999999999997" height="31"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                         </slider>
                     </subviews>

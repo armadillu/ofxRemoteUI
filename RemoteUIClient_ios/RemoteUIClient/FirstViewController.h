@@ -12,9 +12,9 @@
 
 
 #define REFRESH_RATE			1.0f/15.0f
+#define TOOLBAR_H				44
 
-
-@interface FirstViewController : UICollectionViewController{
+@interface FirstViewController : UICollectionViewController <UIActionSheetDelegate>{
 
 	@public
 
@@ -30,6 +30,9 @@
 
 	bool							needFullParamsUpdate;
 	BOOL							connected;
+
+	UIToolbar *						toolbar;
+	UIBarButtonItem *				connectB;
 }
 
 -(ofxRemoteUIClient *)getClient;
@@ -37,5 +40,13 @@
 -(void) partialParamsUpdate;
 -(void)cleanUpGUIParams;
 
+-(IBAction)pressedConnectButton;
 -(void)connect;
+
+// Called when a button is clicked. The view will be automatically dismissed after this call returns
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex;
+
+// Called when we cancel a view (eg. the user clicks the Home button). This is not called when the user clicks the cancel button.
+// If not defined in the delegate, we simulate a click in the cancel button
+- (void)actionSheetCancel:(UIActionSheet *)actionSheet;
 @end
