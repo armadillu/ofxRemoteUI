@@ -67,6 +67,7 @@
 -(IBAction)pressedAddPresetButton;
 
 -(void)connect;
+-(void)disconnect;
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex;
 

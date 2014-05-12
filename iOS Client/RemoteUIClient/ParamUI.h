@@ -16,7 +16,7 @@ using namespace std;
 /////////////////////////////////////////////////////////////////
 
 
-@interface ParamUI : UIView {
+@interface ParamUI : UIView <UITextFieldDelegate> {
 
 	IBOutlet UISlider * slider;
 	IBOutlet UILabel *	paramLabel;

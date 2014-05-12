@@ -68,6 +68,7 @@
 			for(id v in [leftView subviews]){
 				[v removeFromSuperview];
 			}
+			[spacerTitle removeFromSuperview];
 //			widget = colorWell;
 //			[widget setAction:@selector(updateColor:)];
 //			[button removeFromSuperviewWithoutNeedingDisplay];
@@ -87,6 +88,7 @@
 			for(id v in [leftView subviews]){
 				[v removeFromSuperview];
 			}
+			[spacerTitle removeFromSuperview];
 //			widget = enumeratorMenu;
 //			[widget setAction:@selector(updateEnum:)];
 //			[button removeFromSuperviewWithoutNeedingDisplay];
@@ -121,7 +123,8 @@
 
 		case REMOTEUI_PARAM_STRING:
 			widget = textView;
-			[widget addTarget:self action:@selector(textChanged:) forControlEvents:UIControlEventValueChanged];
+			textView.delegate = self;
+
 			[slider removeFromSuperview];
 			[button removeFromSuperview];
 			[sliderMax removeFromSuperview];
@@ -146,6 +149,13 @@
 	[self updateUI];
 }
 
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+	param.stringVal = [textField.text UTF8String];
+	[textField resignFirstResponder];
+	client->sendUntrackedParamUpdate(param, name);
+
+    return NO;
+}
 
 -(IBAction)switchChanged:(id)sender;{
 	UISwitch * s = (UISwitch*) sender;
@@ -153,11 +163,6 @@
 	client->sendUntrackedParamUpdate(param, name);
 }
 
--(IBAction)textChanged:(id)sender;{
-	UITextField * s = (UITextField*) sender;
-	param.stringVal = [s.text UTF8String];
-	client->sendUntrackedParamUpdate(param, name);
-}
 
 
 -(IBAction)sliderChanged:(id)sender{

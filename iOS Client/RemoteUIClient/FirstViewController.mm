@@ -75,8 +75,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 		case SERVER_DISCONNECTED:{
 			//NSLog(@"## Callback: SERVER_DISCONNECTED");
-			[me connect];
-			me->client->disconnect();
+			//
+			[me disconnect];
 //			[me showNotificationWithTitle:@"Server Exited, Disconnected!" description:remoteIP ID:@"ServerDisconnected" priority:-1];
 //			[me updateGroupPopup];
 //			[me updatePresetsPopup];
@@ -563,7 +563,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		ww = bounds.size.width;
 	}
 
-	NSLog(@"sw: %f w: %f nc: %d >> ww: %f",bounds.size.width, w, nc, ww);
+	//NSLog(@"sw: %f w: %f nc: %d >> ww: %f",bounds.size.width, w, nc, ww);
     return CGSizeMake(ww , 50.0f);
 }
 
@@ -578,13 +578,12 @@ void clientCallback(RemoteUIClientCallBackArg a){
     static NSString *identifier = @"Cell";
 	UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:identifier forIndexPath:indexPath];
 
-
 //	for(id view in [cell subviews]){
 //		[view removeFromSuperview ];
 //		NSLog(@"remove %@ from %d",view, indexPath.row);
 //	}
 
-	if ([[cell subviews] count] > 0){
+	if ([[cell subviews] count] > 0 && [paramViews count] > 0){
 
 		ParamUI * paramView = [paramViews objectAtIndex:indexPath.row];
 		//[paramView setNeedsLayout];
@@ -593,8 +592,6 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		CGRect f = [cell frame];
 		f.origin = CGPointMake(0, 0);
 		[[paramView getView] setFrame: f ];
-
-
 		[paramView setup];
 	}
 	//NSLog(@"addSubview %@ from %d",[recipeImages objectAtIndex:indexPath.row], indexPath.row);
