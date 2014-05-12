@@ -158,7 +158,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	saveButton = [[UIBarButtonItem alloc] initWithTitle:SAVE_EMOJI
 													 style:UIBarButtonItemStyleBordered
 													target:self
-													action:@selector(pressedPresetsButton)];
+													action:@selector(pressedSaveButton)];
 
 	addPresetsButton = [[UIBarButtonItem alloc] initWithTitle:ADD_PRESET_EMOJI
 												  style:UIBarButtonItemStyleBordered
@@ -254,6 +254,39 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	}
 }
 
+
+-(IBAction)pressedSaveButton{
+	if(connected){
+		client->saveCurrentStateToDefaultXML();
+	}
+}
+
+
+-(IBAction)pressedAddPresetButton{
+	if(connected){
+		UIAlertView *alert = [[UIAlertView alloc] initWithTitle: @"Input New Preset Name"
+														message: @""
+													   delegate: self
+											  cancelButtonTitle: @"Cancel"
+											  otherButtonTitles: @"OK", nil
+							  ];
+
+		alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+		[alert textFieldAtIndex:0].placeholder = @"New Preset Name";
+		[alert show];
+	}
+}
+
+//moved this to the alert dismiss to avoid jerky fps when fading away the alertview
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+
+	if ( alertView.alertViewStyle == UIAlertViewStylePlainTextInput && buttonIndex == 1){
+		NSString *name = [alertView textFieldAtIndex:0].text;
+		NSLog(@"user saved preset named %@", name);
+		client->savePresetWithName([name UTF8String]);
+	}
+
+}
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex;{
 
