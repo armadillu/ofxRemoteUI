@@ -27,7 +27,6 @@
 	NSTimer *						timer;
 
 	map<string, ParamUI*>			widgets;
-	vector<string>					orderedKeys; // used to keep the order in which the items were added
 
 	NSMutableArray	*				paramViews;
 	NSMutableArray*					currentNeighbors;

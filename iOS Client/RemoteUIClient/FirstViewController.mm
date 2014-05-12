@@ -180,6 +180,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	needFullParamsUpdate = YES; //before connect, always!
 
 	timer = [NSTimer scheduledTimerWithTimeInterval:REFRESH_RATE target:self selector:@selector(update) userInfo:nil repeats:YES];
+
+//	UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
+//	[flowLayout setScrollDirection:UICollectionViewScrollDirectionVertical];
+//	[self.collectionView setCollectionViewLayout:flowLayout];
 }
 
 
@@ -352,7 +356,6 @@ void clientCallback(RemoteUIClientCallBackArg a){
 //		//[t release];
 //	}
 	widgets.clear();
-	orderedKeys.clear();
 	[paramViews removeAllObjects];
 
 	//also remove the spacer bars. Dont ask me why, but dynamic array walking crashes! :?
@@ -394,7 +397,6 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 				ParamUI * paramView = [[ParamUI alloc] initWithParam: p name: paramName ID: c client:client];
 				c++;
-				orderedKeys.push_back(paramName);
 				widgets[paramName] = paramView;
 
 				if (paramView){
@@ -539,6 +541,11 @@ void clientCallback(RemoteUIClientCallBackArg a){
     return paramViews.count;
 }
 
+
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation{
+    [self.collectionView performBatchUpdates:nil completion:nil];
+}
+
 - (CGSize)collectionView:(UICollectionView *)collectionView
                   layout:(UICollectionViewLayout *)collectionViewLayout
   sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
@@ -548,40 +555,76 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		bounds.size = CGSizeMake(bounds.size.height, bounds.size.width);
 	}
 
-
 	float minW = 240;
 	int nc = 0;
 	float w = FLT_MAX;
-	while (w > minW) {
+	while (w >= minW) {
 		nc++;
-		w = bounds.size.width / nc;
+		w = bounds.size.width / nc ;
 	}
 	nc--;
-	w = bounds.size.width / nc ;
+	w = (bounds.size.width / nc) - nc + 1;
+
 	float ww = w;
 	if (nc == 1){
 		ww = bounds.size.width;
 	}
 
-	//NSLog(@"sw: %f w: %f nc: %d >> ww: %f",bounds.size.width, w, nc, ww);
+	NSLog(@"sw: %f w: %f nc: %d >> ww: %f",bounds.size.width, ww, nc, ww);
     return CGSizeMake(ww , 50.0f);
 }
 
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{
-    [self.collectionView performBatchUpdates:nil completion:nil];
-}
 
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
 
     static NSString *identifier = @"Cell";
-	UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:identifier forIndexPath:indexPath];
 
-//	for(id view in [cell subviews]){
-//		[view removeFromSuperview ];
-//		NSLog(@"remove %@ from %d",view, indexPath.row);
+//	CGRect bounds = [[UIScreen mainScreen] bounds]; // portrait bounds
+//	if (UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation])) {
+//		bounds.size = CGSizeMake(bounds.size.height, bounds.size.width);
 //	}
+//
+//
+//	float minW = 240;
+//	int nc = 0;
+//	float w = FLT_MAX;
+//	while (w >= minW) {
+//		nc++;
+//		w = bounds.size.width / nc ;
+//	}nc--;
+//	int numR = (int)[paramViews count] / nc;
+//
+//	//NSLog(@"ww = %d  hh = %d", nc, numR);
+//
+//	//todo this leaks! a lot!
+//	int** map = (int**) malloc( sizeof(int*) * nc);
+//	for(int i = 0; i < nc; i++){
+//		map[i] = (int*) malloc(sizeof(int) * numR);
+//	}
+//
+//	//all this is to change the flow direction; i want vertical scroll BUT vertical flow/grow too
+//	//so im remapping the numbers to what they would be if thhe flow was shifted
+//	int x = 0;
+//	int y = 0;
+//	for(int i = 0; i < [paramViews count]; i++){
+//		map[x][y] = i;
+//		//printf("map[%d][%d] = %d\n", x, y, i);
+//		y++;
+//		if (y >= numR){
+//			y = 0;
+//			x++;
+//		}
+//	}
+//	NSLog(@"section: %d, row: %d, len: %d", indexPath.section, indexPath.row , indexPath.length);
+//
+//	int xx = indexPath.row % nc;
+//	int yy = indexPath.row / nc;
+//	int remapedIndex = map[xx][yy];
+//	printf("original: %d >> remapedIndex = %d >> map[%d][%d]\n",indexPath.row, remapedIndex,  xx, yy);
+
+	//NSIndexPath *ind = [NSIndexPath indexPathWithIndexes: ((const NSUInteger [])[indexPath getIndexes]) length: indexPath.length];
+	UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:identifier forIndexPath:indexPath];
 
 	if ([[cell subviews] count] > 0 && [paramViews count] > 0){
 
