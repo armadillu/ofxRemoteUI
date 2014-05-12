@@ -112,7 +112,9 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 #ifdef OF_AVAILABLE
 	ofDirectory d;
 	d.open(OFXREMOTEUI_PRESET_DIR);
-	d.create(true);
+	if(!d.exists()){
+		d.create(true);
+	}
 #else
 #if defined(_WIN32)
 	_mkdir(OFXREMOTEUI_PRESET_DIR);
@@ -295,7 +297,11 @@ void ofxRemoteUIServer::saveGroupToXML(string fileName, string groupName){
 	ofDirectory d;
 	string path = string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName;
 	d.open(path);
-	d.create(true);
+	if(!d.exists()){
+		d.create(true);
+	}
+
+
 	#else
 		#if defined(_WIN32)
 		_mkdir(path.c_str());
@@ -551,7 +557,11 @@ void ofxRemoteUIServer::saveSettingsBackup(){
 
 	#ifdef OF_AVAILABLE
 	if(autoBackups){
-		ofDirectory::createDirectory(OFXREMOTEUI_SETTINGS_BACKUP_FOLDER);
+		ofDirectory d;
+		d.open(OFXREMOTEUI_SETTINGS_BACKUP_FOLDER);
+		if (d.exists()){
+			ofDirectory::createDirectory(OFXREMOTEUI_SETTINGS_BACKUP_FOLDER);
+		}d.close();
 		string basePath = OFXREMOTEUI_SETTINGS_BACKUP_FOLDER + string("/") + ofFilePath::removeExt(OFXREMOTEUI_SETTINGS_FILENAME) + ".";
 		for (int i = OFXREMOTEUI_NUM_BACKUPS - 1; i >= 0; i--){
 			string originalPath = basePath + ofToString(i) + ".xml";
@@ -680,6 +690,10 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				saveToXML(OFXREMOTEUI_SETTINGS_FILENAME);
 				onScreenNotifications.addNotification("SAVED CONFIG to default XML");
 				break;
+			case 'r':
+				restoreAllParamsToInitialXML();
+				onScreenNotifications.addNotification("RESET CONFIG TO SERVER-LAUNCH XML values");
+				break;
 			case OF_KEY_UP:
 				selectedItem -= 1;
 				if(selectedItem<0) selectedItem = orderedKeys.size() - 1;
@@ -797,14 +811,18 @@ void ofxRemoteUIServer::draw(int x, int y){
 			if (stringw > valOffset){
 				key = key.substr(0, (valOffset) / charw );
 			}
-			if (selectedItem != i) ofSetColor(p.r, p.g, p.b);
-			else ofSetColor(255,0,0);
+			if (selectedItem != i){
+				ofSetColor(p.r, p.g, p.b);
+			}else{
+				if(ofGetFrameNum()%5 < 1) ofSetColor(222);
+				else ofSetColor(255,0,0);
+			}
 
 			if(p.type != REMOTEUI_PARAM_SPACER){
-				string sel = (selectedItem == i) ? ">" : " ";
+				string sel = (selectedItem == i) ? ">>" : "  ";
 				ofDrawBitmapString(sel + key, x, y);
 			}else{
-				ofDrawBitmapString(p.stringVal, x,y);
+				ofDrawBitmapString("+ " + p.stringVal, x,y);
 			}
 
 			switch (p.type) {
@@ -827,7 +845,6 @@ void ofxRemoteUIServer::draw(int x, int y){
 					break;
 				case REMOTEUI_PARAM_SPACER:
 					break;
-
 				default: printf("weird RemoteUIParam at isEqualTo()!\n"); break;
 			}
 			ofSetColor(32);
