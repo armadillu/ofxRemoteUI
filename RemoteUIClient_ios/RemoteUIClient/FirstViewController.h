@@ -12,9 +12,11 @@
 
 
 #define REFRESH_RATE			1.0f/15.0f
-#define TOOLBAR_H				44
+#define TOOLBAR_H				30
 #define CONNECT_EMOJI			@"🌍"
 #define PRESET_EMOJI			@"📖"
+#define SAVE_EMOJI				@"Save"
+#define ADD_PRESET_EMOJI		@"Add📖"
 
 @interface FirstViewController : UICollectionViewController <UIActionSheetDelegate>{
 
@@ -39,6 +41,7 @@
 	UIBarButtonItem *				connectB;
 	UIBarButtonItem *				presetsButton;
 	UIBarButtonItem *				saveButton;
+	UIBarButtonItem *				addPresetsButton;
 
 
 	//current or upcoming connection
@@ -60,6 +63,9 @@
 
 -(IBAction)pressedConnectButton;
 -(IBAction)pressedPresetsButton;
+-(IBAction)pressedSaveButton;
+-(IBAction)pressedAddPresetButton;
+
 -(void)connect;
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex;

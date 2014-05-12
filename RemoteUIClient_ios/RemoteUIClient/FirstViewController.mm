@@ -150,12 +150,23 @@ void clientCallback(RemoteUIClientCallBackArg a){
 											   target:self
 											   action:@selector(pressedConnectButton)];
 
-	//connect button
 	presetsButton = [[UIBarButtonItem alloc] initWithTitle:[NSString stringWithFormat:@"%@(0)", PRESET_EMOJI]
 													 style:UIBarButtonItemStyleBordered
 													target:self
 													action:@selector(pressedPresetsButton)];
-	toolbar.items = @[connectB, presetsButton];
+
+	saveButton = [[UIBarButtonItem alloc] initWithTitle:SAVE_EMOJI
+													 style:UIBarButtonItemStyleBordered
+													target:self
+													action:@selector(pressedPresetsButton)];
+
+	addPresetsButton = [[UIBarButtonItem alloc] initWithTitle:ADD_PRESET_EMOJI
+												  style:UIBarButtonItemStyleBordered
+												 target:self
+												 action:@selector(pressedAddPresetButton)];
+
+
+	toolbar.items = @[connectB, presetsButton, addPresetsButton, saveButton];
 
 	paramViews = [[NSMutableArray alloc] initWithCapacity:50];
 	currentNeighbors = [[NSMutableArray alloc] initWithCapacity:1];
@@ -262,7 +273,9 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	}
 
 	if (actionSheet == presetsSheet){
-
+		NSString* presetName = [actionSheet buttonTitleAtIndex:buttonIndex];
+		NSLog(@"user chose preset: %@", presetName );
+		client->setPreset([presetName UTF8String]);
 	}
 }
 
@@ -278,6 +291,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 //			}
 			((UIButton *)_currentView).titleLabel.adjustsFontSizeToFitWidth = true;
 			((UIButton *)_currentView).titleLabel.minimumScaleFactor = 0.5;
+			((UIButton *)_currentView).titleLabel.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
 			//((UIButton *)_currentView).titleLabel.lineBreakMode = NSLineBreakByTruncatingTail;
 
         }

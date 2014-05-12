@@ -25,7 +25,7 @@
 		NSLog(@"nib nil!");
 		return nil;
 	}
-	view = [nib firstObject];
+	view = [nib objectAtIndex:0];
 	param = p;
 	name = n;
 
