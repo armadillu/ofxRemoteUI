@@ -28,8 +28,8 @@
 
 	map<string, ParamUI*>			widgets;
 
-	NSMutableArray	*				paramViews;
-	NSMutableArray*					currentNeighbors;
+	NSMutableArray *				paramViews;
+	NSMutableArray *				currentNeighbors;
 	vector<string>					presets;
 
 	bool							needFullParamsUpdate;

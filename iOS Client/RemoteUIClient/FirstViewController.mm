@@ -208,6 +208,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		//[arr addObject:[NSString stringWithFormat:@"%s@%s", ns[i].binary.c_str(), ns[i].name.c_str()]];
 		[arr addObject:[NSString stringWithFormat:@"%s@%s (%s:%d)", ns[i].binary.c_str(), ns[i].name.c_str(), ns[i].IP.c_str(), ns[i].port]];
 	}
+	[arr addObject: @"Disconnect"];
 
     connectSheet = [[UIActionSheet alloc] initWithTitle:@"ofxRemoteUI Nearby Servers"
                                                              delegate:self
@@ -219,7 +220,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
     }
 
     [connectSheet addButtonWithTitle:@"Cancel"];
-    connectSheet.cancelButtonIndex = [arr count];
+    connectSheet.cancelButtonIndex = [arr count] ;
 	connectSheet.actionSheetStyle = UIActionSheetStyleDefault;
     [connectSheet showFromToolbar:toolbar];
 }
@@ -294,15 +295,19 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	if (actionSheet == connectSheet){
 
-		if(buttonIndex >= [currentNeighbors count]){
+		if(buttonIndex >= [currentNeighbors count] + 1){
 			//cancel
 		}else{
-			NSString * server_port = [currentNeighbors objectAtIndex:buttonIndex];
-			NSArray * info = [server_port componentsSeparatedByString:@":"];
-			port = [info objectAtIndex:1];
-			address = [info objectAtIndex:0];
-			[self disconnect];
-			[self connect];
+			if (buttonIndex == [currentNeighbors count] ){
+				[self disconnect];
+			}else{
+				NSString * server_port = [currentNeighbors objectAtIndex:buttonIndex];
+				NSArray * info = [server_port componentsSeparatedByString:@":"];
+				port = [info objectAtIndex:1];
+				address = [info objectAtIndex:0];
+				[self disconnect];
+				[self connect];
+			}
 		}
 		connectSheet = nil;
 	}
@@ -311,6 +316,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		NSString* presetName = [actionSheet buttonTitleAtIndex:buttonIndex];
 		NSLog(@"user chose preset: %@", presetName );
 		client->setPreset([presetName UTF8String]);
+		presetsSheet = nil;
 	}
 }
 
@@ -357,6 +363,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 //	}
 	widgets.clear();
 	[paramViews removeAllObjects];
+	widgets.clear();
+	presets.clear();
+	[self updatePresets];
+	[self.collectionView reloadData];
 
 	//also remove the spacer bars. Dont ask me why, but dynamic array walking crashes! :?
 	//that why this ghetto walk is here
@@ -442,8 +452,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	//[presetsMenu removeAllItems];
 	//[groupsMenu removeAllItems];
-	[self cleanUpGUIParams];
 	client->disconnect();
+	[self cleanUpGUIParams];
 	connected = false;
 }
 
@@ -624,6 +634,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 //	printf("original: %d >> remapedIndex = %d >> map[%d][%d]\n",indexPath.row, remapedIndex,  xx, yy);
 
 	//NSIndexPath *ind = [NSIndexPath indexPathWithIndexes: ((const NSUInteger [])[indexPath getIndexes]) length: indexPath.length];
+
+	NSLog(@"section: %d, row: %d, len: %d", indexPath.section, indexPath.row , indexPath.length);
 	UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:identifier forIndexPath:indexPath];
 
 	if ([[cell subviews] count] > 0 && [paramViews count] > 0){

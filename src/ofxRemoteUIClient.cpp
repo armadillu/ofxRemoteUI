@@ -65,6 +65,7 @@ void ofxRemoteUIClient::disconnect(){
 		if(verbose_) cout << "ofxRemoteUIClient: disconnect()" << endl;
 		sendCIAO();
 		readyToSend = false;
+		presetNames.clear(); 
 	}else{
 		if(verbose_) cout << "ofxRemoteUIClient: can't disconnect(); we arent connected!" << endl;
 	}
