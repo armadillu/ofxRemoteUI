@@ -26,19 +26,25 @@
 	vector<string>					orderedKeys; // used to keep the order in which the items were added
 
 	NSMutableArray	*				paramViews;
-
+	NSMutableArray*					currentNeighbors;
 
 	bool							needFullParamsUpdate;
 	BOOL							connected;
 
 	UIToolbar *						toolbar;
 	UIBarButtonItem *				connectB;
+
+	//current or upcoming connection
+	NSString *						address;
+	NSString *						port;
 }
 
 -(ofxRemoteUIClient *)getClient;
 -(void)fullParamsUpdate;
 -(void) partialParamsUpdate;
 -(void)cleanUpGUIParams;
+
+-(void)updateNeighbors;
 
 -(IBAction)pressedConnectButton;
 -(void)connect;

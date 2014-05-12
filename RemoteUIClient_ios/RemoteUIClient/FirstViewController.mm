@@ -108,7 +108,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		}
 
 		case NEIGHBORS_UPDATED:{
-//			[me updateNeighbors];
+			[me updateNeighbors];
 		}break;
 
 		case SERVER_SENT_LOG_LINE:{
@@ -134,7 +134,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 @implementation FirstViewController
 
-- (void)viewWillLayoutSubviews NS_AVAILABLE_IOS(5_0){
+- (void)viewWillLayoutSubviews{
 	CGRect bounds = [[UIScreen mainScreen] bounds]; // portrait bounds
 	if (UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation])) {
 		bounds.size = CGSizeMake(bounds.size.height, bounds.size.width);
@@ -145,26 +145,62 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 -(IBAction)pressedConnectButton{
 	NSLog(@"pressedConnectButton");
-	UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Title"
-															 delegate:self
-													cancelButtonTitle:@"Cancel"
-											   destructiveButtonTitle:@"Okay"
-													otherButtonTitles:@"One", @"Two", @"Three", @"Four", @"Five", @"Six", nil];
 
+	vector<Neighbor> ns = client->getNeighbors();
+	NSMutableArray *arr = [NSMutableArray arrayWithCapacity:1];
+	[currentNeighbors removeAllObjects];
+
+	for(int i = 0; i < ns.size(); i++){
+		[currentNeighbors addObject:[NSString stringWithFormat:@"%s:%d",  ns[i].IP.c_str(), ns[i].port]];
+		//[arr addObject:[NSString stringWithFormat:@"%s@%s", ns[i].binary.c_str(), ns[i].name.c_str()]];
+		[arr addObject:[NSString stringWithFormat:@"%s@%s (%s:%d)", ns[i].binary.c_str(), ns[i].name.c_str(), ns[i].IP.c_str(), ns[i].port]];
+	}
+
+    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"ofxRemoteUI Nearby Servers"
+                                                             delegate:self
+                                                    cancelButtonTitle:nil
+                                               destructiveButtonTitle:nil
+                                                    otherButtonTitles:nil];
+    for (NSString *title in arr) {
+        [actionSheet addButtonWithTitle:title];
+    }
+
+    [actionSheet addButtonWithTitle:@"Cancel"];
+    actionSheet.cancelButtonIndex = [arr count];
 	actionSheet.actionSheetStyle = UIActionSheetStyleBlackTranslucent;
-    [actionSheet showInView:toolbar];
+    [actionSheet showFromToolbar:toolbar];
 }
 
-// Called when a button is clicked. The view will be automatically dismissed after this call returns
+
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex;{
-
+	NSLog(@"pressed %d", buttonIndex);
+	if(buttonIndex >= [currentNeighbors count]){
+		//cancel
+	}else{
+		NSString * server_port = [currentNeighbors objectAtIndex:buttonIndex];
+		NSArray * info = [server_port componentsSeparatedByString:@":"];
+		port = [info objectAtIndex:1];
+		address = [info objectAtIndex:0];
+		[self disconnect];
+		[self connect];
+	}
 }
 
-// Called when we cancel a view (eg. the user clicks the Home button). This is not called when the user clicks the cancel button.
-// If not defined in the delegate, we simulate a click in the cancel button
-- (void)actionSheetCancel:(UIActionSheet *)actionSheet;{
 
+//tweak font size on action sheet
+- (void)willPresentActionSheet:(UIActionSheet *)actionSheet {
+    [actionSheet.subviews enumerateObjectsUsingBlock:^(id _currentView, NSUInteger idx, BOOL *stop) {
+        if ([_currentView isKindOfClass:[UIButton class]]) {
+			if ([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortrait ||
+				[[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortraitUpsideDown
+				){ //make labels smaller if in portrait mode && iphone
+				[((UIButton *)_currentView).titleLabel setFont:[UIFont boldSystemFontOfSize:12.5f]];
+			}
+        }
+    }];
 }
+
+
 
 - (void)viewDidLoad{
 
@@ -186,6 +222,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	paramViews = [[NSMutableArray alloc] initWithCapacity:50];
 
+	currentNeighbors = [[NSMutableArray alloc] initWithCapacity:1];
+
 	//	for(int i = 0; i < 50; i++){
 	//		//UIView* paramview = [[[NSBundle mainBundle] loadNibNamed:@"ParamUI_ipad" owner:self options:nil] firstObject];
 	//		RemoteUIParam p;
@@ -205,7 +243,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	//bool OK = client->setup("192.168.5.145", 13840); //test
 
 	needFullParamsUpdate = YES; //before connect, always!
-	client->connect();
+	//client->connect();
 
 	timer = [NSTimer scheduledTimerWithTimeInterval:REFRESH_RATE target:self selector:@selector(update) userInfo:nil repeats:YES];
 
@@ -269,7 +307,6 @@ void clientCallback(RemoteUIClientCallBackArg a){
 				//NSLog(@"%@", paramView);
 
 				ParamUI * paramView = [[ParamUI alloc] initWithParam: p name: paramName ID: c client:client];
-				cout << paramName << endl;
 				c++;
 				orderedKeys.push_back(paramName);
 				widgets[paramName] = paramView;
@@ -311,7 +348,28 @@ void clientCallback(RemoteUIClientCallBackArg a){
 }
 
 
+-(void)updateNeighbors{
+	vector<Neighbor> ns = client->getNeighbors();
+	connectB.title = [NSString stringWithFormat:@"Connect (%d)", (int)ns.size() ];
+}
+
+
+
+
+-(void)disconnect{
+
+		//[presetsMenu removeAllItems];
+		//[groupsMenu removeAllItems];
+		[self cleanUpGUIParams];
+		client->disconnect();
+}
+
 -(void) connect{
+
+	bool OK = client->setup([address UTF8String], [port intValue]); //test
+	client->connect();
+	needFullParamsUpdate = YES; //before connect, always!
+
 
 //	NSString * date = [[NSDate date] descriptionWithCalendarFormat:@"%H:%M:%S" timeZone:nil locale:nil];
 
