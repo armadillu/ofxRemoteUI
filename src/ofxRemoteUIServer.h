@@ -278,6 +278,7 @@ private:
 	void			_keyPressed(ofKeyEventArgs &e);
 
 	int				selectedItem;
+	ofVboMesh		uiLines;
 #endif
 
 	static ofxRemoteUIServer* singleton;

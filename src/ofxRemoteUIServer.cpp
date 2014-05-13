@@ -94,6 +94,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	std::srand(1979);
 	std::random_shuffle ( colorTables.begin(), colorTables.end() );
 	ofSeedRandom();
+	uiLines.setMode(OF_PRIMITIVE_LINES);
 #else
 	colorTables.push_back(ofColor(194,144,221,a) );
 	colorTables.push_back(ofColor(202,246,70,a)  );
@@ -744,6 +745,9 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 	}
 	if(e.key == showInterfaceKey){
 		showValuesOnScreen = !showValuesOnScreen;
+		if (showValuesOnScreen){
+			uiLines.clear();
+		}
 	}
 }
 
@@ -792,7 +796,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 		int y = initialY;
 		int colw = 320;
 		int valOffset = colw * 0.6;
-		int spacing = 24;
+		int spacing = 20;
 
 		ofSetColor(11, 245);
 		ofRect(0,0, ofGetWidth(), ofGetHeight());
@@ -800,7 +804,9 @@ void ofxRemoteUIServer::draw(int x, int y){
 		ofRect(0,0, ofGetWidth(), padding + spacing );
 
 		ofSetColor(255);
-		ofDrawBitmapString("ofxRemoteUIServer params list : press 'TAB' to hide.\nPress 's' to save current config. Use Arrow Keys to edit values.", padding,  padding - 3);
+		ofDrawBitmapString("ofxRemoteUIServer params list : press 'TAB' to hide.\nPress 's' to save current config. Press 'r' to restore all param's launch state. Use Arrow Keys to edit values.", padding,  padding - 3);
+
+		int linesInited = uiLines.getNumVertices() > 0 ;
 
 		for(int i = 0; i < orderedKeys.size(); i++){
 			string key = orderedKeys[i];
@@ -845,16 +851,20 @@ void ofxRemoteUIServer::draw(int x, int y){
 					break;
 				case REMOTEUI_PARAM_SPACER:
 					break;
-				default: printf("weird RemoteUIParam at isEqualTo()!\n"); break;
+				default: printf("weird RemoteUIParam at draw()!\n"); break;
 			}
-			ofSetColor(32);
-			ofLine(x, y + spacing * 0.33, x + colw * 0.8, y + spacing * 0.33);
+			if(!linesInited){
+				uiLines.addVertex(ofVec2f(x, y + spacing * 0.33));
+				uiLines.addVertex(ofVec2f(x + colw * 0.8, y + spacing * 0.33));
+			}
 			y += spacing;
 			if (y > ofGetHeight() - padding){
 				x += colw;
 				y = initialY;
 			}
 		}
+		ofSetColor(32);
+		uiLines.draw();
 	}else{
 		onScreenNotifications.draw(x, y);
 	}
