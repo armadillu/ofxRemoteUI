@@ -1208,7 +1208,7 @@ bool resizeWindowUpDown = false; //if you keep changing paramUI size, with this 
 -(NSString *)showAlertWithInput: (NSString *)prompt defaultValue: (NSString *)defaultValue {
 
 	//set level to Normal to avoid blocking new preset alert window
-	int level = (int)[window level];
+	NSInteger level = [window level];
 	[window setLevel:NSNormalWindowLevel];
 	[[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 
@@ -1229,6 +1229,9 @@ bool resizeWindowUpDown = false; //if you keep changing paramUI size, with this 
 	//	[[alert accessoryView] setFrame: fr];
 
 	NSInteger button = [alert runModal];
+
+	[window setLevel:level];//restore window level
+	
 	if (button == NSAlertDefaultReturn) {
 		[input validateEditing];
 		return [input stringValue];
@@ -1238,8 +1241,6 @@ bool resizeWindowUpDown = false; //if you keep changing paramUI size, with this 
 		//NSAssert1(NO, @"Invalid input dialog button %d", button);
 		return nil;
 	}
-	//restore window level
-	[window setLevel:level];
 }
 
 -(void)showNotificationWithTitle:(NSString*)title description:(NSString*)desc ID:(NSString*)key priority:(int)p{

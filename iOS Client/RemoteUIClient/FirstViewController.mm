@@ -566,6 +566,9 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	}
 
 	float minW = 240;
+	if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ){
+		minW = 320;
+	}
 	int nc = 0;
 	float w = FLT_MAX;
 	while (w >= minW) {
@@ -580,7 +583,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		ww = bounds.size.width;
 	}
 
-	NSLog(@"sw: %f w: %f nc: %d >> ww: %f",bounds.size.width, ww, nc, ww);
+	//NSLog(@"sw: %f w: %f nc: %d >> ww: %f",bounds.size.width, ww, nc, ww);
     return CGSizeMake(ww , 50.0f);
 }
 
@@ -635,19 +638,28 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	//NSIndexPath *ind = [NSIndexPath indexPathWithIndexes: ((const NSUInteger [])[indexPath getIndexes]) length: indexPath.length];
 
-	NSLog(@"section: %d, row: %d, len: %d", indexPath.section, indexPath.row , indexPath.length);
+	//NSLog(@"section: %d, row: %d, len: %d", indexPath.section, indexPath.row , indexPath.length);
 	UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:identifier forIndexPath:indexPath];
 
-	if ([[cell subviews] count] > 0 && [paramViews count] > 0){
+	cell.opaque = YES;
+//	UIView * v = [[cell subviews] objectAtIndex:0];
+//	int tag = [v tag];
 
+
+	if ([paramViews count] > 0){
+
+		//[v setTag:1];
 		ParamUI * paramView = [paramViews objectAtIndex:indexPath.row];
 		//[paramView setNeedsLayout];
 		[cell addSubview: [paramView getView]];
 		//[cell setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-		CGRect f = [cell frame];
-		f.origin = CGPointMake(0, 0);
-		[[paramView getView] setFrame: f ];
-		[paramView setup];
+		//if (![paramView hasBeenSetup]){
+			CGRect f = [cell frame];
+			f.origin = CGPointMake(0, 0);
+			[[paramView getView] setFrame: f ];
+			[paramView setup];
+			//NSLog(@"making new View ");
+		//}
 	}
 	//NSLog(@"addSubview %@ from %d",[recipeImages objectAtIndex:indexPath.row], indexPath.row);
 	return cell;

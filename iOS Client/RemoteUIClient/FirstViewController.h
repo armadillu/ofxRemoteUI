@@ -12,7 +12,7 @@
 
 
 #define REFRESH_RATE			1.0f/15.0f
-#define TOOLBAR_H				34
+#define TOOLBAR_H				44
 #define CONNECT_EMOJI			@"🌍"
 #define PRESET_EMOJI			@"📖"
 #define SAVE_EMOJI				@"Save"

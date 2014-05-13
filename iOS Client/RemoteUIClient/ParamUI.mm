@@ -25,9 +25,14 @@
 	view = [nib objectAtIndex:0];
 	param = p;
 	name = n;
+	hasBeenSetup = false;
     return self;
 }
 
+-(BOOL)hasBeenSetup{
+
+	return hasBeenSetup;
+}
 
 -(void)setup{
 
@@ -147,6 +152,7 @@
 			break;
 	}
 	[self updateUI];
+	hasBeenSetup = true;
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {

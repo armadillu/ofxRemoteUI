@@ -42,7 +42,7 @@ using namespace std;
 	RemoteUIParam		param;
 	string				name;
 	int					numberID;
-
+	BOOL				hasBeenSetup;
 }
 
 -(id)initWithParam:(RemoteUIParam)p name:(string)name ID:(int)ID client:(ofxRemoteUI*) client;
@@ -61,5 +61,6 @@ using namespace std;
 -(IBAction)updateInt:(id)sender;
 -(IBAction)updateBool:(id)sender;
 -(IBAction)updateString:(id)sender;
+-(BOOL)hasBeenSetup;
 
 @end
