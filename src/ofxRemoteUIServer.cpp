@@ -559,7 +559,7 @@ void ofxRemoteUIServer::saveSettingsBackup(){
 	if(autoBackups){
 		ofDirectory d;
 		d.open(OFXREMOTEUI_SETTINGS_BACKUP_FOLDER);
-		if (d.exists()){
+		if (!d.exists()){
 			ofDirectory::createDirectory(OFXREMOTEUI_SETTINGS_BACKUP_FOLDER);
 		}d.close();
 		string basePath = OFXREMOTEUI_SETTINGS_BACKUP_FOLDER + string("/") + ofFilePath::removeExt(OFXREMOTEUI_SETTINGS_FILENAME) + ".";
