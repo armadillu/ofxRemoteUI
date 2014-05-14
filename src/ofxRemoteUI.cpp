@@ -65,7 +65,7 @@ void ofxRemoteUI::addParamToDB(RemoteUIParam p, string paramName){
 		paramsFromCode[paramName] = p; //cos this didnt exist before, we store it as "from code"
 	}else{
 		params[paramName] = p;
-		cout << "already have a Param with that name on the DB : " << paramName <<"!!" << endl;
+		RUI_LOG_WARNING << "already have a Param with that name on the DB : " << paramName <<"!!";
 	}
 }
 
@@ -150,7 +150,7 @@ string ofxRemoteUI::getMyIP(string userChosenInteface){
 	//from https://github.com/jvcleave/LocalAddressGrabber/blob/master/src/LocalAddressGrabber.h
 	//and http://stackoverflow.com/questions/17288908/get-network-interface-name-from-ipv4-address
 	string output = "NOT FOUND";
-	cout << "ofxRemoteUI establishing local interface and IP @" << endl;
+	RUI_LOG_NOTICE << "ofxRemoteUI establishing local interface and IP @";
 
 #ifdef __APPLE__ /*this should cover linux too TODO*/
 	struct ifaddrs *myaddrs;
@@ -174,18 +174,18 @@ string ofxRemoteUI::getMyIP(string userChosenInteface){
 				printf("%s: inet_ntop failed!\n", ifa->ifa_name);
 			}else{
 				string interface = string(ifa->ifa_name);
-				if(verbose_) cout << "ofxRemoteUI found interface: " << interface << endl;
+				if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUI found interface: " << interface ;
 				if( interface.length() > 2 || interface == userSuppliedNetInterface ){
 					if (userSuppliedNetInterface.length() > 0){
 						if (interface == userSuppliedNetInterface){
 							output = string(buf);
-							if(verbose_) cout << "ofxRemoteUI using user chosen interface: " << interface << endl;
+							if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUI using user chosen interface: " << interface;
 							break;
 						}
 					}else{
 						if ( interface[0] == 'e' && interface[1] == 'n'){
 							output = string(buf);
-							if(verbose_) cout << "ofxRemoteUI using interface: " << interface << endl;
+							if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUI using interface: " << interface;
 							break;
 						}
 					}
@@ -196,8 +196,8 @@ string ofxRemoteUI::getMyIP(string userChosenInteface){
 	freeifaddrs(myaddrs);
 	if (userSuppliedNetInterface.length() > 0){
 		if (output == "NOT FOUND"){
-			cout << "ofxRemoteUI could not find the user supplied net interface: " << userSuppliedNetInterface << endl;
-			cout << "ofxRemoteUI automatic advertising will not work! " << endl;
+			RUI_LOG_ERROR << "ofxRemoteUI could not find the user supplied net interface: " << userSuppliedNetInterface;
+			RUI_LOG_ERROR << "ofxRemoteUI automatic advertising will not work! ";
 		}
 	}
 #endif
@@ -324,8 +324,8 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 			break;
 			
 
-		case NULL_ARG: cout << "updateParamFromDecodedMessage NULL type!" << endl; break;
-		default: cout << "updateParamFromDecodedMessage unknown type!" << endl; break;
+		case NULL_ARG: RUI_LOG_ERROR << "updateParamFromDecodedMessage NULL type!"; break;
+		default: RUI_LOG_ERROR << "updateParamFromDecodedMessage unknown type!"; break;
 	}
 
 	p.r = m.getArgAsInt32(arg); arg++;
@@ -387,7 +387,7 @@ void ofxRemoteUI::sendUpdateForParamsInList(vector<string>list){
 			//cout << "ofxRemoteUIServer: sending updated param " + list[i]; p.print();
 			sendParam(list[i], p);
 		}else{
-			cout << "param not found??!" << endl;
+			RUI_LOG_ERROR << "param not found??!";
 		}
 	}
 }
@@ -523,7 +523,7 @@ bool ofxRemoteUI::hasParamChanged(RemoteUIParam p){
 		case REMOTEUI_PARAM_SPACER: return false;
 		default: break;
 	}
-	cout << "ofxRemoteUIServer::hasParamChanged >> something went wrong, unknown param type" << endl;
+	RUI_LOG_ERROR << "ofxRemoteUIServer::hasParamChanged >> something went wrong, unknown param type";
 	return false;
 }
 
@@ -539,7 +539,7 @@ string ofxRemoteUI::stringForParamType(RemoteUIParamType t){
 		case REMOTEUI_PARAM_SPACER: return "SPA";
 		default: break;
 	}
-	cout << "ofxRemoteUI::stringForParamType >> UNKNOWN TYPE!" << endl;
+	RUI_LOG_ERROR << "ofxRemoteUI::stringForParamType >> UNKNOWN TYPE!";
 	return "ERR";
 }
 
@@ -551,7 +551,7 @@ RemoteUIParam ofxRemoteUI::getParamForName(string paramName){
 	if ( it != params.end() ){	// found!
 		p = params[paramName];
 	}else{
-		cout << "ofxRemoteUIClient::getParamForName >> param " + paramName + " not found!" << endl;
+		RUI_LOG_ERROR << "ofxRemoteUIClient::getParamForName >> param " + paramName + " not found!";
 	}
 	return p;
 }
@@ -627,7 +627,7 @@ void ofxRemoteUI::setValuesFromString( string values ){
 		if ( params.find( *it ) != params.end()){
 			RemoteUIParam param = params[*it];
 			sendUntrackedParamUpdate(param, *it);
-			cout << "sending update for " << *it << endl;
+			RUI_LOG_VERBOSE << "sending update for " << *it ;
 		}
 		it++;
 	}
@@ -636,7 +636,7 @@ void ofxRemoteUI::setValuesFromString( string values ){
 
 void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
 	ofxOscMessage m;
-	if(verbose_){ printf("sending >> %s ", paramName.c_str()); p.print(); }
+	//if(verbose_){ ofLogVerbose("sending >> %s ", paramName.c_str()); p.print(); }
 	m.setAddress("SEND " + stringForParamType(p.type) + " " + paramName);
 	switch (p.type) {
 		case REMOTEUI_PARAM_FLOAT: m.addFloatArg(p.floatVal); m.addFloatArg(p.minFloat); m.addFloatArg(p.maxFloat); break;
@@ -658,14 +658,14 @@ void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
 	try{
 		oscSender.sendMessage(m);
 	}catch(exception e){
-		cout << "exception" << endl;
+		RUI_LOG_ERROR << "exception";
 	}
 }
 
 //if used by server, confirmation == YES
 //else, NO
 void ofxRemoteUI::sendREQU(bool confirmation){
-	if(verbose_) cout << "sendREQU()" << endl;
+	if(verbose_) RUI_LOG_VERBOSE << "sendREQU()";
 	ofxOscMessage m;
 	m.setAddress("REQU");
 	if (confirmation) m.addStringArg("OK");
@@ -674,7 +674,7 @@ void ofxRemoteUI::sendREQU(bool confirmation){
 
 
 void ofxRemoteUI::sendRESX(bool confirm){
-	if(verbose_) cout << "sendRESX()" << endl;
+	if(verbose_) RUI_LOG_VERBOSE << "sendRESX()";
 	ofxOscMessage m;
 	m.setAddress("RESX");
 	if (confirm) m.addStringArg("OK");
@@ -682,7 +682,7 @@ void ofxRemoteUI::sendRESX(bool confirm){
 }
 
 void ofxRemoteUI::sendRESD(bool confirm){
-	if(verbose_) cout << "sendRESD()" << endl;
+	if(verbose_) RUI_LOG_VERBOSE << "sendRESD()";
 	ofxOscMessage m;
 	m.setAddress("RESD");
 	if (confirm) m.addStringArg("OK");
@@ -690,7 +690,7 @@ void ofxRemoteUI::sendRESD(bool confirm){
 }
 
 void ofxRemoteUI::sendSAVE(bool confirm){
-	if(verbose_) cout << "sendSAVE()" << endl;
+	if(verbose_) RUI_LOG_VERBOSE << "sendSAVE()";
 	ofxOscMessage m;
 	m.setAddress("SAVE");
 	if (confirm) m.addStringArg("OK");
@@ -699,7 +699,7 @@ void ofxRemoteUI::sendSAVE(bool confirm){
 
 
 void ofxRemoteUI::sendTEST(){
-	if(verbose_) cout << "sendTEST()" << endl;
+	if(verbose_) RUI_LOG_VERBOSE << "sendTEST()";
 	waitingForReply = true;
 	timeSinceLastReply = 0.0f;
 	ofxOscMessage m;
@@ -710,7 +710,7 @@ void ofxRemoteUI::sendTEST(){
 //on client call, presetNames should be empty vector (request ing the list)
 //on server call, presetNames should have all the presetNames
 void ofxRemoteUI::sendPREL( vector<string> presetNames_ ){
-	if(verbose_) cout << "sendPRES()" << endl;
+	if(verbose_) RUI_LOG_VERBOSE << "sendPRES()";
 	ofxOscMessage m;
 	m.setAddress("PREL");
 	if (presetNames_.size() == 0){ // if we are the client requesting a preset list, delete our current list
@@ -726,7 +726,7 @@ void ofxRemoteUI::sendPREL( vector<string> presetNames_ ){
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
 void ofxRemoteUI::sendSAVP(string presetName, bool confirm){
-	if(verbose_) cout << "sendSAVP()" << endl;
+	if(verbose_) RUI_LOG_VERBOSE << "sendSAVP()";
 	ofxOscMessage m;
 	m.setAddress("SAVP");
 	m.addStringArg(presetName);
@@ -739,7 +739,7 @@ void ofxRemoteUI::sendSAVP(string presetName, bool confirm){
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
 void ofxRemoteUI::sendSETP(string presetName, bool confirm){
-	if(verbose_) cout << "sendSETP()" << endl;
+	if(verbose_) RUI_LOG_VERBOSE << "sendSETP()";
 	ofxOscMessage m;
 	m.setAddress("SETP");
 	m.addStringArg(presetName);
@@ -751,7 +751,7 @@ void ofxRemoteUI::sendSETP(string presetName, bool confirm){
 
 void ofxRemoteUI::sendMISP(vector<string> missingParamsInPreset){
 	if (missingParamsInPreset.size() == 0) return; //do nothing if no params are missing
-	if(verbose_) cout << "sendMISP()" << endl;
+	if(verbose_) RUI_LOG_VERBOSE << "sendMISP()";
 	ofxOscMessage m;
 	m.setAddress("MISP");
 	for(int i = 0; i < missingParamsInPreset.size(); i++){
@@ -761,7 +761,7 @@ void ofxRemoteUI::sendMISP(vector<string> missingParamsInPreset){
 }
 
 void ofxRemoteUI::sendDELP(string presetName, bool confirm){
-	if(verbose_) cout << "sendDELP()" << endl;
+	if(verbose_) RUI_LOG_VERBOSE << "sendDELP()";
 	ofxOscMessage m;
 	m.setAddress("DELP");
 	m.addStringArg(presetName);
@@ -786,7 +786,7 @@ void ofxRemoteUI::sendCIAO(){
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
 void ofxRemoteUI::sendSETp(string presetName, string group, bool confirm){
-	if(verbose_) cout << "sendSETp()" << endl;
+	if(verbose_) RUI_LOG_VERBOSE << "sendSETp()";
 	ofxOscMessage m;
 	m.setAddress("SETp");
 	m.addStringArg(presetName);
@@ -800,7 +800,7 @@ void ofxRemoteUI::sendSETp(string presetName, string group, bool confirm){
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
 void ofxRemoteUI::sendSAVp(string presetName, string group, bool confirm){
-	if(verbose_) cout << "sendSAVp()" << endl;
+	if(verbose_) RUI_LOG_VERBOSE << "sendSAVp()";
 	ofxOscMessage m;
 	m.setAddress("SAVp");
 	m.addStringArg(presetName);
@@ -814,7 +814,7 @@ void ofxRemoteUI::sendSAVp(string presetName, string group, bool confirm){
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
 void ofxRemoteUI::sendDELp(string presetName, string group, bool confirm){
-	if(verbose_) cout << "sendDELp()" << endl;
+	if(verbose_) RUI_LOG_VERBOSE << "sendDELp()";
 	ofxOscMessage m;
 	m.setAddress("DELp");
 	m.addStringArg(presetName);

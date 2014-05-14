@@ -40,13 +40,13 @@ bool ofxRemoteUINeigbors::update(float dt){
 }
 
 void ofxRemoteUINeigbors::print(){
-	cout << "## NEIGHBORS ##############################" << endl;
+	RUI_LOG_NOTICE << "## NEIGHBORS ##############################";
 	map<string, Neighbor>::iterator iterator;
 	for( iterator = neigbhors.begin(); iterator != neigbhors.end(); iterator++) {
 		Neighbor n = iterator->second;
-		cout << n.name << " (" << n.IP << ":" << n.port << ") " << time - n.timeLastSeen << " seconds ago." << endl;
+		RUI_LOG_NOTICE << n.name << " (" << n.IP << ":" << n.port << ") " << time - n.timeLastSeen << " seconds ago.";
 	}
-	cout << "###########################################" << endl;
+	RUI_LOG_NOTICE << "###########################################";
 }
 
 bool ofxRemoteUINeigbors::gotPing(string ip, int port, string name, string binaryName){

@@ -57,7 +57,6 @@ void ofxRemoteUIServer::setShowInterfaceKey(char k){
 
 ofxRemoteUIServer::ofxRemoteUIServer(){
 
-	//cout << "serving at: " << getMyIP() << endl;
 	enabled = true;
 	readyToSend = false;
 	saveToXmlOnExit = true;
@@ -127,7 +126,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 }
 
 ofxRemoteUIServer::~ofxRemoteUIServer(){
-	cout << "~ofxRemoteUIServer()" << endl;
+	RUI_LOG_NOTICE << "~ofxRemoteUIServer()" ;
 }
 
 
@@ -147,7 +146,7 @@ void ofxRemoteUIServer::close(){
 	if(threadedUpdate){
 #ifdef OF_AVAILABLE
 		stopThread();
-		cout << "ofxRemoteUIServer closing; waiting for update thread to end..." << endl;
+		RUI_LOG_NOTICE << "ofxRemoteUIServer closing; waiting for update thread to end..." ;
 		waitForThread();
 #endif
 	}
@@ -227,7 +226,7 @@ void ofxRemoteUIServer::removeParamFromDB(string paramName){
 			orderedKeys[i] = myOrderedKeys[i];
 		}
 	}else{
-		cout << "ofxRemoteUIServer::removeParamFromDB >> trying to delete an unexistant param (" << paramName << ")" << endl;
+		RUI_LOG_ERROR << "ofxRemoteUIServer::removeParamFromDB >> trying to delete an unexistant param (" << paramName << ")" ;
 	}
 }
 
@@ -236,19 +235,19 @@ void ofxRemoteUIServer::saveParamToXmlSettings(RemoteUIParam t, string key, ofxX
 
 	switch (t.type) {
 		case REMOTEUI_PARAM_FLOAT:
-			if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.floatValAddr <<") to XML" << endl;
+			if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.floatValAddr <<") to XML" ;
 			s.setValue(OFXREMOTEUI_FLOAT_PARAM_XML_TAG, (double)*t.floatValAddr, c.numFloats);
 			s.setAttribute(OFXREMOTEUI_FLOAT_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, key, c.numFloats);
 			c.numFloats++;
 			break;
 		case REMOTEUI_PARAM_INT:
-			if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.intValAddr <<") to XML" << endl;
+			if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.intValAddr <<") to XML" ;
 			s.setValue(OFXREMOTEUI_INT_PARAM_XML_TAG, (int)*t.intValAddr, c.numInts);
 			s.setAttribute(OFXREMOTEUI_INT_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, key, c.numInts);
 			c.numInts++;
 			break;
 		case REMOTEUI_PARAM_COLOR:
-			if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" << (int)*t.redValAddr << " " << (int)*(t.redValAddr+1) << " " << (int)*(t.redValAddr+2) << " " << (int)*(t.redValAddr+3) << ") to XML" << endl;
+			if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer saving '" << key << "' (" << (int)*t.redValAddr << " " << (int)*(t.redValAddr+1) << " " << (int)*(t.redValAddr+2) << " " << (int)*(t.redValAddr+3) << ") to XML" ;
 			s.setValue(string(OFXREMOTEUI_COLOR_PARAM_XML_TAG) + ":R", (int)*t.redValAddr, c.numColors);
 			s.setValue(string(OFXREMOTEUI_COLOR_PARAM_XML_TAG) + ":G", (int)*(t.redValAddr+1), c.numColors);
 			s.setValue(string(OFXREMOTEUI_COLOR_PARAM_XML_TAG) + ":B", (int)*(t.redValAddr+2), c.numColors);
@@ -257,26 +256,26 @@ void ofxRemoteUIServer::saveParamToXmlSettings(RemoteUIParam t, string key, ofxX
 			c.numColors++;
 			break;
 		case REMOTEUI_PARAM_ENUM:
-			if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.intValAddr <<") to XML" << endl;
+			if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.intValAddr <<") to XML" ;
 			s.setValue(OFXREMOTEUI_ENUM_PARAM_XML_TAG, (int)*t.intValAddr, c.numEnums);
 			s.setAttribute(OFXREMOTEUI_ENUM_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, key, c.numEnums);
 			c.numEnums++;
 			break;
 		case REMOTEUI_PARAM_BOOL:
-			if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.boolValAddr <<") to XML" << endl;
+			if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.boolValAddr <<") to XML" ;
 			s.setValue(OFXREMOTEUI_BOOL_PARAM_XML_TAG, (bool)*t.boolValAddr, c.numBools);
 			s.setAttribute(OFXREMOTEUI_BOOL_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, key, c.numBools);
 			c.numBools++;
 			break;
 		case REMOTEUI_PARAM_STRING:
-			if(verbose_) cout << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.stringValAddr <<") to XML" << endl;
+			if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.stringValAddr <<") to XML" ;
 			s.setValue(OFXREMOTEUI_STRING_PARAM_XML_TAG, (string)*t.stringValAddr, c.numStrings);
 			s.setAttribute(OFXREMOTEUI_STRING_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, key, c.numStrings);
 			c.numStrings++;
 			break;
 
 		case REMOTEUI_PARAM_SPACER:
-			if(verbose_) cout << "ofxRemoteUIServer skipping save of spacer '" << key << "' to XML" << endl;
+			if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer skipping save of spacer '" << key << "' to XML" ;
 			break;
 
 		default:
@@ -286,7 +285,7 @@ void ofxRemoteUIServer::saveParamToXmlSettings(RemoteUIParam t, string key, ofxX
 
 void ofxRemoteUIServer::saveGroupToXML(string fileName, string groupName){
 
-	cout << "ofxRemoteUIServer: saving group to xml '" << fileName << "'" << endl;
+	RUI_LOG_NOTICE << "ofxRemoteUIServer: saving group to xml '" << fileName << "'" ;
 	ofxXmlSettings s;
 	s.loadFile(fileName);
 	s.clear();
@@ -301,13 +300,11 @@ void ofxRemoteUIServer::saveGroupToXML(string fileName, string groupName){
 	if(!d.exists()){
 		d.create(true);
 	}
-
-
 	#else
 		#if defined(_WIN32)
 		_mkdir(path.c_str());
 		#else
-		mkdir(path.c_str(), 0777);
+		mkdir(fileName.c_str(), 0777);
 		#endif
 	#endif
 
@@ -327,7 +324,7 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 
 	saveSettingsBackup();
 
-	cout << "ofxRemoteUIServer: saving to xml '" << fileName << "'" << endl;
+	RUI_LOG_NOTICE << "ofxRemoteUIServer: saving to xml '" << fileName << "'" ;
 	ofxXmlSettings s;
 	s.loadFile(fileName);
 	if(clearXmlOnSaving){
@@ -377,12 +374,12 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 						params[paramName].floatVal = val;
 						*params[paramName].floatValAddr = ofClamp(*params[paramName].floatValAddr, params[paramName].minFloat, params[paramName].maxFloat);
 						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-						if(verbose_) cout << "ofxRemoteUIServer loading a FLOAT '" << paramName <<"' (" << ofToString( *params[paramName].floatValAddr, 3) << ") from XML" << endl;
+						if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading a FLOAT '" << paramName <<"' (" << ofToString( *params[paramName].floatValAddr, 3) << ") from XML" ;
 					}else{
-						cout << "ofxRemoteUIServer ERROR at loading FLOAT (" << paramName << ")" << endl;
+						RUI_LOG_ERROR << "ofxRemoteUIServer ERROR at loading FLOAT (" << paramName << ")" ;
 					}
 				}else{
-					cout << "ofxRemoteUIServer: float param '" <<paramName << "' defined in xml not found in DB!" << endl;
+					RUI_LOG_ERROR << "ofxRemoteUIServer: float param '" <<paramName << "' defined in xml not found in DB!" ;
 				}
 			}
 
@@ -398,12 +395,12 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 						params[paramName].intVal = val;
 						*params[paramName].intValAddr = ofClamp(*params[paramName].intValAddr, params[paramName].minInt, params[paramName].maxInt);
 						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-						if(verbose_) cout << "ofxRemoteUIServer loading an INT '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" << endl;
+						if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading an INT '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" ;
 					}else{
-						cout << "ofxRemoteUIServer ERROR at loading INT (" << paramName << ")" << endl;
+						RUI_LOG_ERROR << "ofxRemoteUIServer ERROR at loading INT (" << paramName << ")" ;
 					}
 				}else{
-					cout << "ofxRemoteUIServer: int param '" <<paramName << "' defined in xml not found in DB!" << endl;
+					RUI_LOG_ERROR << "ofxRemoteUIServer: int param '" <<paramName << "' defined in xml not found in DB!" ;
 				}
 			}
 
@@ -428,12 +425,12 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 						*(params[paramName].redValAddr+3) = a;
 						params[paramName].alphaVal = a;
 						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-						if(verbose_) cout << "ofxRemoteUIServer loading a COLOR '" << paramName <<"' (" << (int)*params[paramName].redValAddr << " " << (int)*(params[paramName].redValAddr+1) << " " << (int)*(params[paramName].redValAddr+2) << " " << (int)*(params[paramName].redValAddr+3)  << ") from XML" << endl;
+						if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading a COLOR '" << paramName <<"' (" << (int)*params[paramName].redValAddr << " " << (int)*(params[paramName].redValAddr+1) << " " << (int)*(params[paramName].redValAddr+2) << " " << (int)*(params[paramName].redValAddr+3)  << ") from XML" ;
 					}else{
-						cout << "ofxRemoteUIServer ERROR at loading COLOR (" << paramName << ")" << endl;
+						cout << "ofxRemoteUIServer ERROR at loading COLOR (" << paramName << ")" ;
 					}
 				}else{
-					cout << "ofxRemoteUIServer: color param '" <<paramName << "' defined in xml not found in DB!" << endl;
+					cout << "ofxRemoteUIServer: color param '" <<paramName << "' defined in xml not found in DB!" ;
 				}
 				s.popTag();
 			}
@@ -450,12 +447,12 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 						params[paramName].intVal = val;
 						*params[paramName].intValAddr = ofClamp(*params[paramName].intValAddr, params[paramName].minInt, params[paramName].maxInt);
 						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-						if(verbose_) cout << "ofxRemoteUIServer loading an ENUM '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" << endl;
+						if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading an ENUM '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" ;
 					}else{
-						cout << "ofxRemoteUIServer ERROR at loading ENUM (" << paramName << ")" << endl;
+						cout << "ofxRemoteUIServer ERROR at loading ENUM (" << paramName << ")" ;
 					}
 				}else{
-					cout << "ofxRemoteUIServer: enum param '" << paramName << "' defined in xml not found in DB!" << endl;
+					cout << "ofxRemoteUIServer: enum param '" << paramName << "' defined in xml not found in DB!" ;
 				}
 			}
 
@@ -472,12 +469,12 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 						*params[paramName].boolValAddr = val;
 						params[paramName].boolVal = val;
 						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-						if(verbose_) cout << "ofxRemoteUIServer loading a BOOL '" << paramName <<"' (" << (bool) *params[paramName].boolValAddr << ") from XML" << endl;
+						if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading a BOOL '" << paramName <<"' (" << (bool) *params[paramName].boolValAddr << ") from XML" ;
 					}else{
-						cout << "ofxRemoteUIServer ERROR at loading BOOL (" << paramName << ")" << endl;
+						cout << "ofxRemoteUIServer ERROR at loading BOOL (" << paramName << ")" ;
 					}
 				}else{
-					cout << "ofxRemoteUIServer: bool param '" << paramName << "' defined in xml not found in DB!" << endl;
+					cout << "ofxRemoteUIServer: bool param '" << paramName << "' defined in xml not found in DB!" ;
 				}
 			}
 
@@ -493,11 +490,11 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 						params[paramName].stringVal = val;
 						*params[paramName].stringValAddr = val;
 						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-						if(verbose_) cout << "ofxRemoteUIServer loading a STRING '" << paramName <<"' (" << (string) *params[paramName].stringValAddr << ") from XML" << endl;
+						if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading a STRING '" << paramName <<"' (" << (string) *params[paramName].stringValAddr << ") from XML" ;
 					}
-					else cout << "ofxRemoteUIServer ERROR at loading STRING (" << paramName << ")" << endl;
+					else cout << "ofxRemoteUIServer ERROR at loading STRING (" << paramName << ")" ;
 				}else{
-					cout << "ofxRemoteUIServer: string param '" << paramName << "' defined in xml not found in DB!" << endl;
+					cout << "ofxRemoteUIServer: string param '" << paramName << "' defined in xml not found in DB!" ;
 				}
 			}
 		}
@@ -580,7 +577,7 @@ void ofxRemoteUIServer::saveSettingsBackup(){
 			ofFile::copyFromTo(OFXREMOTEUI_SETTINGS_FILENAME, basePath + "0.xml");
 		}
 		f.close();
-		if(verbose_) cout << "ofxRemoteUIServer saving a backup of the current " << OFXREMOTEUI_SETTINGS_FILENAME << " in " << OFXREMOTEUI_SETTINGS_BACKUP_FOLDER << endl;
+		if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer saving a backup of the current " << OFXREMOTEUI_SETTINGS_FILENAME << " in " << OFXREMOTEUI_SETTINGS_BACKUP_FOLDER ;
 	}
 	#endif
 }
@@ -597,7 +594,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		split(comps, computerIP, '.');
 		string multicastIP = comps[0] + "." + comps[1] + "." + comps[2] + "." + "255";
 		broadcastSender.setup( multicastIP, OFXREMOTEUI_BROADCAST_PORT ); //multicast @
-		cout << "ofxRemoteUIServer: letting everyone know that I am at " << multicastIP << ":" << OFXREMOTEUI_BROADCAST_PORT << endl;
+		RUI_LOG_NOTICE << "ofxRemoteUIServer: letting everyone know that I am at " << multicastIP << ":" << OFXREMOTEUI_BROADCAST_PORT ;
 	}else{
 		doBroadcast = false;
 	}
@@ -608,7 +605,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	if(exists){
 		if( s.getNumTags(OFXREMOTEUI_XML_ENABLED) > 0 ){
 			enabled = ("true" == s.getValue(OFXREMOTEUI_XML_ENABLED, "true"));
-			if (!enabled) cout << "ofxRemoteUIServer launching disabled!" << endl;
+			if (!enabled) RUI_LOG_WARNING << "ofxRemoteUIServer launching disabled!" ;
 		}
 	}
 
@@ -649,7 +646,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	waitingForReply = false;
 	avgTimeSinceLastReply = timeSinceLastReply = timeCounter = 0.0f;
 	port = port_;
-	cout << "ofxRemoteUIServer listening at port " << port << " ... " << endl;
+	RUI_LOG_NOTICE << "ofxRemoteUIServer listening at port " << port << " ... " ;
 	oscReceiver.setup(port);
 
 	#ifdef OF_AVAILABLE
@@ -776,7 +773,7 @@ void ofxRemoteUIServer::threadedFunction(){
 		updateServer(1./30.); //30 fps timebase
 		ofSleepMillis(33);
 	}
-	if(verbose_) cout << "ofxRemoteUIServer threadedFunction() ending" << endl;
+	if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer threadedFunction() ending" ;
 }
 #endif
 
@@ -928,7 +925,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 		if (timeCounter > updateInterval){
 			timeCounter = 0.0f;
 			//vector<string> changes = scanForUpdatedParamsAndSync(); //sends changed params to client
-			//cout << "ofxRemoteUIServer: sent " << ofToString(changes.size()) << " updates to client" << endl;
+			//cout << "ofxRemoteUIServer: sent " << ofToString(changes.size()) << " updates to client" ;
 			//sendUpdateForParamsInList(changes);
 		}
 	}
@@ -955,19 +952,19 @@ void ofxRemoteUIServer::updateServer(float dt){
 					cbArg.action = CLIENT_CONNECTED;
 					callBack(cbArg);
 				}
-				if(verbose_) cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " says HELLO!"  << endl;
+				if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer: " << m.getRemoteIp() << " says HELLO!"  ;
 				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("CONNECTED (" + cbArg.host +  ")!");
 				#endif
 				break;
 
 			case REQUEST_ACTION:{ //send all params to client
-				if(verbose_) cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " sends REQU!"  << endl;
+				if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer: " << m.getRemoteIp() << " sends REQU!"  ;
 				pushParamsToClient();
 				}break;
 
 			case SEND_PARAM_ACTION:{ //client is sending us an updated val
-				if(verbose_) cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " sends SEND!"  << endl;
+				if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer: " << m.getRemoteIp() << " sends SEND!"  ;
 				updateParamFromDecodedMessage(m, dm);
 				if(callBack != NULL){
 					cbArg.action = CLIENT_UPDATED_PARAM;
@@ -982,7 +979,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				break;
 
 			case CIAO_ACTION:{
-				if(verbose_) cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " says CIAO!" << endl;
+				if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer: " << m.getRemoteIp() << " says CIAO!" ;
 				sendCIAO();
 				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("DISCONNECTED (" + cbArg.host +  ")!");
@@ -997,7 +994,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 
 			case TEST_ACTION: // we got a request from client, lets bounce back asap.
 				sendTEST();
-				//if(verbose)cout << "ofxRemoteUIServer: " << m.getRemoteIp() << " says TEST!" << endl;
+				//if(verbose)RUI_LOG_VERBOSE << "ofxRemoteUIServer: " << m.getRemoteIp() << " says TEST!" ;
 				break;
 
 			case PRESET_LIST_ACTION: //client wants us to send a list of all available presets
@@ -1011,7 +1008,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case SET_PRESET_ACTION:{ // client wants to set a preset
 				string presetName = m.getArgAsString(0);
 				vector<string> missingParams = loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
-				if(verbose_) cout << "ofxRemoteUIServer: setting preset: " << presetName << endl;
+				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: setting preset: " << presetName ;
 				sendSETP(presetName);
 				sendMISP(missingParams);
 				if(callBack != NULL){
@@ -1026,7 +1023,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 
 			case SAVE_PRESET_ACTION:{ //client wants to save current xml as a new preset
 				string presetName = m.getArgAsString(0);
-				if(verbose_) cout << "ofxRemoteUIServer: saving NEW preset: " << presetName << endl;
+				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: saving NEW preset: " << presetName ;
 				saveToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
 				sendSAVP(presetName);
 				#ifdef OF_AVAILABLE
@@ -1043,7 +1040,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 
 			case DELETE_PRESET_ACTION:{
 				string presetName = m.getArgAsString(0);
-				if(verbose_) cout << "ofxRemoteUIServer: DELETE preset: " << presetName << endl;
+				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: DELETE preset: " << presetName ;
 				deletePreset(presetName);
 				sendDELP(presetName);
 				#ifdef OF_AVAILABLE
@@ -1057,7 +1054,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			}break;
 
 			case SAVE_CURRENT_STATE_ACTION:{
-				if(verbose_) cout << "ofxRemoteUIServer: SAVE CURRENT PARAMS TO DEFAULT XML: " << endl;
+				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: SAVE CURRENT PARAMS TO DEFAULT XML: " ;
 				saveToXML(OFXREMOTEUI_SETTINGS_FILENAME);
 				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("SAVED CONFIG to default XML");
@@ -1070,7 +1067,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			}break;
 
 			case RESET_TO_XML_ACTION:{
-				if(verbose_) cout << "ofxRemoteUIServer: RESET TO XML: " << endl;
+				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: RESET TO XML: " ;
 				restoreAllParamsToInitialXML();
 				sendRESX(true);
 				#ifdef OF_AVAILABLE
@@ -1083,7 +1080,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			}break;
 
 			case RESET_TO_DEFAULTS_ACTION:{
-				if(verbose_) cout << "ofxRemoteUIServer: RESET TO DEFAULTS: " << endl;
+				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: RESET TO DEFAULTS: " ;
 				restoreAllParamsToDefaultValues();
 				sendRESD(true);
 				#ifdef OF_AVAILABLE
@@ -1105,7 +1102,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 						filtered.push_back(missingParams[i]);
 					}
 				}
-				if(verbose_) cout << "ofxRemoteUIServer: setting preset group: " << groupName << "/" <<presetName << endl;
+				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: setting preset group: " << groupName << "/" <<presetName ;
 				sendSETp(presetName, groupName);
 				sendMISP(filtered);
 				if(callBack != NULL){
@@ -1122,7 +1119,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case SAVE_GROUP_PRESET_ACTION:{ //client wants to save current xml as a new preset
 				string presetName = m.getArgAsString(0);
 				string groupName = m.getArgAsString(1);
-				if(verbose_) cout << "ofxRemoteUIServer: saving NEW preset: " << presetName << endl;
+				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: saving NEW preset: " << presetName ;
 				saveGroupToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName + "/" + presetName + ".xml", groupName);
 				sendSAVp(presetName, groupName);
 				#ifdef OF_AVAILABLE
@@ -1139,7 +1136,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case DELETE_GROUP_PRESET_ACTION:{
 				string presetName = m.getArgAsString(0);
 				string groupName = m.getArgAsString(1);
-				if(verbose_) cout << "ofxRemoteUIServer: DELETE preset: " << presetName << endl;
+				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: DELETE preset: " << presetName ;
 				deletePreset(presetName, groupName);
 				sendDELp(presetName, groupName);
 				#ifdef OF_AVAILABLE
@@ -1152,7 +1149,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 					callBack(cbArg);
 				}
 			}break;
-			default: cout << "ofxRemoteUIServer::update >> ERR!" <<endl; break;
+			default: RUI_LOG_ERROR << "ofxRemoteUIServer::update >> ERR!"; break;
 		}
 	}
 }
@@ -1245,8 +1242,12 @@ void ofxRemoteUIServer::addSpacer(string title){
 	p.b = paramColor.b;
 	p.group = upcomingGroup; //to ignore those in the client app later when grouping
 	p.a = 255; //spacer has full alpha
-	addParamToDB(p, title + " - " + ofToString((int)ofRandom(10000)));
-	if(verbose_) cout << "ofxRemoteUIServer Adding Group '" << title << "' #######################" << endl;
+	#ifdef OF_AVAILABLE
+	addParamToDB(p, title + " - " + ofToString((int)ofRandom(1000000)));
+	#else
+	addParamToDB(p, title + " - " + ofToString(rand()%1000000));
+	#endif
+	if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer Adding Group '" << title << "' #######################" ;
 }
 
 
@@ -1260,7 +1261,7 @@ void ofxRemoteUIServer::shareParam(string paramName, float* param, float min, fl
 	p.group = upcomingGroup;
 	setColorForParam(p, c);
 	addParamToDB(p, paramName);
-	if(verbose_) cout << "ofxRemoteUIServer Sharing Float Param '" << paramName << "'" << endl;
+	if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer Sharing Float Param '" << paramName << "'" ;
 }
 
 
@@ -1272,7 +1273,7 @@ void ofxRemoteUIServer::shareParam(string paramName, bool* param, ofColor c, int
 	p.group = upcomingGroup;
 	setColorForParam(p, c);
 	addParamToDB(p, paramName);
-	if(verbose_) cout << "ofxRemoteUIServer Sharing Bool Param '" << paramName << "'" << endl;
+	if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer Sharing Bool Param '" << paramName << "'" ;
 }
 
 
@@ -1286,7 +1287,7 @@ void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int ma
 	setColorForParam(p, c);
 	p.intVal = *param = ofClamp(*param, min, max);
 	addParamToDB(p, paramName);
-	if(verbose_) cout << "ofxRemoteUIServer Sharing Int Param '" << paramName << "'" << endl;
+	if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer Sharing Int Param '" << paramName << "'" ;
 }
 
 void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int max, vector<string> names, ofColor c ){
@@ -1300,7 +1301,7 @@ void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int ma
 	setColorForParam(p, c);
 	p.intVal = *param = ofClamp(*param, min, max);
 	addParamToDB(p, paramName);
-	if(verbose_) cout << "ofxRemoteUIServer Sharing Enum Param '" << paramName << "'" << endl;
+	if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer Sharing Enum Param '" << paramName << "'" ;
 }
 
 
@@ -1312,7 +1313,7 @@ void ofxRemoteUIServer::shareParam(string paramName, string* param, ofColor c, i
 	p.group = upcomingGroup;
 	setColorForParam(p, c);
 	addParamToDB(p, paramName);
-	if(verbose_) cout << "ofxRemoteUIServer Sharing String Param '" << paramName << "'" <<endl;
+	if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer Sharing String Param '" << paramName << "'";
 }
 
 void ofxRemoteUIServer::shareParam(string paramName, unsigned char* param, ofColor bgColor, int nothingUseful){
@@ -1326,7 +1327,7 @@ void ofxRemoteUIServer::shareParam(string paramName, unsigned char* param, ofCol
 	p.group = upcomingGroup;
 	setColorForParam(p, bgColor);
 	addParamToDB(p, paramName);
-	if(verbose_) cout << "ofxRemoteUIServer Sharing Color Param '" << paramName << "'" <<endl;
+	if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer Sharing Color Param '" << paramName << "'";
 }
 
 
@@ -1352,7 +1353,7 @@ void ofxRemoteUIServer::sendLogToClient(char* format, ...){
 		try{
 			oscSender.sendMessage(m);
 		}catch(exception e){
-			cout << "exception " << e.what() << endl;
+			RUI_LOG_ERROR << "exception " << e.what() ;
 		}
 	}
 }

@@ -193,8 +193,10 @@ struct RemoteUIServerCallBackArg{
 };
 
 
+
 #ifndef OF_VERSION_MINOR //if OF is not available, redefine ofColor to myColor
 #define ofColor myColor
+
 struct myColor{
 
 	myColor(){}
@@ -220,9 +222,21 @@ struct myColor{
 	}
 #endif
 };
+
 #else
-#define OF_AVAILABLE 1 //define our custom Constant to detect OF presence
+	#define OF_AVAILABLE 1 //define our custom Constant to detect OF presence
 #endif
 
-
+#ifdef OF_AVAILABLE
+	#define RUI_LOG_NOTICE		(ofLogNotice())
+	#define RUI_LOG_ERROR		(ofLogError())
+	#define RUI_LOG_WARNING		(ofLogWarning())
+	#define RUI_LOG_VERBOSE		(ofLogVerbose())
+#else
+	#define RUI_LOG_NOTICE		(cout << endl)
+	#define RUI_LOG_ERROR		(cout << endl)
+	#define RUI_LOG_WARNING		(cout << endl)
+	#define RUI_LOG_VERBOSE		(cout << endl)
 #endif
+
+#endif //emptyExample_RemoteParam_h

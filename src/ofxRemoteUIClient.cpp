@@ -37,16 +37,16 @@ bool ofxRemoteUIClient::setup(string address, int port_){
 	avgTimeSinceLastReply = timeSinceLastReply = timeCounter = 0.0f;
 	waitingForReply = false;
 	host = address;
-	cout << "ofxRemoteUIClient listening at port " << port + 1 << " ... " << endl;
+	RUI_LOG_NOTICE << "ofxRemoteUIClient listening at port " << port + 1 << " ... " ;
 	clearOscReceiverMsgQueue();
 	oscReceiver.setup(port + 1);
 
-	if(verbose_) cout << "ofxRemoteUIClient connecting to " << address << endl;
+	if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIClient connecting to " << address;
 	try{
 		oscSender.setup(address, port);
 		OSCsetup = true;
 	}catch(exception e){
-		cout << "ofxRemoteUIClient exception setting up oscSender" << e.what() << endl;
+		RUI_LOG_ERROR << "ofxRemoteUIClient exception setting up oscSender" << e.what();
 		OSCsetup = false;
 	}
 	return OSCsetup;
@@ -62,12 +62,12 @@ void ofxRemoteUIClient::disconnect(){
 
 	OSC_CHECK;
 	if (readyToSend){
-		if(verbose_) cout << "ofxRemoteUIClient: disconnect()" << endl;
+		if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIClient: disconnect()" ;
 		sendCIAO();
 		readyToSend = false;
 		presetNames.clear(); 
 	}else{
-		if(verbose_) cout << "ofxRemoteUIClient: can't disconnect(); we arent connected!" << endl;
+		if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIClient: can't disconnect(); we arent connected!" ;
 	}
 }
 
@@ -75,13 +75,13 @@ void ofxRemoteUIClient::disconnect(){
 void ofxRemoteUIClient::connect(){
 	OSC_CHECK;
 	if(!readyToSend){
-		if(verbose_) cout << "ofxRemoteUIClient: connect()" << endl;
+		if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIClient: connect()" ;
 		sendHELLO();	//on first connect, send HI!
 		sendTEST();		//and a lag test
 		readyToSend = true;
 		disconnectStrikes = OFXREMOTEUI_DISCONNECTION_STRIKES;
 	}else{
-		if(verbose_) cout << "ofxRemoteUIClient: can't connect() now, we are already connected!" << endl;
+		if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIClient: can't connect() now, we are already connected!" ;
 	}
 }
 
@@ -125,7 +125,7 @@ void ofxRemoteUIClient::updateAutoDiscovery(float dt){
 				callBack(cbArg);
 			}
 		}
-		//cout << "got broadcast message from " << m.getRemoteIp() << ":" << m.getArgAsInt32(0) << endl;
+		//cout << "got broadcast message from " << m.getRemoteIp() << ":" << m.getArgAsInt32(0) ;
 		//closebyServers.print();
 	}
 
@@ -143,7 +143,7 @@ void ofxRemoteUIClient::updateAutoDiscovery(float dt){
 
 void ofxRemoteUIClient::update(float dt){
 
-	//cout << "ofxRemoteUIClient::update readyToSend = " << readyToSend << endl;
+	//cout << "ofxRemoteUIClient::update readyToSend = " << readyToSend ;
 
 
 	if (readyToSend){ // if connected
@@ -156,7 +156,7 @@ void ofxRemoteUIClient::update(float dt){
 		if (timeCounter > OFXREMOTEUI_LATENCY_TEST_RATE){
 
 			if(waitingForReply){ //we never heard back from the client, keep count of how many we missed
-				cout << "ofxRemoteUIClient: missed one TEST Packet... (" << disconnectStrikes << " left)" << endl;
+				RUI_LOG_NOTICE << "ofxRemoteUIClient: missed one TEST Packet... (" << disconnectStrikes << " left)" ;
 				disconnectStrikes--;
 			}else{
 				disconnectStrikes = OFXREMOTEUI_DISCONNECTION_STRIKES; //reset the strike count, we heard back from server
@@ -167,7 +167,7 @@ void ofxRemoteUIClient::update(float dt){
 				timeCounter = 0.0f; //reset timer
 				sendTEST();
 			}else{ //we tried for too long, out of strikes! assume server is gone
-				cout << "ofxRemoteUIClient: disconnecting bc server connection timed out!" << endl;
+				RUI_LOG_WARNING << "ofxRemoteUIClient: disconnecting bc server connection timed out!" ;
 				avgTimeSinceLastReply = -1;
 				disconnect(); // testing here
 				params.clear();
@@ -192,7 +192,7 @@ void ofxRemoteUIClient::update(float dt){
 						cbArg.action = SERVER_SENT_LOG_LINE;
 						callBack(cbArg);
 					}else{
-						cout << cbArg.msg << endl;
+						RUI_LOG_NOTICE << cbArg.msg ;
 					}
 				}break;
 
@@ -205,7 +205,7 @@ void ofxRemoteUIClient::update(float dt){
 				}break;
 
 				case REQUEST_ACTION: //server closed the REQU, so we should have all the params
-					if(verbose_) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says REQUEST_ACTION!" << endl;
+					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says REQUEST_ACTION!" ;
 					if(callBack != NULL){
 						cbArg.action = SERVER_SENT_FULL_PARAMS_UPDATE;
 						callBack(cbArg);
@@ -213,14 +213,14 @@ void ofxRemoteUIClient::update(float dt){
 					break;
 
 				case SEND_PARAM_ACTION:{ //server is sending us an updated val
-					if(verbose_) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SEND_PARAM_ACTION!" << endl;
+					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SEND_PARAM_ACTION!" ;
 					updateParamFromDecodedMessage(m, dm);
 					gotNewInfo = true;
 				}
 					break;
 
 				case CIAO_ACTION:{
-					if(verbose_) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says CIAO!" << endl;
+					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says CIAO!" ;
 					if(callBack != NULL){
 						cbArg.action = SERVER_DISCONNECTED;
 						callBack(cbArg);
@@ -243,7 +243,7 @@ void ofxRemoteUIClient::update(float dt){
 					break;
 
 				case PRESET_LIST_ACTION: //server sends us the list of current presets
-					if(verbose_) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says PRESET_LIST_ACTION!" << endl;
+					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says PRESET_LIST_ACTION!" ;
 					fillPresetListFromMessage(m);
 					if(callBack != NULL){
 						cbArg.action = SERVER_PRESETS_LIST_UPDATED;
@@ -262,7 +262,7 @@ void ofxRemoteUIClient::update(float dt){
 					break;
 
 				case SET_PRESET_ACTION: // server confirms that it has set the preset, request a full update
-					if(verbose_) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SET_PRESET_ACTION!" << endl;
+					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SET_PRESET_ACTION!" ;
 					requestCompleteUpdate();
 					if(callBack != NULL){
 						cbArg.action = SERVER_DID_SET_PRESET;
@@ -272,7 +272,7 @@ void ofxRemoteUIClient::update(float dt){
 					break;
 
 				case SAVE_PRESET_ACTION:{ // server confirms that it has save the preset,
-					if(verbose_) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SAVE_PRESET_ACTION!" << endl;
+					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SAVE_PRESET_ACTION!" ;
 					vector<string> a;
 					sendPREL(a); //request preset list to server, send empty vector
 					cbArg.action = SERVER_SAVED_PRESET;
@@ -281,7 +281,7 @@ void ofxRemoteUIClient::update(float dt){
 				}break;
 
 				case DELETE_PRESET_ACTION:{ // server confirms that it has deleted preset
-					if(verbose_) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says DELETE_PRESET_ACTION!" << endl;
+					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says DELETE_PRESET_ACTION!" ;
 					vector<string> a;
 					sendPREL(a); //request preset list to server, send empty vector
 					if(callBack != NULL){
@@ -292,7 +292,7 @@ void ofxRemoteUIClient::update(float dt){
 				}break;
 
 				case RESET_TO_XML_ACTION:{ // server confrims
-					if(verbose_) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says RESET_TO_XML_ACTION!" << endl;
+					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says RESET_TO_XML_ACTION!" ;
 					requestCompleteUpdate();
 					if(callBack != NULL){
 						cbArg.action = SERVER_DID_RESET_TO_XML;
@@ -301,7 +301,7 @@ void ofxRemoteUIClient::update(float dt){
 				}break;
 
 				case RESET_TO_DEFAULTS_ACTION:{ // server confrims
-					if(verbose_) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says RESET_TO_DEFAULTS_ACTION!" << endl;
+					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says RESET_TO_DEFAULTS_ACTION!" ;
 					requestCompleteUpdate();
 					if(callBack != NULL){
 						cbArg.action = SERVER_DID_RESET_TO_DEFAULTS;
@@ -310,7 +310,7 @@ void ofxRemoteUIClient::update(float dt){
 				}break;
 
 				case SAVE_CURRENT_STATE_ACTION: // server confirms that it has saved
-					if(verbose_) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SAVE_CURRENT_STATE_ACTION!" << endl;
+					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SAVE_CURRENT_STATE_ACTION!" ;
 					if(callBack != NULL){
 						cbArg.action = SERVER_CONFIRMED_SAVE;
 						callBack(cbArg);
@@ -318,7 +318,7 @@ void ofxRemoteUIClient::update(float dt){
 					break;
 
 				case SET_GROUP_PRESET_ACTION: // server confirms that it has set the group preset, request a full update
-					if(verbose_) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SET_GROUP_PRESET_ACTION!" << endl;
+					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SET_GROUP_PRESET_ACTION!" ;
 					requestCompleteUpdate();
 					if(callBack != NULL){
 						cbArg.action = SERVER_DID_SET_GROUP_PRESET;
@@ -329,7 +329,7 @@ void ofxRemoteUIClient::update(float dt){
 					break;
 
 				case SAVE_GROUP_PRESET_ACTION:{ // server confirms that it has saved the group preset,
-					if(verbose_) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SAVE_GROUP_PRESET_ACTION!" << endl;
+					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SAVE_GROUP_PRESET_ACTION!" ;
 					vector<string> a;
 					sendPREL(a); //request preset list to server, send empty vector
 					cbArg.action = SERVER_SAVED_GROUP_PRESET;
@@ -339,7 +339,7 @@ void ofxRemoteUIClient::update(float dt){
 				}break;
 
 				case DELETE_GROUP_PRESET_ACTION:{ // server confirms that it has deleted the group preset
-					if(verbose_) cout << "ofxRemoteUIClient: " << m.getRemoteIp() << " says DELETE_GROUP_PRESET_ACTION!" << endl;
+					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says DELETE_GROUP_PRESET_ACTION!" ;
 					vector<string> a;
 					sendPREL(a); //request preset list to server, send empty vector
 					if(callBack != NULL){
@@ -350,7 +350,7 @@ void ofxRemoteUIClient::update(float dt){
 					}
 				}break;
 
-				default: cout << "ofxRemoteUIClient::update >> UNKNOWN ACTION!!" <<endl; break;
+				default: RUI_LOG_ERROR << "ofxRemoteUIClient::update >> UNKNOWN ACTION!!" <<endl; break;
 			}
 		}
 	}
@@ -407,7 +407,7 @@ void ofxRemoteUIClient::trackParam(string paramName, float* param){
 	}else{
 		p = params[paramName];
 		if (p.type != REMOTEUI_PARAM_FLOAT ){
-			cout << "wtf called trackParam(float) on a param that's not a float!" << endl;
+			RUI_LOG_ERROR << "wtf called trackParam(float) on a param that's not a float!" ;
 		}
 	}
 	p.floatValAddr = param;
@@ -423,7 +423,7 @@ void ofxRemoteUIClient::trackParam(string paramName, int* param){
 	}else{
 		p = params[paramName];
 		if (p.type != REMOTEUI_PARAM_INT ){
-			cout << "wtf called trackParam(int) on a param that's not a int!" << endl;
+			RUI_LOG_ERROR << "wtf called trackParam(int) on a param that's not a int!" ;
 		}
 	}
 	p.intValAddr = param;
@@ -439,7 +439,7 @@ void ofxRemoteUIClient::trackParam(string paramName, int* param, vector<string> 
 	}else{
 		p = params[paramName];
 		if (p.type != REMOTEUI_PARAM_ENUM ){
-			cout << "wtf called trackParam(int) on a param that's not a int!" << endl;
+			RUI_LOG_ERROR << "wtf called trackParam(int) on a param that's not a int!" ;
 		}
 	}
 	p.intValAddr = param;
@@ -455,7 +455,7 @@ void ofxRemoteUIClient::trackParam(string paramName, string* param){
 	}else{
 		p = params[paramName];
 		if (p.type != REMOTEUI_PARAM_STRING ){
-			cout << "wtf called trackParam(string) on a param that's not a string!" << endl;
+			RUI_LOG_ERROR << "wtf called trackParam(string) on a param that's not a string!" ;
 		}
 	}
 	p.stringValAddr = param;
@@ -471,7 +471,7 @@ void ofxRemoteUIClient::trackParam(string paramName, bool* param){
 	}else{
 		p = params[paramName];
 		if (p.type != REMOTEUI_PARAM_BOOL ){
-			cout << "wtf called trackParam(bool) on a param that's not a bool!" << endl;
+			RUI_LOG_ERROR << "wtf called trackParam(bool) on a param that's not a bool!" ;
 		}
 	}
 	p.boolValAddr = param;
@@ -487,7 +487,7 @@ void ofxRemoteUIClient::trackParam(string paramName, unsigned char* param){
 	}else{
 		p = params[paramName];
 		if (p.type != REMOTEUI_PARAM_COLOR ){
-			cout << "wtf called trackParam(color) on a param that's not a color!" << endl;
+			RUI_LOG_ERROR << "wtf called trackParam(color) on a param that's not a color!" ;
 		}
 	}
 	p.redValAddr = param;
@@ -510,13 +510,13 @@ void ofxRemoteUIClient::sendTrackedParamUpdate(string paramName){
 		syncParamToPointer(paramName);
 		sendParam(paramName, params[paramName]);
 	}else{
-		cout << "ofxRemoteUIClient::sendTrackedParamUpdate >> param '" + paramName + "' not found!" << endl;
+		RUI_LOG_ERROR << "ofxRemoteUIClient::sendTrackedParamUpdate >> param '" + paramName + "' not found!" ;
 	}
 }
 
 
 void ofxRemoteUIClient::requestCompleteUpdate(){
-	//cout << "ofxRemoteUIClient: requestCompleteUpdate()" << endl;
+	//cout << "ofxRemoteUIClient: requestCompleteUpdate()" ;
 	if(readyToSend){
 		sendREQU();
 		vector<string> a;
