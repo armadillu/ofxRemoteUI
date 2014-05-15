@@ -126,7 +126,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 }
 
 ofxRemoteUIServer::~ofxRemoteUIServer(){
-	RUI_LOG_NOTICE << "~ofxRemoteUIServer()" ;
+	RUI_LOG_VERBOSE << "~ofxRemoteUIServer()" ;
 }
 
 

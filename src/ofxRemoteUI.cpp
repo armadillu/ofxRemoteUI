@@ -150,7 +150,7 @@ string ofxRemoteUI::getMyIP(string userChosenInteface){
 	//from https://github.com/jvcleave/LocalAddressGrabber/blob/master/src/LocalAddressGrabber.h
 	//and http://stackoverflow.com/questions/17288908/get-network-interface-name-from-ipv4-address
 	string output = "NOT FOUND";
-	RUI_LOG_NOTICE << "ofxRemoteUI establishing local interface and IP @";
+	RUI_LOG_VERBOSE << "ofxRemoteUI establishing local interface and IP @";
 
 #ifdef __APPLE__ /*this should cover linux too TODO*/
 	struct ifaddrs *myaddrs;
