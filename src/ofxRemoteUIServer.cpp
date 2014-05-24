@@ -607,51 +607,52 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 			enabled = ("true" == s.getValue(OFXREMOTEUI_XML_ENABLED, "true"));
 			if (!enabled){
 				RUI_LOG_WARNING << "ofxRemoteUIServer launching disabled!" ;
-				return;
 			}
 		}
 	}
 
 	saveSettingsBackup();
 
-	if(port_ == -1){ //if no port specified, pick a random one, but only the very first time we get launched!
-		portIsSet = false;
-		ofxXmlSettings s;
-		bool exists = s.loadFile(OFXREMOTEUI_SETTINGS_FILENAME);
-		bool portNeedsToBePicked = false;
-		if (exists){
-			if( s.getNumTags(OFXREMOTEUI_XML_PORT) > 0 ){
-				port_ = s.getValue(OFXREMOTEUI_XML_PORT, 10000);
+	if(enabled){
+		if(port_ == -1){ //if no port specified, pick a random one, but only the very first time we get launched!
+			portIsSet = false;
+			ofxXmlSettings s;
+			bool exists = s.loadFile(OFXREMOTEUI_SETTINGS_FILENAME);
+			bool portNeedsToBePicked = false;
+			if (exists){
+				if( s.getNumTags(OFXREMOTEUI_XML_PORT) > 0 ){
+					port_ = s.getValue(OFXREMOTEUI_XML_PORT, 10000);
+				}else{
+					portNeedsToBePicked = true;
+				}
 			}else{
 				portNeedsToBePicked = true;
 			}
+			if(portNeedsToBePicked){
+				#ifdef OF_AVAILABLE
+				ofSeedRandom();
+				port_ = ofRandom(5000, 60000);
+				#else
+				srand (time(NULL));
+				port_ = 5000 + rand()%55000;
+				#endif
+				ofxXmlSettings s2;
+				s2.loadFile(OFXREMOTEUI_SETTINGS_FILENAME);
+				s2.setValue(OFXREMOTEUI_XML_PORT, port_, 0);
+				s2.saveFile();
+			}
 		}else{
-			portNeedsToBePicked = true;
+			portIsSet = true;
 		}
-		if(portNeedsToBePicked){
-			#ifdef OF_AVAILABLE
-			ofSeedRandom();
-			port_ = ofRandom(5000, 60000);
-			#else
-			srand (time(NULL));
-			port_ = 5000 + rand()%55000;
-			#endif
-			ofxXmlSettings s2;
-			s2.loadFile(OFXREMOTEUI_SETTINGS_FILENAME);
-			s2.setValue(OFXREMOTEUI_XML_PORT, port_, 0);
-			s2.saveFile();
-		}
-	}else{
-		portIsSet = true;
+		params.clear();
+		updateInterval = updateInterval_;
+		waitingForReply = false;
+		avgTimeSinceLastReply = timeSinceLastReply = timeCounter = 0.0f;
+		port = port_;
+		RUI_LOG_NOTICE << "ofxRemoteUIServer listening at port " << port << " ... " ;
+		oscReceiver.setup(port);
 	}
-	params.clear();
-	updateInterval = updateInterval_;
-	waitingForReply = false;
-	avgTimeSinceLastReply = timeSinceLastReply = timeCounter = 0.0f;
-	port = port_;
-	RUI_LOG_NOTICE << "ofxRemoteUIServer listening at port " << port << " ... " ;
-	oscReceiver.setup(port);
-
+	//still get ui access despite being disabled
 	#ifdef OF_AVAILABLE
 	ofAddListener(ofEvents().exit, this, &ofxRemoteUIServer::_appExited); //to save to xml, disconnect, etc
 	ofAddListener(ofEvents().keyPressed, this, &ofxRemoteUIServer::_keyPressed);
@@ -672,7 +673,7 @@ void ofxRemoteUIServer::_appExited(ofEventArgs &e){
 }
 
 void ofxRemoteUIServer::_draw(ofEventArgs &e){
-	if(!enabled) return;
+	//if(!enabled) return;
 	ofSetupScreen(); //mmm this is a bit scary //TODO!
 	draw( 20, ofGetHeight() - 20);
 }
@@ -781,7 +782,7 @@ void ofxRemoteUIServer::threadedFunction(){
 
 void ofxRemoteUIServer::draw(int x, int y){
 
-	if(!enabled) return;
+	//if(!enabled) return;
 
 	#ifdef OF_AVAILABLE
 	ofPushStyle();
@@ -802,7 +803,10 @@ void ofxRemoteUIServer::draw(int x, int y){
 		ofRect(0,0, ofGetWidth(), padding + spacing );
 
 		ofSetColor(255);
-		ofDrawBitmapString("ofxRemoteUIServer params list : press 'TAB' to hide.\nPress 's' to save current config. Press 'r' to restore all param's launch state. Use Arrow Keys to edit values.", padding,  padding - 3);
+		ofDrawBitmapString("ofxRemoteUIServer params list : press 'TAB' to hide." +
+						   string(enabled ? (" Serving on port " + ofToString(port)) + "." : "" ) +
+						   "\nPress 's' to save current config. Press 'r' to restore all param's "
+						   "launch state. Use Arrow Keys to edit values.", padding,  padding - 3);
 
 		int linesInited = uiLines.getNumVertices() > 0 ;
 
