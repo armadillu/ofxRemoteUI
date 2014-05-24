@@ -605,7 +605,10 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	if(exists){
 		if( s.getNumTags(OFXREMOTEUI_XML_ENABLED) > 0 ){
 			enabled = ("true" == s.getValue(OFXREMOTEUI_XML_ENABLED, "true"));
-			if (!enabled) RUI_LOG_WARNING << "ofxRemoteUIServer launching disabled!" ;
+			if (!enabled){
+				RUI_LOG_WARNING << "ofxRemoteUIServer launching disabled!" ;
+				return;
+			}
 		}
 	}
 
@@ -679,8 +682,6 @@ void ofxRemoteUIServer::_update(ofEventArgs &e){
 }
 
 void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
-
-	if(!enabled) return;
 
 	if (showValuesOnScreen){
 		switch(e.key){ //you can save current config from tab screen by pressing s
