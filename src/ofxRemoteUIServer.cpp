@@ -772,7 +772,7 @@ void ofxRemoteUIServer::update(float dt){
 #ifdef OF_AVAILABLE
 void ofxRemoteUIServer::threadedFunction(){
 
-	while (threadRunning) {
+	while (isThreadRunning()) {
 		updateServer(1./30.); //30 fps timebase
 		ofSleepMillis(33);
 	}
