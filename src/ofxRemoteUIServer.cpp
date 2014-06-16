@@ -427,10 +427,10 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
 						if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading a COLOR '" << paramName <<"' (" << (int)*params[paramName].redValAddr << " " << (int)*(params[paramName].redValAddr+1) << " " << (int)*(params[paramName].redValAddr+2) << " " << (int)*(params[paramName].redValAddr+3)  << ") from XML" ;
 					}else{
-						cout << "ofxRemoteUIServer ERROR at loading COLOR (" << paramName << ")" ;
+						RUI_LOG_ERROR << "ofxRemoteUIServer ERROR at loading COLOR (" << paramName << ")" ;
 					}
 				}else{
-					cout << "ofxRemoteUIServer: color param '" <<paramName << "' defined in xml not found in DB!" ;
+					RUI_LOG_WARNING << "ofxRemoteUIServer: color param '" <<paramName << "' defined in xml not found in DB!" ;
 				}
 				s.popTag();
 			}
@@ -449,10 +449,10 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
 						if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading an ENUM '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" ;
 					}else{
-						cout << "ofxRemoteUIServer ERROR at loading ENUM (" << paramName << ")" ;
+						RUI_LOG_ERROR << "ofxRemoteUIServer ERROR at loading ENUM (" << paramName << ")" ;
 					}
 				}else{
-					cout << "ofxRemoteUIServer: enum param '" << paramName << "' defined in xml not found in DB!" ;
+					RUI_LOG_WARNING << "ofxRemoteUIServer: enum param '" << paramName << "' defined in xml not found in DB!" ;
 				}
 			}
 
@@ -471,10 +471,10 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
 						if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading a BOOL '" << paramName <<"' (" << (bool) *params[paramName].boolValAddr << ") from XML" ;
 					}else{
-						cout << "ofxRemoteUIServer ERROR at loading BOOL (" << paramName << ")" ;
+						RUI_LOG_ERROR << "ofxRemoteUIServer ERROR at loading BOOL (" << paramName << ")" ;
 					}
 				}else{
-					cout << "ofxRemoteUIServer: bool param '" << paramName << "' defined in xml not found in DB!" ;
+					RUI_LOG_WARNING << "ofxRemoteUIServer: bool param '" << paramName << "' defined in xml not found in DB!" ;
 				}
 			}
 
@@ -492,9 +492,9 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
 						if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading a STRING '" << paramName <<"' (" << (string) *params[paramName].stringValAddr << ") from XML" ;
 					}
-					else cout << "ofxRemoteUIServer ERROR at loading STRING (" << paramName << ")" ;
+					else RUI_LOG_ERROR << "ofxRemoteUIServer ERROR at loading STRING (" << paramName << ")" ;
 				}else{
-					cout << "ofxRemoteUIServer: string param '" << paramName << "' defined in xml not found in DB!" ;
+					RUI_LOG_WARNING << "ofxRemoteUIServer: string param '" << paramName << "' defined in xml not found in DB!" ;
 				}
 			}
 		}
