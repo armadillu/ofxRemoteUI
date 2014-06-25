@@ -32,7 +32,7 @@
 #define OFX_REMOTEUI_SERVER_SHARE_PARAM(val, ...)						\
 ( ofxRemoteUIServer::instance()->shareParam( #val, &val, ##__VA_ARGS__ ) )
 
-//WCN - "with custom name" share a param with a custom string
+//WCN - "with custom name" share a param with a custom string instead of taking the var name
 #define OFX_REMOTEUI_SERVER_SHARE_PARAM_WCN(pName, val, ...)			\
 ( ofxRemoteUIServer::instance()->shareParam( pName, &val, ##__VA_ARGS__ ) )
 
@@ -51,7 +51,7 @@
 /*set a new small 'hue' change for upcoming params, to create alternating rows inside a group*/
 #define OFX_REMOTEUI_SERVER_SET_NEW_COLOR()								\
 ( ofxRemoteUIServer::instance()->setNewParamColorVariation() )
-#define OFX_REMOTEUI_SERVER_SET_NEW_TONE()								\
+#define OFX_REMOTEUI_SERVER_SET_NEW_TONE()/*deprecated!*/				\
 ( ofxRemoteUIServer::instance()->setNewParamColorVariation() )
 
 /*allows you to get a param from anywhere in your code*/
@@ -83,6 +83,10 @@
  want to see them in a custom location*/
 #define OFX_REMOTEUI_SERVER_DRAW(x,y)									\
 ( ofxRemoteUIServer::instance()->draw(x,y) )
+
+/*toggle backup of main xml file at launch - defaults is off*/
+#define OFX_REMOTEUI_SERVER_SET_AUTO_XML_BACKUPS(doAutoBackups)			\
+( ofxRemoteUIServer::instance()->setAutomaticBackupsEnabled(doAutoBackups) )
 
 /*close the server. no need to call this from OF*/
 #define OFX_REMOTEUI_SERVER_CLOSE()										\

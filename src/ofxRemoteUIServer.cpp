@@ -60,7 +60,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	enabled = true;
 	readyToSend = false;
 	saveToXmlOnExit = true;
-	autoBackups = true;
+	autoBackups = false; //off by default
 	broadcastTime = OFXREMOTEUI_BORADCAST_INTERVAL + 0.05;
 	timeSinceLastReply = avgTimeSinceLastReply = 0;
 	waitingForReply = false;
@@ -322,7 +322,7 @@ void ofxRemoteUIServer::saveGroupToXML(string fileName, string groupName){
 
 void ofxRemoteUIServer::saveToXML(string fileName){
 
-	saveSettingsBackup();
+	saveSettingsBackup(); //every time , before we save
 
 	RUI_LOG_NOTICE << "ofxRemoteUIServer: saving to xml '" << fileName << "'" ;
 	ofxXmlSettings s;
@@ -567,7 +567,7 @@ void ofxRemoteUIServer::saveSettingsBackup(){
 			ofFile og;
 			og.open(originalPath);
 			if ( og.exists() ){
-				ofFile::moveFromTo(originalPath, destPath, true, true);
+				ofFile::moveFromTo(originalPath, destPath, true, true); //TODO this doesnt work on win!
 			}
 			og.close();
 		}
@@ -597,8 +597,6 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 			}
 		}
 	}
-
-	saveSettingsBackup();
 
 	if(enabled){
 
