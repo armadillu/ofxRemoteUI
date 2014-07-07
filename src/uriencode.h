@@ -7,8 +7,8 @@
 //
 // based on http://www.codeguru.com/cpp/cpp/algorithms/strings/article.php/c12759/URI-Encoding-and-Decoding.htm
 
-#ifndef ofxRemoteUIClientOSX_urlencode_h
-#define ofxRemoteUIClientOSX_urlencode_h
+#ifndef urlencode_h
+#define urlencode_h
 
 // hansi: hextable from
 // http://stackoverflow.com/questions/10324/how-can-i-convert-a-hexadecimal-number-to-base-10-efficiently-in-c
