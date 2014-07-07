@@ -534,7 +534,7 @@ void testApp::fullParamsUpdate(){
 				vector<ofxUILabelToggle *> ts = l->getToggles();
 				for(int i = 0; i < ts.size(); i++){
 					if (p.intVal - p.minInt == i ){
-						string option = ts[i]->getLabel()->getLabel();
+						string option = ts[i]->getLabelWidget()->getLabel();
 						cout << "first shown: " << option << endl;
 						l->activateToggle(option);
 					}
