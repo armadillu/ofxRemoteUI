@@ -8,6 +8,7 @@
 
 -(void)dealloc{
 	deleting = true;
+	[widget setTarget:nil];
 	[ui removeFromSuperviewWithoutNeedingDisplay];
 	[ui release];
 	[super dealloc];
