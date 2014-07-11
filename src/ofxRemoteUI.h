@@ -15,7 +15,6 @@
 #include <map>
 #include <set>
 #include <vector>
-using namespace std;
 
 #define OFXREMOTEUI_PORT									10000
 #define OFXREMOTEUI_BROADCAST_PORT							25748
@@ -47,8 +46,17 @@ using namespace std;
 #define OFXREMOTEUI_PARAM_NAME_XML_KEY						"paramName"
 #define OFXREMOTEUI_UNKNOWN_PARAM_NAME_XML_KEY				"unnamedParamName"
 
+
+#ifdef OF_VERSION_MINOR
+    #define OF_AVAILABLE
+#else
+    #error "no OF"
+#endif
+
 #include "RemoteParam.h"
 
+
+using namespace std;
 
 /*
 
@@ -75,7 +83,7 @@ using namespace std;
 
  // client updates a param
  CLIENT:	SEND *** PARAM_NAME val (*** Type)		//client sends a var change to server, where *** is FLT, INT, BOL, etc
- 
+
  // keep alive
  CLIENT:	TEST								//every OFXREMOTEUI_LATENCY_TEST_RATE, client sends a msg to server to measure delay and connectivity
  SERVER:	TEST								//server replies
@@ -87,13 +95,13 @@ using namespace std;
  CLIENT:	REQU								//client wants values for that preset
  SERVER:	SEND *****							//server sends all params
  SERVER:	REQU OK								//server closes REQU
- 
+
  // client saves a preset
  CLIENT:    SAVP PRESET_NAME					//Save Preset - client wants to save current params as a preset named PRESET_NAME, overwrites if already exists
  SERVER:	SAVP PRESET_NAME OK					//server replies OK
  CLIENT:	PREL								//Client requests full list of presets
  SERVER:	PREL PRESET_NAME_LIST(n)			//server sends all preset names
- 
+
  // client deletes a preset
  CLIENT:	DELP PRESET_NAME					//client wants to delete preset named PRESET_NAME
  SERVER:	DELP PRESET_NAME OK					//server says ok
@@ -106,7 +114,7 @@ using namespace std;
  CLIENT:	REQU								//client wants ALL values
  SERVER:	SEND *****							//server sends all params
  SERVER:	REQU OK								//server closes REQU
- 
+
  // client resets to starting values
  CLIENT:	RESD								//client wants to reset all params from the code defaults
  SERVER:	RESD OK								//server says ok
@@ -117,7 +125,7 @@ using namespace std;
  // client saves current params to default xml
  CLIENT:	SAVE								//client wants to save current state of params to default xml
  SERVER:	SAVE OK
- 
+
  //client creates a group preset
  CLIENT:    SAVp PRESET_NAME					//Save Preset - client wants to save current params as a preset named PRESET_NAME, overwrites if already exists
  SERVER:	SAVp PRESET_NAME OK					//server replies OK
@@ -142,11 +150,11 @@ using namespace std;
  CLIENT:	CIAO								//client disconnects
  SERVER:	CIAO								//server disconnects
 
- 
+
  // self-advertising: server broadcasts itself every OFXREMOTEUI_BORADCAST_INTERVAL on OSC port OFXREMOTEUI_BROADCAST_PORT
  // this is for clients to see all available servers on the network
  SERVER:	send packet with contents: arg0(oscPort:int) arg1(hostName:string) arg2(appName:string)
- 
+
 
  // SERVER API ////////////////////////////////////////
 
@@ -254,7 +262,7 @@ protected:
 	float							timeSinceLastReply;
 	float							avgTimeSinceLastReply;
 	bool							waitingForReply;
-	int								disconnectStrikes; 
+	int								disconnectStrikes;
 
 	float							updateInterval;
 	int								port;
@@ -273,7 +281,7 @@ protected:
 private:
 
 	string stringForParamType(RemoteUIParamType t);
-	
+
 };
 
 void split(vector<string> &tokens, const string &text, char separator);

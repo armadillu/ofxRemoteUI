@@ -21,12 +21,12 @@ public:
 		bool drawOutlines;
 		int numCircles;
 		float circleSize;
-		string unloadTest; 
+		string unloadTest;
 
 		ofColor color;
 		MenuItems menu;
 
-		string currentSentence; 
+		string currentSentence;
 		int currentMouseX;
 		static void serverCallback(RemoteUIServerCallBackArg arg);
 };

@@ -6,7 +6,7 @@
 //
 //
 
-#include "ofxRemoteUIServer.h"
+
 #ifdef TARGET_WIN32
 #include <winsock2.h>
 #endif
@@ -24,12 +24,15 @@
 #include <sys/stat.h>
 #include <time.h>
 
+#include "ofxRemoteUIServer.h"
+
 #ifdef OF_AVAILABLE
 #include <Poco/Path.h>
 #include <Poco/Environment.h>
 #include <Poco/Process.h>
+#include <Poco/Util/Application.h>
+using Poco::Util::Application;
 #endif
-
 
 ofxRemoteUIServer* ofxRemoteUIServer::singleton = NULL;
 ofxRemoteUIServer* ofxRemoteUIServer::instance(){
@@ -887,21 +890,32 @@ void ofxRemoteUIServer::handleBroadcast(){
 
 				char pathbuf[2048];
 				uint32_t  bufsize = sizeof(pathbuf);
-#ifdef TARGET_OSX
+    #ifdef TARGET_OSX
 				_NSGetExecutablePath(pathbuf, &bufsize);
 				Poco::Path p = Poco::Path(pathbuf);
 				binaryName = p[p.depth()];
-#endif
-#ifdef TARGET_WIN32
+    #else
+        #ifdef TARGET_WIN32
 				GetModuleFileNameA( NULL, pathbuf, bufsize ); //no idea why, but GetModuleFileName() is not defined?
 				Poco::Path p = Poco::Path(pathbuf);
 				binaryName = p[p.depth()];
-#endif
-#else
-				computerName = "Computer"; //TODO!
-				binaryName = "App";
+
+        #else
+
+            char procname[1024];
+            int len = readlink("/proc/self/exe", procname, 1024-1);
+            if (len > 0){
+                procname[len] = '\0';
+                Poco::Path p = Poco::Path(procname);
+				binaryName = p[p.depth()];
+            }
+        #endif
+    #endif
 #endif
 			}
+
+
+
 			ofxOscMessage m;
 			m.addIntArg(port); //0
 			m.addStringArg(computerName); //1

@@ -9,8 +9,6 @@
 #include "ofxRemoteUIClient.h"
 #include <iostream>
 
-
-
 ofxRemoteUIClient::ofxRemoteUIClient(){
 	readyToSend = false;
 	timeSinceLastReply = 0;
@@ -65,7 +63,7 @@ void ofxRemoteUIClient::disconnect(){
 		if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIClient: disconnect()" ;
 		sendCIAO();
 		readyToSend = false;
-		presetNames.clear(); 
+		presetNames.clear();
 	}else{
 		if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIClient: can't disconnect(); we arent connected!" ;
 	}

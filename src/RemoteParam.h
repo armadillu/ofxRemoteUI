@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <sstream>
 
-
 enum RemoteUICallClientAction{
 	SERVER_CONNECTED, SERVER_DISCONNECTED, SERVER_SENT_FULL_PARAMS_UPDATE, SERVER_PRESETS_LIST_UPDATED,
 	SERVER_CONFIRMED_SAVE, SERVER_DID_RESET_TO_DEFAULTS, SERVER_DELETED_PRESET,
@@ -170,7 +169,7 @@ public:
 	string group;
 	vector<string> enumList; //for enum type
 
-	unsigned char r,g,b,a; // param bg color [0,255] 
+	unsigned char r,g,b,a; // param bg color [0,255]
 };
 
 
@@ -193,8 +192,8 @@ struct RemoteUIServerCallBackArg{
 };
 
 
-
-#ifndef OF_VERSION_MINOR //if OF is not available, redefine ofColor to myColor
+#ifndef OF_AVAILABLE //if OF is not available, redefine ofColor to myColor
+#warning "Openframeworks is not available!"
 #define ofColor myColor
 
 struct myColor{
@@ -216,16 +215,15 @@ struct myColor{
 		struct { unsigned char r, g, b, a; };
 		unsigned char v[4];
 	};
-#ifdef CINDER_CINDER //if cinder available, define an easy port to cinderColor
-	cinder::ColorA8u toCinder(){
-		return cinder::ColorA8u(r,g,b,a);
-	}
-#endif
+    #ifdef CINDER_CINDER //if cinder available, define an easy port to cinderColor
+        #warning "Compiling for Cinder!"
+        cinder::ColorA8u toCinder(){
+            return cinder::ColorA8u(r,g,b,a);
+        }
+    #endif
 };
-
-#else
-	#define OF_AVAILABLE 1 //define our custom Constant to detect OF presence
 #endif
+
 
 #ifdef OF_AVAILABLE
 	#define RUI_LOG_NOTICE		(ofLogNotice())

@@ -12,7 +12,13 @@
 #include "uriencode.h"
 #include <sstream>
 
-#ifdef __APPLE__ //TODO  i need to cover linux too
+#if !defined(__APPLE__) && !defined(TARGET_WIN32)
+    #ifndef __linux__
+        #define __linux__
+    #endif
+#endif
+
+#if defined(__APPLE__) || defined(__linux__)
 #include <arpa/inet.h>
 #include <net/if.h>
 #include <ifaddrs.h>
@@ -55,6 +61,7 @@ vector<string> ofxRemoteUI::getPresetsList(){
 
 
 void ofxRemoteUI::addParamToDB(RemoteUIParam p, string paramName){
+
 
 	//see if we already had it, if we didnt, set its add order #
 	map<string,RemoteUIParam>::iterator it = params.find(paramName);
@@ -152,7 +159,7 @@ string ofxRemoteUI::getMyIP(string userChosenInteface){
 	string output = "NOT FOUND";
 	RUI_LOG_VERBOSE << "ofxRemoteUI establishing local interface and IP @";
 
-#ifdef __APPLE__ /*this should cover linux too TODO*/
+#if defined(__APPLE__) || defined(__linux__)
 	struct ifaddrs *myaddrs;
 	struct ifaddrs *ifa;
 	struct sockaddr_in *s4;
@@ -183,7 +190,7 @@ string ofxRemoteUI::getMyIP(string userChosenInteface){
 							break;
 						}
 					}else{
-						if ( interface[0] == 'e' && interface[1] == 'n'){
+                        if ((interface[0] == 'e' && interface[1] == 'n') || (interface[0] == 'e' && interface[1] == 't')){
 							output = string(buf);
 							if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUI using interface: " << interface;
 							break;
@@ -321,7 +328,7 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 			p.type = REMOTEUI_PARAM_SPACER;
 			p.stringVal = m.getArgAsString(arg); arg++;
 			break;
-			
+
 
 		case NULL_ARG: RUI_LOG_ERROR << "updateParamFromDecodedMessage NULL type!"; break;
 		default: RUI_LOG_ERROR << "updateParamFromDecodedMessage unknown type!"; break;

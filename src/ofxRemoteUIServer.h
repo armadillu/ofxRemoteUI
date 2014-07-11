@@ -12,8 +12,8 @@
 // you will need to add this to your "Header Search Path" for ofxOsc to compile
 // ../../../addons/ofxOsc/libs ../../../addons/ofxOsc/libs/oscpack ../../../addons/ofxOsc/libs/oscpack/src ../../../addons/ofxOsc/libs/oscpack/src/ip ../../../addons/ofxOsc/libs/oscpack/src/ip/posix ../../../addons/ofxOsc/libs/oscpack/src/ip/win32 ../../../addons/ofxOsc/libs/oscpack/src/osc ../../../addons/ofxOsc/src
 #include "ofxOsc.h"
-#include "ofxRemoteUI.h"
 #include "ofxXmlSettings.h"
+#include "ofxRemoteUI.h"
 #include <map>
 #include <set>
 #include <vector>
@@ -60,7 +60,7 @@
 
 /*setup the server-client callback. This will be called on important events
  and param updates from the UI. Supplied method should look like:
-	void serverCallback(RemoteUIServerCallBackArg arg); 
+	void serverCallback(RemoteUIServerCallBackArg arg);
  See example code below. */
 #define OFX_REMOTEUI_SERVER_SET_CALLBACK(serverCallback)				\
 ( ofxRemoteUIServer::instance()->setCallback(serverCallback) )
@@ -79,7 +79,7 @@
 ( ofxRemoteUIServer::instance()->update(deltaTime) )
 
 /*draw the server msgs. No need to call this from OF
- only call this if you disabled automatic notifications and still 
+ only call this if you disabled automatic notifications and still
  want to see them in a custom location*/
 #define OFX_REMOTEUI_SERVER_DRAW(x,y)									\
 ( ofxRemoteUIServer::instance()->draw(x,y) )
@@ -106,7 +106,7 @@
 ( ofxRemoteUIServer::instance()->setDrawsNotificationsAutomaticallly(draw) )
 
 /*sends all params to client, same as pressing sync on client
- updates client UI to match current param values. use this if you modify 
+ updates client UI to match current param values. use this if you modify
  params internally and want those changes reflected in the UI*/
 #define OFX_REMOTEUI_SERVER_PUSH_TO_CLIENT()							\
 ( ofxRemoteUIServer::instance()->pushParamsToClient() )

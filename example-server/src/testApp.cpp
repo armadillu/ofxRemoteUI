@@ -127,7 +127,7 @@ void testApp::draw(){
 
 	ofSetupScreen();
 	ofDrawBitmapStringHighlight(
-								string("SERVER\n") + 
+								string("SERVER\n") +
 								"x: " + ofToString(x) + "\n" +
 								"y: " + ofToString(y) + "\n" +
 								"drawOutlines: " + ofToString(drawOutlines) + "\n" +
