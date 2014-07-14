@@ -222,8 +222,11 @@ string ofxRemoteUI::getMyIP(string userChosenInteface){
 		//this is crappy, we get the first non 0.0.0.0 interface (no idea which order they come in) TODO!
 		for (IP_ADAPTER_INFO *pAdapter = pAdapterInfo; pAdapter; pAdapter = pAdapter->Next) {
 			printf("%s (%s)\n", pAdapter->IpAddressList.IpAddress.String, pAdapter->Description);
-			output = pAdapter->IpAddressList.IpAddress.String;
-			if (output != "0.0.0.0") break;
+			string ip = pAdapter->IpAddressList.IpAddress.String;
+			if (ip != "0.0.0.0"){
+				output = ip;
+				break;
+			}
 		}
 	}
 	if (pAdapterInfo) free(pAdapterInfo);

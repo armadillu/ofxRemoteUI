@@ -570,14 +570,18 @@ void ofxRemoteUIServer::saveSettingsBackup(){
 			ofFile og;
 			og.open(originalPath);
 			if ( og.exists() ){
-				ofFile::moveFromTo(originalPath, destPath, true, true); //TODO this doesnt work on win!
+				try{
+					ofFile::moveFromTo(originalPath, destPath, true, true); //TODO complains on windows!
+				}catch(...){}
 			}
 			og.close();
 		}
 		ofFile f;
 		f.open(OFXREMOTEUI_SETTINGS_FILENAME);
 		if(f.exists()){
-			ofFile::copyFromTo(OFXREMOTEUI_SETTINGS_FILENAME, basePath + "0.xml");
+			try{
+				ofFile::copyFromTo(OFXREMOTEUI_SETTINGS_FILENAME, basePath + "0.xml");
+			}catch(...){}
 		}
 		f.close();
 		if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer saving a backup of the current " << OFXREMOTEUI_SETTINGS_FILENAME << " in " << OFXREMOTEUI_SETTINGS_BACKUP_FOLDER ;
