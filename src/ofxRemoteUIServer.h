@@ -36,9 +36,9 @@
 #define OFX_REMOTEUI_SERVER_SHARE_PARAM_WCN(pName, val, ...)			\
 ( ofxRemoteUIServer::instance()->shareParam( pName, &val, ##__VA_ARGS__ ) )
 
-//use this macro to share enums + enumList
+//use this macro to share enums + enumList; enum list can be vector<string> or string[]
 #define OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM(val, enumMin, enumMax, menuList, ...)	\
-( ofxRemoteUIServer::instance()->shareParam( #val, (int*)&val,enumMin, enumMax,menuList, ##__VA_ARGS__ ) )
+( ofxRemoteUIServer::instance()->shareParam( #val, (int*)&val,enumMin, enumMax, menuList, ##__VA_ARGS__ ) )
 
 //use this macro to share ofColors
 #define OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color, ...)				\
@@ -175,6 +175,7 @@ public:
 	void shareParam(string paramName, int* param, int min, int max, ofColor bgColor = ofColor(0,0,0,0) );
 	void shareParam(string paramName, string* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
 	void shareParam(string paramName, int* param, int min, int max, vector<string> names, ofColor c = ofColor(0,0,0,0)); //enum!
+	void shareParam(string paramName, int* param, int min, int max, string* names, ofColor c = ofColor(0,0,0,0)); //enum with old school string array
 	void shareParam(string paramName, unsigned char* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 );	//ofColor
 
 	void addSpacer(string name);

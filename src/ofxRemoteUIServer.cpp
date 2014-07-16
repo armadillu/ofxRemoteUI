@@ -844,6 +844,16 @@ void ofxRemoteUIServer::draw(int x, int y){
 					ofDrawBitmapString(ofToString(p.floatVal), x + valOffset, y);
 					break;
 				case REMOTEUI_PARAM_ENUM:
+					if (p.intVal >= 0 && p.intVal < p.enumList.size() && p.enumList.size() > 0){
+						string val = p.enumList[p.intVal];
+						if (val.length() > 8){
+							val = val.substr(0, 8); //todo hardcoded!
+						}
+						ofDrawBitmapString(val, x + valOffset, y);
+					}else{
+						ofDrawBitmapString(ofToString(p.intVal), x + valOffset, y);
+					}
+					break;
 				case REMOTEUI_PARAM_INT:
 					ofDrawBitmapString(ofToString(p.intVal), x + valOffset, y);
 					break;
@@ -1325,6 +1335,25 @@ void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int ma
 	addParamToDB(p, paramName);
 	if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer Sharing Enum Param '" << paramName << "'" ;
 }
+
+void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int max, string* names, ofColor c ){
+	RemoteUIParam p;
+	p.type = REMOTEUI_PARAM_ENUM;
+	p.intValAddr = param;
+	p.maxInt = max;
+	p.minInt = min;
+	vector<string> list;
+	for(int i = min; i <= max; i++){
+		list.push_back(names[i - min]);
+	}
+	p.enumList = list;
+	p.group = upcomingGroup;
+	setColorForParam(p, c);
+	p.intVal = *param = ofClamp(*param, min, max);
+	addParamToDB(p, paramName);
+	if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer Sharing Enum Param '" << paramName << "'" ;
+}
+
 
 
 void ofxRemoteUIServer::shareParam(string paramName, string* param, ofColor c, int nothingUseful ){
