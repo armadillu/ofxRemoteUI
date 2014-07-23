@@ -885,7 +885,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 		uiLines.draw();
 	}else{
 		for(int i = 0; i < paramsToWatch.size(); i++){
-			onScreenNotifications.addParamUpdate(paramsToWatch[i], params[paramsToWatch[i]].getValueAsString());
+			onScreenNotifications.addParamWatch(paramsToWatch[i], params[paramsToWatch[i]].getValueAsStringFromPointer());
 		}
 		onScreenNotifications.draw(x, y);
 	}
@@ -1006,10 +1006,10 @@ void ofxRemoteUIServer::updateServer(float dt){
 					cbArg.paramName = dm.paramName;
 					cbArg.param = params[dm.paramName];  //copy the updated param to the callbakc arg
 					callBack(cbArg);
-					#ifdef OF_AVAILABLE
-					onScreenNotifications.addParamUpdate(dm.paramName, cbArg.param.getValueAsString());
-					#endif
 				}
+				#ifdef OF_AVAILABLE
+				onScreenNotifications.addParamUpdate(dm.paramName, params[dm.paramName].getValueAsString());
+				#endif
 			}
 				break;
 

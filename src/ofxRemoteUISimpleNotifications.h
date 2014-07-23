@@ -12,6 +12,14 @@
 
 #if defined OF_VERSION_MINOR /*if OF exists*/
 
+#define NOTIFICATION_ALPHA_OVEFLOW		3.0
+#define NOTIFICATION_COLOR				ofColor(200,16,16, 255 * a)
+
+#define PARAM_UPDATE_COLOR				ofColor(0, 200, 0, 255 * a)
+#define FRESH_COLOR						ofColor(0)
+#define PARAM_WATCH_COLOR				ofColor(0, 128, 255)
+#define NOTIFICATION_LINEHEIGHT			20
+
 #include "ofMain.h"
 
 class ofxRemoteUISimpleNotifications{
@@ -62,32 +70,43 @@ public:
 
 	void draw(float x, float y){
 
-		float spacing = 16;
+		float spacing = NOTIFICATION_LINEHEIGHT;
 
 		for(int i = 0; i < notifications.size(); i++){
-			float a = ofClamp( 3.0 * notifications[i].time, 0.0f, 1.0f);
+			float a = ofClamp( NOTIFICATION_ALPHA_OVEFLOW * notifications[i].time, 0.0f, 1.0f);
 			ofDrawBitmapStringHighlight("ofxRemoteUIServer: " + notifications[i].msg,
 										x,
 										y - spacing * (notifications.size() - 1) + i * spacing,
 										ofColor(0, 255 * a),
-										ofColor(255,0,0, 255 * a)
+										NOTIFICATION_COLOR
 										);
 		}
 
 		typedef std::map<string, ParamNotification>::iterator it_type;
 		int c = 0;
 		for(it_type it = paramNotifications.begin(); it != paramNotifications.end(); it++){
-			float a = ofClamp( 3.0 * it->second.time, 0.0f, 1.0f);
+			float a = ofClamp( NOTIFICATION_ALPHA_OVEFLOW * it->second.time, 0.0f, 1.0f);
 			float fresh = 1.0f - ofClamp(OFXREMOTEUI_PARAM_UPDATE_NOTIFICATION_SCREENTIME - it->second.time, 0.0f, 1.0f);
-			string freshS = (fresh > 0.2 ) ? (ofGetFrameNum() % 12 < 6 ? " <<" : "") : "";
+			string freshS = (fresh > 0.2 ) ? (ofGetFrameNum() % 6 < 3 ? " <<" : "") : "";
 			ofDrawBitmapStringHighlight( it->first + ": " + it->second.value + freshS,
 										x,
 										y - spacing * ( notifications.size() + (paramNotifications.size()-1) - c ),
-										ofColor(0, 255 * a),
-										(fresh > 0.2 ) ? ofColor(0, 255, 0, 255 * a) : ofColor(255, 255, 255, 255 * a)
+										(fresh > 0.1 ) ? ofColor(0,255,0) : ofColor(0, 255 * a),
+										(fresh > 0.1 ) ? FRESH_COLOR : PARAM_UPDATE_COLOR
 										);
 			c++;
 		}
+
+		c = 0;
+		for(it_type it = paramWatch.begin(); it != paramWatch.end(); it++){
+			ofDrawBitmapStringHighlight( "[" + it->first + "] " + it->second.value,
+										x,
+										y - spacing * ( notifications.size() + paramNotifications.size() + (paramWatch.size()-1) - c ),
+										ofColor(0), PARAM_WATCH_COLOR
+										);
+			c++;
+		}
+
 	};
 
 	void addNotification(string msg){
@@ -104,10 +123,18 @@ public:
 		paramNotifications[paramName] = n;
 	};
 
+	void addParamWatch(string paramName, string paramValue){
+		ParamNotification n;
+		n.value = paramValue;
+		n.time = OFXREMOTEUI_PARAM_UPDATE_NOTIFICATION_SCREENTIME;
+		paramWatch[paramName] = n;
+	};
+
 private:
 
 	vector<SimpleNotification> notifications;
 	map<string, ParamNotification> paramNotifications;
+	map<string, ParamNotification> paramWatch;
 };
 
 #endif

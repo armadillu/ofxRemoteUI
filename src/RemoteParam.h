@@ -132,6 +132,24 @@ public:
 		}
 	}
 
+	string getValueAsStringFromPointer(){
+		std::ostringstream ss;
+		char aux[50];
+		switch (type) {
+			case REMOTEUI_PARAM_FLOAT: ss << *floatValAddr; return ss.str();
+			case REMOTEUI_PARAM_ENUM:
+			case REMOTEUI_PARAM_INT: ss << *intValAddr; return ss.str();
+			case REMOTEUI_PARAM_BOOL: return *boolValAddr ? "TRUE" : "FALSE";
+			case REMOTEUI_PARAM_STRING: return *stringValAddr;
+			case REMOTEUI_PARAM_COLOR:{
+				sprintf(aux, "RGBA: [%d, %d, %d, %d]", redValAddr[0], redValAddr[1], redValAddr[2], redValAddr[3]);
+				return string(aux);
+			}
+			case REMOTEUI_PARAM_SPACER: return "";
+			default: return "unknown value (BUG!)";
+		}
+	}
+
 	void print(){
 		switch (type) {
 			case REMOTEUI_PARAM_FLOAT: printf("float: %.2f [%.2f, %.2f]\n", floatVal, minFloat, maxFloat); break;
