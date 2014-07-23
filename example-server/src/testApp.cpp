@@ -86,6 +86,10 @@ void testApp::setup(){
 	cout << "unloadTest: '" << unloadTest << "'" << endl;
 
 
+	OFX_REMOTEUI_SERVER_WATCH_PARAM(currentMouseX); //this will print this param all the time on screen
+													//useful for debugging
+
+
 	//OFX_REMOTEUI_SERVER_START_THREADED(); //if you want all the osc communication to happen on a different
 											//thread, call this. This has implications though.
 											//your params can be changed at anytime by the client,

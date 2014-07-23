@@ -125,6 +125,12 @@
 #define OFX_REMOTEUI_SERVER_REMOVE_PARAM(paramName)						\
 ( ofxRemoteUIServer::instance()->removeParamFromDB(#paramName) )
 
+//sets the param as "to watch", so its value is printed on
+//screen all the time. WCN version in case you want to supply a custom string instead of the var itself
+#define OFX_REMOTEUI_SERVER_WATCH_PARAM(paramName)                          \
+( ofxRemoteUIServer::instance()->watchParamOnScreen(#paramName) )
+#define OFX_REMOTEUI_SERVER_WATCH_PARAM_WCN(paramName)                      \
+( ofxRemoteUIServer::instance()->watchParamOnScreen(paramName) )
 
 #ifdef OF_AVAILABLE
 /*run the server on a back thread. Useful for apps with very low framerate.
@@ -214,6 +220,8 @@ public:
 												//to load from xml and then remove from the list to
 												//avoid crowding it too much
 
+	void watchParamOnScreen(string paramName);
+
 	void setShowInterfaceKey(char k);
 	void setAutomaticBackupsEnabled(bool enabled);
 
@@ -274,6 +282,8 @@ private:
 
 	bool			enabled;
 	bool			autoBackups;
+
+	vector                  <string> paramsToWatch;
 
 #ifdef OF_AVAILABLE
 	ofxRemoteUISimpleNotifications onScreenNotifications;

@@ -884,6 +884,9 @@ void ofxRemoteUIServer::draw(int x, int y){
 		ofSetColor(32);
 		uiLines.draw();
 	}else{
+		for(int i = 0; i < paramsToWatch.size(); i++){
+			onScreenNotifications.addParamUpdate(paramsToWatch[i], params[paramsToWatch[i]].getValueAsString());
+		}
 		onScreenNotifications.draw(x, y);
 	}
 
@@ -1264,6 +1267,13 @@ void ofxRemoteUIServer::setColorForParam(RemoteUIParam &p, ofColor c){
 	}
 }
 
+void ofxRemoteUIServer::watchParamOnScreen(string paramName){
+	if (params.find(paramName) != params.end()){
+		paramsToWatch.push_back(paramName);
+	}else{
+		RUI_LOG_ERROR << "ofxRemoteUIServer can't watch that param; it doesnt exist! " << paramName << endl;
+	}
+}
 
 void ofxRemoteUIServer::addSpacer(string title){
 	RemoteUIParam p;
