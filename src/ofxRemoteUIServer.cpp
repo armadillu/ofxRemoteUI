@@ -69,6 +69,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	waitingForReply = false;
 	colorSet = false;
 	computerName = binaryName = "";
+	directoryPrefix = "";
 	callBack = NULL;
 	upcomingGroup = OFXREMOTEUI_DEFAULT_PARAM_GROUP;
 	verbose_ = false;
@@ -234,6 +235,12 @@ void ofxRemoteUIServer::removeParamFromDB(string paramName){
 }
 
 
+void ofxRemoteUIServer::setDirectoryPrefix(string _directoryPrefix){
+	directoryPrefix = _directoryPrefix;
+	cout << "directoryPrefix set to " << directoryPrefix << endl;
+}
+
+
 void ofxRemoteUIServer::saveParamToXmlSettings(RemoteUIParam t, string key, ofxXmlSettings & s, XmlCounter & c){
 
 	switch (t.type) {
@@ -327,6 +334,10 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 
 	saveSettingsBackup(); //every time , before we save
 
+	stringstream ss;
+	ss << directoryPrefix << "/" << fileName;
+	fileName = ss.str();
+
 	RUI_LOG_NOTICE << "ofxRemoteUIServer: saving to xml '" << fileName << "'" ;
 	ofxXmlSettings s;
 	s.loadFile(fileName);
@@ -355,6 +366,10 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 }
 
 vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
+
+	stringstream ss;
+	ss << directoryPrefix << "/" << fileName;
+	fileName = ss.str();
 
 	vector<string> loadedParams;
 	ofxXmlSettings s;

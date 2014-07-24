@@ -215,6 +215,7 @@ public:
 	void pushParamsToClient(); //pushes all param values to client, updating its UI
 	void sendLogToClient(char* format, ...);
 	void setClearXMLonSave(bool clear){clearXmlOnSaving = clear;}
+	void			setDirectoryPrefix(string _directoryPrefix); // set the optional directory prefix
 
 	void removeParamFromDB(string paramName);	//useful for params its value is kinda set,
 												//to load from xml and then remove from the list to
@@ -266,6 +267,9 @@ private:
 	string			computerName;
 	string			binaryName;
 	string			computerIP;
+
+	string			directoryPrefix; // the optional directory prefix where we should store data
+
 
 	bool			doBroadcast; //controls if the server advertises itself
 	bool			drawNotifications;
