@@ -836,6 +836,11 @@ void ofxRemoteUIServer::draw(int x, int y){
 				string sel = (selectedItem == i) ? ">>" : "  ";
 				ofDrawBitmapString(sel + key, x, y);
 			}else{
+				ofPushStyle();
+				ofColor c = ofColor(p.r, p.g, p.b);
+				ofSetColor(c * 0.3);
+				ofRect(x , -spacing + y + spacing * 0.33, colw * 0.8, spacing);
+				ofPopStyle();
 				ofDrawBitmapString("+ " + p.stringVal, x,y);
 			}
 
@@ -882,6 +887,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 			}
 		}
 		ofSetColor(32);
+		ofSetLineWidth(1);
 		uiLines.draw();
 	}else{
 		for(int i = 0; i < paramsToWatch.size(); i++){
