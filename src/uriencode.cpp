@@ -10,9 +10,6 @@
 #include "uriencode.h"
 #include <iostream.h>
 
-#ifndef urlencode_h
-#define urlencode_h
-
 
 std::string UriEncode(const std::string & sSrc){
 
@@ -83,5 +80,3 @@ std::string UriDecode(const std::string & sSrc){
 	delete [] pStart;
 	return sResult;
 }
-
-#endif

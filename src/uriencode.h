@@ -7,6 +7,8 @@
 //
 // based on http://www.codeguru.com/cpp/cpp/algorithms/strings/article.php/c12759/URI-Encoding-and-Decoding.htm
 
+#pragma once
+
 #ifndef urlencode_h
 #define urlencode_h
 
