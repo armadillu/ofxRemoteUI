@@ -47,6 +47,7 @@
 /*set a new group for the upcoming params, this also sets a new color*/
 #define OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP(g)					\
 ( ofxRemoteUIServer::instance()->setParamGroup( g ) )
+#define OFX_REMOTEUI_SERVER_NEW_GROUP(g) OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP(g)
 
 /*set a new small 'hue' change for upcoming params, to create alternating rows inside a group*/
 #define OFX_REMOTEUI_SERVER_SET_NEW_COLOR()								\
