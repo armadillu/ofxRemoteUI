@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		73002CDB140ABCF60035299A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73002CDA140ABCF60035299A /* Cocoa.framework */; };
+		BB09FCA9198DDB8000E04B02 /* uriencode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB09FCA8198DDB8000E04B02 /* uriencode.cpp */; };
 		BB37FC98185E0FDB008DA8DD /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB37FC97185E0FDB008DA8DD /* IOKit.framework */; };
 		BB395E96173E6326002FA815 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB395E95173E6326002FA815 /* QuartzCore.framework */; };
 		BB5CC60C177E49D500B595F8 /* IpEndpointName.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5DD177E49D500B595F8 /* IpEndpointName.cpp */; };
@@ -88,6 +89,7 @@
 		73002CDD140ABCF60035299A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		73002CDE140ABCF60035299A /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		73002CDF140ABCF60035299A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		BB09FCA8198DDB8000E04B02 /* uriencode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = uriencode.cpp; sourceTree = "<group>"; };
 		BB37FC97185E0FDB008DA8DD /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = ../../../../../../../../Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/IOKit.framework; sourceTree = "<group>"; };
 		BB395E95173E6326002FA815 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
 		BB4B54F0177FAD5D004838E4 /* ToDo.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ToDo.txt; sourceTree = "<group>"; };
@@ -527,6 +529,7 @@
 				BBEE7854182302FF00D93161 /* ofxRemoteUINeigbors.cpp */,
 				BBEE7855182302FF00D93161 /* ofxRemoteUINeigbors.h */,
 				BBFB932A17785ECC00A5E741 /* RemoteParam.h */,
+				BB09FCA8198DDB8000E04B02 /* uriencode.cpp */,
 				BB5F5EB01769462600F1FA92 /* uriencode.h */,
 				BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */,
 				BBAAAFA8173BF54B00FE94C4 /* ofxRemoteUIClient.h */,
@@ -677,6 +680,7 @@
 				BBB627C2191C4C4B005F95BF /* NSColorStringExtension.m in Sources */,
 				BB5CC61E177E49D500B595F8 /* ofxXmlSettings.cpp in Sources */,
 				BBEE7856182302FF00D93161 /* ofxRemoteUINeigbors.cpp in Sources */,
+				BB09FCA9198DDB8000E04B02 /* uriencode.cpp in Sources */,
 				BBF0A82D191C56030048DB4F /* main.m in Sources */,
 				BBB627D4191C4CD0005F95BF /* LogWindows.mm in Sources */,
 			);

@@ -50,7 +50,7 @@
 #ifdef OF_VERSION_MINOR
     #define OF_AVAILABLE
 #else
-    #error "no OF"
+    //#error "no OF"
 #endif
 
 #include "RemoteParam.h"
