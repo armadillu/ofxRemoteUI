@@ -8,7 +8,7 @@
 // based on http://www.codeguru.com/cpp/cpp/algorithms/strings/article.php/c12759/URI-Encoding-and-Decoding.htm
 
 #include "uriencode.h"
-#include <iostream.h>
+#include <iostream>
 
 
 std::string UriEncode(const std::string & sSrc){

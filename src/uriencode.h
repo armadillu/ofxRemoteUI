@@ -12,7 +12,7 @@
 #ifndef urlencode_h
 #define urlencode_h
 
-#include <iostream.h>
+#include <iostream>
 
 // hansi: hextable from
 // http://stackoverflow.com/questions/10324/how-can-i-convert-a-hexadecimal-number-to-base-10-efficiently-in-c
