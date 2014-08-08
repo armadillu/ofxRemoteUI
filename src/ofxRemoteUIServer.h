@@ -138,6 +138,11 @@
  default is disabled in OF; only works in OF! */
 #define OFX_REMOTEUI_SERVER_START_THREADED()							\
 ( ofxRemoteUIServer::instance()->startInBackgroundThread() )
+
+#define OFX_REMOTEUI_SERVER_SET_UI_COLUMN_WIDTH(w)						\
+( ofxRemoteUIServer::instance()->setUiColumnWidth(w) )
+
+
 #endif
 
 
@@ -226,6 +231,8 @@ public:
 	void setShowInterfaceKey(char k);
 	void setAutomaticBackupsEnabled(bool enabled);
 
+	void setUiColumnWidth(int w){ uiColumnWidth = w; }
+
 private:
 
 	ofxRemoteUIServer(); // use ofxRemoteUIServer::instance() instead! Use the MACROS defined above!
@@ -295,6 +302,9 @@ private:
 
 	int				selectedItem;
 	ofVboMesh		uiLines;
+
+	float			uiColumnWidth;
+	float			uiAlpha;
 #endif
 
 	static ofxRemoteUIServer* singleton;

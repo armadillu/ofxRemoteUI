@@ -61,6 +61,7 @@ void ofxRemoteUIServer::setShowInterfaceKey(char k){
 ofxRemoteUIServer::ofxRemoteUIServer(){
 
 	enabled = true;
+	uiColumnWidth = 320;
 	readyToSend = false;
 	saveToXmlOnExit = true;
 	autoBackups = false; //off by default
@@ -83,6 +84,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	newColorInGroupCounter = 1;
 	showInterfaceKey = '\t';
 	int a = 80;
+	uiAlpha = 1.0;
 #ifdef OF_AVAILABLE
 	selectedItem = 0;
 	ofSeedRandom(1979);
@@ -710,6 +712,7 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				break;
 			case OF_KEY_LEFT:
 			case OF_KEY_RIGHT:{
+				uiAlpha = 0;
 				float sign = e.key == OF_KEY_RIGHT ? 1.0 : -1.0;
 				string key = orderedKeys[selectedItem];
 				RemoteUIParam p = params[key];
@@ -769,6 +772,8 @@ void ofxRemoteUIServer::update(float dt){
 		updateServer(dt);
 	}
 	updatedThisFrame = true; //this only makes sense when running threaded
+	uiAlpha += 0.3 * ofGetLastFrameTime();
+	if(uiAlpha > 1) uiAlpha = 1;
 	#else
 	updateServer(dt);
 	#endif
@@ -799,11 +804,13 @@ void ofxRemoteUIServer::draw(int x, int y){
 		int x = padding;
 		int initialY = padding * 2.5;
 		int y = initialY;
-		int colw = 320;
-		int valOffset = colw * 0.6;
+		int colw = uiColumnWidth;
+		int realColW = colw * 0.9;
+		int valOffset = realColW * 0.7;
+		int valSpaceW = realColW - valOffset;
 		int spacing = 20;
 
-		ofSetColor(11, 245);
+		ofSetColor(11, 245 * uiAlpha);
 		ofRect(0,0, ofGetWidth(), ofGetHeight());
 		ofSetColor(44, 245);
 		ofRect(0,0, ofGetWidth(), padding + spacing );
@@ -839,7 +846,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 				ofPushStyle();
 				ofColor c = ofColor(p.r, p.g, p.b);
 				ofSetColor(c * 0.3);
-				ofRect(x , -spacing + y + spacing * 0.33, colw * 0.8, spacing);
+				ofRect(x , -spacing + y + spacing * 0.33, realColW, spacing);
 				ofPopStyle();
 				ofDrawBitmapString("+ " + p.stringVal, x,y);
 			}
@@ -851,8 +858,9 @@ void ofxRemoteUIServer::draw(int x, int y){
 				case REMOTEUI_PARAM_ENUM:
 					if (p.intVal >= 0 && p.intVal < p.enumList.size() && p.enumList.size() > 0){
 						string val = p.enumList[p.intVal];
-						if (val.length() > 8){
-							val = val.substr(0, 8); //todo hardcoded!
+						int chars = ceil(valSpaceW / charw) + 1;
+						if (val.length() > chars){
+							val = val.substr(0, chars);
 						}
 						ofDrawBitmapString(val, x + valOffset, y);
 					}else{
