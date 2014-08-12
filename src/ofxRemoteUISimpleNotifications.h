@@ -34,6 +34,7 @@ public:
 	struct ParamNotification{
 		string value;
 		float time;
+		ofColor color;
 	};
 
 	ofxRemoteUISimpleNotifications(){};
@@ -87,13 +88,20 @@ public:
 		for(it_type it = paramNotifications.begin(); it != paramNotifications.end(); it++){
 			float a = ofClamp( NOTIFICATION_ALPHA_OVEFLOW * it->second.time, 0.0f, 1.0f);
 			float fresh = 1.0f - ofClamp(OFXREMOTEUI_PARAM_UPDATE_NOTIFICATION_SCREENTIME - it->second.time, 0.0f, 1.0f);
-			string freshS = (fresh > 0.2 ) ? (ofGetFrameNum() % 6 < 3 ? " <<" : "") : "";
-			ofDrawBitmapStringHighlight( it->first + ": " + it->second.value + freshS,
+			string total = it->first + ": " + it->second.value ;
+			float yy = y - spacing * ( notifications.size() + (paramNotifications.size()-1) - c );
+			ofDrawBitmapStringHighlight( total,
 										x,
-										y - spacing * ( notifications.size() + (paramNotifications.size()-1) - c ),
+										yy,
 										(fresh > 0.1 ) ? ofColor(0,255,0) : ofColor(0, 255 * a),
 										(fresh > 0.1 ) ? FRESH_COLOR : PARAM_UPDATE_COLOR
 										);
+			if (it->second.color.a != 0){
+				ofPushStyle();
+				ofSetColor(it->second.color, a * 255);
+				ofRect(x + total.length() * 8 + 4, yy - 14, 40, 20);
+				ofPopStyle();
+			}
 			c++;
 		}
 
@@ -116,8 +124,9 @@ public:
 		notifications.push_back(n);
 	};
 
-	void addParamUpdate(string paramName, string paramValue){
+	void addParamUpdate(string paramName, string paramValue, ofColor c = ofColor(0,0,0,0)){
 		ParamNotification n;
+		n.color = c;
 		n.value = paramValue;
 		n.time = OFXREMOTEUI_PARAM_UPDATE_NOTIFICATION_SCREENTIME;
 		paramNotifications[paramName] = n;
@@ -125,6 +134,7 @@ public:
 
 	void addParamWatch(string paramName, string paramValue){
 		ParamNotification n;
+		n.color = ofColor(0,0,0,0);
 		n.value = paramValue;
 		n.time = OFXREMOTEUI_PARAM_UPDATE_NOTIFICATION_SCREENTIME;
 		paramWatch[paramName] = n;

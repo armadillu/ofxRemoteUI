@@ -1015,6 +1015,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case SEND_PARAM_ACTION:{ //client is sending us an updated val
 				if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer: " << m.getRemoteIp() << " sends SEND!"  ;
 				updateParamFromDecodedMessage(m, dm);
+				
 				if(callBack != NULL){
 					cbArg.action = CLIENT_UPDATED_PARAM;
 					cbArg.paramName = dm.paramName;
@@ -1022,7 +1023,12 @@ void ofxRemoteUIServer::updateServer(float dt){
 					callBack(cbArg);
 				}
 				#ifdef OF_AVAILABLE
-				onScreenNotifications.addParamUpdate(dm.paramName, params[dm.paramName].getValueAsString());
+				RemoteUIParam p = params[dm.paramName];
+				onScreenNotifications.addParamUpdate(dm.paramName, p.getValueAsString(),
+													 p.type == REMOTEUI_PARAM_COLOR ?
+													 ofColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal):
+													 ofColor(0,0,0,0)
+													 );
 				#endif
 			}
 				break;
