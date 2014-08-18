@@ -611,16 +611,17 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 
 		//setup the broadcasting
 		computerIP = getMyIP(userSuppliedNetInterface);
+		doBroadcast = true;
+		string multicastIP;
 		if (computerIP != "NOT FOUND"){
-			doBroadcast = true;
-			vector<string>comps;
-			split(comps, computerIP, '.');
-			string multicastIP = comps[0] + "." + comps[1] + "." + comps[2] + "." + "255";
-			broadcastSender.setup( multicastIP, OFXREMOTEUI_BROADCAST_PORT ); //multicast @
-			RUI_LOG_NOTICE << "ofxRemoteUIServer: letting everyone know that I am at " << multicastIP << ":" << OFXREMOTEUI_BROADCAST_PORT ;
+		vector<string>comps;
+		split(comps, computerIP, '.');
+		multicastIP = comps[0] + "." + comps[1] + "." + comps[2] + "." + "255";
 		}else{
-			doBroadcast = false;
+			multicastIP = "255.255.255.255";
 		}
+		broadcastSender.setup( multicastIP, OFXREMOTEUI_BROADCAST_PORT ); //multicast @
+		RUI_LOG_NOTICE << "ofxRemoteUIServer: letting everyone know that I am at " << multicastIP << ":" << OFXREMOTEUI_BROADCAST_PORT ;
 
 		if(port_ == -1){ //if no port specified, pick a random one, but only the very first time we get launched!
 			portIsSet = false;
