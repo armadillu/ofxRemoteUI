@@ -85,6 +85,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	showInterfaceKey = '\t';
 	int a = 80;
 	uiAlpha = 1.0;
+	selectedPreset = selectedGroupPreset = 0;
 #ifdef OF_AVAILABLE
 	selectedItem = -1;
 	ofSeedRandom(1979);
@@ -918,13 +919,13 @@ void ofxRemoteUIServer::draw(int x, int y){
 						   "launch state. Use Arrow Keys to edit values.", padding, ofGetHeight() - padding + 3);
 
 		//preset selection
-		if(presetsCached.size() > 0 && selectedPreset >= 0 && selectedPreset < presetsCached.size()){
-			ofSetColor(64);
-			ofRect(0 , 0, ofGetWidth(), 22);
+		ofSetColor(64);
+		ofRect(0 , 0, ofGetWidth(), 22);
+		ofColor textBlinkC ;
+		if(ofGetFrameNum()%5 < 1) textBlinkC = ofColor(255);
+		else textBlinkC = ofColor(255,0,0);
 
-			ofColor textBlinkC ;
-			if(ofGetFrameNum()%5 < 1) textBlinkC = ofColor(255);
-			else textBlinkC = ofColor(255,0,0);
+		if(presetsCached.size() > 0 && selectedPreset >= 0 && selectedPreset < presetsCached.size()){
 
 			ofVec2f dpos = ofVec2f(192, 16);
 			ofSetColor(180);
@@ -953,11 +954,11 @@ void ofxRemoteUIServer::draw(int x, int y){
 					ofDrawBitmapString("Selected Preset: NONE", dpos);
 				}
 			}
-			if (selectedItem != -1) ofSetColor(255);
-			else ofSetColor(textBlinkC);
-			ofDrawBitmapString("+ PRESET SELECTION: " , 30,  16);
-
 		}
+		if (selectedItem != -1) ofSetColor(255);
+		else ofSetColor(textBlinkC);
+		ofDrawBitmapString("+ PRESET SELECTION: " , 30,  16);
+
 
 		int linesInited = uiLines.getNumVertices() > 0 ;
 
