@@ -219,7 +219,7 @@ public:
 	void setDrawsNotificationsAutomaticallly(bool draw);
 	void setNetworkInterface(string iface);
 	void pushParamsToClient(); //pushes all param values to client, updating its UI
-	void sendLogToClient(char* format, ...);
+	void sendLogToClient(string message);
 	void setClearXMLonSave(bool clear){clearXmlOnSaving = clear;}
 
 	void removeParamFromDB(string paramName);	//useful for params its value is kinda set,
