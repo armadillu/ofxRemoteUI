@@ -9,7 +9,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		case SERVER_DELETED_PRESET: cout << "SERVER_DELETED_PRESET" << endl; break;
 		case SERVER_SAVED_PRESET: cout << "SERVER_SAVED_PRESET" << endl; break;
 		case SERVER_DID_SET_PRESET: cout << "SERVER_DID_SET_PRESET" << endl; break;
-		case SERVER_REQUESTED_ALL_PARAMS_UPDATE: cout << "SERVER_REQUESTED_ALL_PARAMS_UPDATE" << endl; break;
+		case SERVER_SENT_FULL_PARAMS_UPDATE: cout << "SERVER_SENT_FULL_PARAMS_UPDATE" << endl; break;
 		case SERVER_PRESETS_LIST_UPDATED: cout << "SERVER_PRESETS_LIST_UPDATED" << endl; break;
 		case SERVER_CONFIRMED_SAVE: cout << "SERVER_CONFIRMED_SAVE" << endl;; break;
 		case SERVER_DID_RESET_TO_XML: cout << "SERVER_DID_RESET_TO_XML" << endl; break;

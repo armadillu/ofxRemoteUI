@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BB7F71AB19A4596E0012DA98 /* uriencode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB7F71AA19A4596E0012DA98 /* uriencode.cpp */; };
 		BBAFD8FC191FCD0000FF7733 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBAFD8FB191FCD0000FF7733 /* Foundation.framework */; };
 		BBAFD8FE191FCD0000FF7733 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBAFD8FD191FCD0000FF7733 /* CoreGraphics.framework */; };
 		BBAFD900191FCD0000FF7733 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBAFD8FF191FCD0000FF7733 /* UIKit.framework */; };
@@ -60,6 +61,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		BB7F71AA19A4596E0012DA98 /* uriencode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = uriencode.cpp; path = ../src/uriencode.cpp; sourceTree = "<group>"; };
 		BBAFD8F8191FCD0000FF7733 /* RemoteUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RemoteUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBAFD8FB191FCD0000FF7733 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		BBAFD8FD191FCD0000FF7733 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -254,6 +256,7 @@
 				BBAFD9DB191FD11100FF7733 /* ofxRemoteUINeigbors.cpp */,
 				BBAFD9DC191FD11100FF7733 /* ofxRemoteUINeigbors.h */,
 				BBAFD9DD191FD11100FF7733 /* RemoteParam.h */,
+				BB7F71AA19A4596E0012DA98 /* uriencode.cpp */,
 				BBAFD9DE191FD11100FF7733 /* uriencode.h */,
 			);
 			name = ofxRemoteUI;
@@ -510,6 +513,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB7F71AB19A4596E0012DA98 /* uriencode.cpp in Sources */,
 				BBAFDA20191FD11800FF7733 /* OscReceivedElements.cpp in Sources */,
 				BBAFDA1A191FD11800FF7733 /* NetworkingUtils.cpp in Sources */,
 				BBAFDA2B191FD11800FF7733 /* ofxXmlSettings.cpp in Sources */,
