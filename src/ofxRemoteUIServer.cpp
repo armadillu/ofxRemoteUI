@@ -1162,7 +1162,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				sendSETp(presetName, groupName);
 				sendMISP(filtered);
 				if(callBack != NULL){
-					cbArg.action = CLIENT_DID_SET_GRUP_PRESET;
+					cbArg.action = CLIENT_DID_SET_GROUP_PRESET;
 					cbArg.msg = presetName;
 					cbArg.group = groupName;
 					callBack(cbArg);
