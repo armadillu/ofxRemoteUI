@@ -247,7 +247,9 @@ private:
 	void			restoreAllParamsToDefaultValues();
 	void			connect(string address, int port);
 	void			setColorForParam(RemoteUIParam &p, ofColor c);
-	vector<string>	getAvailablePresets();
+	vector<string>	getAvailablePresets(bool onlyGlobal = false); //all, including group presets! group presets have group/presetName name pattern
+	vector<string>	getAvailablePresetsForGroup(string group);
+
 	void			deletePreset(string name, string group=""); //if group is not "", then this is a global preset. otherwise its a group preset
 	void			updateServer(float dt);
 	void			handleBroadcast();
@@ -282,7 +284,7 @@ private:
 	bool			saveToXmlOnExit;
 
 	bool			threadedUpdate;
-	bool			showValuesOnScreen; //displays all params on screen
+	bool			showUI; //displays all params on screen
 	bool			updatedThisFrame;
 	bool			clearXmlOnSaving;  //if false, allows you to keep defaults for old params that you are not sharing anymore
 
@@ -291,7 +293,7 @@ private:
 	bool			enabled;
 	bool			autoBackups;
 
-	vector                  <string> paramsToWatch;
+	vector			<string> paramsToWatch;
 
 #ifdef OF_AVAILABLE
 	ofxRemoteUISimpleNotifications onScreenNotifications;
@@ -302,6 +304,14 @@ private:
 
 	int				selectedItem;
 	ofVboMesh		uiLines;
+
+	vector<string>	presetsCached; //for the built in client
+	map<string, vector<string> > groupPresetsCached;
+	int 			selectedGroupPreset;
+	int 			selectedPreset;
+	string			lastChosenPreset;
+
+
 
 	float			uiColumnWidth;
 	float			uiAlpha;

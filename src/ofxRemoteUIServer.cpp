@@ -75,7 +75,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	verbose_ = false;
 	threadedUpdate = false;
 	drawNotifications = true;
-	showValuesOnScreen = false;
+	showUI = false;
 	loadedFromXML = false;
 	clearXmlOnSaving = false;
 	//add random colors to table
@@ -86,7 +86,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	int a = 80;
 	uiAlpha = 1.0;
 #ifdef OF_AVAILABLE
-	selectedItem = 0;
+	selectedItem = -1;
 	ofSeedRandom(1979);
 	ofColor prevColor = ofColor::fromHsb(0, 255, 200, BG_COLOR_ALPHA);
 	for(int i = 0; i < 30; i++){
@@ -681,81 +681,162 @@ void ofxRemoteUIServer::_appExited(ofEventArgs &e){
 	}
 }
 
-void ofxRemoteUIServer::_draw(ofEventArgs &e){
-	//if(!enabled) return;
-	ofSetupScreen(); //mmm this is a bit scary //TODO!
-	draw( 20, ofGetHeight() - 20);
-}
-
-void ofxRemoteUIServer::_update(ofEventArgs &e){
-	update(ofGetLastFrameTime());
-}
 
 void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 
-	if (showValuesOnScreen){
+	if (showUI){
 		switch(e.key){ //you can save current config from tab screen by pressing s
+
 			case 's':
 				saveToXML(OFXREMOTEUI_SETTINGS_FILENAME);
 				onScreenNotifications.addNotification("SAVED CONFIG to default XML");
 				break;
+
 			case 'r':
 				restoreAllParamsToInitialXML();
 				onScreenNotifications.addNotification("RESET CONFIG TO SERVER-LAUNCH XML values");
 				break;
-			case OF_KEY_UP:
-				selectedItem -= 1;
-				if(selectedItem<0) selectedItem = orderedKeys.size() - 1;
-				break;
-			case OF_KEY_DOWN:
-				selectedItem += 1;
-				if(selectedItem >= orderedKeys.size()) selectedItem = 0;
-				break;
-			case OF_KEY_LEFT:
-			case OF_KEY_RIGHT:{
-				uiAlpha = 0;
-				float sign = e.key == OF_KEY_RIGHT ? 1.0 : -1.0;
-				string key = orderedKeys[selectedItem];
-				RemoteUIParam p = params[key];
-				switch (p.type) {
-					case REMOTEUI_PARAM_FLOAT:
-						p.floatVal += sign * (p.maxFloat - p.minFloat) * 0.0025;
-						p.floatVal = ofClamp(p.floatVal, p.minFloat, p.maxFloat);
-						break;
-					case REMOTEUI_PARAM_ENUM:
-					case REMOTEUI_PARAM_INT:
-						p.intVal += sign;
-						p.intVal = ofClamp(p.intVal, p.minInt, p.maxInt);
-						break;
-					case REMOTEUI_PARAM_BOOL:
-						p.boolVal = !p.boolVal;
-						break;
-					default:
-						break;
-				}
-				params[key] = p;
-				syncPointerToParam(key);
-				pushParamsToClient();
-				if(callBack != NULL){ //send "param modified" callback to ourselves!
-					RemoteUIServerCallBackArg cbArg;
-					cbArg.action = CLIENT_DID_RESET_TO_XML;
-					cbArg.host = "localhost";
-					cbArg.action =  CLIENT_UPDATED_PARAM;
-					cbArg.paramName = key;
-					cbArg.param = params[key];  //copy the updated param to the callbakc arg
+
+			case OF_KEY_RETURN:
+				if(selectedItem == -1 && selectedPreset >= 0){ //global presets
+					lastChosenPreset = presetsCached[selectedPreset];
+					loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + lastChosenPreset + ".xml");
+					syncAllPointersToParams();
+					uiAlpha = 0;
+					if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: setting preset: " << lastChosenPreset ;
+					if(callBack != NULL){
+						RemoteUIServerCallBackArg cbArg;
+						cbArg.action = CLIENT_DID_SET_PRESET;
+						cbArg.msg = lastChosenPreset;
+						callBack(cbArg);
+					}
 					#ifdef OF_AVAILABLE
-					onScreenNotifications.addParamUpdate(key, cbArg.param.getValueAsString());
+					onScreenNotifications.addNotification("SET PRESET to '" + string(OFXREMOTEUI_PRESET_DIR) + "/" + lastChosenPreset + ".xml'");
 					#endif
-					callBack(cbArg);
 				}
+				if (selectedItem >= 0){ //selection on params list
+					string key = orderedKeys[selectedItem];
+					RemoteUIParam p = params[key];
+					if(p.type == REMOTEUI_PARAM_SPACER){
+						string presetName = p.group + "/" + groupPresetsCached[p.group][selectedGroupPreset];
+						loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
+						syncAllPointersToParams();
+						uiAlpha = 0;
+						if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: setting preset: " << presetName ;
+						if(callBack != NULL){
+							RemoteUIServerCallBackArg cbArg;
+							cbArg.action = CLIENT_DID_SET_GROUP_PRESET;
+							cbArg.msg = p.group;
+							callBack(cbArg);
+						}
+						#ifdef OF_AVAILABLE
+						onScreenNotifications.addNotification("SET '" + p.group  + "' GROUP TO '" + presetName + ".xml' PRESET");
+						#endif
+					}
+				}
+				break;
+
+			case OF_KEY_DOWN:
+			case OF_KEY_UP:{
+				float sign = e.key == OF_KEY_DOWN ? 1.0 : -1.0;
+				selectedGroupPreset = 0;
+				uiAlpha = 1;
+				selectedItem += sign;
+				if(selectedItem < -1) selectedItem = orderedKeys.size() - 1;
+				if(selectedItem >= orderedKeys.size()) selectedItem = -1; //presets menu >> selectedItem = -1, on top of all
+				selectedGroupPreset = 0;
 				}break;
 
+			case OF_KEY_LEFT:
+			case OF_KEY_RIGHT:{
+
+				float sign = e.key == OF_KEY_RIGHT ? 1.0 : -1.0;
+
+				if (selectedItem >= 0){ //params
+					string key = orderedKeys[selectedItem];
+					RemoteUIParam p = params[key];
+					if (p.type != REMOTEUI_PARAM_SPACER){
+						uiAlpha = 0;
+						switch (p.type) {
+							case REMOTEUI_PARAM_FLOAT:
+								p.floatVal += sign * (p.maxFloat - p.minFloat) * 0.0025;
+								p.floatVal = ofClamp(p.floatVal, p.minFloat, p.maxFloat);
+								break;
+							case REMOTEUI_PARAM_ENUM:
+							case REMOTEUI_PARAM_INT:
+								p.intVal += sign;
+								p.intVal = ofClamp(p.intVal, p.minInt, p.maxInt);
+								break;
+							case REMOTEUI_PARAM_BOOL:
+								p.boolVal = !p.boolVal;
+								break;
+							default:
+								break;
+						}
+						params[key] = p;
+						syncPointerToParam(key);
+						pushParamsToClient();
+						if(callBack != NULL){ //send "param modified" callback to ourselves!
+							RemoteUIServerCallBackArg cbArg;
+							cbArg.action = CLIENT_DID_RESET_TO_XML;
+							cbArg.host = "localhost";
+							cbArg.action =  CLIENT_UPDATED_PARAM;
+							cbArg.paramName = key;
+							cbArg.param = params[key];  //copy the updated param to the callbakc arg
+							#ifdef OF_AVAILABLE
+							onScreenNotifications.addParamUpdate(key, cbArg.param.getValueAsString());
+							#endif
+							callBack(cbArg);
+						}
+					}else{ //in spacer! group time, cycle through group presets
+						int numGroupPresets = groupPresetsCached[p.group].size();
+						if(numGroupPresets > 0){
+							selectedGroupPreset += sign;
+							if (selectedGroupPreset < 0) selectedGroupPreset = numGroupPresets -1;
+							if (selectedGroupPreset > numGroupPresets -1) selectedGroupPreset = 0;
+						}
+					}
+				}else{ //presets!
+					if (presetsCached.size()){
+						selectedPreset += sign;
+						int limit = presetsCached.size() - 1;
+						if (selectedPreset > limit){
+							selectedPreset = 0;
+						}
+						if (selectedPreset < 0){
+							selectedPreset = limit;
+						}
+					}
+				}
+			}break;
 		}
 	}
+
 	if(e.key == showInterfaceKey){
-		showValuesOnScreen = !showValuesOnScreen;
-		if (showValuesOnScreen){
+		if (uiAlpha < 1.0 && showUI){
+			uiAlpha = 1.0;
+		}else{
+			showUI = !showUI;
+		}
+
+		if (showUI){
+			uiAlpha = 1;
 			uiLines.clear();
+			syncAllPointersToParams();
+
+			//get all group presets
+			groupPresetsCached.clear();
+			for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+				if((*ii).second.type == REMOTEUI_PARAM_SPACER){
+					groupPresetsCached[(*ii).second.group] = getAvailablePresetsForGroup((*ii).second.group);
+				};
+			}
+
+			presetsCached = getAvailablePresets(true);
+
+			if (selectedPreset > presetsCached.size() -1){
+				selectedPreset = 0;
+			}
 		}
 	}
 }
@@ -792,6 +873,17 @@ void ofxRemoteUIServer::threadedFunction(){
 #endif
 
 
+void ofxRemoteUIServer::_draw(ofEventArgs &e){
+	//if(!enabled) return;
+	ofSetupScreen(); //mmm this is a bit scary //TODO!
+	draw( 20, ofGetHeight() - 20);
+}
+
+void ofxRemoteUIServer::_update(ofEventArgs &e){
+	update(ofGetLastFrameTime());
+}
+
+
 void ofxRemoteUIServer::draw(int x, int y){
 
 	//if(!enabled) return;
@@ -800,30 +892,76 @@ void ofxRemoteUIServer::draw(int x, int y){
 	ofPushStyle();
 	ofFill();
 	ofEnableAlphaBlending();
-	if(showValuesOnScreen){
+	if(showUI && uiAlpha > 0.99){
+
 		int padding = 30;
 		int x = padding;
-		int initialY = padding * 2.5;
+		int initialY = padding * 1.5;
 		int y = initialY;
 		int colw = uiColumnWidth;
 		int realColW = colw * 0.9;
 		int valOffset = realColW * 0.7;
 		int valSpaceW = realColW - valOffset;
 		int spacing = 20;
+		int bottomBarHeight = padding + spacing;
 
+		//bottom bar
 		ofSetColor(11, 245 * uiAlpha);
 		ofRect(0,0, ofGetWidth(), ofGetHeight());
 		ofSetColor(44, 245);
-		ofRect(0,0, ofGetWidth(), padding + spacing );
+		ofRect(0,ofGetHeight() - bottomBarHeight, ofGetWidth(), bottomBarHeight );
 
 		ofSetColor(255);
-		ofDrawBitmapString("ofxRemoteUIServer params list : press 'TAB' to hide." +
-						   string(enabled ? (" Serving on port " + ofToString(port)) + "." : "" ) +
+		ofDrawBitmapString("ofxRemoteUIServer built in client. press 'TAB' to hide." +
+						   string(enabled ? (" Serving on " + computerIP + ":" + ofToString(port)) + "." : "" ) +
 						   "\nPress 's' to save current config. Press 'r' to restore all param's "
-						   "launch state. Use Arrow Keys to edit values.", padding,  padding - 3);
+						   "launch state. Use Arrow Keys to edit values.", padding, ofGetHeight() - padding + 3);
+
+		//preset selection
+		if(presetsCached.size() > 0 && selectedPreset >= 0 && selectedPreset < presetsCached.size()){
+			ofSetColor(64);
+			ofRect(0 , 0, ofGetWidth(), 22);
+
+			ofColor textBlinkC ;
+			if(ofGetFrameNum()%5 < 1) textBlinkC = ofColor(255);
+			else textBlinkC = ofColor(255,0,0);
+
+			ofVec2f dpos = ofVec2f(192, 16);
+			ofSetColor(180);
+			if (selectedItem < 0){
+				ofDrawBitmapString("Press RETURN to load GLOBAL PRESET: \"" + presetsCached[selectedPreset] +
+								   "\", <- and -> to select other presets.", dpos);
+				ofSetColor(textBlinkC);
+				ofDrawBitmapString("                                     " + presetsCached[selectedPreset], dpos);
+			}else{
+				RemoteUIParam p = params[orderedKeys[selectedItem]];
+				int howMany = 0;
+				if(p.type == REMOTEUI_PARAM_SPACER){
+					howMany = groupPresetsCached[p.group].size();
+					if (howMany > 0){
+						ofDrawBitmapString("Press ENTER to load GROUP PRESET: \"" +
+										   groupPresetsCached[p.group][selectedGroupPreset] +
+										   "\", <- and -> to select other presets.", dpos);
+						ofSetColor(textBlinkC);
+						ofDrawBitmapString("                                   " +
+										   groupPresetsCached[p.group][selectedGroupPreset], dpos);
+
+					}
+				}
+				if(howMany == 0){
+					ofSetColor(255);
+					ofDrawBitmapString("Selected Preset: NONE", dpos);
+				}
+			}
+			if (selectedItem != -1) ofSetColor(255);
+			else ofSetColor(textBlinkC);
+			ofDrawBitmapString("+ PRESET SELECTION: " , 30,  16);
+
+		}
 
 		int linesInited = uiLines.getNumVertices() > 0 ;
 
+		//param list
 		for(int i = 0; i < orderedKeys.size(); i++){
 			string key = orderedKeys[i];
 			RemoteUIParam p = params[key];
@@ -881,8 +1019,19 @@ void ofxRemoteUIServer::draw(int x, int y){
 					ofSetColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal);
 					ofRect(x + valOffset, y - spacing * 0.6, 64, spacing * 0.85);
 					break;
-				case REMOTEUI_PARAM_SPACER:
-					break;
+				case REMOTEUI_PARAM_SPACER:{
+					int howMany = groupPresetsCached[p.group].size();
+
+					if (selectedItem == i){ //selected
+						if (selectedGroupPreset < howMany && selectedGroupPreset >= 0){
+							ofDrawBitmapString(groupPresetsCached[p.group][selectedGroupPreset], x + valOffset, y);
+						}
+					}else{ //not selected
+						if(howMany > 0 ){
+							ofDrawBitmapString("(" + ofToString(howMany) + ")", x + valOffset, y);
+						}
+					}
+					}break;
 				default: printf("weird RemoteUIParam at draw()!\n"); break;
 			}
 			if(!linesInited){
@@ -890,7 +1039,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 				uiLines.addVertex(ofVec2f(x + colw * 0.8, y + spacing * 0.33));
 			}
 			y += spacing;
-			if (y > ofGetHeight() - padding){
+			if (y > ofGetHeight() - padding * 0.5 - bottomBarHeight){
 				x += colw;
 				y = initialY;
 			}
@@ -1226,7 +1375,7 @@ void ofxRemoteUIServer::deletePreset(string name, string group){
 }
 
 
-vector<string> ofxRemoteUIServer::getAvailablePresets(){
+vector<string> ofxRemoteUIServer::getAvailablePresets(bool onlyGlobal){
 
 	vector<string> presets;
 
@@ -1242,7 +1391,7 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(){
 			string presetName = fileName.substr(0, fileName.size()-4);
 			presets.push_back(presetName);
 		}
-		if (files[i].isDirectory()){
+		if (files[i].isDirectory() && !onlyGlobal){
 			ofDirectory dir2;
 			dir2.listDir( ofToDataPath( string(OFXREMOTEUI_PRESET_DIR) + "/" + fileName) );
 			vector<ofFile> files2 = dir2.getFiles();
@@ -1273,6 +1422,31 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(){
 	#endif
 	return presets;
 }
+
+vector<string>	ofxRemoteUIServer::getAvailablePresetsForGroup(string group){
+
+	vector<string> presets;
+
+	#ifdef OF_AVAILABLE
+	ofDirectory dir;
+	string path = ofToDataPath(string(OFXREMOTEUI_PRESET_DIR) + "/" + group );
+	if(ofDirectory::doesDirectoryExist(path)){
+		dir.listDir(path);
+		vector<ofFile> files = dir.getFiles();
+		for(int i = 0; i < files.size(); i++){
+			string fileName = files[i].getFileName();
+			string extension = files[i].getExtension();
+			std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+			if (files[i].isFile() && extension == "xml"){
+				string presetName = fileName.substr(0, fileName.size()-4);
+				presets.push_back(presetName);
+			}
+		}
+	}
+	#endif
+	return presets;
+}
+
 
 void ofxRemoteUIServer::setColorForParam(RemoteUIParam &p, ofColor c){
 
