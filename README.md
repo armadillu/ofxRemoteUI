@@ -6,7 +6,7 @@ OF addon allows you to serve any variables you want (bool, float, int, enum, str
 Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 
 
-![MultiPlatform Client](https://farm4.staticflickr.com/3779/13538469924_bf3e571119_o.png "WIP MultiPlatform Client") OSX Client(left), multipatform client(right), in-app client (below)
+![MultiPlatform Client](https://farm4.staticflickr.com/3926/14983323502_4019a37a8f_o_d.png "clients"") In Order of appearance, OSX Client, Built In Client, iOS Client (wip), multiplatform client (based on ofxUI)
 
 
 ---

@@ -85,15 +85,16 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	showInterfaceKey = '\t';
 	int a = 80;
 	uiAlpha = 1.0;
-	selectedPreset = selectedGroupPreset = 0;
 #ifdef OF_AVAILABLE
+	selectedPreset = selectedGroupPreset = 0;
 	selectedItem = -1;
 	ofSeedRandom(1979);
-	ofColor prevColor = ofColor::fromHsb(0, 255, 200, BG_COLOR_ALPHA);
+	ofColor prevColor = ofColor::fromHsb(35, 255, 200, BG_COLOR_ALPHA);
 	for(int i = 0; i < 30; i++){
 		ofColor c = ofColor::fromHsb(prevColor.getHue() + 10, 255, 210, BG_COLOR_ALPHA);
 		colorTables.push_back( c );
 		prevColor = c;
+		cout << c << endl;
 	}
 	//shuffle
 	std::srand(1979);
@@ -904,7 +905,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 		int valOffset = realColW * 0.7;
 		int valSpaceW = realColW - valOffset;
 		int spacing = 20;
-		int bottomBarHeight = padding + spacing;
+		int bottomBarHeight = padding + spacing + 20;
 
 		//bottom bar
 		ofSetColor(11, 245 * uiAlpha);
@@ -913,10 +914,10 @@ void ofxRemoteUIServer::draw(int x, int y){
 		ofRect(0,ofGetHeight() - bottomBarHeight, ofGetWidth(), bottomBarHeight );
 
 		ofSetColor(255);
-		ofDrawBitmapString("ofxRemoteUIServer built in client. press 'TAB' to hide." +
-						   string(enabled ? (" Serving on " + computerIP + ":" + ofToString(port)) + "." : "" ) +
-						   "\nPress 's' to save current config. Press 'r' to restore all param's "
-						   "launch state. Use Arrow Keys to edit values.", padding, ofGetHeight() - padding + 3);
+		ofDrawBitmapString("ofxRemoteUIServer built in client. press 'TAB' to hide.\n" +
+						   string(enabled ? ("Serving on " + computerIP + ":" + ofToString(port)) + ". " : "" ) +
+						   "Press 's' to save current config.\nPress 'r' to restore all param's "
+						   "launch state.\nUse Arrow Keys to edit values.", padding, ofGetHeight() - bottomBarHeight + 20);
 
 		//preset selection
 		ofSetColor(64);
@@ -930,8 +931,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 			ofVec2f dpos = ofVec2f(192, 16);
 			ofSetColor(180);
 			if (selectedItem < 0){
-				ofDrawBitmapString("Press RETURN to load GLOBAL PRESET: \"" + presetsCached[selectedPreset] +
-								   "\", <- and -> to select other presets.", dpos);
+				ofDrawBitmapString("Press RETURN to load GLOBAL PRESET: \"" + presetsCached[selectedPreset] + "\"", dpos);
 				ofSetColor(textBlinkC);
 				ofDrawBitmapString("                                     " + presetsCached[selectedPreset], dpos);
 			}else{
@@ -941,8 +941,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 					howMany = groupPresetsCached[p.group].size();
 					if (howMany > 0){
 						ofDrawBitmapString("Press ENTER to load GROUP PRESET: \"" +
-										   groupPresetsCached[p.group][selectedGroupPreset] +
-										   "\", <- and -> to select other presets.", dpos);
+										   groupPresetsCached[p.group][selectedGroupPreset] + "\"", dpos);
 						ofSetColor(textBlinkC);
 						ofDrawBitmapString("                                   " +
 										   groupPresetsCached[p.group][selectedGroupPreset], dpos);
@@ -950,7 +949,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 					}
 				}
 				if(howMany == 0){
-					ofSetColor(255);
+					ofSetColor(180);
 					ofDrawBitmapString("Selected Preset: NONE", dpos);
 				}
 			}
