@@ -893,7 +893,8 @@ void ofxRemoteUIServer::draw(int x, int y){
 	ofPushStyle();
 	ofFill();
 	ofEnableAlphaBlending();
-	if(showUI && uiAlpha > 0.99){
+
+	if(showUI){
 
 		int padding = 30;
 		int x = padding;
@@ -907,16 +908,18 @@ void ofxRemoteUIServer::draw(int x, int y){
 		int bottomBarHeight = padding + spacing + 20;
 
 		//bottom bar
-		ofSetColor(11, 245 * uiAlpha);
-		ofRect(0,0, ofGetWidth(), ofGetHeight());
-		ofSetColor(44, 245);
-		ofRect(0,ofGetHeight() - bottomBarHeight, ofGetWidth(), bottomBarHeight );
+		if (uiAlpha > 0.99){
+			ofSetColor(11, 245 * uiAlpha);
+			ofRect(0,0, ofGetWidth(), ofGetHeight());
+			ofSetColor(44, 245);
+			ofRect(0,ofGetHeight() - bottomBarHeight, ofGetWidth(), bottomBarHeight );
 
-		ofSetColor(255);
-		ofDrawBitmapString("ofxRemoteUIServer built in client. press 'TAB' to hide.\n" +
-						   string(enabled ? ("Serving on " + computerIP + ":" + ofToString(port)) + ". " : "" ) +
-						   "Press 's' to save current config.\nPress 'r' to restore all param's "
-						   "launch state.\nUse Arrow Keys to edit values.", padding, ofGetHeight() - bottomBarHeight + 20);
+			ofSetColor(255);
+			ofDrawBitmapString("ofxRemoteUIServer built in client. press 'TAB' to hide.\n" +
+							   string(enabled ? ("Serving on " + computerIP + ":" + ofToString(port)) + ". " : "" ) +
+							   "Press 's' to save current config.\nPress 'r' to restore all param's "
+							   "launch state.\nUse Arrow Keys to edit values.", padding, ofGetHeight() - bottomBarHeight + 20);
+		}
 
 		//preset selection
 		ofSetColor(64);
@@ -960,93 +963,99 @@ void ofxRemoteUIServer::draw(int x, int y){
 
 		int linesInited = uiLines.getNumVertices() > 0 ;
 
-		//param list
-		for(int i = 0; i < orderedKeys.size(); i++){
-			string key = orderedKeys[i];
-			RemoteUIParam p = params[key];
-			int chars = key.size();
-			int charw = 9;
-			int stringw = chars * charw;
-			if (stringw > valOffset){
-				key = key.substr(0, (valOffset) / charw );
-			}
-			if (selectedItem != i){
-				ofSetColor(p.r, p.g, p.b);
-			}else{
-				if(ofGetFrameNum()%5 < 1) ofSetColor(222);
-				else ofSetColor(255,0,0);
-			}
+		if(uiAlpha > 0.99){
 
-			if(p.type != REMOTEUI_PARAM_SPACER){
-				string sel = (selectedItem == i) ? ">>" : "  ";
-				ofDrawBitmapString(sel + key, x, y);
-			}else{
-				ofPushStyle();
-				ofColor c = ofColor(p.r, p.g, p.b);
-				ofSetColor(c * 0.3);
-				ofRect(x , -spacing + y + spacing * 0.33, realColW, spacing);
-				ofPopStyle();
-				ofDrawBitmapString("+ " + p.stringVal, x,y);
-			}
 
-			switch (p.type) {
-				case REMOTEUI_PARAM_FLOAT:
-					ofDrawBitmapString(ofToString(p.floatVal), x + valOffset, y);
-					break;
-				case REMOTEUI_PARAM_ENUM:
-					if (p.intVal >= 0 && p.intVal < p.enumList.size() && p.enumList.size() > 0){
-						string val = p.enumList[p.intVal];
-						int chars = ceil(valSpaceW / charw) + 1;
-						if (val.length() > chars){
-							val = val.substr(0, chars);
+			//param list
+			for(int i = 0; i < orderedKeys.size(); i++){
+				string key = orderedKeys[i];
+				RemoteUIParam p = params[key];
+				int chars = key.size();
+				int charw = 9;
+				int stringw = chars * charw;
+				if (stringw > valOffset){
+					key = key.substr(0, (valOffset) / charw );
+				}
+				if (selectedItem != i){
+					ofSetColor(p.r, p.g, p.b);
+				}else{
+					if(ofGetFrameNum()%5 < 1) ofSetColor(222);
+					else ofSetColor(255,0,0);
+				}
+
+				if(p.type != REMOTEUI_PARAM_SPACER){
+					string sel = (selectedItem == i) ? ">>" : "  ";
+					ofDrawBitmapString(sel + key, x, y);
+				}else{
+					ofPushStyle();
+					ofColor c = ofColor(p.r, p.g, p.b);
+					ofSetColor(c * 0.3);
+					ofRect(x , -spacing + y + spacing * 0.33, realColW, spacing);
+					ofPopStyle();
+					ofDrawBitmapString("+ " + p.stringVal, x,y);
+				}
+
+				switch (p.type) {
+					case REMOTEUI_PARAM_FLOAT:
+						ofDrawBitmapString(ofToString(p.floatVal), x + valOffset, y);
+						break;
+					case REMOTEUI_PARAM_ENUM:
+						if (p.intVal >= 0 && p.intVal < p.enumList.size() && p.enumList.size() > 0){
+							string val = p.enumList[p.intVal];
+							int chars = ceil(valSpaceW / charw) + 1;
+							if (val.length() > chars){
+								val = val.substr(0, chars);
+							}
+							ofDrawBitmapString(val, x + valOffset, y);
+						}else{
+							ofDrawBitmapString(ofToString(p.intVal), x + valOffset, y);
 						}
-						ofDrawBitmapString(val, x + valOffset, y);
-					}else{
+						break;
+					case REMOTEUI_PARAM_INT:
 						ofDrawBitmapString(ofToString(p.intVal), x + valOffset, y);
-					}
-					break;
-				case REMOTEUI_PARAM_INT:
-					ofDrawBitmapString(ofToString(p.intVal), x + valOffset, y);
-					break;
-				case REMOTEUI_PARAM_BOOL:
-					ofDrawBitmapString(p.boolVal ? "true" : "false", x + valOffset, y);
-					break;
-				case REMOTEUI_PARAM_STRING:
-					ofDrawBitmapString(p.stringVal, x + valOffset, y);
-					break;
-				case REMOTEUI_PARAM_COLOR:
-					ofSetColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal);
-					ofRect(x + valOffset, y - spacing * 0.6, 64, spacing * 0.85);
-					break;
-				case REMOTEUI_PARAM_SPACER:{
-					int howMany = groupPresetsCached[p.group].size();
+						break;
+					case REMOTEUI_PARAM_BOOL:
+						ofDrawBitmapString(p.boolVal ? "true" : "false", x + valOffset, y);
+						break;
+					case REMOTEUI_PARAM_STRING:
+						ofDrawBitmapString(p.stringVal, x + valOffset, y);
+						break;
+					case REMOTEUI_PARAM_COLOR:
+						ofSetColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal);
+						ofRect(x + valOffset, y - spacing * 0.6, 64, spacing * 0.85);
+						break;
+					case REMOTEUI_PARAM_SPACER:{
+						int howMany = groupPresetsCached[p.group].size();
 
-					if (selectedItem == i){ //selected
-						if (selectedGroupPreset < howMany && selectedGroupPreset >= 0){
-							ofDrawBitmapString(groupPresetsCached[p.group][selectedGroupPreset], x + valOffset, y);
+						if (selectedItem == i){ //selected
+							if (selectedGroupPreset < howMany && selectedGroupPreset >= 0){
+								ofDrawBitmapString(groupPresetsCached[p.group][selectedGroupPreset], x + valOffset, y);
+							}
+						}else{ //not selected
+							if(howMany > 0 ){
+								ofDrawBitmapString("(" + ofToString(howMany) + ")", x + valOffset, y);
+							}
 						}
-					}else{ //not selected
-						if(howMany > 0 ){
-							ofDrawBitmapString("(" + ofToString(howMany) + ")", x + valOffset, y);
-						}
-					}
-					}break;
-				default: printf("weird RemoteUIParam at draw()!\n"); break;
+						}break;
+					default: printf("weird RemoteUIParam at draw()!\n"); break;
+				}
+				if(!linesInited){
+					uiLines.addVertex(ofVec2f(x, y + spacing * 0.33));
+					uiLines.addVertex(ofVec2f(x + colw * 0.8, y + spacing * 0.33));
+				}
+				y += spacing;
+				if (y > ofGetHeight() - padding * 0.5 - bottomBarHeight){
+					x += colw;
+					y = initialY;
+				}
 			}
-			if(!linesInited){
-				uiLines.addVertex(ofVec2f(x, y + spacing * 0.33));
-				uiLines.addVertex(ofVec2f(x + colw * 0.8, y + spacing * 0.33));
-			}
-			y += spacing;
-			if (y > ofGetHeight() - padding * 0.5 - bottomBarHeight){
-				x += colw;
-				y = initialY;
-			}
+			ofSetColor(32);
+			ofSetLineWidth(1);
+			uiLines.draw();
 		}
-		ofSetColor(32);
-		ofSetLineWidth(1);
-		uiLines.draw();
-	}else{
+	}
+
+	if (!showUI || uiAlpha < 1.0){
 		for(int i = 0; i < paramsToWatch.size(); i++){
 			onScreenNotifications.addParamWatch(paramsToWatch[i], params[paramsToWatch[i]].getValueAsStringFromPointer());
 		}
