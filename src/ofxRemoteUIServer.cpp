@@ -1165,7 +1165,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case SEND_PARAM_ACTION:{ //client is sending us an updated val
 				if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer: " << m.getRemoteIp() << " sends SEND!"  ;
 				updateParamFromDecodedMessage(m, dm);
-				
+
 				if(callBack != NULL){
 					cbArg.action = CLIENT_UPDATED_PARAM;
 					cbArg.paramName = dm.paramName;
@@ -1595,17 +1595,27 @@ void ofxRemoteUIServer::connect(string ipAddress, int port){
 	readyToSend = true;
 }
 
-void ofxRemoteUIServer::sendLogToClient(char* format, ...){
-
+void ofxRemoteUIServer::sendLogToClient(const char* format, ...){
 	if(readyToSend){
-		char line[1024]; //this will crash (or worse, make a memory mess) if you try to log >= 1024 chars
+		// protect from crashes or memory issues
+		if (strlen(format) >= 1024) {
+			RUI_LOG_ERROR << "ofxRemoteUIServer log string must be under 1024 chars" << endl;
+		    return;
+		}
+
+		char line[1024];
 		va_list args;
 		va_start(args, format);
 		vsprintf(line, format,  args);
+		sendLogToClient(string(line));
+	}
+}
 
+void ofxRemoteUIServer::sendLogToClient(string message){
+	if(readyToSend){
 		ofxOscMessage m;
 		m.setAddress("LOG_");
-		m.addStringArg(string(line));
+		m.addStringArg(message);
 		try{
 			oscSender.sendMessage(m);
 		}catch(exception e){
@@ -1613,4 +1623,3 @@ void ofxRemoteUIServer::sendLogToClient(char* format, ...){
 		}
 	}
 }
-
