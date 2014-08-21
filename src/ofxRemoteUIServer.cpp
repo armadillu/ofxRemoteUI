@@ -94,7 +94,6 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 		ofColor c = ofColor::fromHsb(prevColor.getHue() + 10, 255, 210, BG_COLOR_ALPHA);
 		colorTables.push_back( c );
 		prevColor = c;
-		cout << c << endl;
 	}
 	//shuffle
 	std::srand(1979);
