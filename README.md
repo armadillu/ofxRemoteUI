@@ -25,7 +25,7 @@ Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 * Colorize your variables to visually group them in the OSX client.
 * Realtime Filter your params by name to find things quickly.
 * Automatic discovery of servers in the network; easily control multiple apps from one Client interface.
-* Press "tab" your app (ofxRemoteUIServer) to see/edit your params from inside your OF app, allows you to do quick clientless edits.
+* Press "tab" on your OF app to see/edit your params from within your OF app. Allows you to do quick clientless edits, and load global and group presets.
 * Event notifications in both OSX client (through growl) and on your OF app.
 * You can always restore your parameters to the "previous launch" state, or to the default values.
 * Log remotely - ofxRemoteUIServer allows you to log messages to you client with OFX_REMOTEUI_SERVER_LOG(); which accepts printf-like formatted writing.
