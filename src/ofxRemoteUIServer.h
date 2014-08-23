@@ -316,6 +316,8 @@ private:
 
 	float			uiColumnWidth;
 	float			uiAlpha;
+
+	void			refreshPresetsCache();
 #endif
 
 	static ofxRemoteUIServer* singleton;

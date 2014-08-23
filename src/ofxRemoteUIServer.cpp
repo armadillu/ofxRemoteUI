@@ -693,6 +693,52 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				onScreenNotifications.addNotification("SAVED CONFIG to default XML");
 				break;
 
+			case 'S':{
+				bool groupIsSelected = false;
+				string groupName;
+				if (selectedItem >= 0){ //selection on params list
+					string key = orderedKeys[selectedItem];
+					RemoteUIParam p = params[key];
+					if (p.type == REMOTEUI_PARAM_SPACER){
+						groupIsSelected = true;
+						groupName = p.group;
+					}
+				}
+				string presetName = ofSystemTextBoxDialog(groupIsSelected ?
+														  "Create a New Group Preset For " + groupName
+														  :
+														  "Create a New Global Preset" ,
+														  "");
+				if(presetName.size()){
+					RemoteUIServerCallBackArg cbArg;
+					if (groupIsSelected){
+						saveGroupToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName + "/" + presetName + ".xml", groupName);
+						#ifdef OF_AVAILABLE
+						onScreenNotifications.addNotification("SAVED PRESET '" + presetName + ".xml' FOR GROUP '" + groupName + "'");
+						#endif
+						if(callBack != NULL){
+							cbArg.action = CLIENT_SAVED_GROUP_PRESET;
+							cbArg.msg = presetName;
+							cbArg.group = groupName;
+							callBack(cbArg);
+						}
+					}else{
+						if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: saving NEW preset: " << presetName ;
+						saveToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
+						#ifdef OF_AVAILABLE
+						onScreenNotifications.addNotification("SAVED PRESET to '" + string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml'");
+						#endif
+						if(callBack != NULL){
+							cbArg.action = CLIENT_SAVED_PRESET;
+							cbArg.msg = presetName;
+							callBack(cbArg);
+						}
+					}
+					refreshPresetsCache();
+				}
+			}break;
+
+
 			case 'r':
 				restoreAllParamsToInitialXML();
 				onScreenNotifications.addNotification("RESET CONFIG TO SERVER-LAUNCH XML values");
@@ -736,7 +782,6 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 					}
 				}
 				break;
-
 			case OF_KEY_DOWN:
 			case OF_KEY_UP:{
 				float sign = e.key == OF_KEY_DOWN ? 1.0 : -1.0;
@@ -824,21 +869,25 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 			uiAlpha = 1;
 			uiLines.clear();
 			syncAllPointersToParams();
-
-			//get all group presets
-			groupPresetsCached.clear();
-			for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
-				if((*ii).second.type == REMOTEUI_PARAM_SPACER){
-					groupPresetsCached[(*ii).second.group] = getAvailablePresetsForGroup((*ii).second.group);
-				};
-			}
-
-			presetsCached = getAvailablePresets(true);
-
-			if (selectedPreset > presetsCached.size() -1){
-				selectedPreset = 0;
-			}
+			refreshPresetsCache();
 		}
+	}
+}
+
+void ofxRemoteUIServer::refreshPresetsCache(){
+
+	//get all group presets
+	groupPresetsCached.clear();
+	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+		if((*ii).second.type == REMOTEUI_PARAM_SPACER){
+			groupPresetsCached[(*ii).second.group] = getAvailablePresetsForGroup((*ii).second.group);
+		};
+	}
+
+	presetsCached = getAvailablePresets(true);
+
+	if (selectedPreset > presetsCached.size() -1){
+		selectedPreset = 0;
 	}
 }
 
@@ -905,7 +954,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 		int valOffset = realColW * 0.7;
 		int valSpaceW = realColW - valOffset;
 		int spacing = 20;
-		int bottomBarHeight = padding + spacing + 20;
+		int bottomBarHeight = padding + spacing + 36;
 
 		//bottom bar
 		if (uiAlpha > 0.99){
@@ -915,10 +964,13 @@ void ofxRemoteUIServer::draw(int x, int y){
 			ofRect(0,ofGetHeight() - bottomBarHeight, ofGetWidth(), bottomBarHeight );
 
 			ofSetColor(255);
-			ofDrawBitmapString("ofxRemoteUIServer built in client. press 'TAB' to hide.\n" +
+			ofDrawBitmapString("ofxRemoteUIServer built in client " +
 							   string(enabled ? ("Serving on " + computerIP + ":" + ofToString(port)) + ". " : "" ) +
-							   "Press 's' to save current config.\nPress 'r' to restore all param's "
-							   "launch state.\nUse Arrow Keys to edit values.", padding, ofGetHeight() - bottomBarHeight + 20);
+							   "\nPress 's' to save current config.\n" +
+							   "Press 'S' to make a new preset.\n" +
+							   "Press 'r' to restore all param's launch state.\n" +
+							   "Use Arrow Keys to edit values. Press 'TAB' to hide.", padding, ofGetHeight() - bottomBarHeight + 20);
+
 		}
 
 		//preset selection
@@ -942,11 +994,11 @@ void ofxRemoteUIServer::draw(int x, int y){
 				if(p.type == REMOTEUI_PARAM_SPACER){
 					howMany = groupPresetsCached[p.group].size();
 					if (howMany > 0){
-						ofDrawBitmapString("Press ENTER to load GROUP PRESET: \"" +
-										   groupPresetsCached[p.group][selectedGroupPreset] + "\"", dpos);
+						string msg = "Press RETURN to load \"" + p.group + "\" GROUP PRESET: \"";
+						ofDrawBitmapString( msg + groupPresetsCached[p.group][selectedGroupPreset] + "\"", dpos);
 						ofSetColor(textBlinkC);
-						ofDrawBitmapString("                                   " +
-										   groupPresetsCached[p.group][selectedGroupPreset], dpos);
+						ofDrawBitmapString(groupPresetsCached[p.group][selectedGroupPreset],
+										   dpos + ofVec2f(msg.length() * 8, 0));
 
 					}
 				}
@@ -965,13 +1017,13 @@ void ofxRemoteUIServer::draw(int x, int y){
 
 		if(uiAlpha > 0.99){
 
-
 			//param list
 			for(int i = 0; i < orderedKeys.size(); i++){
 				string key = orderedKeys[i];
 				RemoteUIParam p = params[key];
 				int chars = key.size();
 				int charw = 9;
+				int column2MaxLen = ceil(valSpaceW / charw) + 1;
 				int stringw = chars * charw;
 				if (stringw > valOffset){
 					key = key.substr(0, (valOffset) / charw );
@@ -1002,9 +1054,8 @@ void ofxRemoteUIServer::draw(int x, int y){
 					case REMOTEUI_PARAM_ENUM:
 						if (p.intVal >= 0 && p.intVal < p.enumList.size() && p.enumList.size() > 0){
 							string val = p.enumList[p.intVal];
-							int chars = ceil(valSpaceW / charw) + 1;
-							if (val.length() > chars){
-								val = val.substr(0, chars);
+							if (val.length() > column2MaxLen){
+								val = val.substr(0, column2MaxLen);
 							}
 							ofDrawBitmapString(val, x + valOffset, y);
 						}else{
@@ -1029,7 +1080,11 @@ void ofxRemoteUIServer::draw(int x, int y){
 
 						if (selectedItem == i){ //selected
 							if (selectedGroupPreset < howMany && selectedGroupPreset >= 0){
-								ofDrawBitmapString(groupPresetsCached[p.group][selectedGroupPreset], x + valOffset, y);
+								string presetName = groupPresetsCached[p.group][selectedGroupPreset];
+								if (presetName.length() > column2MaxLen){
+									presetName = presetName.substr(0, column2MaxLen);
+								}
+								ofDrawBitmapString(presetName, x + valOffset, y);
 							}
 						}else{ //not selected
 							if(howMany > 0 ){
@@ -1242,8 +1297,6 @@ void ofxRemoteUIServer::updateServer(float dt){
 				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("SAVED PRESET to '" + string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml'");
 				#endif
-
-
 				if(callBack != NULL){
 					cbArg.action = CLIENT_SAVED_PRESET;
 					cbArg.msg = presetName;
