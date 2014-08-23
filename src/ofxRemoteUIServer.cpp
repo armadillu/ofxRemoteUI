@@ -964,8 +964,8 @@ void ofxRemoteUIServer::draw(int x, int y){
 			ofRect(0,ofGetHeight() - bottomBarHeight, ofGetWidth(), bottomBarHeight );
 
 			ofSetColor(255);
-			ofDrawBitmapString("ofxRemoteUIServer built in client " +
-							   string(enabled ? ("Serving on " + computerIP + ":" + ofToString(port)) + ". " : "" ) +
+			ofDrawBitmapString("ofxRemoteUI built in client. " +
+							   string(enabled ? ("Server reachable at " + computerIP + ":" + ofToString(port)) + ". " : "" ) +
 							   "\nPress 's' to save current config.\n" +
 							   "Press 'S' to make a new preset.\n" +
 							   "Press 'r' to restore all param's launch state.\n" +
