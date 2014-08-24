@@ -156,7 +156,7 @@ string ofxRemoteUI::getMyIP(string userChosenInteface){
 
 	//from https://github.com/jvcleave/LocalAddressGrabber/blob/master/src/LocalAddressGrabber.h
 	//and http://stackoverflow.com/questions/17288908/get-network-interface-name-from-ipv4-address
-	string output = "NOT FOUND";
+	string output = RUI_LOCAL_IP_ADDRESS;
 	RUI_LOG_VERBOSE << "ofxRemoteUI establishing local interface and IP @";
 
 #if defined(__APPLE__) || defined(__linux__)
@@ -202,7 +202,7 @@ string ofxRemoteUI::getMyIP(string userChosenInteface){
 	}
 	freeifaddrs(myaddrs);
 	if (userSuppliedNetInterface.length() > 0){
-		if (output == "NOT FOUND"){
+		if (output == RUI_LOCAL_IP_ADDRESS){
 			RUI_LOG_ERROR << "ofxRemoteUI could not find the user supplied net interface: " << userSuppliedNetInterface;
 			RUI_LOG_ERROR << "ofxRemoteUI automatic advertising will not work! ";
 		}

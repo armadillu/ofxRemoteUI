@@ -55,7 +55,7 @@
 
 #include "RemoteParam.h"
 
-
+#define RUI_LOCAL_IP_ADDRESS "127.0.0.1"
 using namespace std;
 
 /*

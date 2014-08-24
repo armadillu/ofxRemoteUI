@@ -142,15 +142,38 @@
 #define OFX_REMOTEUI_SERVER_SET_UI_COLUMN_WIDTH(w)						\
 ( ofxRemoteUIServer::instance()->setUiColumnWidth(w) )
 
-
 #endif
+
+// shorter macros //
+#define RUI_SETUP					OFX_REMOTEUI_SERVER_SETUP
+#define RUI_SHARE_PARAM				OFX_REMOTEUI_SERVER_SHARE_PARAM
+#define RUI_SHARE_PARAM_WCN			OFX_REMOTEUI_SERVER_SHARE_PARAM_WCN
+#define RUI_SHARE_ENUM_PARAM		OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM
+#define RUI_SHARE_COLOR_PARAM		OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM
+#define RUI_NEW_GROUP				OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP
+#define RUI_NEW_COLOR				OFX_REMOTEUI_SERVER_SET_NEW_COLOR
+#define RUI_SET_CALLBACK			OFX_REMOTEUI_SERVER_SET_CALLBACK
+#define	RUI_LOAD_FROM_XML			OFX_REMOTEUI_SERVER_LOAD_FROM_XML
+#define	RUI_SAVE_TO_XML				OFX_REMOTEUI_SERVER_SAVE_TO_XML
+#define RUI_START_THREADED			OFX_REMOTEUI_SERVER_START_THREADED
+#define RUI_SET_AUTO_XML_BACKUPS	OFX_REMOTEUI_SERVER_SET_AUTO_XML_BACKUPS
+#define RUI_SET_SAVES_ON_EXIT		OFX_REMOTEUI_SERVER_SET_SAVES_ON_EXIT
+#define RUI_SET_NET_INTERFACE		OFX_REMOTEUI_SERVER_SET_NET_INTERFACE
+#define RUI_SET_DRAWS_NOTIF			OFX_REMOTEUI_SERVER_SET_DRAWS_NOTIF
+#define RUI_PUSH_TO_CLIENT			OFX_REMOTEUI_SERVER_PUSH_TO_CLIENT
+#define RUI_GET_INSTANCE			OFX_REMOTEUI_SERVER_GET_INSTANCE
+#define RUI_LOG						OFX_REMOTEUI_SERVER_LOG
+#define RUI_REMOVE_PARAM			OFX_REMOTEUI_SERVER_REMOVE_PARAM
+#define RUI_WATCH_PARAM				OFX_REMOTEUI_SERVER_WATCH_PARAM
+#define RUI_WATCH_PARAM_WCN			OFX_REMOTEUI_SERVER_WATCH_PARAM_WCN
+//
 
 
 #define BG_COLOR_ALPHA			55
 
 class ofxRemoteUIServer: public ofxRemoteUI
 #ifdef OF_AVAILABLE
-, ofThread
+, ofThread /*if within OF, we want to be able to run threaded*/
 #endif
 {
 
@@ -223,9 +246,9 @@ public:
 	void sendLogToClient(string message);
 	void setClearXMLonSave(bool clear){clearXmlOnSaving = clear;}
 
-	void removeParamFromDB(string paramName);	//useful for params its value is kinda set,
+	void removeParamFromDB(string paramName);	//useful for params its value is kinda set and will not change,
 												//to load from xml and then remove from the list to
-												//avoid crowding it too much
+												//avoid crowding the UI too much
 
 	void watchParamOnScreen(string paramName);
 

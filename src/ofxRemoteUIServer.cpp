@@ -614,10 +614,10 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		computerIP = getMyIP(userSuppliedNetInterface);
 		doBroadcast = true;
 		string multicastIP;
-		if (computerIP != "NOT FOUND"){
-		vector<string>comps;
-		split(comps, computerIP, '.');
-		multicastIP = comps[0] + "." + comps[1] + "." + comps[2] + "." + "255";
+		if (computerIP != RUI_LOCAL_IP_ADDRESS){
+			vector<string>comps;
+			split(comps, computerIP, '.');
+			multicastIP = comps[0] + "." + comps[1] + "." + comps[2] + "." + "255";
 		}else{
 			multicastIP = "255.255.255.255";
 		}

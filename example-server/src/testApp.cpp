@@ -19,59 +19,58 @@ void testApp::setup(){
 	unloadTest = "inited from source";
 
 	// START THE SERVER ///////////////////////////////////////////
-	OFX_REMOTEUI_SERVER_SETUP(); 	//specify a port if you want a specific one
+	RUI_SETUP(); 	//specify a port if you want a specific one
 									//if you dont specify, the server will choose a random one
 									//the first time you launch it, and will use it forever
 
 	// SETUP A CALLBACK ///////////////////////////////////////////
-	OFX_REMOTEUI_SERVER_SET_CALLBACK(testApp::serverCallback); // (optional!) get notified when things happen in the client
+	RUI_SET_CALLBACK(testApp::serverCallback); // (optional!) get notified when things happen in the client
 
 	// SET PARAM GROUPS / COLORS //////////////////////////////////
-	OFX_REMOTEUI_SERVER_SET_NEW_COLOR(); // set a bg color for all the upcoming params (optional)
-	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP("POSITION"); //make a new group (optional)
+	RUI_NEW_GROUP("POSITION"); //make a new group (optional)
 
 	// SHARE A FLOAT PARAM ////////////////////////////////////////
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(x, 0, ofGetWidth() ); //add an "x" float param to the current group ("position")
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(y, 0, ofGetHeight()); //provide a variable, a rangeMin and a rangeMax
+	RUI_SHARE_PARAM(x, 0, ofGetWidth() ); //add an "x" float param to the current group ("position")
+	RUI_SHARE_PARAM(y, 0, ofGetHeight()); //provide a variable, a rangeMin and a rangeMax
 
-	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP("STYLE"); //make a new group (optional)
-	OFX_REMOTEUI_SERVER_SET_NEW_COLOR(); // set a bg color for the upcoming params (optional)
+	RUI_NEW_GROUP("STYLE"); //make a new group (optional)
+	RUI_NEW_COLOR(); // set a bg color for the upcoming params (optional)
 
 	// SHARE A BOOL PARAM ////////////////////////////////////////
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(drawOutlines);
+	RUI_SHARE_PARAM(drawOutlines);
 
-	OFX_REMOTEUI_SERVER_SET_NEW_COLOR(); //slighly change the bg color within the group
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(numCircles, 0, 30);	//variable, rangeMin, rangeMax
+	RUI_NEW_COLOR(); //slighly change the bg color within the group
+	RUI_SHARE_PARAM(numCircles, 0, 30);	//variable, rangeMin, rangeMax
 
 
-	OFX_REMOTEUI_SERVER_SET_NEW_COLOR(); //slighly change the bg color within the group
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(circleSize, 1, 30);	//variable, rangeMin, rangeMax
+	RUI_NEW_COLOR(); //slighly change the bg color within the group
+	RUI_SHARE_PARAM(circleSize, 1, 30);	//variable, rangeMin, rangeMax
 
-	OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP("OTHER"); //make a new group
+	RUI_NEW_GROUP("OTHER"); //make a new group
 
 	// SHARE A STRING PARAM ////////////////////////////////
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentSentence, ofColor(255,0,0,64));	// you can also set a color on a per-param basis
+	RUI_SHARE_PARAM(currentSentence, ofColor(255,0,0,64));	// you can also set a color on a per-param basis
 
 	// SHARE A FLOAT //////////////////////////////////////
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(currentMouseX, 0, ofGetWidth());
+	RUI_SHARE_PARAM(currentMouseX, 0, ofGetWidth());
 
 	// SHARE AN ENUM PARAM ////////////////////////////////
 	vector<string> menuItems;
 	menuItems.push_back("MENU_OPTION_0");menuItems.push_back("MENU_OPTION_1");
 	menuItems.push_back("MENU_OPTION_2"); menuItems.push_back("MENU_OPTION_3");
-	OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM(menu, MENU_OPTION_0, MENU_OPTION_3, menuItems);
+	RUI_SHARE_ENUM_PARAM(menu, MENU_OPTION_0, MENU_OPTION_3, menuItems);
 
 	// SHARE A COLOR PARAM ////////////////////////////////
-	OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color);
+	RUI_SHARE_COLOR_PARAM(color);
 
 	// SHARE A string PARAM to unload it later;
 	//this is useful in cases where a variable used to be shared,
 	//but its value is now on the xml and you still want it loaded
 	//but you dont want it to show on the client interface
 	//to do so, you first share the param, then load from XML, then remove the param
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(unloadTest);
+	RUI_SHARE_PARAM(unloadTest);
 
-	OFX_REMOTEUI_SERVER_LOAD_FROM_XML();	//load values from XML, if you want to do so
+	RUI_LOAD_FROM_XML();	//load values from XML, if you want to do so
 											//this will result on the UI showing the params
 											//as they were when last saved (saved on app quit by default)
 
@@ -82,20 +81,20 @@ void testApp::setup(){
 	//This is meant to be a way to reduce clutter in the client,
 	//allowing you to phase out params that have settled down and dont
 	//need further editing, but still allowing you to load its value from the xml.
-	OFX_REMOTEUI_SERVER_REMOVE_PARAM(unloadTest);
+	RUI_REMOVE_PARAM(unloadTest);
 	cout << "unloadTest: '" << unloadTest << "'" << endl;
 
 
-	OFX_REMOTEUI_SERVER_WATCH_PARAM(currentMouseX); //this will print this param all the time on screen
+	RUI_WATCH_PARAM(currentMouseX); //this will print this param all the time on screen
 													//useful for debugging
 
 
-	//OFX_REMOTEUI_SERVER_START_THREADED(); //if you want all the osc communication to happen on a different
-											//thread, call this. This has implications though.
-											//your params can be changed at anytime by the client,
-											//potentially leading to problems. String params are
-											//especially very likely to cause crashes!
-											//so don't use this unless you know you need it!
+	//RUI_START_THREADED(); //if you want all the osc communication to happen on a different
+							//thread, call this. This has implications though.
+							//your params can be changed at anytime by the client,
+							//potentially leading to problems. String params are
+							//especially very likely to cause crashes!
+							//so don't use this unless you know you need it!
 
 }
 
@@ -145,10 +144,10 @@ void testApp::draw(){
 
 void testApp::keyPressed( int key ){
 	//force an update in the client side (same as pressing sync button on osx client)
-	OFX_REMOTEUI_SERVER_PUSH_TO_CLIENT();
+	RUI_PUSH_TO_CLIENT();
 
 	//and also send a text log line to the client
-	OFX_REMOTEUI_SERVER_LOG("key pressed at %f", ofGetElapsedTimef());
+	RUI_LOG("key pressed at %f", ofGetElapsedTimef());
 }
 
 

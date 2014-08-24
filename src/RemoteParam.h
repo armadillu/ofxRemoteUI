@@ -249,7 +249,7 @@ struct myColor{
 	#define RUI_LOG_WARNING		(ofLogWarning())
 	#define RUI_LOG_VERBOSE		(ofLogVerbose())
 #else
-	#define RUI_LOG_NOTICE		(cout << endl)
+	#define RUI_LOG_NOTICE		(cout << endl) //TODO!
 	#define RUI_LOG_ERROR		(cout << endl)
 	#define RUI_LOG_WARNING		(cout << endl)
 	#define RUI_LOG_VERBOSE		(cout << endl)
