@@ -337,9 +337,11 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 
 	saveSettingsBackup(); //every time , before we save
 
-	stringstream ss;
-	ss << directoryPrefix << "/" << fileName;
-	fileName = ss.str();
+	if(directoryPrefix.size()){
+		stringstream ss;
+		ss << directoryPrefix << "/" << fileName;
+		fileName = ss.str();
+	}
 
 	RUI_LOG_NOTICE << "ofxRemoteUIServer: saving to xml '" << fileName << "'" ;
 	ofxXmlSettings s;
@@ -370,9 +372,12 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 
 vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 
-	stringstream ss;
-	ss << directoryPrefix << "/" << fileName;
-	fileName = ss.str();
+	if(directoryPrefix.size()){
+		stringstream ss;
+		ss << directoryPrefix << "/" << fileName;
+		fileName = ss.str();
+	}
+
 
 	vector<string> loadedParams;
 	ofxXmlSettings s;
