@@ -245,6 +245,7 @@ public:
 	void sendLogToClient(const char* format, ...);
 	void sendLogToClient(string message);
 	void setClearXMLonSave(bool clear){clearXmlOnSaving = clear;}
+	void			setDirectoryPrefix(string _directoryPrefix); // set the optional directory prefix
 
 	void removeParamFromDB(string paramName);	//useful for params its value is kinda set and will not change,
 												//to load from xml and then remove from the list to
@@ -300,6 +301,9 @@ private:
 	string			computerName;
 	string			binaryName;
 	string			computerIP;
+
+	string			directoryPrefix; // the optional directory prefix where we should store data
+
 
 	bool			doBroadcast; //controls if the server advertises itself
 	bool			drawNotifications;
