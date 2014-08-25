@@ -116,20 +116,6 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	colorTables.push_back(ofColor(165,154,206,a) );
 #endif
 
-#ifdef OF_AVAILABLE
-	ofDirectory d;
-	d.open(OFXREMOTEUI_PRESET_DIR);
-	if(!d.exists()){
-		d.create(true);
-	}
-#else
-#if defined(_WIN32)
-	_mkdir(OFXREMOTEUI_PRESET_DIR);
-#else
-	mkdir(OFXREMOTEUI_PRESET_DIR, 0777);
-#endif
-#endif
-
 }
 
 ofxRemoteUIServer::~ofxRemoteUIServer(){
@@ -242,7 +228,7 @@ void ofxRemoteUIServer::setDirectoryPrefix(string _directoryPrefix){
 	directoryPrefix = _directoryPrefix;
 	cout << "directoryPrefix set to " << directoryPrefix << endl;
 	ofDirectory d;
-	d.open(directoryPrefix + "/" + OFXREMOTEUI_PRESET_DIR);
+	d.open(getFinalPath(OFXREMOTEUI_PRESET_DIR));
 	if(!d.exists()){
 		d.create(true);
 	}
@@ -303,6 +289,23 @@ void ofxRemoteUIServer::saveParamToXmlSettings(RemoteUIParam t, string key, ofxX
 
 void ofxRemoteUIServer::saveGroupToXML(string fileName, string groupName){
 
+	fileName = getFinalPath(fileName);
+
+	#ifdef OF_AVAILABLE
+	ofDirectory d;
+	string path = getFinalPath(string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName);
+	d.open(path);
+	if(!d.exists()){
+		d.create(true);
+	}
+	#else
+	#if defined(_WIN32)
+		_mkdir(path.c_str());
+		#else
+		mkdir(fileName.c_str(), 0777);
+		#endif
+	#endif
+
 	RUI_LOG_NOTICE << "ofxRemoteUIServer: saving group to xml '" << fileName << "'" ;
 	ofxXmlSettings s;
 	s.loadFile(fileName);
@@ -310,22 +313,6 @@ void ofxRemoteUIServer::saveGroupToXML(string fileName, string groupName){
 	s.addTag(OFXREMOTEUI_XML_TAG);
 	s.pushTag(OFXREMOTEUI_XML_TAG);
 	XmlCounter counters;
-
-	#ifdef OF_AVAILABLE
-	ofDirectory d;
-	string path = string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName;
-	d.open(path);
-	if(!d.exists()){
-		d.create(true);
-	}
-	#else
-		#if defined(_WIN32)
-		_mkdir(path.c_str());
-		#else
-		mkdir(fileName.c_str(), 0777);
-		#endif
-	#endif
-
 
 	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		string key = (*ii).first;
@@ -342,11 +329,7 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 
 	saveSettingsBackup(); //every time , before we save
 
-	if(directoryPrefix.size()){
-		stringstream ss;
-		ss << directoryPrefix << "/" << fileName;
-		fileName = ss.str();
-	}
+	fileName = getFinalPath(fileName);
 
 	RUI_LOG_NOTICE << "ofxRemoteUIServer: saving to xml '" << fileName << "'" ;
 	ofxXmlSettings s;
@@ -377,12 +360,7 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 
 vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 
-	if(directoryPrefix.size()){
-		stringstream ss;
-		ss << directoryPrefix << "/" << fileName;
-		fileName = ss.str();
-	}
-
+	fileName = getFinalPath(fileName);
 
 	vector<string> loadedParams;
 	ofxXmlSettings s;
@@ -581,17 +559,27 @@ void ofxRemoteUIServer::setNetworkInterface(string iface){
 	userSuppliedNetInterface = iface;
 }
 
+string ofxRemoteUIServer::getFinalPath(string p){
+
+	if(directoryPrefix.size()){
+		stringstream ss;
+		ss << directoryPrefix << "/" << p;
+		p = ss.str();
+	}
+	return p;
+}
 
 void ofxRemoteUIServer::saveSettingsBackup(){
 
 	#ifdef OF_AVAILABLE
 	if(autoBackups){
 		ofDirectory d;
-		d.open(OFXREMOTEUI_SETTINGS_BACKUP_FOLDER);
+		d.open( getFinalPath(OFXREMOTEUI_SETTINGS_BACKUP_FOLDER) );
 		if (!d.exists()){
-			ofDirectory::createDirectory(OFXREMOTEUI_SETTINGS_BACKUP_FOLDER);
+			ofDirectory::createDirectory(getFinalPath(OFXREMOTEUI_SETTINGS_BACKUP_FOLDER));
 		}d.close();
 		string basePath = OFXREMOTEUI_SETTINGS_BACKUP_FOLDER + string("/") + ofFilePath::removeExt(OFXREMOTEUI_SETTINGS_FILENAME) + ".";
+		basePath = getFinalPath(basePath);
 		for (int i = OFXREMOTEUI_NUM_BACKUPS - 1; i >= 0; i--){
 			string originalPath = basePath + ofToString(i) + ".xml";
 			string destPath = basePath + ofToString(i+1) + ".xml";
@@ -605,14 +593,14 @@ void ofxRemoteUIServer::saveSettingsBackup(){
 			og.close();
 		}
 		ofFile f;
-		f.open(OFXREMOTEUI_SETTINGS_FILENAME);
+		f.open(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME));
 		if(f.exists()){
 			try{
-				ofFile::copyFromTo(OFXREMOTEUI_SETTINGS_FILENAME, basePath + "0.xml");
+				ofFile::copyFromTo(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME), basePath + "0.xml");
 			}catch(...){}
 		}
 		f.close();
-		if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer saving a backup of the current " << OFXREMOTEUI_SETTINGS_FILENAME << " in " << OFXREMOTEUI_SETTINGS_BACKUP_FOLDER ;
+		if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer saving a backup of the current " << getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME) << " in " << getFinalPath(OFXREMOTEUI_SETTINGS_BACKUP_FOLDER) ;
 	}
 	#endif
 }
@@ -621,9 +609,23 @@ void ofxRemoteUIServer::saveSettingsBackup(){
 
 void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 
+	#ifdef OF_AVAILABLE
+		ofDirectory d;
+		d.open(getFinalPath(OFXREMOTEUI_PRESET_DIR));
+		if(!d.exists()){
+			d.create(true);
+		}
+	#else
+	#if defined(_WIN32)
+		_mkdir(getFinalPath(OFXREMOTEUI_PRESET_DIR));
+	#else
+		mkdir(getFinalPath(OFXREMOTEUI_PRESET_DIR), 0777);
+	#endif
+	#endif
+	
 	//check for enabled
 	ofxXmlSettings s;
-	bool exists = s.loadFile(OFXREMOTEUI_SETTINGS_FILENAME);
+	bool exists = s.loadFile(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME));
 	if(exists){
 		if( s.getNumTags(OFXREMOTEUI_XML_ENABLED) > 0 ){
 			enabled = ("true" == s.getValue(OFXREMOTEUI_XML_ENABLED, "true"));
@@ -652,7 +654,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		if(port_ == -1){ //if no port specified, pick a random one, but only the very first time we get launched!
 			portIsSet = false;
 			ofxXmlSettings s;
-			bool exists = s.loadFile(OFXREMOTEUI_SETTINGS_FILENAME);
+			bool exists = s.loadFile(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME));
 			bool portNeedsToBePicked = false;
 			if (exists){
 				if( s.getNumTags(OFXREMOTEUI_XML_PORT) > 0 ){
@@ -672,7 +674,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 				port_ = 5000 + rand()%55000;
 				#endif
 				ofxXmlSettings s2;
-				s2.loadFile(OFXREMOTEUI_SETTINGS_FILENAME);
+				s2.loadFile(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME));
 				s2.setValue(OFXREMOTEUI_XML_PORT, port_, 0);
 				s2.saveFile();
 			}
@@ -751,7 +753,7 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 						if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: saving NEW preset: " << presetName ;
 						saveToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
 						#ifdef OF_AVAILABLE
-						onScreenNotifications.addNotification("SAVED PRESET to '" + string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml'");
+						onScreenNotifications.addNotification("SAVED PRESET to '" + getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml'");
 						#endif
 						if(callBack != NULL){
 							cbArg.action = CLIENT_SAVED_PRESET;
@@ -783,13 +785,13 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 						callBack(cbArg);
 					}
 					#ifdef OF_AVAILABLE
-					onScreenNotifications.addNotification("SET PRESET to '" + string(OFXREMOTEUI_PRESET_DIR) + "/" + lastChosenPreset + ".xml'");
+					onScreenNotifications.addNotification("SET PRESET to '" + getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + lastChosenPreset + ".xml'");
 					#endif
 				}
 				if (selectedItem >= 0){ //selection on params list
 					string key = orderedKeys[selectedItem];
 					RemoteUIParam p = params[key];
-					if(p.type == REMOTEUI_PARAM_SPACER){
+					if(p.type == REMOTEUI_PARAM_SPACER && groupPresetsCached[p.group].size() > 0){
 						string presetName = p.group + "/" + groupPresetsCached[p.group][selectedGroupPreset];
 						loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
 						syncAllPointersToParams();
@@ -886,6 +888,7 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 	if(e.key == showInterfaceKey){
 		if (uiAlpha < 1.0 && showUI){
 			uiAlpha = 1.0;
+			showUI = false;
 		}else{
 			showUI = !showUI;
 		}
@@ -998,7 +1001,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 
 		}
 
-		//preset selection
+		//preset selection / top bar
 		ofSetColor(64);
 		ofRect(0 , 0, ofGetWidth(), 22);
 		ofColor textBlinkC ;
@@ -1036,7 +1039,6 @@ void ofxRemoteUIServer::draw(int x, int y){
 		if (selectedItem != -1) ofSetColor(255);
 		else ofSetColor(textBlinkC);
 		ofDrawBitmapString("+ PRESET SELECTION: " , 30,  16);
-
 
 		int linesInited = uiLines.getNumVertices() > 0 ;
 
@@ -1132,6 +1134,27 @@ void ofxRemoteUIServer::draw(int x, int y){
 			ofSetColor(32);
 			ofSetLineWidth(1);
 			uiLines.draw();
+		}
+
+		//tiny clock top left
+		if (uiAlpha < 1.0){
+			ofMesh m;
+			int step = 30;
+			m.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
+			ofVec2f origin = ofVec2f(15,11); //rect is 22
+			m.addVertex(origin);
+			float r = 8.0f;
+			float ang;
+			float lim = 360.0f * (1.0f - uiAlpha);
+			for(ang = 0; ang < lim; ang += step){
+				m.addVertex( origin + ofVec2f( r * cosf((-90.0f + ang) * DEG_TO_RAD),
+											  r * sinf((-90.0f + ang) * DEG_TO_RAD)));
+			}
+			float lastBit = lim - ang;
+			m.addVertex( origin + ofVec2f( r * cosf((-90.0f + ang + lastBit) * DEG_TO_RAD),
+										  r * sinf((-90.0f + ang + lastBit) * DEG_TO_RAD)));
+			ofSetColor(128);
+			m.draw();
 		}
 	}
 
@@ -1310,7 +1333,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 					callBack(cbArg);
 				}
 				#ifdef OF_AVAILABLE
-				onScreenNotifications.addNotification("SET PRESET to '" + string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml'");
+				onScreenNotifications.addNotification("SET PRESET to '" + getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml'");
 				#endif
 			}break;
 
@@ -1320,7 +1343,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				saveToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
 				sendSAVP(presetName);
 				#ifdef OF_AVAILABLE
-				onScreenNotifications.addNotification("SAVED PRESET to '" + string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml'");
+				onScreenNotifications.addNotification("SAVED PRESET to '" + getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml'");
 				#endif
 				if(callBack != NULL){
 					cbArg.action = CLIENT_SAVED_PRESET;
@@ -1335,7 +1358,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				deletePreset(presetName);
 				sendDELP(presetName);
 				#ifdef OF_AVAILABLE
-				onScreenNotifications.addNotification("DELETED PRESET '" + string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml'");
+				onScreenNotifications.addNotification("DELETED PRESET '" + getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml'");
 				#endif
 				if(callBack != NULL){
 					cbArg.action = CLIENT_DELETED_PRESET;
@@ -1449,13 +1472,13 @@ void ofxRemoteUIServer::deletePreset(string name, string group){
 	#ifdef OF_AVAILABLE
 	ofDirectory dir;
 	if (group == "")
-		dir.open(string(OFXREMOTEUI_PRESET_DIR) + "/" + name + ".xml");
+		dir.open(getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + name + ".xml");
 	else
-		dir.open(string(OFXREMOTEUI_PRESET_DIR) + "/" + group + "/" + name + ".xml");
+		dir.open(getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + group + "/" + name + ".xml");
 	dir.remove(true);
 	#else
-	string file = string(OFXREMOTEUI_PRESET_DIR) + "/" + name + ".xml";
-	if (group != "") file = string(OFXREMOTEUI_PRESET_DIR) + "/" + group + "/" + name + ".xml";
+	string file = getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + name + ".xml";
+	if (group != "") file = getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + group + "/" + name + ".xml";
 	remove( file.c_str() );
 	#endif
 }
@@ -1467,7 +1490,7 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(bool onlyGlobal){
 
 	#ifdef OF_AVAILABLE
 	ofDirectory dir;
-	dir.listDir(ofToDataPath(OFXREMOTEUI_PRESET_DIR));
+	dir.listDir(ofToDataPath(getFinalPath(OFXREMOTEUI_PRESET_DIR)));
 	vector<ofFile> files = dir.getFiles();
 	for(int i = 0; i < files.size(); i++){
 		string fileName = files[i].getFileName();
@@ -1479,7 +1502,7 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(bool onlyGlobal){
 		}
 		if (files[i].isDirectory() && !onlyGlobal){
 			ofDirectory dir2;
-			dir2.listDir( ofToDataPath( string(OFXREMOTEUI_PRESET_DIR) + "/" + fileName) );
+			dir2.listDir( ofToDataPath( getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + fileName) );
 			vector<ofFile> files2 = dir2.getFiles();
 			for(int j = 0; j < files2.size(); j++){
 				string fileName2 = files2[j].getFileName();
@@ -1493,10 +1516,10 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(bool onlyGlobal){
 		}
 	}
 	#else
-	DIR *dir;
+	DIR *dir2;
 	struct dirent *ent;
-	if ((dir = opendir (OFXREMOTEUI_PRESET_DIR)) != NULL) {
-		while ((ent = readdir (dir)) != NULL) {
+	if ((dir2 = opendir(getFinalPath(OFXREMOTEUI_PRESET_DIR))) != NULL) {
+		while ((ent = readdir (dir2)) != NULL) {
 			if ( strcmp( get_filename_ext(ent->d_name), "xml") == 0 ){
 				string fileName = string(ent->d_name);
 				string presetName = fileName.substr(0, fileName.size()-4);
@@ -1515,7 +1538,7 @@ vector<string>	ofxRemoteUIServer::getAvailablePresetsForGroup(string group){
 
 	#ifdef OF_AVAILABLE
 	ofDirectory dir;
-	string path = ofToDataPath(string(OFXREMOTEUI_PRESET_DIR) + "/" + group );
+	string path = ofToDataPath(getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + group );
 	if(ofDirectory::doesDirectoryExist(path)){
 		dir.listDir(path);
 		vector<ofFile> files = dir.getFiles();

@@ -89,6 +89,10 @@
 #define OFX_REMOTEUI_SERVER_SET_AUTO_XML_BACKUPS(doAutoBackups)			\
 ( ofxRemoteUIServer::instance()->setAutomaticBackupsEnabled(doAutoBackups) )
 
+/*define where all the xml files should be saved*/
+#define OFX_REMOTEUI_SERVER_SET_CONFIGS_DIR(dir)			\
+( ofxRemoteUIServer::instance()->setDirectoryPrefix(dir) )
+
 /*close the server. no need to call this from OF*/
 #define OFX_REMOTEUI_SERVER_CLOSE()										\
 ( ofxRemoteUIServer::instance()->close() )
@@ -166,6 +170,7 @@
 #define RUI_REMOVE_PARAM			OFX_REMOTEUI_SERVER_REMOVE_PARAM
 #define RUI_WATCH_PARAM				OFX_REMOTEUI_SERVER_WATCH_PARAM
 #define RUI_WATCH_PARAM_WCN			OFX_REMOTEUI_SERVER_WATCH_PARAM_WCN
+#define RUI_SET_CONFIGS_DIR			OFX_REMOTEUI_SERVER_SET_CONFIGS_DIR
 //
 
 
@@ -245,7 +250,7 @@ public:
 	void sendLogToClient(const char* format, ...);
 	void sendLogToClient(string message);
 	void setClearXMLonSave(bool clear){clearXmlOnSaving = clear;}
-	void			setDirectoryPrefix(string _directoryPrefix); // set the optional directory prefix
+	void setDirectoryPrefix(string _directoryPrefix); // set the optional directory prefix
 
 	void removeParamFromDB(string paramName);	//useful for params its value is kinda set and will not change,
 												//to load from xml and then remove from the list to
@@ -340,6 +345,7 @@ private:
 	string			lastChosenPreset;
 
 
+	string 			getFinalPath(string);
 
 	float			uiColumnWidth;
 	float			uiAlpha;
