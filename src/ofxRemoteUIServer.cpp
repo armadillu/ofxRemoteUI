@@ -625,7 +625,8 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	
 	//check for enabled
 	ofxXmlSettings s;
-	bool exists = s.loadFile(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME));
+	string configFile = ofToDataPath(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME));
+	bool exists = s.loadFile(configFile);
 	if(exists){
 		if( s.getNumTags(OFXREMOTEUI_XML_ENABLED) > 0 ){
 			enabled = ("true" == s.getValue(OFXREMOTEUI_XML_ENABLED, "true"));
@@ -654,7 +655,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		if(port_ == -1){ //if no port specified, pick a random one, but only the very first time we get launched!
 			portIsSet = false;
 			ofxXmlSettings s;
-			bool exists = s.loadFile(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME));
+			bool exists = s.loadFile(configFile);
 			bool portNeedsToBePicked = false;
 			if (exists){
 				if( s.getNumTags(OFXREMOTEUI_XML_PORT) > 0 ){
