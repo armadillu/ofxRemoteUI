@@ -318,7 +318,6 @@ private:
 
 	bool			threadedUpdate;
 	bool			showUI; //displays all params on screen
-	bool			updatedThisFrame;
 	bool			clearXmlOnSaving;  //if false, allows you to keep defaults for old params that you are not sharing anymore
 
 	char			showInterfaceKey;

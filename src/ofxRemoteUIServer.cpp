@@ -51,6 +51,13 @@ void ofxRemoteUIServer::setAutomaticBackupsEnabled(bool enabled){
 }
 
 void ofxRemoteUIServer::setDrawsNotificationsAutomaticallly(bool draw){
+#ifdef OF_AVAILABLE
+    if(!drawNotifications && draw){
+        ofAddListener(ofEvents().draw, this, &ofxRemoteUIServer::_draw);
+    } else if (drawNotifications && !draw) {
+        ofRemoveListener(ofEvents().draw, this, &ofxRemoteUIServer::_draw);
+    }
+#endif
 	drawNotifications = draw;
 }
 
@@ -622,7 +629,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		mkdir(getFinalPath(OFXREMOTEUI_PRESET_DIR), 0777);
 	#endif
 	#endif
-	
+
 	//check for enabled
 	ofxXmlSettings s;
 	string configFile = ofToDataPath(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME));
@@ -695,9 +702,6 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	ofAddListener(ofEvents().exit, this, &ofxRemoteUIServer::_appExited); //to save to xml, disconnect, etc
 	ofAddListener(ofEvents().keyPressed, this, &ofxRemoteUIServer::_keyPressed);
 	ofAddListener(ofEvents().update, this, &ofxRemoteUIServer::_update);
-	if(drawNotifications){
-		ofAddListener(ofEvents().draw, this, &ofxRemoteUIServer::_draw);
-	}
 	#endif
 }
 
@@ -927,12 +931,10 @@ void ofxRemoteUIServer::startInBackgroundThread(){
 #endif
 
 void ofxRemoteUIServer::update(float dt){
-
 	#ifdef OF_AVAILABLE
-	if(!threadedUpdate && !updatedThisFrame){
+	if(!threadedUpdate){
 		updateServer(dt);
 	}
-	updatedThisFrame = true; //this only makes sense when running threaded
 	uiAlpha += 0.3 * ofGetLastFrameTime();
 	if(uiAlpha > 1) uiAlpha = 1;
 	#else
@@ -1168,7 +1170,6 @@ void ofxRemoteUIServer::draw(int x, int y){
 
 	ofPopStyle();
 	#endif
-	updatedThisFrame = false;
 }
 
 
