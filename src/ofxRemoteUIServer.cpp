@@ -51,6 +51,13 @@ void ofxRemoteUIServer::setAutomaticBackupsEnabled(bool enabled){
 }
 
 void ofxRemoteUIServer::setDrawsNotificationsAutomaticallly(bool draw){
+#ifdef OF_AVAILABLE
+    if(!drawNotifications && draw){
+        ofAddListener(ofEvents().draw, this, &ofxRemoteUIServer::_draw);
+    } else if (drawNotifications && !draw) {
+        ofRemoveListener(ofEvents().draw, this, &ofxRemoteUIServer::_draw);
+    }
+#endif
 	drawNotifications = draw;
 }
 
@@ -622,7 +629,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		mkdir(getFinalPath(OFXREMOTEUI_PRESET_DIR), 0777);
 	#endif
 	#endif
-	
+
 	//check for enabled
 	ofxXmlSettings s;
 	string configFile = ofToDataPath(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME));
@@ -695,9 +702,6 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	ofAddListener(ofEvents().exit, this, &ofxRemoteUIServer::_appExited); //to save to xml, disconnect, etc
 	ofAddListener(ofEvents().keyPressed, this, &ofxRemoteUIServer::_keyPressed);
 	ofAddListener(ofEvents().update, this, &ofxRemoteUIServer::_update);
-	if(drawNotifications){
-		ofAddListener(ofEvents().draw, this, &ofxRemoteUIServer::_draw);
-	}
 	#endif
 }
 
@@ -1170,7 +1174,6 @@ void ofxRemoteUIServer::draw(int x, int y){
 
 
 void ofxRemoteUIServer::handleBroadcast(){
-
 	if(doBroadcast){
 		if(broadcastTime > OFXREMOTEUI_BORADCAST_INTERVAL){
 			broadcastTime = 0.0f;
