@@ -927,12 +927,10 @@ void ofxRemoteUIServer::startInBackgroundThread(){
 #endif
 
 void ofxRemoteUIServer::update(float dt){
-
 	#ifdef OF_AVAILABLE
-	if(!threadedUpdate && !updatedThisFrame){
+	if(!threadedUpdate){
 		updateServer(dt);
 	}
-	updatedThisFrame = true; //this only makes sense when running threaded
 	uiAlpha += 0.3 * ofGetLastFrameTime();
 	if(uiAlpha > 1) uiAlpha = 1;
 	#else
@@ -1168,11 +1166,11 @@ void ofxRemoteUIServer::draw(int x, int y){
 
 	ofPopStyle();
 	#endif
-	updatedThisFrame = false;
 }
 
 
 void ofxRemoteUIServer::handleBroadcast(){
+
 	if(doBroadcast){
 		if(broadcastTime > OFXREMOTEUI_BORADCAST_INTERVAL){
 			broadcastTime = 0.0f;
