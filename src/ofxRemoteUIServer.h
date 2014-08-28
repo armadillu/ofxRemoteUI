@@ -328,6 +328,7 @@ private:
 	vector			<string> paramsToWatch;
 
 #ifdef OF_AVAILABLE
+	
 	ofxRemoteUISimpleNotifications onScreenNotifications;
 	void			_appExited(ofEventArgs &e);
 	void			_draw(ofEventArgs &d);
@@ -338,17 +339,16 @@ private:
 	ofVboMesh												uiLines;
 
 	vector<string>											presetsCached; //for the built in client
-	unordered_map<string, vector<string> > 		groupPresetsCached;
-	int 														selectedGroupPreset;
-	int 														selectedPreset;
+	unordered_map<string, vector<string> > 					groupPresetsCached;
+	int 													selectedGroupPreset;
+	int 													selectedPreset;
 	string													lastChosenPreset;
+	float													uiColumnWidth;
+	float													uiAlpha;
 
+	void			refreshPresetsCache();
 	string 			getFinalPath(string);
 
-	float														uiColumnWidth;
-	float														uiAlpha;
-
-	void														refreshPresetsCache();
 #endif
 
 	static ofxRemoteUIServer* 							singleton;
