@@ -695,9 +695,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	ofAddListener(ofEvents().exit, this, &ofxRemoteUIServer::_appExited); //to save to xml, disconnect, etc
 	ofAddListener(ofEvents().keyPressed, this, &ofxRemoteUIServer::_keyPressed);
 	ofAddListener(ofEvents().update, this, &ofxRemoteUIServer::_update);
-	if(drawNotifications){
-		ofAddListener(ofEvents().draw, this, &ofxRemoteUIServer::_draw);
-	}
+	ofAddListener(ofEvents().draw, this, &ofxRemoteUIServer::_draw);
 	#endif
 }
 
@@ -929,10 +927,9 @@ void ofxRemoteUIServer::startInBackgroundThread(){
 void ofxRemoteUIServer::update(float dt){
 
 	#ifdef OF_AVAILABLE
-	if(!threadedUpdate && !updatedThisFrame){
+	if(!threadedUpdate){
 		updateServer(dt);
 	}
-	updatedThisFrame = true; //this only makes sense when running threaded
 	uiAlpha += 0.3 * ofGetLastFrameTime();
 	if(uiAlpha > 1) uiAlpha = 1;
 	#else
@@ -953,7 +950,6 @@ void ofxRemoteUIServer::threadedFunction(){
 
 
 void ofxRemoteUIServer::_draw(ofEventArgs &e){
-	//if(!enabled) return;
 	ofSetupScreen(); //mmm this is a bit scary //TODO!
 	draw( 20, ofGetHeight() - 20);
 }
@@ -964,8 +960,6 @@ void ofxRemoteUIServer::_update(ofEventArgs &e){
 
 
 void ofxRemoteUIServer::draw(int x, int y){
-
-	//if(!enabled) return;
 
 	#ifdef OF_AVAILABLE
 	ofPushStyle();
@@ -1160,15 +1154,16 @@ void ofxRemoteUIServer::draw(int x, int y){
 	}
 
 	if (!showUI || uiAlpha < 1.0){
-		for(int i = 0; i < paramsToWatch.size(); i++){
-			onScreenNotifications.addParamWatch(paramsToWatch[i], params[paramsToWatch[i]].getValueAsStringFromPointer());
+		if (drawNotifications){
+			for(int i = 0; i < paramsToWatch.size(); i++){
+				onScreenNotifications.addParamWatch(paramsToWatch[i], params[paramsToWatch[i]].getValueAsStringFromPointer());
+			}
+			onScreenNotifications.draw(x, y);
 		}
-		onScreenNotifications.draw(x, y);
 	}
 
 	ofPopStyle();
 	#endif
-	updatedThisFrame = false;
 }
 
 
