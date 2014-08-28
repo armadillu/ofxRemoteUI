@@ -185,7 +185,7 @@ void ofxRemoteUIServer::setNewParamColor(int num){
 
 void ofxRemoteUIServer::removeParamFromDB(string paramName){
 
-	map<string, RemoteUIParam>::iterator it = params.find(paramName);
+	unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
 
 	if (it != params.end()){
 
@@ -204,7 +204,7 @@ void ofxRemoteUIServer::removeParamFromDB(string paramName){
 
 		//re-create orderedKeys
 		vector<string> myOrderedKeys;
-		std::map<int, string>::iterator iterator;
+		unordered_map<int, string>::iterator iterator;
 
 		for(iterator = orderedKeys.begin(); iterator != orderedKeys.end(); iterator++) {
 
@@ -314,7 +314,7 @@ void ofxRemoteUIServer::saveGroupToXML(string fileName, string groupName){
 	s.pushTag(OFXREMOTEUI_XML_TAG);
 	XmlCounter counters;
 
-	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+	for( unordered_map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		string key = (*ii).first;
 		RemoteUIParam t = params[key];
 		if( t.group != OFXREMOTEUI_DEFAULT_PARAM_GROUP && t.group == groupName ){
@@ -344,7 +344,7 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 	s.pushTag(OFXREMOTEUI_XML_TAG);
 
 	XmlCounter counters;
-	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+	for( unordered_map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		string key = (*ii).first;
 		RemoteUIParam t = params[key];
 		saveParamToXmlSettings(t, key, s, counters);
@@ -375,7 +375,7 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 			for (int i=0; i< numFloats; i++){
 				string paramName = s.getAttribute(OFXREMOTEUI_FLOAT_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, OFXREMOTEUI_UNKNOWN_PARAM_NAME_XML_KEY, i);
 				float val = s.getValue(OFXREMOTEUI_FLOAT_PARAM_XML_TAG, 0.0, i);
-				map<string,RemoteUIParam>::iterator it = params.find(paramName);
+				unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
 				if ( it != params.end() ){	// found!
 					loadedParams.push_back(paramName);
 					if(params[paramName].floatValAddr != NULL){
@@ -396,7 +396,7 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 			for (int i=0; i< numInts; i++){
 				string paramName = s.getAttribute(OFXREMOTEUI_INT_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, OFXREMOTEUI_UNKNOWN_PARAM_NAME_XML_KEY, i);
 				float val = s.getValue(OFXREMOTEUI_INT_PARAM_XML_TAG, 0, i);
-				map<string,RemoteUIParam>::iterator it = params.find(paramName);
+				unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
 				if ( it != params.end() ){	// found!
 					loadedParams.push_back(paramName);
 					if(params[paramName].intValAddr != NULL){
@@ -421,7 +421,7 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 				int g = s.getValue("G", 0);
 				int b = s.getValue("B", 0);
 				int a = s.getValue("A", 0);
-				map<string,RemoteUIParam>::iterator it = params.find(paramName);
+				unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
 				if ( it != params.end() ){	// found!
 					loadedParams.push_back(paramName);
 					if(params[paramName].redValAddr != NULL){
@@ -448,7 +448,7 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 			for (int i=0; i< numEnums; i++){
 				string paramName = s.getAttribute(OFXREMOTEUI_ENUM_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, OFXREMOTEUI_UNKNOWN_PARAM_NAME_XML_KEY, i);
 				float val = s.getValue(OFXREMOTEUI_ENUM_PARAM_XML_TAG, 0, i);
-				map<string,RemoteUIParam>::iterator it = params.find(paramName);
+				unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
 				if ( it != params.end() ){	// found!
 					loadedParams.push_back(paramName);
 					if(params[paramName].intValAddr != NULL){
@@ -471,7 +471,7 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 				string paramName = s.getAttribute(OFXREMOTEUI_BOOL_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, OFXREMOTEUI_UNKNOWN_PARAM_NAME_XML_KEY, i);
 				float val = s.getValue(OFXREMOTEUI_BOOL_PARAM_XML_TAG, false, i);
 
-				map<string,RemoteUIParam>::iterator it = params.find(paramName);
+				unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
 				if ( it != params.end() ){	// found!
 					loadedParams.push_back(paramName);
 					if(params[paramName].boolValAddr != NULL){
@@ -492,7 +492,7 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 				string paramName = s.getAttribute(OFXREMOTEUI_STRING_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, OFXREMOTEUI_UNKNOWN_PARAM_NAME_XML_KEY, i);
 				string val = s.getValue(OFXREMOTEUI_STRING_PARAM_XML_TAG, "", i);
 
-				map<string,RemoteUIParam>::iterator it = params.find(paramName);
+				unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
 				if ( it != params.end() ){	// found!
 					loadedParams.push_back(paramName);
 					if(params[paramName].stringValAddr != NULL){
@@ -510,7 +510,7 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 	}
 
 	vector<string> paramsNotInXML;
-	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+	for( unordered_map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 
 		string paramName = (*ii).first;
 
@@ -528,7 +528,7 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 }
 
 void ofxRemoteUIServer::restoreAllParamsToInitialXML(){
-	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+	for( unordered_map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		string key = (*ii).first;
 		if (params[key].type != REMOTEUI_PARAM_SPACER){
 			params[key] = paramsFromXML[key];
@@ -538,7 +538,7 @@ void ofxRemoteUIServer::restoreAllParamsToInitialXML(){
 }
 
 void ofxRemoteUIServer::restoreAllParamsToDefaultValues(){
-	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+	for( unordered_map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		string key = (*ii).first;
 		params[key] = paramsFromCode[key];
 		syncPointerToParam(key);
@@ -907,7 +907,7 @@ void ofxRemoteUIServer::refreshPresetsCache(){
 
 	//get all group presets
 	groupPresetsCached.clear();
-	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+	for( unordered_map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		if((*ii).second.type == REMOTEUI_PARAM_SPACER){
 			groupPresetsCached[(*ii).second.group] = getAvailablePresetsForGroup((*ii).second.group);
 		};

@@ -64,7 +64,7 @@ void ofxRemoteUI::addParamToDB(RemoteUIParam p, string paramName){
 
 
 	//see if we already had it, if we didnt, set its add order #
-	map<string,RemoteUIParam>::iterator it = params.find(paramName);
+	unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
 	if ( it == params.end() ){	//not found!
 		//cout << "adding key: " << paramName <<endl;
 		params[paramName] = p;
@@ -255,7 +255,7 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 	string paramName = dm.paramName;
 	RemoteUIParam original;
 	bool newParam = true;
-	map<string,RemoteUIParam>::iterator it = params.find(paramName);
+	unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
 	if ( it != params.end() ){	//found the param, we already had it
 		original = params[paramName];
 		newParam = false;
@@ -361,7 +361,7 @@ vector<string> ofxRemoteUI::getAllParamNamesList(){
 
 	vector<string>paramsList;
 	//get list of params in add order
-	for( map<int,string>::iterator ii = orderedKeys.begin(); ii != orderedKeys.end(); ++ii ){
+	for( unordered_map<int,string>::iterator ii = orderedKeys.begin(); ii != orderedKeys.end(); ++ii ){
 		string paramName = (*ii).second;
 		paramsList.push_back(paramName);
 	}
@@ -373,7 +373,7 @@ vector<string> ofxRemoteUI::scanForUpdatedParamsAndSync(){
 
 	vector<string>paramsPendingUpdate;
 
-	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+	for( unordered_map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 
 		RemoteUIParam p = (*ii).second;
 		if ( hasParamChanged(p) ){
@@ -390,7 +390,7 @@ void ofxRemoteUI::sendUpdateForParamsInList(vector<string>list){
 
 	for(int i = 0; i < list.size(); i++){
 		string name = list[i];
-		map<string, RemoteUIParam>::const_iterator it = params.find(name);
+		unordered_map<string, RemoteUIParam>::const_iterator it = params.find(name);
 		if(it!=params.end()){
 			RemoteUIParam p = params[list[i]];
 			//cout << "ofxRemoteUIServer: sending updated param " + list[i]; p.print();
@@ -402,13 +402,13 @@ void ofxRemoteUI::sendUpdateForParamsInList(vector<string>list){
 }
 
 void ofxRemoteUI::syncAllParamsToPointers(){
-	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+	for( unordered_map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		syncParamToPointer( (*ii).first );
 	}
 }
 
 void ofxRemoteUI::syncAllPointersToParams(){
-	for( map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+	for( unordered_map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		syncPointerToParam( (*ii).first );
 	}
 }
@@ -556,7 +556,7 @@ string ofxRemoteUI::stringForParamType(RemoteUIParamType t){
 RemoteUIParam ofxRemoteUI::getParamForName(string paramName){
 
 	RemoteUIParam p;
-	map<string,RemoteUIParam>::iterator it = params.find(paramName);
+	unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
 	if ( it != params.end() ){	// found!
 		p = params[paramName];
 	}else{
@@ -568,7 +568,7 @@ RemoteUIParam ofxRemoteUI::getParamForName(string paramName){
 
 string ofxRemoteUI::getValuesAsString(){
 	stringstream out;
-	map<int,string>::iterator it = orderedKeys.begin();
+	unordered_map<int,string>::iterator it = orderedKeys.begin();
 	while( it != orderedKeys.end() ){
 		RemoteUIParam param = params[it->second];
 		if(param.type != REMOTEUI_PARAM_SPACER){

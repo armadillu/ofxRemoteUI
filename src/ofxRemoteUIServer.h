@@ -335,25 +335,24 @@ private:
 	void			_update(ofEventArgs &d);
 	void			_keyPressed(ofKeyEventArgs &e);
 
-	int				selectedItem;
-	ofVboMesh		uiLines;
+	int														selectedItem;
+	ofVboMesh												uiLines;
 
-	vector<string>	presetsCached; //for the built in client
-	map<string, vector<string> > groupPresetsCached;
-	int 			selectedGroupPreset;
-	int 			selectedPreset;
-	string			lastChosenPreset;
-
+	vector<string>											presetsCached; //for the built in client
+	unordered_map<string, vector<string> > 		groupPresetsCached;
+	int 														selectedGroupPreset;
+	int 														selectedPreset;
+	string													lastChosenPreset;
 
 	string 			getFinalPath(string);
 
-	float			uiColumnWidth;
-	float			uiAlpha;
+	float														uiColumnWidth;
+	float														uiAlpha;
 
-	void			refreshPresetsCache();
+	void														refreshPresetsCache();
 #endif
 
-	static ofxRemoteUIServer* singleton;
+	static ofxRemoteUIServer* 							singleton;
 };
 
 #endif
