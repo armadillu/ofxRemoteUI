@@ -988,7 +988,8 @@ void ofxRemoteUIServer::draw(int x, int y){
 
 			ofSetColor(255);
 			ofDrawBitmapString("ofxRemoteUI built in client. " +
-							   string(enabled ? ("Server reachable at " + computerIP + ":" + ofToString(port)) + ". " : "" ) +
+							   string(enabled ? ("Server reachable at " + computerIP + ":" + ofToString(port)) + "." :
+									  "Sever Disabled." ) +
 							   "\nPress 's' to save current config.\n" +
 							   "Press 'S' to make a new preset.\n" +
 							   "Press 'r' to restore all param's launch state.\n" +
@@ -1118,7 +1119,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 				}
 				if(!linesInited){
 					uiLines.addVertex(ofVec2f(x, y + spacing * 0.33));
-					uiLines.addVertex(ofVec2f(x + colw * 0.8, y + spacing * 0.33));
+					uiLines.addVertex(ofVec2f(x + realColW, y + spacing * 0.33));
 				}
 				y += spacing;
 				if (y > ofGetHeight() - padding * 0.5 - bottomBarHeight){
