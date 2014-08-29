@@ -19,7 +19,7 @@ bool ofxRemoteUINeigbors::update(float dt){
 
 	bool updated = false;
 	time += dt;
-	map<string, Neighbor>::iterator iterator;
+	unordered_map<string, Neighbor>::iterator iterator;
 	vector<string>idsToDelete;
 	for( iterator = neigbhors.begin(); iterator != neigbhors.end(); iterator++) {
 		string ID = iterator->first;
@@ -41,7 +41,7 @@ bool ofxRemoteUINeigbors::update(float dt){
 
 void ofxRemoteUINeigbors::print(){
 	RUI_LOG_NOTICE << "## NEIGHBORS ##############################";
-	map<string, Neighbor>::iterator iterator;
+	unordered_map<string, Neighbor>::iterator iterator;
 	for( iterator = neigbhors.begin(); iterator != neigbhors.end(); iterator++) {
 		Neighbor n = iterator->second;
 		RUI_LOG_NOTICE << n.name << " (" << n.IP << ":" << n.port << ") " << time - n.timeLastSeen << " seconds ago.";
@@ -70,7 +70,7 @@ bool ofxRemoteUINeigbors::gotPing(string ip, int port, string name, string binar
 
 vector<Neighbor> ofxRemoteUINeigbors::getNeighbors(){
 
-	map<string, Neighbor>::iterator iterator;
+	unordered_map<string, Neighbor>::iterator iterator;
 	vector<Neighbor>ns;
 	for( iterator = neigbhors.begin(); iterator != neigbhors.end(); iterator++) {
 		ns.push_back(iterator->second);
