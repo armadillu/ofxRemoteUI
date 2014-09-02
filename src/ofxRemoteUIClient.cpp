@@ -32,7 +32,7 @@ bool ofxRemoteUIClient::setup(string address, int port_){
 	presetNames.clear();
 
 	if (port < 1000){
-		RUI_LOG_ERROR << "ofxRemoteUIClient cant use such low port" << e.what();
+		RUI_LOG_ERROR << "ofxRemoteUIClient cant use such low port";
 		OSCsetup = false;
 		return OSCsetup;
 	}
