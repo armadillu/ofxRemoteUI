@@ -12,14 +12,7 @@
 // you will need to add this to your "Header Search Path" for ofxOsc to compile
 // ../../../addons/ofxOsc/libs ../../../addons/ofxOsc/libs/oscpack ../../../addons/ofxOsc/libs/oscpack/src ../../../addons/ofxOsc/libs/oscpack/src/ip ../../../addons/ofxOsc/libs/oscpack/src/ip/posix ../../../addons/ofxOsc/libs/oscpack/src/ip/win32 ../../../addons/ofxOsc/libs/oscpack/src/osc ../../../addons/ofxOsc/src
 #include "ofxOsc.h"
-#if __cplusplus>=200103L
 #include <unordered_map>
-#include <unordered_map>
-#else
-#include <tr1/unordered_map>
-#include <tr1/unordered_map>
-using std::tr1::unordered_map;
-#endif
 
 #include <set>
 #include <vector>
