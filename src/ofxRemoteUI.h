@@ -12,10 +12,16 @@
 // you will need to add this to your "Header Search Path" for ofxOsc to compile
 // ../../../addons/ofxOsc/libs ../../../addons/ofxOsc/libs/oscpack ../../../addons/ofxOsc/libs/oscpack/src ../../../addons/ofxOsc/libs/oscpack/src/ip ../../../addons/ofxOsc/libs/oscpack/src/ip/posix ../../../addons/ofxOsc/libs/oscpack/src/ip/win32 ../../../addons/ofxOsc/libs/oscpack/src/osc ../../../addons/ofxOsc/src
 #include "ofxOsc.h"
-#include <unordered_map>
-
 #include <set>
 #include <vector>
+
+#if __cplusplus>=201103L || defined(_MSC_VER)
+	#include <unordered_map>
+	#include <memory>
+#else
+	#include <tr1/unordered_map>
+	using std::tr1::unordered_map;
+#endif
 
 #define OFXREMOTEUI_PORT									10000
 #define OFXREMOTEUI_BROADCAST_PORT							25748
