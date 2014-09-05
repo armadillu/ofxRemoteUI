@@ -191,9 +191,14 @@ string ofxRemoteUI::getMyIP(string userChosenInteface){
 						}
 					}else{
                         if ((interface[0] == 'e' && interface[1] == 'n') || (interface[0] == 'e' && interface[1] == 't')){
-							output = string(buf);
-							if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUI using interface: " << interface;
-							break;
+							if(strlen(buf) > 2){
+								bool is169 = buf[0] == '1' && buf[1] == '6' && buf[2] == '9';
+								if(!is169){ //avoid 169.x.x.x addresses
+									output = string(buf);
+									if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUI using interface: " << interface;
+									break;
+								}
+							}
 						}
 					}
 				}
@@ -231,6 +236,7 @@ string ofxRemoteUI::getMyIP(string userChosenInteface){
 	}
 	if (pAdapterInfo) free(pAdapterInfo);
 #endif
+	cout << "ou: " << output<<endl;
 	return output;
 }
 
@@ -243,7 +249,7 @@ void GetHostName(std::string& host_name){
     ret_code = gethostname(buf, MAX_PATH);
 
     if (ret_code == SOCKET_ERROR)
-    	host_name = "NOT_FOUND";
+    	host_name = RUI_LOCAL_IP_ADDRESS;
 	else
 		host_name = buf;
     WSACleanup();

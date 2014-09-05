@@ -692,10 +692,10 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	}
 	//still get ui access despite being disabled
 	#ifdef OF_AVAILABLE
-	ofAddListener(ofEvents().exit, this, &ofxRemoteUIServer::_appExited, OF_EVENT_ORDER_BEFORE_APP); //to save to xml, disconnect, etc
+	ofAddListener(ofEvents().exit, this, &ofxRemoteUIServer::_appExited); //to save to xml, disconnect, etc
 	ofAddListener(ofEvents().keyPressed, this, &ofxRemoteUIServer::_keyPressed);
 	ofAddListener(ofEvents().update, this, &ofxRemoteUIServer::_update);
-	ofAddListener(ofEvents().draw, this, &ofxRemoteUIServer::_draw, OF_EVENT_ORDER_AFTER_APP);
+	ofAddListener(ofEvents().draw, this, &ofxRemoteUIServer::_draw);
 	#endif
 }
 
