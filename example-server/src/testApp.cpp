@@ -1,7 +1,6 @@
 #include "testApp.h"
 
 
-
 void testApp::setup(){
 
 	ofBackground(22);
@@ -20,11 +19,12 @@ void testApp::setup(){
 
 	// START THE SERVER ///////////////////////////////////////////
 	RUI_SETUP(); 	//specify a port if you want a specific one
-									//if you dont specify, the server will choose a random one
-									//the first time you launch it, and will use it forever
+					//if you dont specify, the server will choose a random one
+					//the first time you launch it, and will use it forever
 
 	// SETUP A CALLBACK ///////////////////////////////////////////
-	RUI_SET_CALLBACK(testApp::serverCallback); // (optional!) get notified when things happen in the client
+	ofAddListener(RUI_GET_OF_EVENT(), this, &testApp::clientDidSomething);
+
 
 	// SET PARAM GROUPS / COLORS //////////////////////////////////
 	RUI_NEW_GROUP("POSITION"); //make a new group (optional)
@@ -102,10 +102,8 @@ void testApp::setup(){
 void testApp::update(){
 
 	float dt = 0.016666;
-
 	currentMouseX = ofGetMouseX();
 }
-
 
 
 void testApp::draw(){
@@ -126,7 +124,6 @@ void testApp::draw(){
 					circleSize
 				 );
 	}
-
 
 	ofSetupScreen();
 	ofDrawBitmapStringHighlight(
@@ -152,7 +149,7 @@ void testApp::keyPressed( int key ){
 
 
 //define a callback method to get notifications of client actions
-void testApp::serverCallback(RemoteUIServerCallBackArg arg){
+void testApp::clientDidSomething(RemoteUIServerCallBackArg &arg){
 
 	switch (arg.action) {
 		case CLIENT_CONNECTED: cout << "CLIENT_CONNECTED" << endl; break;
@@ -166,7 +163,7 @@ void testApp::serverCallback(RemoteUIServerCallBackArg arg){
 		case CLIENT_SAVED_STATE: cout << "CLIENT_SAVED_STATE" << endl; break;
 		case CLIENT_DID_RESET_TO_XML: cout << "CLIENT_DID_RESET_TO_XML" << endl; break;
 		case CLIENT_DID_RESET_TO_DEFAULTS: cout << "CLIENT_DID_RESET_TO_DEFAULTS" << endl; break;
-		default:break;
+		default:
+			break;
 	}
 }
-

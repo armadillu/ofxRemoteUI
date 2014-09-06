@@ -16,6 +16,8 @@ public:
 		void draw();
 		void keyPressed( int key );
 
+		void clientDidSomething(RemoteUIServerCallBackArg & arg);
+
 		float x;
 		float y;
 		bool drawOutlines;
@@ -28,7 +30,9 @@ public:
 
 		string currentSentence;
 		int currentMouseX;
-		static void serverCallback(RemoteUIServerCallBackArg arg);
+
+
+
 };
 
 #endif

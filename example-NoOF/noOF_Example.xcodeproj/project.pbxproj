@@ -29,6 +29,7 @@
 		BB5CC6A6177E4C1D00B595F8 /* tinyxmlparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC692177E4C1D00B595F8 /* tinyxmlparser.cpp */; };
 		BB5CC6A7177E4C1D00B595F8 /* ofxXmlSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC695177E4C1D00B595F8 /* ofxXmlSettings.cpp */; };
 		BB5CC6A9177E4C3B00B595F8 /* ofStolenUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC6A8177E4C3B00B595F8 /* ofStolenUtils.cpp */; };
+		BBD66E2C19BA9E6D0084BC1A /* uriencode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBD66E2B19BA9E6D0084BC1A /* uriencode.cpp */; };
 		BBEE785A182335F800D93161 /* ofxRemoteUINeigbors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBEE7858182335F800D93161 /* ofxRemoteUINeigbors.cpp */; };
 /* End PBXBuildFile section */
 
@@ -97,6 +98,7 @@
 		BB5CC695177E4C1D00B595F8 /* ofxXmlSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxXmlSettings.cpp; sourceTree = "<group>"; };
 		BB5CC696177E4C1D00B595F8 /* ofxXmlSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxXmlSettings.h; sourceTree = "<group>"; };
 		BB5CC6A8177E4C3B00B595F8 /* ofStolenUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofStolenUtils.cpp; sourceTree = "<group>"; };
+		BBD66E2B19BA9E6D0084BC1A /* uriencode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = uriencode.cpp; path = ../src/uriencode.cpp; sourceTree = "<group>"; };
 		BBEE7858182335F800D93161 /* ofxRemoteUINeigbors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofxRemoteUINeigbors.cpp; path = ../src/ofxRemoteUINeigbors.cpp; sourceTree = "<group>"; };
 		BBEE7859182335F800D93161 /* ofxRemoteUINeigbors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxRemoteUINeigbors.h; path = ../src/ofxRemoteUINeigbors.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -150,6 +152,7 @@
 				BB5CC624177E4A4700B595F8 /* ofxRemoteUIServer.cpp */,
 				BB5CC625177E4A4700B595F8 /* ofxRemoteUIServer.h */,
 				BB5CC626177E4A4700B595F8 /* RemoteParam.h */,
+				BBD66E2B19BA9E6D0084BC1A /* uriencode.cpp */,
 				BB5CC627177E4A4700B595F8 /* uriencode.h */,
 			);
 			name = ofxRemoteUI;
@@ -364,6 +367,7 @@
 				BB5CC69B177E4C1D00B595F8 /* UdpSocketWin.cpp in Sources */,
 				BB5CC69C177E4C1D00B595F8 /* OscOutboundPacketStream.cpp in Sources */,
 				BB5CC6A9177E4C3B00B595F8 /* ofStolenUtils.cpp in Sources */,
+				BBD66E2C19BA9E6D0084BC1A /* uriencode.cpp in Sources */,
 				BB5CC69D177E4C1D00B595F8 /* OscPrintReceivedElements.cpp in Sources */,
 				BB5CC69E177E4C1D00B595F8 /* OscReceivedElements.cpp in Sources */,
 				BB5CC69F177E4C1D00B595F8 /* OscTypes.cpp in Sources */,

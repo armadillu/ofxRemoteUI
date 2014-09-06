@@ -16,11 +16,12 @@
 #include <string>
 #include <string.h>
 #ifdef __APPLE__
-#include "dirent.h"
-#include <mach-o/dyld.h>	/* _NSGetExecutablePath */
+	#include "dirent.h"
+	#include <mach-o/dyld.h>	/* _NSGetExecutablePath */
 #elif _WIN32 || _WIN64
-#include "dirent_vs.h"
+	#include "dirent_vs.h"
 #endif
+
 #include <sys/stat.h>
 #include <time.h>
 
@@ -35,6 +36,7 @@ using Poco::Util::Application;
 #endif
 
 ofxRemoteUIServer* ofxRemoteUIServer::singleton = NULL;
+
 ofxRemoteUIServer* ofxRemoteUIServer::instance(){
 	if (!singleton){   // Only allow one instance of class to be generated.
 		singleton = new ofxRemoteUIServer();
@@ -61,7 +63,6 @@ void ofxRemoteUIServer::setShowInterfaceKey(char k){
 ofxRemoteUIServer::ofxRemoteUIServer(){
 
 	enabled = true;
-	uiColumnWidth = 320;
 	readyToSend = false;
 	saveToXmlOnExit = true;
 	autoBackups = false; //off by default
@@ -85,8 +86,10 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	newColorInGroupCounter = 1;
 	showInterfaceKey = '\t';
 	int a = 80;
-	uiAlpha = 1.0;
+
 #ifdef OF_AVAILABLE
+	uiColumnWidth = 320;
+	uiAlpha = 1.0f;
 	selectedPreset = selectedGroupPreset = 0;
 	selectedItem = -1;
 	ofSeedRandom(1979);
@@ -227,11 +230,13 @@ void ofxRemoteUIServer::removeParamFromDB(string paramName){
 void ofxRemoteUIServer::setDirectoryPrefix(string _directoryPrefix){
 	directoryPrefix = _directoryPrefix;
 	cout << "directoryPrefix set to " << directoryPrefix << endl;
+	#ifdef OF_AVAILABLE
 	ofDirectory d;
 	d.open(getFinalPath(OFXREMOTEUI_PRESET_DIR));
 	if(!d.exists()){
 		d.create(true);
 	}
+	#endif
 }
 
 
@@ -289,9 +294,8 @@ void ofxRemoteUIServer::saveParamToXmlSettings(RemoteUIParam t, string key, ofxX
 
 void ofxRemoteUIServer::saveGroupToXML(string fileName, string groupName){
 
-	fileName = getFinalPath(fileName);
-
 	#ifdef OF_AVAILABLE
+	fileName = getFinalPath(fileName);
 	ofDirectory d;
 	string path = getFinalPath(string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName);
 	d.open(path);
@@ -329,7 +333,9 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 
 	saveSettingsBackup(); //every time , before we save
 
+	#ifdef OF_AVAILABLE
 	fileName = getFinalPath(fileName);
+	#endif
 
 	RUI_LOG_NOTICE << "ofxRemoteUIServer: saving to xml '" << fileName << "'" ;
 	ofxXmlSettings s;
@@ -360,7 +366,9 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 
 vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 
+	#ifdef OF_AVAILABLE
 	fileName = getFinalPath(fileName);
+	#endif
 
 	vector<string> loadedParams;
 	ofxXmlSettings s;
@@ -619,13 +627,15 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	#if defined(_WIN32)
 		_mkdir(getFinalPath(OFXREMOTEUI_PRESET_DIR));
 	#else
-		mkdir(getFinalPath(OFXREMOTEUI_PRESET_DIR), 0777);
+		mkdir(getFinalPath(OFXREMOTEUI_PRESET_DIR).c_str(), (mode_t)0777);
 	#endif
 	#endif
 	
 	//check for enabled
+	string configFile;
+	#ifdef OF_AVAILABLE
 	ofxXmlSettings s;
-	string configFile = ofToDataPath(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME));
+	configFile = ofToDataPath(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME));
 	bool exists = s.loadFile(configFile);
 	if(exists){
 		if( s.getNumTags(OFXREMOTEUI_XML_ENABLED) > 0 ){
@@ -635,6 +645,10 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 			}
 		}
 	}
+	#else
+	configFile = getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME);
+	enabled = true;
+	#endif
 
 	if(enabled){
 
@@ -739,26 +753,25 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 					RemoteUIServerCallBackArg cbArg;
 					if (groupIsSelected){
 						saveGroupToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName + "/" + presetName + ".xml", groupName);
+						if(callBack) callBack(cbArg);
+						cbArg.action = CLIENT_SAVED_GROUP_PRESET;
+						cbArg.msg = presetName;
+						cbArg.group = groupName;
 						#ifdef OF_AVAILABLE
+						ofNotifyEvent(clientAction, cbArg, this);
 						onScreenNotifications.addNotification("SAVED PRESET '" + presetName + ".xml' FOR GROUP '" + groupName + "'");
 						#endif
-						if(callBack != NULL){
-							cbArg.action = CLIENT_SAVED_GROUP_PRESET;
-							cbArg.msg = presetName;
-							cbArg.group = groupName;
-							callBack(cbArg);
-						}
+
 					}else{
 						if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: saving NEW preset: " << presetName ;
 						saveToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
+						cbArg.action = CLIENT_SAVED_PRESET;
+						cbArg.msg = presetName;
 						#ifdef OF_AVAILABLE
 						onScreenNotifications.addNotification("SAVED PRESET to '" + getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml'");
+						ofNotifyEvent(clientAction, cbArg, this);
 						#endif
-						if(callBack != NULL){
-							cbArg.action = CLIENT_SAVED_PRESET;
-							cbArg.msg = presetName;
-							callBack(cbArg);
-						}
+						if(callBack) callBack(cbArg);
 					}
 					refreshPresetsCache();
 				}
@@ -777,14 +790,13 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 					syncAllPointersToParams();
 					uiAlpha = 0;
 					if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: setting preset: " << lastChosenPreset ;
-					if(callBack != NULL){
-						RemoteUIServerCallBackArg cbArg;
-						cbArg.action = CLIENT_DID_SET_PRESET;
-						cbArg.msg = lastChosenPreset;
-						callBack(cbArg);
-					}
+					RemoteUIServerCallBackArg cbArg;
+					cbArg.action = CLIENT_DID_SET_PRESET;
+					cbArg.msg = lastChosenPreset;
+					if(callBack) callBack(cbArg);
 					#ifdef OF_AVAILABLE
 					onScreenNotifications.addNotification("SET PRESET to '" + getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + lastChosenPreset + ".xml'");
+					ofNotifyEvent(clientAction, cbArg, this);
 					#endif
 				}
 				if (selectedItem >= 0){ //selection on params list
@@ -796,13 +808,12 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 						syncAllPointersToParams();
 						uiAlpha = 0;
 						if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: setting preset: " << presetName ;
-						if(callBack != NULL){
-							RemoteUIServerCallBackArg cbArg;
-							cbArg.action = CLIENT_DID_SET_GROUP_PRESET;
-							cbArg.msg = p.group;
-							callBack(cbArg);
-						}
+						RemoteUIServerCallBackArg cbArg;
+						cbArg.action = CLIENT_DID_SET_GROUP_PRESET;
+						cbArg.msg = p.group;
+						if(callBack) callBack(cbArg);
 						#ifdef OF_AVAILABLE
+						ofNotifyEvent(clientAction, cbArg, this);
 						onScreenNotifications.addNotification("SET '" + p.group  + "' GROUP TO '" + presetName + ".xml' PRESET");
 						#endif
 					}
@@ -848,18 +859,17 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 						params[key] = p;
 						syncPointerToParam(key);
 						pushParamsToClient();
-						if(callBack != NULL){ //send "param modified" callback to ourselves!
-							RemoteUIServerCallBackArg cbArg;
-							cbArg.action = CLIENT_DID_RESET_TO_XML;
-							cbArg.host = "localhost";
-							cbArg.action =  CLIENT_UPDATED_PARAM;
-							cbArg.paramName = key;
-							cbArg.param = params[key];  //copy the updated param to the callbakc arg
-							#ifdef OF_AVAILABLE
-							onScreenNotifications.addParamUpdate(key, cbArg.param.getValueAsString());
-							#endif
-							callBack(cbArg);
-						}
+						RemoteUIServerCallBackArg cbArg;
+						cbArg.action = CLIENT_DID_RESET_TO_XML;
+						cbArg.host = "localhost";
+						cbArg.action =  CLIENT_UPDATED_PARAM;
+						cbArg.paramName = key;
+						cbArg.param = params[key];  //copy the updated param to the callbakc arg
+						#ifdef OF_AVAILABLE
+						onScreenNotifications.addParamUpdate(key, cbArg.param.getValueAsString());
+						ofNotifyEvent(clientAction, cbArg, this);
+						#endif
+						if(callBack) callBack(cbArg);
 					}else{ //in spacer! group time, cycle through group presets
 						int numGroupPresets = groupPresetsCached[p.group].size();
 						if(numGroupPresets > 0){
@@ -946,7 +956,6 @@ void ofxRemoteUIServer::threadedFunction(){
 	}
 	if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer threadedFunction() ending" ;
 }
-#endif
 
 
 void ofxRemoteUIServer::_draw(ofEventArgs &e){
@@ -961,7 +970,6 @@ void ofxRemoteUIServer::_update(ofEventArgs &e){
 
 void ofxRemoteUIServer::draw(int x, int y){
 
-	#ifdef OF_AVAILABLE
 	ofPushStyle();
 	ofFill();
 	ofEnableAlphaBlending();
@@ -1164,8 +1172,8 @@ void ofxRemoteUIServer::draw(int x, int y){
 	}
 
 	ofPopStyle();
-	#endif
 }
+#endif
 
 
 void ofxRemoteUIServer::handleBroadcast(){
@@ -1255,14 +1263,14 @@ void ofxRemoteUIServer::updateServer(float dt){
 
 			case HELO_ACTION: //if client says hi, say hi back
 				sendHELLO();
-				if(callBack != NULL){
-					cbArg.action = CLIENT_CONNECTED;
-					callBack(cbArg);
-				}
-				if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer: " << m.getRemoteIp() << " says HELLO!"  ;
+				cbArg.action = CLIENT_CONNECTED;
+				if(callBack) callBack(cbArg);
 				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("CONNECTED (" + cbArg.host +  ")!");
+				ofNotifyEvent(clientAction, cbArg, this);
 				#endif
+				if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer: " << m.getRemoteIp() << " says HELLO!"  ;
+
 				break;
 
 			case REQUEST_ACTION:{ //send all params to client
@@ -1273,13 +1281,10 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case SEND_PARAM_ACTION:{ //client is sending us an updated val
 				if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer: " << m.getRemoteIp() << " sends SEND!"  ;
 				updateParamFromDecodedMessage(m, dm);
-
-				if(callBack != NULL){
-					cbArg.action = CLIENT_UPDATED_PARAM;
-					cbArg.paramName = dm.paramName;
-					cbArg.param = params[dm.paramName];  //copy the updated param to the callbakc arg
-					callBack(cbArg);
-				}
+				cbArg.action = CLIENT_UPDATED_PARAM;
+				cbArg.paramName = dm.paramName;
+				cbArg.param = params[dm.paramName];  //copy the updated param to the callbakc arg
+				if(callBack) callBack(cbArg);
 				#ifdef OF_AVAILABLE
 				RemoteUIParam p = params[dm.paramName];
 				onScreenNotifications.addParamUpdate(dm.paramName, p.getValueAsString(),
@@ -1287,22 +1292,22 @@ void ofxRemoteUIServer::updateServer(float dt){
 													 ofColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal):
 													 ofColor(0,0,0,0)
 													 );
+				ofNotifyEvent(clientAction, cbArg, this);
 				#endif
 			}
 				break;
 
 			case CIAO_ACTION:{
-				if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer: " << m.getRemoteIp() << " says CIAO!" ;
 				sendCIAO();
+				cbArg.action = CLIENT_DISCONNECTED;
+				if(callBack) callBack(cbArg);
 				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("DISCONNECTED (" + cbArg.host +  ")!");
+				ofNotifyEvent(clientAction, cbArg, this);
 				#endif
-				if(callBack != NULL){
-					cbArg.action = CLIENT_DISCONNECTED;
-					callBack(cbArg);
-				}
 				clearOscReceiverMsgQueue();
 				readyToSend = false;
+				if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer: " << m.getRemoteIp() << " says CIAO!" ;
 			}break;
 
 			case TEST_ACTION: // we got a request from client, lets bounce back asap.
@@ -1321,86 +1326,80 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case SET_PRESET_ACTION:{ // client wants to set a preset
 				string presetName = m.getArgAsString(0);
 				vector<string> missingParams = loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
-				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: setting preset: " << presetName ;
 				sendSETP(presetName);
 				sendMISP(missingParams);
-				if(callBack != NULL){
-					cbArg.action = CLIENT_DID_SET_PRESET;
-					cbArg.msg = presetName;
-					callBack(cbArg);
-				}
+				cbArg.action = CLIENT_DID_SET_PRESET;
+				cbArg.msg = presetName;
+				if(callBack) callBack(cbArg);
 				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("SET PRESET to '" + getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml'");
+				ofNotifyEvent(clientAction, cbArg, this);
 				#endif
+				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: setting preset: " << presetName ;
 			}break;
 
 			case SAVE_PRESET_ACTION:{ //client wants to save current xml as a new preset
 				string presetName = m.getArgAsString(0);
-				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: saving NEW preset: " << presetName ;
 				saveToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
 				sendSAVP(presetName);
+				cbArg.action = CLIENT_SAVED_PRESET;
+				cbArg.msg = presetName;
+				if(callBack) callBack(cbArg);
 				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("SAVED PRESET to '" + getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml'");
+				ofNotifyEvent(clientAction, cbArg, this);
 				#endif
-				if(callBack != NULL){
-					cbArg.action = CLIENT_SAVED_PRESET;
-					cbArg.msg = presetName;
-					callBack(cbArg);
-				}
+				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: saving NEW preset: " << presetName ;
 			}break;
 
 			case DELETE_PRESET_ACTION:{
 				string presetName = m.getArgAsString(0);
-				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: DELETE preset: " << presetName ;
 				deletePreset(presetName);
 				sendDELP(presetName);
+				cbArg.action = CLIENT_DELETED_PRESET;
+				cbArg.msg = presetName;
+				if(callBack) callBack(cbArg);
 				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("DELETED PRESET '" + getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml'");
+				ofNotifyEvent(clientAction, cbArg, this);
+				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: DELETE preset: " << presetName ;
 				#endif
-				if(callBack != NULL){
-					cbArg.action = CLIENT_DELETED_PRESET;
-					cbArg.msg = presetName;
-					callBack(cbArg);
-				}
 			}break;
 
 			case SAVE_CURRENT_STATE_ACTION:{
-				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: SAVE CURRENT PARAMS TO DEFAULT XML: " ;
 				saveToXML(OFXREMOTEUI_SETTINGS_FILENAME);
+				cbArg.action = CLIENT_SAVED_STATE;
+				if(callBack) callBack(cbArg);
 				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("SAVED CONFIG to default XML");
+				ofNotifyEvent(clientAction, cbArg, this);
 				#endif
 				sendSAVE(true);
-				if(callBack != NULL){
-					cbArg.action = CLIENT_SAVED_STATE;
-					callBack(cbArg);
-				}
+				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: SAVE CURRENT PARAMS TO DEFAULT XML: " ;
 			}break;
 
 			case RESET_TO_XML_ACTION:{
-				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: RESET TO XML: " ;
 				restoreAllParamsToInitialXML();
 				sendRESX(true);
+				cbArg.action = CLIENT_DID_RESET_TO_XML;
 				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("RESET CONFIG TO SERVER-LAUNCH XML values");
+				ofNotifyEvent(clientAction, cbArg, this);
 				#endif
-				if(callBack != NULL){
-					cbArg.action = CLIENT_DID_RESET_TO_XML;
-					callBack(cbArg);
-				}
+				if(callBack)callBack(cbArg);
+				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: RESET TO XML: " ;
 			}break;
 
 			case RESET_TO_DEFAULTS_ACTION:{
-				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: RESET TO DEFAULTS: " ;
+				cbArg.action = CLIENT_DID_RESET_TO_DEFAULTS;
 				restoreAllParamsToDefaultValues();
 				sendRESD(true);
 				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("RESET CONFIG TO DEFAULTS (source defined values)");
+				ofNotifyEvent(clientAction, cbArg, this);
 				#endif
-				if(callBack != NULL){
-					cbArg.action = CLIENT_DID_RESET_TO_DEFAULTS;
-					callBack(cbArg);
-				}
+				if(callBack)callBack(cbArg);
+				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: RESET TO DEFAULTS: " ;
 			}break;
 
 			case SET_GROUP_PRESET_ACTION:{ // client wants to set a preset for a group
@@ -1413,52 +1412,49 @@ void ofxRemoteUIServer::updateServer(float dt){
 						filtered.push_back(missingParams[i]);
 					}
 				}
-				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: setting preset group: " << groupName << "/" <<presetName ;
 				sendSETp(presetName, groupName);
 				sendMISP(filtered);
-				if(callBack != NULL){
-					cbArg.action = CLIENT_DID_SET_GROUP_PRESET;
-					cbArg.msg = presetName;
-					cbArg.group = groupName;
-					callBack(cbArg);
-				}
+				cbArg.action = CLIENT_DID_SET_GROUP_PRESET;
+				cbArg.msg = presetName;
+				cbArg.group = groupName;
+				if(callBack)callBack(cbArg);
 				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("SET '" + groupName + "' GROUP TO '" + presetName + ".xml' PRESET");
+				ofNotifyEvent(clientAction, cbArg, this);
 				#endif
+				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: setting preset group: " << groupName << "/" <<presetName ;
 			}break;
 
 			case SAVE_GROUP_PRESET_ACTION:{ //client wants to save current xml as a new preset
 				string presetName = m.getArgAsString(0);
 				string groupName = m.getArgAsString(1);
-				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: saving NEW preset: " << presetName ;
 				saveGroupToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName + "/" + presetName + ".xml", groupName);
 				sendSAVp(presetName, groupName);
+				cbArg.action = CLIENT_SAVED_GROUP_PRESET;
+				cbArg.msg = presetName;
+				cbArg.group = groupName;
 				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("SAVED PRESET '" + presetName + ".xml' FOR GROUP '" + groupName + "'");
+				ofNotifyEvent(clientAction, cbArg, this);
 				#endif
-				if(callBack != NULL){
-					cbArg.action = CLIENT_SAVED_GROUP_PRESET;
-					cbArg.msg = presetName;
-					cbArg.group = groupName;
-					callBack(cbArg);
-				}
+				if(callBack) callBack(cbArg);
+				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: saving NEW preset: " << presetName ;
 			}break;
 
 			case DELETE_GROUP_PRESET_ACTION:{
 				string presetName = m.getArgAsString(0);
 				string groupName = m.getArgAsString(1);
-				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: DELETE preset: " << presetName ;
 				deletePreset(presetName, groupName);
 				sendDELp(presetName, groupName);
+				cbArg.action = CLIENT_DELETED_GROUP_PRESET;
+				cbArg.msg = presetName;
+				cbArg.group = groupName;
 				#ifdef OF_AVAILABLE
 				onScreenNotifications.addNotification("DELETED PRESET '" + presetName + ".xml' FOR GROUP'" + groupName + "'");
+				ofNotifyEvent(clientAction, cbArg, this);
 				#endif
-				if(callBack != NULL){
-					cbArg.action = CLIENT_DELETED_GROUP_PRESET;
-					cbArg.msg = presetName;
-					cbArg.group = groupName;
-					callBack(cbArg);
-				}
+				if(callBack)callBack(cbArg);
+				if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: DELETE preset: " << presetName ;
 			}break;
 			default: RUI_LOG_ERROR << "ofxRemoteUIServer::update >> ERR!"; break;
 		}
@@ -1515,7 +1511,7 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(bool onlyGlobal){
 	#else
 	DIR *dir2;
 	struct dirent *ent;
-	if ((dir2 = opendir(getFinalPath(OFXREMOTEUI_PRESET_DIR))) != NULL) {
+	if ((dir2 = opendir(getFinalPath(OFXREMOTEUI_PRESET_DIR).c_str() )) != NULL) {
 		while ((ent = readdir (dir2)) != NULL) {
 			if ( strcmp( get_filename_ext(ent->d_name), "xml") == 0 ){
 				string fileName = string(ent->d_name);
@@ -1523,7 +1519,7 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(bool onlyGlobal){
 				presets.push_back(presetName);
 			}
 		}
-		closedir (dir);
+		closedir(dir2);
 	}
 	#endif
 	return presets;

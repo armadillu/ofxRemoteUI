@@ -90,7 +90,7 @@
 ( ofxRemoteUIServer::instance()->setAutomaticBackupsEnabled(doAutoBackups) )
 
 /*define where all the xml files should be saved*/
-#define OFX_REMOTEUI_SERVER_SET_CONFIGS_DIR(dir)			\
+#define OFX_REMOTEUI_SERVER_SET_CONFIGS_DIR(dir)						\
 ( ofxRemoteUIServer::instance()->setDirectoryPrefix(dir) )
 
 /*close the server. no need to call this from OF*/
@@ -132,9 +132,9 @@
 
 //sets the param as "to watch", so its value is printed on
 //screen all the time. WCN version in case you want to supply a custom string instead of the var itself
-#define OFX_REMOTEUI_SERVER_WATCH_PARAM(paramName)                          \
+#define OFX_REMOTEUI_SERVER_WATCH_PARAM(paramName)						\
 ( ofxRemoteUIServer::instance()->watchParamOnScreen(#paramName) )
-#define OFX_REMOTEUI_SERVER_WATCH_PARAM_WCN(paramName)                      \
+#define OFX_REMOTEUI_SERVER_WATCH_PARAM_WCN(paramName)					\
 ( ofxRemoteUIServer::instance()->watchParamOnScreen(paramName) )
 
 #ifdef OF_AVAILABLE
@@ -145,6 +145,9 @@
 
 #define OFX_REMOTEUI_SERVER_SET_UI_COLUMN_WIDTH(w)						\
 ( ofxRemoteUIServer::instance()->setUiColumnWidth(w) )
+
+#define OFX_REMOTEUI_SERVER_GET_CLIENT_OF_EVENT()						\
+( ofxRemoteUIServer::instance()->clientAction )
 
 #endif
 
@@ -171,6 +174,7 @@
 #define RUI_WATCH_PARAM				OFX_REMOTEUI_SERVER_WATCH_PARAM
 #define RUI_WATCH_PARAM_WCN			OFX_REMOTEUI_SERVER_WATCH_PARAM_WCN
 #define RUI_SET_CONFIGS_DIR			OFX_REMOTEUI_SERVER_SET_CONFIGS_DIR
+#define RUI_GET_OF_EVENT			OFX_REMOTEUI_SERVER_GET_CLIENT_OF_EVENT
 //
 
 
@@ -187,19 +191,6 @@ public:
 	static ofxRemoteUIServer* instance();
 
 	void setup(int port = -1, float updateInterval = 0.1/*sec*/);
-
-#ifdef OF_AVAILABLE
-	void startInBackgroundThread();
-	/*	Calling this will run the server in a background thread.
-		all param changes will run in a separate thread, this might cause issues with your app
-		as parameters can be changed at any time! so be aware, especially with strings. You might get crashes.
-		This can be useful in situation where your main thread is blocked for seconds, or your app runs
-		at a very low framerate. In those situations, the server doesnt get updated often enough,
-		and you might get disconnected. Using a background thread means you can still control your params
-		as the main thread is blocked, but it also means the changes may happen at any time. Also, the
-		callback method will be called from a background thread, so keep it in mind. (no GL calls in there!)
-	 */
-#endif
 
 	//You shouldnt need to call any of these directly. Use the Macros supplied above instead.
 	void update(float dt);
@@ -261,7 +252,25 @@ public:
 	void setShowInterfaceKey(char k);
 	void setAutomaticBackupsEnabled(bool enabled);
 
+#ifdef OF_AVAILABLE
+
 	void setUiColumnWidth(int w){ uiColumnWidth = w; }
+
+	//of style event/callback
+	ofEvent<RemoteUIServerCallBackArg> clientAction;
+
+	void startInBackgroundThread();
+	/*	Calling this will run the server in a background thread.
+	 all param changes will run in a separate thread, this might cause issues with your app
+	 as parameters can be changed at any time! so be aware, especially with strings. You might get crashes.
+	 This can be useful in situation where your main thread is blocked for seconds, or your app runs
+	 at a very low framerate. In those situations, the server doesnt get updated often enough,
+	 and you might get disconnected. Using a background thread means you can still control your params
+	 as the main thread is blocked, but it also means the changes may happen at any time. Also, the
+	 callback method will be called from a background thread, so keep it in mind. (no GL calls in there!)
+	 */
+
+#endif
 
 private:
 
@@ -288,6 +297,8 @@ private:
 
 	void			saveParamToXmlSettings(RemoteUIParam p, string key, ofxXmlSettings & s, XmlCounter & counter);
 	void			saveSettingsBackup();
+
+	string 			getFinalPath(string);
 
 	vector<ofColor> colorTables;
 	int				colorTableIndex;
@@ -347,7 +358,6 @@ private:
 	float													uiAlpha;
 
 	void			refreshPresetsCache();
-	string 			getFinalPath(string);
 
 #endif
 
