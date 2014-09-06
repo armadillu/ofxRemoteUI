@@ -56,42 +56,42 @@ int main(int argc, const char * argv[]){
 	std::cout << "Hello, World!\n";
 
 	//setup our client callback, to get notified when client changes things
-	OFX_REMOTEUI_SERVER_SET_CALLBACK(serverCallback);
+	RUI_SET_CALLBACK(serverCallback);
 
 	//start the server
-	OFX_REMOTEUI_SERVER_SETUP();
+	RUI_SETUP();
 
 	//chose a new random color for all the upcoming variables
-	OFX_REMOTEUI_SERVER_SET_NEW_COLOR();
+	RUI_NEW_COLOR();
 	// share my float param, give a valid range [0..100]
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(myParam, 0, 100);
+	RUI_SHARE_PARAM(myParam, 0, 100);
 
 
-	OFX_REMOTEUI_SERVER_SET_NEW_COLOR();
-	OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color); //share color param
+	RUI_NEW_COLOR();
+	RUI_SHARE_COLOR_PARAM(color); //share color param
 
-	OFX_REMOTEUI_SERVER_SET_NEW_COLOR();
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(myString); //share string param
+	RUI_NEW_COLOR();
+	RUI_SHARE_PARAM(myString); //share string param
 
-	OFX_REMOTEUI_SERVER_SET_NEW_COLOR();
-	OFX_REMOTEUI_SERVER_SHARE_PARAM(quitButton); //finally share bool param, used as a "quit now" flag
+	RUI_NEW_COLOR();
+	RUI_SHARE_PARAM(quitButton); //finally share bool param, used as a "quit now" flag
 
 
-	OFX_REMOTEUI_SERVER_LOAD_FROM_XML();	//load param states from XML
+	RUI_LOAD_FROM_XML();	//load param states from XML
 
 	//stay here until user presses quit button
 	while (quitButton == false) {
-		OFX_REMOTEUI_SERVER_UPDATE(0.01666);
+		RUI_UPDATE(0.01666);
 		usleep(100000 / 6.);
 	}
 
 	quitButton = false;
 
 	//save current state of params to XML
-	OFX_REMOTEUI_SERVER_SAVE_TO_XML();
+	RUI_SAVE_TO_XML();
 
 	//close server, notify client about the closure
-	OFX_REMOTEUI_SERVER_CLOSE();
+	RUI_CLOSE();
 
 	//end program
     return 0;
