@@ -236,7 +236,6 @@ string ofxRemoteUI::getMyIP(string userChosenInteface){
 	}
 	if (pAdapterInfo) free(pAdapterInfo);
 #endif
-	cout << "ou: " << output<<endl;
 	return output;
 }
 
