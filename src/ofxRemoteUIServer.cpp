@@ -229,7 +229,7 @@ void ofxRemoteUIServer::removeParamFromDB(string paramName){
 
 void ofxRemoteUIServer::setDirectoryPrefix(string _directoryPrefix){
 	directoryPrefix = _directoryPrefix;
-	cout << "directoryPrefix set to " << directoryPrefix << endl;
+	RUI_LOG_NOTICE << "ofxRemoteUIServer: directoryPrefix set to '" << directoryPrefix << "'" << endl;
 	#ifdef OF_AVAILABLE
 	ofDirectory d;
 	d.open(getFinalPath(OFXREMOTEUI_PRESET_DIR));
