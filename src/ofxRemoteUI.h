@@ -225,7 +225,8 @@ protected:
 	void sendParam(string paramName, RemoteUIParam p);
 	DecodedMessage decode(ofxOscMessage m);
 
-	vector<string> scanForUpdatedParamsAndSync();
+	vector<string> scanForUpdatedParamsAndSync();	//goes through all params, comparing * to real valie
+													//reports those that are out of syn
 
 	void sendUpdateForParamsInList(vector<string>paramsPendingUpdate);
 	bool hasParamChanged(RemoteUIParam p);

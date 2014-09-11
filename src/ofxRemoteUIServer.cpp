@@ -555,9 +555,22 @@ void ofxRemoteUIServer::restoreAllParamsToDefaultValues(){
 
 void ofxRemoteUIServer::pushParamsToClient(){
 	if(readyToSend){
+		vector<string>changedParams =  scanForUpdatedParamsAndSync();
 		vector<string>paramsList = getAllParamNamesList();
 		syncAllParamsToPointers();
 		sendUpdateForParamsInList(paramsList);
+		#ifdef OF_AVAILABLE
+		for(int i = 0 ; i < changedParams.size(); i++){
+			string pName = changedParams[i];
+			RemoteUIParam p = params[pName];
+			onScreenNotifications.addParamUpdate(pName, p.getValueAsString(),
+												 p.type == REMOTEUI_PARAM_COLOR ?
+												 ofColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal) :
+												 ofColor(0,0,0,0)
+												 );
+
+		}
+		#endif
 		sendREQU(true); //once all send, confirm to close the REQU
 	}
 }
