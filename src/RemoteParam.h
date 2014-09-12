@@ -120,6 +120,11 @@ public:
 		switch (type) {
 			case REMOTEUI_PARAM_FLOAT: ss << floatVal; return ss.str();
 			case REMOTEUI_PARAM_ENUM:
+				if (intVal >= 0 && intVal < enumList.size())
+					ss << enumList[intVal];
+				else
+					ss << "Invalid Enum!";
+				return ss.str();
 			case REMOTEUI_PARAM_INT: ss << intVal; return ss.str();
 			case REMOTEUI_PARAM_BOOL: return boolVal ? "TRUE" : "FALSE";
 			case REMOTEUI_PARAM_STRING: return stringVal;
