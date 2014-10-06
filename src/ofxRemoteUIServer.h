@@ -44,6 +44,10 @@
 #define OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color, ...)				\
 ( ofxRemoteUIServer::instance()->shareParam( #color, (unsigned char*)&color.v[0], ##__VA_ARGS__ ) )
 
+//use this macro to share ofColors with a custom string for the name
+#define OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM_WCN(pName, color, ...)    \
+( ofxRemoteUIServer::instance()->shareParam( pName, (unsigned char*)&color.v[0], ##__VA_ARGS__ ) )
+
 /*set a new group for the upcoming params, this also sets a new color*/
 #define OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP(g)					\
 ( ofxRemoteUIServer::instance()->setParamGroup( g ) )
@@ -157,6 +161,7 @@
 #define RUI_SHARE_PARAM_WCN			OFX_REMOTEUI_SERVER_SHARE_PARAM_WCN
 #define RUI_SHARE_ENUM_PARAM		OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM
 #define RUI_SHARE_COLOR_PARAM		OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM
+#define RUI_SHARE_COLOR_PARAM_WCN   OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM_WCN
 #define RUI_NEW_GROUP				OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP
 #define RUI_NEW_COLOR				OFX_REMOTEUI_SERVER_SET_NEW_COLOR
 #define RUI_SET_CALLBACK			OFX_REMOTEUI_SERVER_SET_CALLBACK
