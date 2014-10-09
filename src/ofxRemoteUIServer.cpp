@@ -725,7 +725,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	ofAddListener(ofEvents().exit, this, &ofxRemoteUIServer::_appExited); //to save to xml, disconnect, etc
 	ofAddListener(ofEvents().keyPressed, this, &ofxRemoteUIServer::_keyPressed);
 	ofAddListener(ofEvents().update, this, &ofxRemoteUIServer::_update);
-	ofAddListener(ofEvents().draw, this, &ofxRemoteUIServer::_draw);
+	ofAddListener(ofEvents().draw, this, &ofxRemoteUIServer::_draw, OF_EVENT_ORDER_AFTER_APP + 110);
 	#endif
 }
 
