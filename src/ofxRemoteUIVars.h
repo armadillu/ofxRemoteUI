@@ -26,7 +26,7 @@
     ( *OFX_REMOTEUI_SERVER_GET_VAR_ADDRESS(type, name) )
 
 #define OFX_REMOTEUI_SERVER_SET_VAR(type, name, value) \
-    ( (*OFX_REMOTEUI_SERVER_GET_VAR_ADDRESS(type, name)) = value )
+    if(type *__tmp_p__ = OFX_REMOTEUI_SERVER_GET_VAR_ADDRESS(type, name)){ (*__tmp_p__) = value;}
 
 // shorter macro aliases
 #define RUI_DEFINE_VAR          OFX_REMOTEUI_SERVER_DEFINE_VAR
@@ -56,8 +56,8 @@ public:
 
 
 protected:
-    map<string, void*> namedPointers;
-    vector<VarType*> list;
+    map<string, VarType> namedPointers;
+    // vector<VarType*> list;
 
 }; // class ofxRemoteUIVars
 
@@ -66,36 +66,32 @@ template <typename VarType>
 VarType* ofxRemoteUIVars<VarType>::getParam(string name){
     // Find existing named pointer and return its address
     try {
-        return (VarType*) namedPointers[name];
+        return &namedPointers[name];
     } catch (std::out_of_range e) {
     }
-    
+
     return NULL;
 }
 
 template <typename VarType>
 ofxRemoteUIVars<VarType>::~ofxRemoteUIVars(){
-    for(int i=0; i<list.size(); i++){
-        delete list[i];
-    }
-
-    list.clear();
+//    for(int i=0; i<list.size(); i++){
+//        delete list[i];
+//    }
+//
+//    list.clear();
 }
 
 template <typename VarType>
 VarType* ofxRemoteUIVars<VarType>::defineParam(string name){
     // just need a temp var to push into the vector
-    VarType* tmp = new VarType();
-    cout << tmp;
-    cout << *tmp;
-    (*tmp) = 3.0f;
-    cout << *tmp;
+    VarType tmp;
     // store
-    list.push_back(tmp);
+    // list.push_back(tmp);
     // store address with name
-    namedPointers[name] = (void*) tmp;
+    namedPointers[name] = tmp;
     // return address
-    return tmp;
+    return &namedPointers[name];
 }
 
 
