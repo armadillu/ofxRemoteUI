@@ -19,6 +19,9 @@
 #define OFX_REMOTEUI_SERVER_DEFINE_VAR(type, name, ...) \
     ( ofxRemoteUIServer::instance()->shareParam( name, ofxRemoteUIVars<type>::one().defineParam(name), ##__VA_ARGS__) )
 
+#define OFX_REMOTEUI_SERVER_DEFINE_VAR_WITH_VALUE(type, name, value, ...) \
+    ( ofxRemoteUIServer::instance()->shareParam( name, ofxRemoteUIVars<type>::one().defineParam(name, value), ##__VA_ARGS__) )
+
 #define OFX_REMOTEUI_SERVER_GET_VAR_ADDRESS(type, name) \
     ( ofxRemoteUIVars<type>::one().getParam(name) )
 
@@ -30,6 +33,7 @@
 
 // shorter macro aliases
 #define RUI_DEFINE_VAR          OFX_REMOTEUI_SERVER_DEFINE_VAR
+#define RUI_DEFINE_VAR_WV       OFX_REMOTEUI_SERVER_DEFINE_VAR_WITH_VALUE
 #define RUI_GET_VAR_ADDRESS     OFX_REMOTEUI_SERVER_GET_VAR_ADDRESS
 #define RUI_GET_VAR             OFX_REMOTEUI_SERVER_GET_VAR
 #define RUI_SET_VAR             OFX_REMOTEUI_SERVER_SET_VAR
@@ -53,6 +57,7 @@ public:
     VarType* getParam(string name);
 
     VarType* defineParam(string name);
+    VarType* defineParam(string name, VarType value);
 
 
 protected:
@@ -92,6 +97,13 @@ VarType* ofxRemoteUIVars<VarType>::defineParam(string name){
     namedPointers[name] = tmp;
     // return address
     return &namedPointers[name];
+}
+
+template <typename VarType>
+VarType* ofxRemoteUIVars<VarType>::defineParam(string name, VarType value){
+    VarType* p = defineParam(name);
+    (*p) = value;
+    return p;
 }
 
 
