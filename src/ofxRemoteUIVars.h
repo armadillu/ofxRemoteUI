@@ -91,11 +91,9 @@ ofxRemoteUIVars<VarType>::~ofxRemoteUIVars(){
 template <typename VarType>
 VarType* ofxRemoteUIVars<VarType>::defineParam(string name){
     // just need a temp var to push into the vector
-    VarType tmp;
-    // store
-    // list.push_back(tmp);
+    // VarType tmp;
     // store address with name
-    namedPointers[name] = tmp;
+    namedPointers[name] = VarType(); // = tmp;
     // return address
     return &namedPointers[name];
 }
