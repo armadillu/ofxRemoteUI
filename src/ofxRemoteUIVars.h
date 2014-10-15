@@ -79,13 +79,23 @@ VarType* ofxRemoteUIVars<VarType>::getParam(string name){
     return NULL;
 }
 
+// So here's the promblem; on windows (this problem doesn't seem to occur on Mac)
+// The ofxRemoteUIVars<***>::instance global static variables are DESTRUCTED, before
+// ofxRemoteUIServer's auto-save-on-exit callback is triggered. Which means that the callback
+// is saving garbage for all the parameters from ofxRemoteUIVars. Solution:
+// When a singleton instance of ofxRemoteUIVars is destroyed, it's pretty save to assume
+// Everything is shutting down and it's time to auto-save (but only if this is enabled of course)
+// so this destructor explicitly triggers the auto-save and disables the preregistered auto-saves.
 template <typename VarType>
 ofxRemoteUIVars<VarType>::~ofxRemoteUIVars(){
-//    for(int i=0; i<list.size(); i++){
-//        delete list[i];
-//    }
-//
-//    list.clear();
+	// only continue if this is the singleton instance of this class
+	if(this != &ofxRemoteUIVars<VarType>::one()) return;
+	// only continue if ofxRemoteUIServer is atually configured to automatically save on exit
+	if(!OFX_REMOTEUI_SERVER_GET_SAVES_ON_EXIT()) return;
+	// explicitly request to save now, don't wait until auto-scheduled on-exit-callback
+	OFX_REMOTEUI_SERVER_SAVE_TO_XML();
+	// we already saved, so no need for it to happen again, disable auto-save
+	OFX_REMOTEUI_SERVER_SET_SAVES_ON_EXIT(false);
 }
 
 template <typename VarType>
