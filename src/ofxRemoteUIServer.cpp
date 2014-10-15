@@ -686,6 +686,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 			multicastIP == "255.255.255.255"
 			){
 				doBroadcast = false; //windows crashes on bradcast if no devices are up!
+				RUI_LOG_WARNING << "ofxRemoteUIServer: no network interface found, we will not broadcast ourselves";
 		}
 
 		if(doBroadcast){
