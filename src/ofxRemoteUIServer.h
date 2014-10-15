@@ -101,6 +101,10 @@
 #define OFX_REMOTEUI_SERVER_CLOSE()										\
 ( ofxRemoteUIServer::instance()->close() )
 
+/*get if saves to XML automatically on app exit. Default is YES in OF*/
+#define	OFX_REMOTEUI_SERVER_GET_SAVES_ON_EXIT()	 				\
+( ofxRemoteUIServer::instance()->getSaveToXMLOnExit() )
+
 /*set if saves to XML automatically on app exit. Default is YES in OF*/
 #define	OFX_REMOTEUI_SERVER_SET_SAVES_ON_EXIT(save)						\
 ( ofxRemoteUIServer::instance()->setSaveToXMLOnExit(save) )
@@ -242,6 +246,7 @@ public:
 	//	}
 
 	void setEnabled(bool enabled);
+	bool getSaveToXMLOnExit(){ return saveToXmlOnExit; }
 	void setSaveToXMLOnExit(bool save);
 	void setDrawsNotificationsAutomaticallly(bool draw);
 	void setNetworkInterface(string iface);
