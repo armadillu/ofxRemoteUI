@@ -679,8 +679,19 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		}else{
 			multicastIP = "255.255.255.255";
 		}
-		broadcastSender.setup( multicastIP, OFXREMOTEUI_BROADCAST_PORT ); //multicast @
-		RUI_LOG_NOTICE << "ofxRemoteUIServer: letting everyone know that I am at " << multicastIP << ":" << OFXREMOTEUI_BROADCAST_PORT ;
+
+		ofTargetPlatform platform = ofGetTargetPlatform();
+		if ( (platform == OF_TARGET_WINVS || platform == OF_TARGET_WINGCC)
+			&&
+			multicastIP == "255.255.255.255"
+			){
+				doBroadcast = false; //windows crashes on bradcast if no devices are up!
+		}
+
+		if(doBroadcast){
+			broadcastSender.setup( multicastIP, OFXREMOTEUI_BROADCAST_PORT ); //multicast @
+			RUI_LOG_NOTICE << "ofxRemoteUIServer: letting everyone know that I am at " << multicastIP << ":" << OFXREMOTEUI_BROADCAST_PORT ;
+		}
 
 		if(port_ == -1){ //if no port specified, pick a random one, but only the very first time we get launched!
 			portIsSet = false;
