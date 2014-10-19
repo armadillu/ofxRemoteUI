@@ -67,7 +67,12 @@ NSMutableArray * coloredWindows = nil;
 	if ( [coloredWindows containsObject:self] ){
 
 		CGContextRef context = [[NSGraphicsContext currentContext] graphicsPort];
-		CGContextSetBlendMode(context, kCGBlendModeOverlay);
+		//kCGBlendModeMultiply
+		if (floor(NSAppKitVersionNumber) <= 1265) {
+			CGContextSetBlendMode(context, kCGBlendModeOverlay);
+		}else{
+			CGContextSetBlendMode(context, kCGBlendModeNormal);
+		}
 
 		[myWinColor set];
 		float cornerRadius = 4.5;

@@ -23,7 +23,7 @@
 	param = p;
 	deleting = false;
 	paramName = name;
-	AppDelegate * delegate = [NSApp delegate];
+	AppDelegate * delegate = (AppDelegate *) [NSApp delegate];
 	RowHeightSize rowH = [delegate getRowHeight];
 	BOOL didLoad = FALSE;
 	switch (rowH) {
@@ -180,7 +180,7 @@
 		float w = [s frame].size.width;
 		int numTicks = w / 7;
 
-		RowHeightSize rowH = [[NSApp delegate] getRowHeight];
+		RowHeightSize rowH = [(AppDelegate *)[NSApp delegate] getRowHeight];
 		if(rowH == LARGE_34){
 			if ([s allowsTickMarkValuesOnly]){ // for int sliders, lets make sure there arent more marks than possible values
 				int range = 1 + [s maxValue] - [s minValue];
@@ -414,7 +414,7 @@
 
 -(IBAction)userPressedAddGroupPreset:(id)sender;{
 
-	AppDelegate* del = [NSApp delegate];
+	AppDelegate* del = (AppDelegate *)[NSApp delegate];
 	NSString * msg = [NSString stringWithFormat:@"Add a Preset For the '%s' Group", param.group.c_str() ];
 	NSString * newPreset = [del showAlertWithInput:msg defaultValue:@"myGroupPreset"];
 
@@ -434,7 +434,7 @@
 	}
 	NSString * preset = [[groupPresetMenu itemAtIndex:index] title];
 	NSLog(@"user delete group preset: %@", preset );
-	AppDelegate* del = [NSApp delegate];
+	AppDelegate* del = (AppDelegate *)[NSApp delegate];
 	[groupPresetMenu selectItemAtIndex:index];
 	[del getClient]->deleteGroupPreset([preset UTF8String], param.group);
 	currentPreset = "";
@@ -450,7 +450,7 @@
 	NSString * preset = [[sender itemAtIndex:index] title];
 	[groupPresetMenu selectItemAtIndex:index];
 	currentPreset = [preset UTF8String];
-	AppDelegate* del = [NSApp delegate];
+	AppDelegate* del = (AppDelegate *)[NSApp delegate];
 	[del clearSelectionPresetMenu];
 	[del getClient]->setGroupPreset(currentPreset, param.group);
 	NSLog(@"user chose group preset: %s", currentPreset.c_str() );

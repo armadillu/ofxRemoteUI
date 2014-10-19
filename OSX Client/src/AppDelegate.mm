@@ -15,7 +15,7 @@
 #pragma mark - CALLBACKS
 void clientCallback(RemoteUIClientCallBackArg a){
 
-	AppDelegate * me = [NSApp delegate];
+	AppDelegate * me = (AppDelegate *)[NSApp delegate];
 	LogWindows * logs = [me getLogWindows];
 	NSString * remoteIP = [NSString stringWithFormat:@"%s", a.host.c_str()];
 	
