@@ -999,6 +999,10 @@ void ofxRemoteUIServer::_update(ofEventArgs &e){
 void ofxRemoteUIServer::draw(int x, int y){
 
 	ofPushStyle();
+	ofPushMatrix();
+	ofScale(uiScale,uiScale);
+	ofSetDrawBitmapMode(OF_BITMAPMODE_SIMPLE);
+
 	ofFill();
 	ofEnableAlphaBlending();
 
@@ -1018,9 +1022,9 @@ void ofxRemoteUIServer::draw(int x, int y){
 		//bottom bar
 		if (uiAlpha > 0.99){
 			ofSetColor(11, 245 * uiAlpha);
-			ofRect(0,0, ofGetWidth(), ofGetHeight());
+			ofRect(0,0, ofGetWidth() / uiScale, ofGetHeight() / uiScale);
 			ofSetColor(44, 245);
-			ofRect(0,ofGetHeight() - bottomBarHeight, ofGetWidth(), bottomBarHeight );
+			ofRect(0,ofGetHeight() / uiScale - bottomBarHeight, ofGetWidth() / uiScale, bottomBarHeight );
 
 			ofSetColor(255);
 			ofDrawBitmapString("ofxRemoteUI built in client. " +
@@ -1029,13 +1033,13 @@ void ofxRemoteUIServer::draw(int x, int y){
 							   "\nPress 's' to save current config.\n" +
 							   "Press 'S' to make a new preset.\n" +
 							   "Press 'r' to restore all param's launch state.\n" +
-							   "Use Arrow Keys to edit values. Press 'TAB' to hide.", padding, ofGetHeight() - bottomBarHeight + 20);
+							   "Use Arrow Keys to edit values. Press 'TAB' to hide.", padding, ofGetHeight() / uiScale - bottomBarHeight + 20);
 
 		}
 
 		//preset selection / top bar
 		ofSetColor(64);
-		ofRect(0 , 0, ofGetWidth(), 22);
+		ofRect(0 , 0, ofGetWidth() / uiScale, 22);
 		ofColor textBlinkC ;
 		if(ofGetFrameNum()%5 < 1) textBlinkC = ofColor(255);
 		else textBlinkC = ofColor(255,0,0);
@@ -1078,6 +1082,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 
 			//param list
 			for(int i = 0; i < orderedKeys.size(); i++){
+
 				string key = orderedKeys[i];
 				RemoteUIParam p = params[key];
 				int chars = key.size();
@@ -1158,7 +1163,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 					uiLines.addVertex(ofVec2f(x + realColW, y + spacing * 0.33));
 				}
 				y += spacing;
-				if (y > ofGetHeight() - padding * 0.5 - bottomBarHeight){
+				if (y > ofGetHeight() / uiScale - padding * 0.5 - bottomBarHeight){
 					x += colw;
 					y = initialY;
 				}
@@ -1198,7 +1203,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 			onScreenNotifications.draw(x, y);
 		}
 	}
-
+	ofPopMatrix();
 	ofPopStyle();
 }
 #endif

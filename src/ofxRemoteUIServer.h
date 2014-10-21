@@ -268,6 +268,7 @@ public:
 #ifdef OF_AVAILABLE
 
 	void setUiColumnWidth(int w){ uiColumnWidth = w; }
+	void setBuiltInUiScale(float s){uiScale = s;}
 
 	//of style event/callback
 	ofEvent<RemoteUIServerCallBackArg> clientAction;
@@ -369,6 +370,7 @@ private:
 	string													lastChosenPreset;
 	float													uiColumnWidth;
 	float													uiAlpha;
+	float													uiScale;
 
 	void			refreshPresetsCache();
 
