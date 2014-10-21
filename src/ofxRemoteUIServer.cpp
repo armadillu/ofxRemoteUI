@@ -988,7 +988,7 @@ void ofxRemoteUIServer::threadedFunction(){
 
 void ofxRemoteUIServer::_draw(ofEventArgs &e){
 	ofSetupScreen(); //mmm this is a bit scary //TODO!
-	draw( 20, ofGetHeight() - 20);
+	draw( 20 / uiScale, ofGetHeight() / uiScale - 20 / uiScale);
 }
 
 void ofxRemoteUIServer::_update(ofEventArgs &e){
