@@ -85,7 +85,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	broadcastCount = 0;
 	newColorInGroupCounter = 1;
 	showInterfaceKey = '\t';
-	int a = 80;
+	uiScale = 1;
 
 #ifdef OF_AVAILABLE
 	uiColumnWidth = 320;
