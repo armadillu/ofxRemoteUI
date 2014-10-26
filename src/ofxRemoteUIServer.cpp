@@ -976,6 +976,22 @@ void ofxRemoteUIServer::update(float dt){
 }
 
 #ifdef OF_AVAILABLE
+
+#ifdef USE_OFX_FONTSTASH
+void ofxRemoteUIServer::drawUiWithFontStash(string fontPath, float fontSize_){
+	useFontStash = true;
+	fontFile = ofToDataPath(fontPath, true);
+	fontSize = fontSize_;
+	font.setup(fontFile, 1.0, 512, false, 0, uiScale);
+	onScreenNotifications.drawUiWithFontStash(&font);
+}
+
+void ofxRemoteUIServer::drawUiWithBitmapFont(){
+	useFontStash = false;
+}
+#endif
+
+
 void ofxRemoteUIServer::threadedFunction(){
 
 	while (isThreadRunning()) {
@@ -995,6 +1011,21 @@ void ofxRemoteUIServer::_update(ofEventArgs &e){
 	update(ofGetLastFrameTime());
 }
 
+void ofxRemoteUIServer::drawString(const string & text, const ofVec2f & pos){
+	drawString(text, pos.x, pos.y);
+}
+
+void ofxRemoteUIServer::drawString(const string & text, const float & x, const float & y){
+	#ifdef USE_OFX_FONTSTASH
+	if(useFontStash){
+		font.drawMultiLine(text, fontSize, x, y + 1);
+	}else{
+		ofDrawBitmapString(text, x, y);
+	}
+	#else
+	ofDrawBitmapString(text, x, y);
+	#endif
+}
 
 void ofxRemoteUIServer::draw(int x, int y){
 
@@ -1027,7 +1058,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 			ofRect(0,ofGetHeight() / uiScale - bottomBarHeight, ofGetWidth() / uiScale, bottomBarHeight );
 
 			ofSetColor(255);
-			ofDrawBitmapString("ofxRemoteUI built in client. " +
+			drawString("ofxRemoteUI built in client. " +
 							   string(enabled ? ("Server reachable at " + computerIP + ":" + ofToString(port)) + "." :
 									  "Sever Disabled." ) +
 							   "\nPress 's' to save current config.\n" +
@@ -1049,9 +1080,9 @@ void ofxRemoteUIServer::draw(int x, int y){
 			ofVec2f dpos = ofVec2f(192, 16);
 			ofSetColor(180);
 			if (selectedItem < 0){
-				ofDrawBitmapString("Press RETURN to load GLOBAL PRESET: \"" + presetsCached[selectedPreset] + "\"", dpos);
+				drawString("Press RETURN to load GLOBAL PRESET: \"" + presetsCached[selectedPreset] + "\"", dpos);
 				ofSetColor(textBlinkC);
-				ofDrawBitmapString("                                     " + presetsCached[selectedPreset], dpos);
+				drawString("                                     " + presetsCached[selectedPreset], dpos);
 			}else{
 				RemoteUIParam p = params[orderedKeys[selectedItem]];
 				int howMany = 0;
@@ -1059,22 +1090,22 @@ void ofxRemoteUIServer::draw(int x, int y){
 					howMany = groupPresetsCached[p.group].size();
 					if (howMany > 0){
 						string msg = "Press RETURN to load \"" + p.group + "\" GROUP PRESET: \"";
-						ofDrawBitmapString( msg + groupPresetsCached[p.group][selectedGroupPreset] + "\"", dpos);
+						drawString( msg + groupPresetsCached[p.group][selectedGroupPreset] + "\"", dpos);
 						ofSetColor(textBlinkC);
-						ofDrawBitmapString(groupPresetsCached[p.group][selectedGroupPreset],
+						drawString(groupPresetsCached[p.group][selectedGroupPreset],
 										   dpos + ofVec2f(msg.length() * 8, 0));
 
 					}
 				}
 				if(howMany == 0){
 					ofSetColor(180);
-					ofDrawBitmapString("Selected Preset: NONE", dpos);
+					drawString("Selected Preset: NONE", dpos);
 				}
 			}
 		}
 		if (selectedItem != -1) ofSetColor(255);
 		else ofSetColor(textBlinkC);
-		ofDrawBitmapString("+ PRESET SELECTION: " , 30,  16);
+		drawString("+ PRESET SELECTION: " , 30,  16);
 
 		int linesInited = uiLines.getNumVertices() > 0 ;
 
@@ -1101,19 +1132,19 @@ void ofxRemoteUIServer::draw(int x, int y){
 
 				if(p.type != REMOTEUI_PARAM_SPACER){
 					string sel = (selectedItem == i) ? ">>" : "  ";
-					ofDrawBitmapString(sel + key, x, y);
+					drawString(sel + key, x, y);
 				}else{
 					ofPushStyle();
 					ofColor c = ofColor(p.r, p.g, p.b);
 					ofSetColor(c * 0.3);
 					ofRect(x , -spacing + y + spacing * 0.33, realColW, spacing);
 					ofPopStyle();
-					ofDrawBitmapString("+ " + p.stringVal, x,y);
+					drawString("+ " + p.stringVal, x,y);
 				}
 
 				switch (p.type) {
 					case REMOTEUI_PARAM_FLOAT:
-						ofDrawBitmapString(ofToString(p.floatVal), x + valOffset, y);
+						drawString(ofToString(p.floatVal), x + valOffset, y);
 						break;
 					case REMOTEUI_PARAM_ENUM:
 						if (p.intVal >= 0 && p.intVal < p.enumList.size() && p.enumList.size() > 0){
@@ -1121,19 +1152,19 @@ void ofxRemoteUIServer::draw(int x, int y){
 							if (val.length() > column2MaxLen){
 								val = val.substr(0, column2MaxLen);
 							}
-							ofDrawBitmapString(val, x + valOffset, y);
+							drawString(val, x + valOffset, y);
 						}else{
-							ofDrawBitmapString(ofToString(p.intVal), x + valOffset, y);
+							drawString(ofToString(p.intVal), x + valOffset, y);
 						}
 						break;
 					case REMOTEUI_PARAM_INT:
-						ofDrawBitmapString(ofToString(p.intVal), x + valOffset, y);
+						drawString(ofToString(p.intVal), x + valOffset, y);
 						break;
 					case REMOTEUI_PARAM_BOOL:
-						ofDrawBitmapString(p.boolVal ? "true" : "false", x + valOffset, y);
+						drawString(p.boolVal ? "true" : "false", x + valOffset, y);
 						break;
 					case REMOTEUI_PARAM_STRING:
-						ofDrawBitmapString(p.stringVal, x + valOffset, y);
+						drawString(p.stringVal, x + valOffset, y);
 						break;
 					case REMOTEUI_PARAM_COLOR:
 						ofSetColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal);
@@ -1148,11 +1179,11 @@ void ofxRemoteUIServer::draw(int x, int y){
 								if (presetName.length() > column2MaxLen){
 									presetName = presetName.substr(0, column2MaxLen);
 								}
-								ofDrawBitmapString(presetName, x + valOffset, y);
+								drawString(presetName, x + valOffset, y);
 							}
 						}else{ //not selected
 							if(howMany > 0 ){
-								ofDrawBitmapString("(" + ofToString(howMany) + ")", x + valOffset, y);
+								drawString("(" + ofToString(howMany) + ")", x + valOffset, y);
 							}
 						}
 						}break;

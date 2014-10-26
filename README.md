@@ -125,6 +125,17 @@ RUI_SETUP() assigns a random port the first time the app is launched, and it use
 
 ofxRemoteUIServer listens for the keyDown event, and if "tab" is pressed, it displays a built-in client with some basic features. You can interact with the built-in client using arrow keys, return, and some other keystrokes depending on the context. Read the on-screen help.
 
+The built-in UI can be set to draw in any scale (useful for retina screens) by using:
+```
+RUI_GET_INSTANCE()->setBuiltInUiScale(scale);
+```
+
+You can set the built-in UI to be drawn using [ofxFontStash](https://github.com/armadillu/ofxFontStash) by adding it to your project, and defining USE_OFX_FONTSTASH in your project's PreProcessor Macros. This allows you to use any font to draw the built-in client ui by calling, instead of the default OF bitmap font.
+```
+RUI_GET_INSTANCE()->drawUiWithFontStash("myFont.ttf");
+```
+
+
 
 ## LICENSE and ATTRIBUTIONS
 

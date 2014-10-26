@@ -18,6 +18,9 @@
 #include <set>
 #include <vector>
 #include "ofxRemoteUISimpleNotifications.h"
+#ifdef USE_OFX_FONTSTASH
+	#include "ofxFontStash.h"
+#endif
 
 // ################################################################################################
 // ## EASY ACCES MACROS ## use these instead of direct calls
@@ -264,6 +267,10 @@ public:
 
 	void setShowInterfaceKey(char k);
 	void setAutomaticBackupsEnabled(bool enabled);
+	#ifdef USE_OFX_FONTSTASH
+	void drawUiWithFontStash(string fontPath, float fontSize = 15 /*good with veraMono*/ );
+	void drawUiWithBitmapFont();
+	#endif
 
 #ifdef OF_AVAILABLE
 
@@ -354,7 +361,6 @@ private:
 
 #ifdef OF_AVAILABLE
 	
-	ofxRemoteUISimpleNotifications onScreenNotifications;
 	void			_appExited(ofEventArgs &e);
 	void			_draw(ofEventArgs &d);
 	void			_update(ofEventArgs &d);
@@ -362,6 +368,7 @@ private:
 
 	int														selectedItem;
 	ofVboMesh												uiLines;
+	ofxRemoteUISimpleNotifications							onScreenNotifications;
 
 	vector<string>											presetsCached; //for the built in client
 	unordered_map<string, vector<string> > 					groupPresetsCached;
@@ -371,9 +378,16 @@ private:
 	float													uiColumnWidth;
 	float													uiAlpha;
 	float													uiScale;
+	#ifdef USE_OFX_FONTSTASH
+	bool													useFontStash;
+	ofxFontStash											font;
+	string													fontFile;
+	float													fontSize;
+	#endif
 
 	void			refreshPresetsCache();
-
+	void			drawString(const string & text, const float & x, const float & y);
+	void			drawString(const string & text, const ofVec2f & pos);
 #endif
 
 	static ofxRemoteUIServer* 							singleton;

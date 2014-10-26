@@ -19,8 +19,12 @@
 #define FRESH_COLOR						ofColor(0)
 #define PARAM_WATCH_COLOR				ofColor(0, 128, 255)
 #define NOTIFICATION_LINEHEIGHT			20
-
 #include "ofMain.h"
+
+#ifdef USE_OFX_FONTSTASH
+	#include "ofxFontStash.h"
+#endif
+
 
 class ofxRemoteUISimpleNotifications{
 
@@ -37,7 +41,12 @@ public:
 		ofColor color;
 	};
 
-	ofxRemoteUISimpleNotifications(){};
+
+	ofxRemoteUISimpleNotifications(){
+		#ifdef USE_OFX_FONTSTASH
+		font = NULL;
+		#endif
+	};
 
 	void update(float dt){
 		vector<int> toDeleteIndexes;
@@ -75,7 +84,7 @@ public:
 
 		for(int i = 0; i < notifications.size(); i++){
 			float a = ofClamp( NOTIFICATION_ALPHA_OVEFLOW * notifications[i].time, 0.0f, 1.0f);
-			ofDrawBitmapStringHighlight("ofxRemoteUIServer: " + notifications[i].msg,
+			drawStringWithBox("ofxRemoteUIServer: " + notifications[i].msg,
 										x,
 										y - spacing * (notifications.size() - 1) + i * spacing,
 										ofColor(0, 255 * a),
@@ -90,7 +99,7 @@ public:
 			float fresh = 1.0f - ofClamp(OFXREMOTEUI_PARAM_UPDATE_NOTIFICATION_SCREENTIME - it->second.time, 0.0f, 1.0f);
 			string total = it->first + ": " + it->second.value ;
 			float yy = y - spacing * ( notifications.size() + (paramNotifications.size()-1) - c );
-			ofDrawBitmapStringHighlight( total,
+			drawStringWithBox( total,
 										x,
 										yy,
 										(fresh > 0.1 ) ? ofColor(0,255,0) : ofColor(0, 255 * a),
@@ -107,7 +116,7 @@ public:
 
 		c = 0;
 		for(it_type it = paramWatch.begin(); it != paramWatch.end(); it++){
-			ofDrawBitmapStringHighlight( "[" + it->first + "] " + it->second.value,
+			drawStringWithBox( "[" + it->first + "] " + it->second.value,
 										x,
 										y - spacing * ( notifications.size() + paramNotifications.size() + (paramWatch.size()-1) - c ),
 										ofColor(0), PARAM_WATCH_COLOR
@@ -140,7 +149,46 @@ public:
 		paramWatch[paramName] = n;
 	};
 
+
+	#ifdef USE_OFX_FONTSTASH
+	void drawUiWithFontStash(ofxFontStash * font_){
+		font = font_;
+	}
+	void drawUiWithBitmapFont(){
+		font = NULL;
+	}
+	#endif
+
 private:
+
+	float drawStringWithBox(string text, int x, int y, const ofColor& background, const ofColor& foreground ){
+		#ifdef USE_OFX_FONTSTASH
+		if(font == NULL){
+			ofDrawBitmapStringHighlight(text, x, y, background, foreground);
+		}else{
+			ofRectangle r = font->getBBox(text, 15, x, y);
+			float diff = (NOTIFICATION_LINEHEIGHT - r.height);
+			r.x -= diff * 0.5f;
+			r.y -= diff * 0.5f;
+			r.width += diff;
+			r.height += diff;
+			ofPushStyle();
+			ofSetColor(background);
+			ofRect(r);
+			ofSetColor(foreground);
+			font->draw(text, 15, x, y);
+			ofPopStyle();
+			return r.height + r.y - y;
+		}
+		#else
+		ofDrawBitmapStringHighlight(text, x, y, background, foreground);
+		#endif
+		return NOTIFICATION_LINEHEIGHT;
+	}
+
+	#ifdef USE_OFX_FONTSTASH
+	ofxFontStash * font;
+	#endif
 
 	vector<SimpleNotification> notifications;
 	map<string, ParamNotification> paramNotifications;
