@@ -373,103 +373,123 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 	vector<string> loadedParams;
 	ofxXmlSettings s;
 	bool exists = s.loadFile(fileName);
+	unordered_map<string, bool> readKeys; //to keep track of duplicated keys;
 
 	if (exists){
-
 		if( s.getNumTags(OFXREMOTEUI_XML_TAG) > 0 ){
 			s.pushTag(OFXREMOTEUI_XML_TAG, 0);
 
 			int numFloats = s.getNumTags(OFXREMOTEUI_FLOAT_PARAM_XML_TAG);
 			for (int i=0; i< numFloats; i++){
 				string paramName = s.getAttribute(OFXREMOTEUI_FLOAT_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, OFXREMOTEUI_UNKNOWN_PARAM_NAME_XML_KEY, i);
-				float val = s.getValue(OFXREMOTEUI_FLOAT_PARAM_XML_TAG, 0.0, i);
-				unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
-				if ( it != params.end() ){	// found!
-					loadedParams.push_back(paramName);
-					if(params[paramName].floatValAddr != NULL){
-						*params[paramName].floatValAddr = val;
-						params[paramName].floatVal = val;
-						*params[paramName].floatValAddr = ofClamp(*params[paramName].floatValAddr, params[paramName].minFloat, params[paramName].maxFloat);
-						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-						if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading a FLOAT '" << paramName <<"' (" << ofToString( *params[paramName].floatValAddr, 3) << ") from XML" ;
+				if (readKeys.find(paramName) == readKeys.end()){
+					readKeys[paramName] = true;
+					float val = s.getValue(OFXREMOTEUI_FLOAT_PARAM_XML_TAG, 0.0, i);
+					unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
+					if ( it != params.end() ){	// found!
+						loadedParams.push_back(paramName);
+						if(params[paramName].floatValAddr != NULL){
+							*params[paramName].floatValAddr = val;
+							params[paramName].floatVal = val;
+							*params[paramName].floatValAddr = ofClamp(*params[paramName].floatValAddr, params[paramName].minFloat, params[paramName].maxFloat);
+							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
+							if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading a FLOAT '" << paramName <<"' (" << ofToString( *params[paramName].floatValAddr, 3) << ") from XML" ;
+						}else{
+							RUI_LOG_ERROR << "ofxRemoteUIServer ERROR at loading FLOAT (" << paramName << ")" ;
+						}
 					}else{
-						RUI_LOG_ERROR << "ofxRemoteUIServer ERROR at loading FLOAT (" << paramName << ")" ;
+						RUI_LOG_ERROR << "ofxRemoteUIServer: float param '" << paramName << "' defined in xml not found in DB!" ;
 					}
 				}else{
-					RUI_LOG_ERROR << "ofxRemoteUIServer: float param '" <<paramName << "' defined in xml not found in DB!" ;
+					RUI_LOG_ERROR << "ofxRemoteUIServer: float param '" << paramName << "' defined twice in xml! Using first definition only" ;
 				}
 			}
 
 			int numInts = s.getNumTags(OFXREMOTEUI_INT_PARAM_XML_TAG);
 			for (int i=0; i< numInts; i++){
 				string paramName = s.getAttribute(OFXREMOTEUI_INT_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, OFXREMOTEUI_UNKNOWN_PARAM_NAME_XML_KEY, i);
-				float val = s.getValue(OFXREMOTEUI_INT_PARAM_XML_TAG, 0, i);
-				unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
-				if ( it != params.end() ){	// found!
-					loadedParams.push_back(paramName);
-					if(params[paramName].intValAddr != NULL){
-						*params[paramName].intValAddr = val;
-						params[paramName].intVal = val;
-						*params[paramName].intValAddr = ofClamp(*params[paramName].intValAddr, params[paramName].minInt, params[paramName].maxInt);
-						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-						if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading an INT '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" ;
+				if (readKeys.find(paramName) == readKeys.end()){
+					readKeys[paramName] = true;
+					float val = s.getValue(OFXREMOTEUI_INT_PARAM_XML_TAG, 0, i);
+					unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
+					if ( it != params.end() ){	// found!
+						loadedParams.push_back(paramName);
+						if(params[paramName].intValAddr != NULL){
+							*params[paramName].intValAddr = val;
+							params[paramName].intVal = val;
+							*params[paramName].intValAddr = ofClamp(*params[paramName].intValAddr, params[paramName].minInt, params[paramName].maxInt);
+							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
+							if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading an INT '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" ;
+						}else{
+							RUI_LOG_ERROR << "ofxRemoteUIServer ERROR at loading INT (" << paramName << ")" ;
+						}
 					}else{
-						RUI_LOG_ERROR << "ofxRemoteUIServer ERROR at loading INT (" << paramName << ")" ;
+						RUI_LOG_ERROR << "ofxRemoteUIServer: int param '" <<paramName << "' defined in xml not found in DB!" ;
 					}
 				}else{
-					RUI_LOG_ERROR << "ofxRemoteUIServer: int param '" <<paramName << "' defined in xml not found in DB!" ;
+					RUI_LOG_ERROR << "ofxRemoteUIServer: int param '" << paramName << "' defined twice in xml! Using first definition only" ;
 				}
 			}
 
 			int numColors = s.getNumTags(OFXREMOTEUI_COLOR_PARAM_XML_TAG);
 			for (int i=0; i< numColors; i++){
 				string paramName = s.getAttribute(OFXREMOTEUI_COLOR_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, "OFXREMOTEUI_UNKNOWN_PARAM_NAME_XML_KEY", i);
-				s.pushTag(OFXREMOTEUI_COLOR_PARAM_XML_TAG, i);
-				int r = s.getValue("R", 0);
-				int g = s.getValue("G", 0);
-				int b = s.getValue("B", 0);
-				int a = s.getValue("A", 0);
-				unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
-				if ( it != params.end() ){	// found!
-					loadedParams.push_back(paramName);
-					if(params[paramName].redValAddr != NULL){
-						*params[paramName].redValAddr = r;
-						params[paramName].redVal = r;
-						*(params[paramName].redValAddr+1) = g;
-						params[paramName].greenVal = g;
-						*(params[paramName].redValAddr+2) = b;
-						params[paramName].blueVal = b;
-						*(params[paramName].redValAddr+3) = a;
-						params[paramName].alphaVal = a;
-						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-						if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading a COLOR '" << paramName <<"' (" << (int)*params[paramName].redValAddr << " " << (int)*(params[paramName].redValAddr+1) << " " << (int)*(params[paramName].redValAddr+2) << " " << (int)*(params[paramName].redValAddr+3)  << ") from XML" ;
+				if (readKeys.find(paramName) == readKeys.end()){
+					readKeys[paramName] = true;
+					s.pushTag(OFXREMOTEUI_COLOR_PARAM_XML_TAG, i);
+					int r = s.getValue("R", 0);
+					int g = s.getValue("G", 0);
+					int b = s.getValue("B", 0);
+					int a = s.getValue("A", 0);
+					unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
+					if ( it != params.end() ){	// found!
+						loadedParams.push_back(paramName);
+						if(params[paramName].redValAddr != NULL){
+							*params[paramName].redValAddr = r;
+							params[paramName].redVal = r;
+							*(params[paramName].redValAddr+1) = g;
+							params[paramName].greenVal = g;
+							*(params[paramName].redValAddr+2) = b;
+							params[paramName].blueVal = b;
+							*(params[paramName].redValAddr+3) = a;
+							params[paramName].alphaVal = a;
+							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
+							if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading a COLOR '" << paramName <<"' (" << (int)*params[paramName].redValAddr << " " << (int)*(params[paramName].redValAddr+1) << " " << (int)*(params[paramName].redValAddr+2) << " " << (int)*(params[paramName].redValAddr+3)  << ") from XML" ;
+						}else{
+							RUI_LOG_ERROR << "ofxRemoteUIServer ERROR at loading COLOR (" << paramName << ")" ;
+						}
 					}else{
-						RUI_LOG_ERROR << "ofxRemoteUIServer ERROR at loading COLOR (" << paramName << ")" ;
+						RUI_LOG_WARNING << "ofxRemoteUIServer: color param '" <<paramName << "' defined in xml not found in DB!" ;
 					}
+					s.popTag();
 				}else{
-					RUI_LOG_WARNING << "ofxRemoteUIServer: color param '" <<paramName << "' defined in xml not found in DB!" ;
+					RUI_LOG_ERROR << "ofxRemoteUIServer: color param '" << paramName << "' defined twice in xml! Using first definition only" ;
 				}
-				s.popTag();
 			}
 
 			int numEnums = s.getNumTags(OFXREMOTEUI_ENUM_PARAM_XML_TAG);
 			for (int i=0; i< numEnums; i++){
 				string paramName = s.getAttribute(OFXREMOTEUI_ENUM_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, OFXREMOTEUI_UNKNOWN_PARAM_NAME_XML_KEY, i);
-				float val = s.getValue(OFXREMOTEUI_ENUM_PARAM_XML_TAG, 0, i);
-				unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
-				if ( it != params.end() ){	// found!
-					loadedParams.push_back(paramName);
-					if(params[paramName].intValAddr != NULL){
-						*params[paramName].intValAddr = val;
-						params[paramName].intVal = val;
-						*params[paramName].intValAddr = ofClamp(*params[paramName].intValAddr, params[paramName].minInt, params[paramName].maxInt);
-						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-						if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading an ENUM '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" ;
+				if (readKeys.find(paramName) == readKeys.end()){
+					readKeys[paramName] = true;
+					float val = s.getValue(OFXREMOTEUI_ENUM_PARAM_XML_TAG, 0, i);
+					unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
+					if ( it != params.end() ){	// found!
+						loadedParams.push_back(paramName);
+						if(params[paramName].intValAddr != NULL){
+							*params[paramName].intValAddr = val;
+							params[paramName].intVal = val;
+							*params[paramName].intValAddr = ofClamp(*params[paramName].intValAddr, params[paramName].minInt, params[paramName].maxInt);
+							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
+							if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading an ENUM '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" ;
+						}else{
+							RUI_LOG_ERROR << "ofxRemoteUIServer ERROR at loading ENUM (" << paramName << ")" ;
+						}
 					}else{
-						RUI_LOG_ERROR << "ofxRemoteUIServer ERROR at loading ENUM (" << paramName << ")" ;
+						RUI_LOG_WARNING << "ofxRemoteUIServer: enum param '" << paramName << "' defined in xml not found in DB!" ;
 					}
 				}else{
-					RUI_LOG_WARNING << "ofxRemoteUIServer: enum param '" << paramName << "' defined in xml not found in DB!" ;
+					RUI_LOG_ERROR << "ofxRemoteUIServer: enum param '" << paramName << "' defined twice in xml! Using first definition only" ;
 				}
 			}
 
@@ -477,41 +497,49 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 			int numBools = s.getNumTags(OFXREMOTEUI_BOOL_PARAM_XML_TAG);
 			for (int i=0; i< numBools; i++){
 				string paramName = s.getAttribute(OFXREMOTEUI_BOOL_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, OFXREMOTEUI_UNKNOWN_PARAM_NAME_XML_KEY, i);
-				float val = s.getValue(OFXREMOTEUI_BOOL_PARAM_XML_TAG, false, i);
-
-				unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
-				if ( it != params.end() ){	// found!
-					loadedParams.push_back(paramName);
-					if(params[paramName].boolValAddr != NULL){
-						*params[paramName].boolValAddr = val;
-						params[paramName].boolVal = val;
-						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-						if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading a BOOL '" << paramName <<"' (" << (bool) *params[paramName].boolValAddr << ") from XML" ;
+				if (readKeys.find(paramName) == readKeys.end()){
+					readKeys[paramName] = true;
+					float val = s.getValue(OFXREMOTEUI_BOOL_PARAM_XML_TAG, false, i);
+					unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
+					if ( it != params.end() ){	// found!
+						loadedParams.push_back(paramName);
+						if(params[paramName].boolValAddr != NULL){
+							*params[paramName].boolValAddr = val;
+							params[paramName].boolVal = val;
+							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
+							if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading a BOOL '" << paramName <<"' (" << (bool) *params[paramName].boolValAddr << ") from XML" ;
+						}else{
+							RUI_LOG_ERROR << "ofxRemoteUIServer ERROR at loading BOOL (" << paramName << ")" ;
+						}
 					}else{
-						RUI_LOG_ERROR << "ofxRemoteUIServer ERROR at loading BOOL (" << paramName << ")" ;
+						RUI_LOG_WARNING << "ofxRemoteUIServer: bool param '" << paramName << "' defined in xml not found in DB!" ;
 					}
 				}else{
-					RUI_LOG_WARNING << "ofxRemoteUIServer: bool param '" << paramName << "' defined in xml not found in DB!" ;
+					RUI_LOG_ERROR << "ofxRemoteUIServer: bool param '" << paramName << "' defined twice in xml! Using first definition only" ;
 				}
 			}
 
 			int numStrings = s.getNumTags(OFXREMOTEUI_STRING_PARAM_XML_TAG);
 			for (int i=0; i< numStrings; i++){
 				string paramName = s.getAttribute(OFXREMOTEUI_STRING_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, OFXREMOTEUI_UNKNOWN_PARAM_NAME_XML_KEY, i);
-				string val = s.getValue(OFXREMOTEUI_STRING_PARAM_XML_TAG, "", i);
-
-				unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
-				if ( it != params.end() ){	// found!
-					loadedParams.push_back(paramName);
-					if(params[paramName].stringValAddr != NULL){
-						params[paramName].stringVal = val;
-						*params[paramName].stringValAddr = val;
-						if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-						if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading a STRING '" << paramName <<"' (" << (string) *params[paramName].stringValAddr << ") from XML" ;
+				if (readKeys.find(paramName) == readKeys.end()){
+					readKeys[paramName] = true;
+					string val = s.getValue(OFXREMOTEUI_STRING_PARAM_XML_TAG, "", i);
+					unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
+					if ( it != params.end() ){	// found!
+						loadedParams.push_back(paramName);
+						if(params[paramName].stringValAddr != NULL){
+							params[paramName].stringVal = val;
+							*params[paramName].stringValAddr = val;
+							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
+							if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIServer loading a STRING '" << paramName <<"' (" << (string) *params[paramName].stringValAddr << ") from XML" ;
+						}
+						else RUI_LOG_ERROR << "ofxRemoteUIServer ERROR at loading STRING (" << paramName << ")" ;
+					}else{
+						RUI_LOG_WARNING << "ofxRemoteUIServer: string param '" << paramName << "' defined in xml not found in DB!" ;
 					}
-					else RUI_LOG_ERROR << "ofxRemoteUIServer ERROR at loading STRING (" << paramName << ")" ;
 				}else{
-					RUI_LOG_WARNING << "ofxRemoteUIServer: string param '" << paramName << "' defined in xml not found in DB!" ;
+					RUI_LOG_ERROR << "ofxRemoteUIServer: string param '" << paramName << "' defined twice in xml! Using first definition only" ;
 				}
 			}
 		}

@@ -25,23 +25,21 @@ void testApp::setup(){
 	// SETUP A CALLBACK ///////////////////////////////////////////
 	ofAddListener(RUI_GET_OF_EVENT(), this, &testApp::clientDidSomething);
 
-
 	// SET PARAM GROUPS / COLORS //////////////////////////////////
-	RUI_NEW_GROUP("POSITION"); //make a new group (optional)
+	RUI_NEW_GROUP("POSITION");	//make a new group (optional)
+								//All items inside a group show the same background hue on the client
 
 	// SHARE A FLOAT PARAM ////////////////////////////////////////
 	RUI_SHARE_PARAM(x, 0, ofGetWidth() ); //add an "x" float param to the current group ("position")
 	RUI_SHARE_PARAM(y, 0, ofGetHeight()); //provide a variable, a rangeMin and a rangeMax
 
 	RUI_NEW_GROUP("STYLE"); //make a new group (optional)
-	RUI_NEW_COLOR(); // set a bg color for the upcoming params (optional)
 
 	// SHARE A BOOL PARAM ////////////////////////////////////////
 	RUI_SHARE_PARAM(drawOutlines);
 
 	RUI_NEW_COLOR(); //slighly change the bg color within the group
 	RUI_SHARE_PARAM(numCircles, 0, 30);	//variable, rangeMin, rangeMax
-
 
 	RUI_NEW_COLOR(); //slighly change the bg color within the group
 	RUI_SHARE_PARAM(circleSize, 1, 30);	//variable, rangeMin, rangeMax
@@ -55,9 +53,9 @@ void testApp::setup(){
 	RUI_SHARE_PARAM(currentMouseX, 0, ofGetWidth());
 
 	// SHARE AN ENUM PARAM ////////////////////////////////
-	vector<string> menuItems;
-	menuItems.push_back("MENU_OPTION_0");menuItems.push_back("MENU_OPTION_1");
-	menuItems.push_back("MENU_OPTION_2"); menuItems.push_back("MENU_OPTION_3");
+	//build a string list for the UI to show
+	string menuItems[] = {"MENU_OPTION_0", "MENU_OPTION_1", "MENU_OPTION_2", "MENU_OPTION_3"};
+	//privide the enum param, loweset enum, highest enum, and the Enum string list
 	RUI_SHARE_ENUM_PARAM(menu, MENU_OPTION_0, MENU_OPTION_3, menuItems);
 
 	// SHARE A COLOR PARAM ////////////////////////////////
@@ -71,8 +69,8 @@ void testApp::setup(){
 	RUI_SHARE_PARAM(unloadTest);
 
 	RUI_LOAD_FROM_XML();	//load values from XML, if you want to do so
-											//this will result on the UI showing the params
-											//as they were when last saved (saved on app quit by default)
+							//this will result on the UI showing the params
+							//as they were when last saved (saved on app quit by default)
 
 	//this efectively removes all remoteUI references to this param
 	//but bc it's been loaded from xml in the previous step before,
@@ -85,8 +83,8 @@ void testApp::setup(){
 	cout << "unloadTest: '" << unloadTest << "'" << endl;
 
 
-	RUI_WATCH_PARAM(currentMouseX); //this will print this param all the time on screen
-													//useful for debugging
+	RUI_WATCH_PARAM(currentMouseX); //this will print the supplied param all the time on screen,
+									//useful for debugging
 
 
 	//RUI_START_THREADED(); //if you want all the osc communication to happen on a different
