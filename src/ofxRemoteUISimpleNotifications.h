@@ -166,11 +166,12 @@ private:
 			ofDrawBitmapStringHighlight(text, x, y, background, foreground);
 		}else{
 			ofRectangle r = font->getBBox(text, 15, x, y);
-			float diff = (NOTIFICATION_LINEHEIGHT - r.height);
+			float diff = floor(NOTIFICATION_LINEHEIGHT - r.height);
 			r.x = x - 4;
 			r.y -= diff * 0.5f;
 			r.width += diff + 2;
 			r.height += diff;
+			r.height = ceil(r.height);
 			ofPushStyle();
 			ofSetColor(background);
 			ofRect(r);
