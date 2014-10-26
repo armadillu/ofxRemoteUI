@@ -88,6 +88,9 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	uiScale = 1;
 
 #ifdef OF_AVAILABLE
+	#ifdef USE_OFX_FONTSTASH
+	useFontStash = false;
+	#endif
 	uiColumnWidth = 320;
 	uiAlpha = 1.0f;
 	selectedPreset = selectedGroupPreset = 0;

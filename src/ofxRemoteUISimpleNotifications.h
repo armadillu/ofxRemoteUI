@@ -123,7 +123,6 @@ public:
 										);
 			c++;
 		}
-
 	};
 
 	void addNotification(string msg){
@@ -168,9 +167,9 @@ private:
 		}else{
 			ofRectangle r = font->getBBox(text, 15, x, y);
 			float diff = (NOTIFICATION_LINEHEIGHT - r.height);
-			r.x -= diff * 0.5f;
+			r.x = x - 4;
 			r.y -= diff * 0.5f;
-			r.width += diff;
+			r.width += diff + 2;
 			r.height += diff;
 			ofPushStyle();
 			ofSetColor(background);
