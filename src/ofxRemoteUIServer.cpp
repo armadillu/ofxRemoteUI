@@ -1123,9 +1123,8 @@ void ofxRemoteUIServer::draw(int x, int y){
 						string msg = "Press RETURN to load \"" + p.group + "\" GROUP PRESET: \"";
 						drawString( msg + groupPresetsCached[p.group][selectedGroupPreset] + "\"", dpos);
 						ofSetColor(textBlinkC);
-						drawString(groupPresetsCached[p.group][selectedGroupPreset],
-										   dpos + ofVec2f(msg.length() * 8, 0));
-
+						std::string padding(msg.length(), ' ');
+						drawString(padding + groupPresetsCached[p.group][selectedGroupPreset], dpos);
 					}
 				}
 				if(howMany == 0){
