@@ -272,6 +272,8 @@ public:
 	void drawUiWithBitmapFont();
 	#endif
 
+	bool builtInClientIsVisible(){return showUI;}
+
 #ifdef OF_AVAILABLE
 
 	void setUiColumnWidth(int w){ uiColumnWidth = w; }
