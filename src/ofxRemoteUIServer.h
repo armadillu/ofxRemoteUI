@@ -43,6 +43,10 @@
 #define OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM(val, enumMin, enumMax, menuList, ...)	\
 ( ofxRemoteUIServer::instance()->shareParam( #val, (int*)&val,enumMin, enumMax, menuList, ##__VA_ARGS__ ) )
 
+//use this macro to share enums + enumList with a string for the name; enum list can be vector<string> or string[]
+#define OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM_WCN(pName, val, enumMin, enumMax, menuList, ...)	\
+( ofxRemoteUIServer::instance()->shareParam( pName, (int*)&val, enumMin, enumMax, menuList, ##__VA_ARGS__ ) )
+
 //use this macro to share ofColors
 #define OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color, ...)				\
 ( ofxRemoteUIServer::instance()->shareParam( #color, (unsigned char*)&color.v[0], ##__VA_ARGS__ ) )
@@ -167,6 +171,7 @@
 #define RUI_SHARE_PARAM				OFX_REMOTEUI_SERVER_SHARE_PARAM
 #define RUI_SHARE_PARAM_WCN			OFX_REMOTEUI_SERVER_SHARE_PARAM_WCN
 #define RUI_SHARE_ENUM_PARAM		OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM
+#define RUI_SHARE_ENUM_PARAM_WCN    OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM_WCN
 #define RUI_SHARE_COLOR_PARAM		OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM
 #define RUI_SHARE_COLOR_PARAM_WCN   OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM_WCN
 #define RUI_NEW_GROUP				OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP
