@@ -100,6 +100,10 @@
 #define OFX_REMOTEUI_SERVER_SET_AUTO_XML_BACKUPS(doAutoBackups)			\
 ( ofxRemoteUIServer::instance()->setAutomaticBackupsEnabled(doAutoBackups) )
 
+/*set the show interface key*/
+#define OFX_REMOTE_UI_SERVER_SET_SHOW_INTERFACE_KEY(k)                  \
+( ofxRemoteUIServer::instance()->setShowInterfaceKey(k) )
+
 /*define where all the xml files should be saved*/
 #define OFX_REMOTEUI_SERVER_SET_CONFIGS_DIR(dir)						\
 ( ofxRemoteUIServer::instance()->setDirectoryPrefix(dir) )
@@ -190,6 +194,7 @@
 #define RUI_REMOVE_PARAM			OFX_REMOTEUI_SERVER_REMOVE_PARAM
 #define RUI_WATCH_PARAM				OFX_REMOTEUI_SERVER_WATCH_PARAM
 #define RUI_WATCH_PARAM_WCN			OFX_REMOTEUI_SERVER_WATCH_PARAM_WCN
+#define RUI_SET_INTERFACE_KEY       OFX_REMOTE_UI_SERVER_SET_SHOW_INTERFACE_KEY
 #define RUI_SET_CONFIGS_DIR			OFX_REMOTEUI_SERVER_SET_CONFIGS_DIR
 #define RUI_GET_OF_EVENT			OFX_REMOTEUI_SERVER_GET_CLIENT_OF_EVENT
 
