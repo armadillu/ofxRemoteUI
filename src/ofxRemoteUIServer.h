@@ -43,6 +43,10 @@
 #define OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM(val, enumMin, enumMax, menuList, ...)	\
 ( ofxRemoteUIServer::instance()->shareParam( #val, (int*)&val,enumMin, enumMax, menuList, ##__VA_ARGS__ ) )
 
+//use this macro to share enums + enumList with a string for the name; enum list can be vector<string> or string[]
+#define OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM_WCN(pName, val, enumMin, enumMax, menuList, ...)	\
+( ofxRemoteUIServer::instance()->shareParam( pName, (int*)&val, enumMin, enumMax, menuList, ##__VA_ARGS__ ) )
+
 //use this macro to share ofColors
 #define OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM(color, ...)				\
 ( ofxRemoteUIServer::instance()->shareParam( #color, (unsigned char*)&color.v[0], ##__VA_ARGS__ ) )
@@ -95,6 +99,10 @@
 /*toggle backup of main xml file at launch - defaults is off*/
 #define OFX_REMOTEUI_SERVER_SET_AUTO_XML_BACKUPS(doAutoBackups)			\
 ( ofxRemoteUIServer::instance()->setAutomaticBackupsEnabled(doAutoBackups) )
+
+/*set the show interface key*/
+#define OFX_REMOTE_UI_SERVER_SET_SHOW_INTERFACE_KEY(k)                  \
+( ofxRemoteUIServer::instance()->setShowInterfaceKey(k) )
 
 /*define where all the xml files should be saved*/
 #define OFX_REMOTEUI_SERVER_SET_CONFIGS_DIR(dir)						\
@@ -167,6 +175,7 @@
 #define RUI_SHARE_PARAM				OFX_REMOTEUI_SERVER_SHARE_PARAM
 #define RUI_SHARE_PARAM_WCN			OFX_REMOTEUI_SERVER_SHARE_PARAM_WCN
 #define RUI_SHARE_ENUM_PARAM		OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM
+#define RUI_SHARE_ENUM_PARAM_WCN    OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM_WCN
 #define RUI_SHARE_COLOR_PARAM		OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM
 #define RUI_SHARE_COLOR_PARAM_WCN   OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM_WCN
 #define RUI_NEW_GROUP				OFX_REMOTEUI_SERVER_SET_UPCOMING_PARAM_GROUP
@@ -185,6 +194,7 @@
 #define RUI_REMOVE_PARAM			OFX_REMOTEUI_SERVER_REMOVE_PARAM
 #define RUI_WATCH_PARAM				OFX_REMOTEUI_SERVER_WATCH_PARAM
 #define RUI_WATCH_PARAM_WCN			OFX_REMOTEUI_SERVER_WATCH_PARAM_WCN
+#define RUI_SET_INTERFACE_KEY       OFX_REMOTE_UI_SERVER_SET_SHOW_INTERFACE_KEY
 #define RUI_SET_CONFIGS_DIR			OFX_REMOTEUI_SERVER_SET_CONFIGS_DIR
 #define RUI_GET_OF_EVENT			OFX_REMOTEUI_SERVER_GET_CLIENT_OF_EVENT
 
