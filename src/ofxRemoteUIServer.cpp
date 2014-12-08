@@ -91,6 +91,8 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	#ifdef USE_OFX_FONTSTASH
 	useFontStash = false;
 	#endif
+	xOffset = 0.0f;
+	selectedColorComp = 0;
 	uiColumnWidth = 320;
 	uiAlpha = 1.0f;
 	selectedPreset = selectedGroupPreset = 0;
@@ -875,15 +877,21 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 						ofNotifyEvent(clientAction, cbArg, this);
 						onScreenNotifications.addNotification("SET '" + p.group  + "' GROUP TO '" + presetName + ".xml' PRESET");
 						#endif
+					}else if(p.type == REMOTEUI_PARAM_COLOR){
+						selectedColorComp++;
+						if(selectedColorComp > 3) selectedColorComp = 0;
 					}
 				}
 				break;
+
 			case OF_KEY_DOWN:
 			case OF_KEY_UP:{
+				float skip = 1;
+				if(ofGetKeyPressed(OF_KEY_SHIFT)) skip = 10;
 				float sign = e.key == OF_KEY_DOWN ? 1.0 : -1.0;
 				selectedGroupPreset = 0;
 				uiAlpha = 1;
-				selectedItem += sign;
+				selectedItem += sign * skip;
 				if(selectedItem < -1) selectedItem = orderedKeys.size() - 1;
 				if(selectedItem >= orderedKeys.size()) selectedItem = -1; //presets menu >> selectedItem = -1, on top of all
 				selectedGroupPreset = 0;
@@ -894,58 +902,73 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 
 				float sign = e.key == OF_KEY_RIGHT ? 1.0 : -1.0;
 
-				if (selectedItem >= 0){ //params
-					string key = orderedKeys[selectedItem];
-					RemoteUIParam p = params[key];
-					if (p.type != REMOTEUI_PARAM_SPACER){
-						uiAlpha = 0;
-						switch (p.type) {
-							case REMOTEUI_PARAM_FLOAT:
-								p.floatVal += sign * (p.maxFloat - p.minFloat) * 0.0025;
-								p.floatVal = ofClamp(p.floatVal, p.minFloat, p.maxFloat);
-								break;
-							case REMOTEUI_PARAM_ENUM:
-							case REMOTEUI_PARAM_INT:
-								p.intVal += sign;
-								p.intVal = ofClamp(p.intVal, p.minInt, p.maxInt);
-								break;
-							case REMOTEUI_PARAM_BOOL:
-								p.boolVal = !p.boolVal;
-								break;
-							default:
-								break;
+				if(ofGetKeyPressed(OF_KEY_RIGHT_SHIFT)){
+					xOffset += (uiColumnWidth) * sign;
+					xOffset = ofClamp(xOffset, -FLT_MAX, 2 * uiColumnWidth);
+				}else{
+					if(ofGetKeyPressed(OF_KEY_SHIFT)) sign *= 10;
+
+					if (selectedItem >= 0){ //params
+						string key = orderedKeys[selectedItem];
+						RemoteUIParam p = params[key];
+						if (p.type != REMOTEUI_PARAM_SPACER){
+							uiAlpha = 0;
+							switch (p.type) {
+								case REMOTEUI_PARAM_FLOAT:
+									p.floatVal += sign * (p.maxFloat - p.minFloat) * 0.0025;
+									p.floatVal = ofClamp(p.floatVal, p.minFloat, p.maxFloat);
+									break;
+								case REMOTEUI_PARAM_ENUM:
+								case REMOTEUI_PARAM_INT:
+									p.intVal += sign;
+									p.intVal = ofClamp(p.intVal, p.minInt, p.maxInt);
+									break;
+								case REMOTEUI_PARAM_BOOL:
+									p.boolVal = !p.boolVal;
+									break;
+								case REMOTEUI_PARAM_COLOR:
+									switch (selectedColorComp) {
+										case 0: p.redVal += sign; break;
+										case 1: p.greenVal += sign; break;
+										case 2: p.blueVal += sign; break;
+										case 3: p.alphaVal += sign; break;
+									}
+									break;
+								default:
+									break;
+							}
+							params[key] = p;
+							syncPointerToParam(key);
+							pushParamsToClient();
+							RemoteUIServerCallBackArg cbArg;
+							cbArg.action = CLIENT_DID_RESET_TO_XML;
+							cbArg.host = "localhost";
+							cbArg.action =  CLIENT_UPDATED_PARAM;
+							cbArg.paramName = key;
+							cbArg.param = params[key];  //copy the updated param to the callbakc arg
+							#ifdef OF_AVAILABLE
+							onScreenNotifications.addParamUpdate(key, cbArg.param.getValueAsString());
+							ofNotifyEvent(clientAction, cbArg, this);
+							#endif
+							if(callBack) callBack(cbArg);
+						}else{ //in spacer! group time, cycle through group presets
+							int numGroupPresets = groupPresetsCached[p.group].size();
+							if(numGroupPresets > 0){
+								selectedGroupPreset += sign;
+								if (selectedGroupPreset < 0) selectedGroupPreset = numGroupPresets -1;
+								if (selectedGroupPreset > numGroupPresets -1) selectedGroupPreset = 0;
+							}
 						}
-						params[key] = p;
-						syncPointerToParam(key);
-						pushParamsToClient();
-						RemoteUIServerCallBackArg cbArg;
-						cbArg.action = CLIENT_DID_RESET_TO_XML;
-						cbArg.host = "localhost";
-						cbArg.action =  CLIENT_UPDATED_PARAM;
-						cbArg.paramName = key;
-						cbArg.param = params[key];  //copy the updated param to the callbakc arg
-						#ifdef OF_AVAILABLE
-						onScreenNotifications.addParamUpdate(key, cbArg.param.getValueAsString());
-						ofNotifyEvent(clientAction, cbArg, this);
-						#endif
-						if(callBack) callBack(cbArg);
-					}else{ //in spacer! group time, cycle through group presets
-						int numGroupPresets = groupPresetsCached[p.group].size();
-						if(numGroupPresets > 0){
-							selectedGroupPreset += sign;
-							if (selectedGroupPreset < 0) selectedGroupPreset = numGroupPresets -1;
-							if (selectedGroupPreset > numGroupPresets -1) selectedGroupPreset = 0;
-						}
-					}
-				}else{ //presets!
-					if (presetsCached.size()){
-						selectedPreset += sign;
-						int limit = presetsCached.size() - 1;
-						if (selectedPreset > limit){
-							selectedPreset = 0;
-						}
-						if (selectedPreset < 0){
-							selectedPreset = limit;
+					}else{ //presets!
+						if (presetsCached.size()){
+							selectedPreset += sign;
+							int limit = presetsCached.size() - 1;
+							if (selectedPreset > limit){
+								selectedPreset = 0;
+							}
+							if (selectedPreset < 0){
+								selectedPreset = limit;
+							}
 						}
 					}
 				}
@@ -1092,10 +1115,10 @@ void ofxRemoteUIServer::draw(int x, int y){
 			drawString("ofxRemoteUI built in client. " +
 							   string(enabled ? ("Server reachable at " + computerIP + ":" + ofToString(port)) + "." :
 									  "Sever Disabled." ) +
-							   "\nPress 's' to save current config.\n" +
-							   "Press 'S' to make a new preset.\n" +
-							   "Press 'r' to restore all param's launch state.\n" +
-							   "Use Arrow Keys to edit values. Press 'TAB' to hide.", padding, ofGetHeight() / uiScale - bottomBarHeight + 20);
+					   "\nPress 's' to save current config, 'S' to make a new preset.\n" +
+					   "Press 'r' to restore all param's launch state.\n" +
+					   "Press Arrow Keys to edit values. Shift + Arrow Keys for bigger increments when editing. Right Shift + L/R Arrow Keys scroll.\n" +
+					   "Press 'TAB' to hide. Press 'RETURN' when on a color param to cycle through RGBA components.", padding, ofGetHeight() / uiScale - bottomBarHeight + 20);
 
 		}
 
@@ -1140,6 +1163,8 @@ void ofxRemoteUIServer::draw(int x, int y){
 		int linesInited = uiLines.getNumVertices() > 0 ;
 
 		if(uiAlpha > 0.99){
+
+			ofTranslate(xOffset, 0);
 
 			//param list
 			for(int i = 0; i < orderedKeys.size(); i++){
@@ -1196,10 +1221,27 @@ void ofxRemoteUIServer::draw(int x, int y){
 					case REMOTEUI_PARAM_STRING:
 						drawString(p.stringVal, x + valOffset, y);
 						break;
-					case REMOTEUI_PARAM_COLOR:
+					case REMOTEUI_PARAM_COLOR:{
+						ofPushStyle();
 						ofSetColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal);
 						ofRect(x + valOffset, y - spacing * 0.6, 64, spacing * 0.85);
-						break;
+						char aux[200];
+						char auxSelect[200];
+						sprintf(aux, "[%0*d,%0*d,%0*d,%0*d]", 3, p.redVal, 3, p.greenVal, 3, p.blueVal, 3, p.alphaVal);
+						switch (selectedColorComp) {
+							case 0: sprintf(auxSelect, " ___"); break;
+							case 1: sprintf(auxSelect, "     ___"); break;
+							case 2: sprintf(auxSelect, "         ___"); break;
+							case 3: sprintf(auxSelect, "             ___"); break;
+						}
+						ofSetColor(0); //shadow
+						drawString(aux, x + valOffset + 1, y + 1);
+						ofSetColor(255);
+						drawString(aux, x + valOffset, y);
+						ofPopStyle();
+						ofSetColor(255,0,0);
+						drawString(auxSelect, x + valOffset, y);
+						}break;
 					case REMOTEUI_PARAM_SPACER:{
 						int howMany = groupPresetsCached[p.group].size();
 
@@ -1675,11 +1717,7 @@ void ofxRemoteUIServer::addSpacer(string title){
 	p.b = paramColor.b;
 	p.group = upcomingGroup; //to ignore those in the client app later when grouping
 	p.a = 255; //spacer has full alpha
-	#ifdef OF_AVAILABLE
-	addParamToDB(p, title + " - " + ofToString((int)ofRandom(1000000)));
-	#else
-	addParamToDB(p, title + " - " + ofToString(rand()%1000000));
-	#endif
+	addParamToDB(p, title);
 	if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer Adding Group '" << title << "' #######################" ;
 }
 

@@ -141,6 +141,9 @@
 #define OFX_REMOTEUI_SERVER_REMOVE_PARAM(paramName)						\
 ( ofxRemoteUIServer::instance()->removeParamFromDB(#paramName) )
 
+#define OFX_REMOTEUI_SERVER_REMOVE_PARAM_WCN(paramName)						\
+( ofxRemoteUIServer::instance()->removeParamFromDB(paramName) )
+
 //sets the param as "to watch", so its value is printed on
 //screen all the time. WCN version in case you want to supply a custom string instead of the var itself
 #define OFX_REMOTEUI_SERVER_WATCH_PARAM(paramName)						\
@@ -183,6 +186,7 @@
 #define RUI_GET_INSTANCE			OFX_REMOTEUI_SERVER_GET_INSTANCE
 #define RUI_LOG						OFX_REMOTEUI_SERVER_LOG
 #define RUI_REMOVE_PARAM			OFX_REMOTEUI_SERVER_REMOVE_PARAM
+#define RUI_REMOVE_PARAM_WCN		OFX_REMOTEUI_SERVER_REMOVE_PARAM_WCN
 #define RUI_WATCH_PARAM				OFX_REMOTEUI_SERVER_WATCH_PARAM
 #define RUI_WATCH_PARAM_WCN			OFX_REMOTEUI_SERVER_WATCH_PARAM_WCN
 #define RUI_SET_CONFIGS_DIR			OFX_REMOTEUI_SERVER_SET_CONFIGS_DIR
@@ -380,6 +384,8 @@ private:
 	float													uiColumnWidth;
 	float													uiAlpha;
 	float													uiScale;
+	float													xOffset;
+	int														selectedColorComp; //[0..4]
 	#ifdef USE_OFX_FONTSTASH
 	bool													useFontStash;
 	ofxFontStash											font;
