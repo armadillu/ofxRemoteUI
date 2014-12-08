@@ -1126,7 +1126,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 		ofSetColor(64);
 		ofRect(0 , 0, ofGetWidth() / uiScale, 22);
 		ofColor textBlinkC ;
-		if(ofGetFrameNum()%5 < 1) textBlinkC = ofColor(255);
+		if(ofGetFrameNum()%6 < 4) textBlinkC = ofColor(0,0);
 		else textBlinkC = ofColor(255,0,0);
 
 		if(presetsCached.size() > 0 && selectedPreset >= 0 && selectedPreset < presetsCached.size()){
@@ -1226,21 +1226,23 @@ void ofxRemoteUIServer::draw(int x, int y){
 						ofSetColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal);
 						ofRect(x + valOffset, y - spacing * 0.6, 64, spacing * 0.85);
 						char aux[200];
-						char auxSelect[200];
 						sprintf(aux, "[%0*d,%0*d,%0*d,%0*d]", 3, p.redVal, 3, p.greenVal, 3, p.blueVal, 3, p.alphaVal);
-						switch (selectedColorComp) {
-							case 0: sprintf(auxSelect, " ___"); break;
-							case 1: sprintf(auxSelect, "     ___"); break;
-							case 2: sprintf(auxSelect, "         ___"); break;
-							case 3: sprintf(auxSelect, "             ___"); break;
-						}
 						ofSetColor(0); //shadow
 						drawString(aux, x + valOffset + 1, y + 1);
 						ofSetColor(255);
 						drawString(aux, x + valOffset, y);
+						if(selectedItem == i){
+							char auxSelect[200];
+							switch (selectedColorComp) {
+								case 0: sprintf(auxSelect, " ___"); break;
+								case 1: sprintf(auxSelect, "     ___"); break;
+								case 2: sprintf(auxSelect, "         ___"); break;
+								case 3: sprintf(auxSelect, "             ___"); break;
+							}
+							ofSetColor(textBlinkC);
+							drawString(auxSelect, x + valOffset, y);
+						}
 						ofPopStyle();
-						ofSetColor(255,0,0);
-						drawString(auxSelect, x + valOffset, y);
 						}break;
 					case REMOTEUI_PARAM_SPACER:{
 						int howMany = groupPresetsCached[p.group].size();
