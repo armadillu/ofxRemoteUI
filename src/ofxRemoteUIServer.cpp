@@ -902,7 +902,7 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 
 				float sign = e.key == OF_KEY_RIGHT ? 1.0 : -1.0;
 
-				if(ofGetKeyPressed(OF_KEY_RIGHT_SHIFT)){
+				if(ofGetKeyPressed(' ')){
 					xOffset += (uiColumnWidth) * sign;
 					xOffset = ofClamp(xOffset, -FLT_MAX, 2 * uiColumnWidth);
 				}else{
@@ -1117,7 +1117,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 									  "Sever Disabled." ) +
 					   "\nPress 's' to save current config, 'S' to make a new preset.\n" +
 					   "Press 'r' to restore all param's launch state.\n" +
-					   "Press Arrow Keys to edit values. Shift + Arrow Keys for bigger increments when editing. Right Shift + L/R Arrow Keys scroll.\n" +
+					   "Press Arrow Keys to edit values. Shift + Arrow Keys for bigger increments when editing. SPACEBAR + L/R Arrow Keys scroll.\n" +
 					   "Press 'TAB' to hide. Press 'RETURN' when on a color param to cycle through RGBA components.", padding, ofGetHeight() / uiScale - bottomBarHeight + 20);
 
 		}
