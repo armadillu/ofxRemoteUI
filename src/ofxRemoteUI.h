@@ -30,6 +30,8 @@
 #define OFXREMOTEUI_PARAM_UPDATE_NOTIFICATION_SCREENTIME	6.0
 #define OFXREMOTEUI_EVENT_NOTIFICATION_SCREENTIME			5.0
 
+#define MAX_PACKETS_PER_FRAME	300
+
 #define OFXREMOTEUI_LATENCY_TEST_RATE						0.3333
 #define OFXREMOTEUI_DISCONNECTION_STRIKES					4
 #define OFXREMOTEUI_CONNECTION_TIMEOUT						OFXREMOTEUI_LATENCY_TEST_RATE * OFXREMOTEUI_DISCONNECTION_STRIKES
@@ -221,6 +223,7 @@ public:
 
 protected:
 
+	void updateSendQueue();
 	virtual void update(float dt) = 0;
 	void sendParam(string paramName, RemoteUIParam p);
 	DecodedMessage decode(ofxOscMessage m);
@@ -285,6 +288,8 @@ protected:
 
 	unordered_map<string, RemoteUIParam>		paramsFromCode; //this will hold a copy of all the params as they where when shared first
 	unordered_map<string, RemoteUIParam>		paramsFromXML; //this will hold a copy of all the params as they where when first loaded from XML
+
+	vector<ofxOscMessage*>						sendQueue;
 
 private:
 

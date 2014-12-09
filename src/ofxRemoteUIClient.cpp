@@ -179,7 +179,8 @@ void ofxRemoteUIClient::update(float dt){
 			}
 		}
 
-		while( oscReceiver.hasWaitingMessages() ){// check for waiting messages from server
+		int numRecieved = 0;
+		while( oscReceiver.hasWaitingMessages() && numRecieved < MAX_PACKETS_PER_FRAME ){// check for waiting messages from server
 
 			ofxOscMessage m;
 			oscReceiver.getNextMessage(&m);
@@ -356,7 +357,10 @@ void ofxRemoteUIClient::update(float dt){
 
 				default: RUI_LOG_ERROR << "ofxRemoteUIClient::update >> UNKNOWN ACTION!!" <<endl; break;
 			}
+			numRecieved++;
 		}
+		if(numRecieved > 0) ofLog() << "numRecieved: " << numRecieved;
+		updateSendQueue();
 	}
 }
 

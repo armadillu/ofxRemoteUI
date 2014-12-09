@@ -594,6 +594,22 @@ string ofxRemoteUI::getValuesAsString(){
 	return out.str();
 }
 
+void ofxRemoteUI::updateSendQueue(){
+	int numSent = 0;
+	float t = 0;
+	if(verbose_){
+		t = ofGetElapsedTimef();
+	}
+	while (sendQueue.size() && numSent < MAX_PACKETS_PER_FRAME) {
+		oscSender.sendMessage(*sendQueue[0]);
+		delete sendQueue[0];
+		sendQueue.erase(sendQueue.begin());
+		numSent++;
+	}
+	if(numSent && verbose_){
+		ofLog() << "numSent: " << numSent << " took " << ofGetElapsedTimef() - t << "sec";
+	}
+}
 
 void ofxRemoteUI::setValuesFromString( string values ){
 
@@ -649,28 +665,28 @@ void ofxRemoteUI::setValuesFromString( string values ){
 
 
 void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
-	ofxOscMessage m;
+	ofxOscMessage * m = new ofxOscMessage();
 	//if(verbose_){ ofLogVerbose("sending >> %s ", paramName.c_str()); p.print(); }
-	m.setAddress("SEND " + stringForParamType(p.type) + " " + paramName);
+	m->setAddress("SEND " + stringForParamType(p.type) + " " + paramName);
 	switch (p.type) {
-		case REMOTEUI_PARAM_FLOAT: m.addFloatArg(p.floatVal); m.addFloatArg(p.minFloat); m.addFloatArg(p.maxFloat); break;
-		case REMOTEUI_PARAM_INT: m.addIntArg(p.intVal); m.addIntArg(p.minInt); m.addIntArg(p.maxInt); break;
-		case REMOTEUI_PARAM_COLOR: m.addIntArg(p.redVal); m.addIntArg(p.greenVal); m.addIntArg(p.blueVal); m.addIntArg(p.alphaVal); break;
-		case REMOTEUI_PARAM_BOOL: m.addIntArg(p.boolVal ? 1 : 0); break;
-		case REMOTEUI_PARAM_STRING: m.addStringArg(p.stringVal); break;
+		case REMOTEUI_PARAM_FLOAT: m->addFloatArg(p.floatVal); m->addFloatArg(p.minFloat); m->addFloatArg(p.maxFloat); break;
+		case REMOTEUI_PARAM_INT: m->addIntArg(p.intVal); m->addIntArg(p.minInt); m->addIntArg(p.maxInt); break;
+		case REMOTEUI_PARAM_COLOR: m->addIntArg(p.redVal); m->addIntArg(p.greenVal); m->addIntArg(p.blueVal); m->addIntArg(p.alphaVal); break;
+		case REMOTEUI_PARAM_BOOL: m->addIntArg(p.boolVal ? 1 : 0); break;
+		case REMOTEUI_PARAM_STRING: m->addStringArg(p.stringVal); break;
 		case REMOTEUI_PARAM_ENUM:{
-			m.addIntArg(p.intVal); m.addIntArg(p.minInt); m.addIntArg(p.maxInt);
+			m->addIntArg(p.intVal); m->addIntArg(p.minInt); m->addIntArg(p.maxInt);
 			for (int i = 0; i < p.enumList.size(); i++) {
-				m.addStringArg(p.enumList[i]);
+				m->addStringArg(p.enumList[i]);
 			}
 		}break;
-		case REMOTEUI_PARAM_SPACER: m.addStringArg(p.stringVal); break;
+		case REMOTEUI_PARAM_SPACER: m->addStringArg(p.stringVal); break;
 		default: break;
 	}
-	m.addIntArg(p.r); m.addIntArg(p.g); m.addIntArg(p.b); m.addIntArg(p.a); // set bg color!
-	m.addStringArg(p.group);
+	m->addIntArg(p.r); m->addIntArg(p.g); m->addIntArg(p.b); m->addIntArg(p.a); // set bg color!
+	m->addStringArg(p.group);
 	try{
-		oscSender.sendMessage(m);
+		sendQueue.push_back(m);
 	}catch(exception e){
 		RUI_LOG_ERROR << "exception";
 	}
@@ -680,35 +696,35 @@ void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
 //else, NO
 void ofxRemoteUI::sendREQU(bool confirmation){
 	if(verbose_) RUI_LOG_VERBOSE << "sendREQU()";
-	ofxOscMessage m;
-	m.setAddress("REQU");
-	if (confirmation) m.addStringArg("OK");
-	oscSender.sendMessage(m);
+	ofxOscMessage * m = new ofxOscMessage();
+	m->setAddress("REQU");
+	if (confirmation) m->addStringArg("OK");
+	sendQueue.push_back(m);
 }
 
 
 void ofxRemoteUI::sendRESX(bool confirm){
 	if(verbose_) RUI_LOG_VERBOSE << "sendRESX()";
-	ofxOscMessage m;
-	m.setAddress("RESX");
-	if (confirm) m.addStringArg("OK");
-	oscSender.sendMessage(m);
+	ofxOscMessage * m = new ofxOscMessage();
+	m->setAddress("RESX");
+	if (confirm) m->addStringArg("OK");
+	sendQueue.push_back(m);
 }
 
 void ofxRemoteUI::sendRESD(bool confirm){
 	if(verbose_) RUI_LOG_VERBOSE << "sendRESD()";
-	ofxOscMessage m;
-	m.setAddress("RESD");
-	if (confirm) m.addStringArg("OK");
-	oscSender.sendMessage(m);
+	ofxOscMessage * m = new ofxOscMessage();
+	m->setAddress("RESD");
+	if (confirm) m->addStringArg("OK");
+	sendQueue.push_back(m);
 }
 
 void ofxRemoteUI::sendSAVE(bool confirm){
 	if(verbose_) RUI_LOG_VERBOSE << "sendSAVE()";
-	ofxOscMessage m;
-	m.setAddress("SAVE");
-	if (confirm) m.addStringArg("OK");
-	oscSender.sendMessage(m);
+	ofxOscMessage * m = new ofxOscMessage();
+	m->setAddress("SAVE");
+	if (confirm) m->addStringArg("OK");
+	sendQueue.push_back(m);
 }
 
 
@@ -716,127 +732,127 @@ void ofxRemoteUI::sendTEST(){
 	if(verbose_) RUI_LOG_VERBOSE << "sendTEST()";
 	waitingForReply = true;
 	timeSinceLastReply = 0.0f;
-	ofxOscMessage m;
-	m.setAddress("TEST");
-	oscSender.sendMessage(m);
+	ofxOscMessage * m = new ofxOscMessage();
+	m->setAddress("TEST");
+	sendQueue.push_back(m);
 }
 
 //on client call, presetNames should be empty vector (request ing the list)
 //on server call, presetNames should have all the presetNames
 void ofxRemoteUI::sendPREL( vector<string> presetNames_ ){
 	if(verbose_) RUI_LOG_VERBOSE << "sendPRES()";
-	ofxOscMessage m;
-	m.setAddress("PREL");
+	ofxOscMessage * m = new ofxOscMessage();
+	m->setAddress("PREL");
 	if (presetNames_.size() == 0){ // if we are the client requesting a preset list, delete our current list
 		presetNames.clear();
-		m.addStringArg("OK");
+		m->addStringArg("OK");
 	}
 	for(int i = 0; i < presetNames_.size(); i++){
-		m.addStringArg(presetNames_[i]);
+		m->addStringArg(presetNames_[i]);
 	}
-	oscSender.sendMessage(m);
+	sendQueue.push_back(m);
 }
 
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
 void ofxRemoteUI::sendSAVP(string presetName, bool confirm){
 	if(verbose_) RUI_LOG_VERBOSE << "sendSAVP()";
-	ofxOscMessage m;
-	m.setAddress("SAVP");
-	m.addStringArg(presetName);
+	ofxOscMessage * m = new ofxOscMessage();
+	m->setAddress("SAVP");
+	m->addStringArg(presetName);
 	if (confirm){
-		m.addStringArg("OK");
+		m->addStringArg("OK");
 	}
-	oscSender.sendMessage(m);
+	sendQueue.push_back(m);
 }
 
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
 void ofxRemoteUI::sendSETP(string presetName, bool confirm){
 	if(verbose_) RUI_LOG_VERBOSE << "sendSETP()";
-	ofxOscMessage m;
-	m.setAddress("SETP");
-	m.addStringArg(presetName);
+	ofxOscMessage * m = new ofxOscMessage();
+	m->setAddress("SETP");
+	m->addStringArg(presetName);
 	if (confirm){
-		m.addStringArg("OK");
+		m->addStringArg("OK");
 	}
-	oscSender.sendMessage(m);
+	sendQueue.push_back(m);
 }
 
 void ofxRemoteUI::sendMISP(vector<string> missingParamsInPreset){
 	if (missingParamsInPreset.size() == 0) return; //do nothing if no params are missing
 	if(verbose_) RUI_LOG_VERBOSE << "sendMISP()";
-	ofxOscMessage m;
-	m.setAddress("MISP");
+	ofxOscMessage * m = new ofxOscMessage();
+	m->setAddress("MISP");
 	for(int i = 0; i < missingParamsInPreset.size(); i++){
-		m.addStringArg(missingParamsInPreset[i]);
+		m->addStringArg(missingParamsInPreset[i]);
 	}
-	oscSender.sendMessage(m);
+	sendQueue.push_back(m);
 }
 
 void ofxRemoteUI::sendDELP(string presetName, bool confirm){
 	if(verbose_) RUI_LOG_VERBOSE << "sendDELP()";
-	ofxOscMessage m;
-	m.setAddress("DELP");
-	m.addStringArg(presetName);
+	ofxOscMessage * m = new ofxOscMessage();
+	m->setAddress("DELP");
+	m->addStringArg(presetName);
 	if (confirm){
-		m.addStringArg("OK");
+		m->addStringArg("OK");
 	}
-	oscSender.sendMessage(m);
+	sendQueue.push_back(m);
 }
 
 void ofxRemoteUI::sendHELLO(){
-	ofxOscMessage m;
-	m.setAddress("HELO");
-	oscSender.sendMessage(m);
+	ofxOscMessage * m = new ofxOscMessage();
+	m->setAddress("HELO");
+	sendQueue.push_back(m);
 }
 
 void ofxRemoteUI::sendCIAO(){
-	ofxOscMessage m;
-	m.setAddress("CIAO");
-	oscSender.sendMessage(m);
+	ofxOscMessage * m = new ofxOscMessage();
+	m->setAddress("CIAO");
+	sendQueue.push_back(m);
 }
 
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
 void ofxRemoteUI::sendSETp(string presetName, string group, bool confirm){
 	if(verbose_) RUI_LOG_VERBOSE << "sendSETp()";
-	ofxOscMessage m;
-	m.setAddress("SETp");
-	m.addStringArg(presetName);
-	m.addStringArg(group);
+	ofxOscMessage * m = new ofxOscMessage();
+	m->setAddress("SETp");
+	m->addStringArg(presetName);
+	m->addStringArg(group);
 	if (confirm){
-		m.addStringArg("OK");
+		m->addStringArg("OK");
 	}
-	oscSender.sendMessage(m);
+	sendQueue.push_back(m);
 }
 
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
 void ofxRemoteUI::sendSAVp(string presetName, string group, bool confirm){
 	if(verbose_) RUI_LOG_VERBOSE << "sendSAVp()";
-	ofxOscMessage m;
-	m.setAddress("SAVp");
-	m.addStringArg(presetName);
-	m.addStringArg(group);
+	ofxOscMessage * m = new ofxOscMessage();
+	m->setAddress("SAVp");
+	m->addStringArg(presetName);
+	m->addStringArg(group);
 	if (confirm){
-		m.addStringArg("OK");
+		m->addStringArg("OK");
 	}
-	oscSender.sendMessage(m);
+	sendQueue.push_back(m);
 }
 
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
 void ofxRemoteUI::sendDELp(string presetName, string group, bool confirm){
 	if(verbose_) RUI_LOG_VERBOSE << "sendDELp()";
-	ofxOscMessage m;
-	m.setAddress("DELp");
-	m.addStringArg(presetName);
-	m.addStringArg(group);
+	ofxOscMessage * m = new ofxOscMessage();
+	m->setAddress("DELp");
+	m->addStringArg(presetName);
+	m->addStringArg(group);
 	if (confirm){
-		m.addStringArg("OK");
+		m->addStringArg("OK");
 	}
-	oscSender.sendMessage(m);
+	sendQueue.push_back(m);
 }
 
 

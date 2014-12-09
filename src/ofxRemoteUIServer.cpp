@@ -1370,6 +1370,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 
 	if(!enabled) return;
 
+
 	timeCounter += dt;
 	broadcastTime += dt;
 	timeSinceLastReply  += dt;
@@ -1382,6 +1383,8 @@ void ofxRemoteUIServer::updateServer(float dt){
 			//sendUpdateForParamsInList(changes);
 		}
 	}
+
+	updateSendQueue();
 
 	//let everyone know I exist and which is my port, every now and then
 	handleBroadcast();
@@ -1597,6 +1600,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			default: RUI_LOG_ERROR << "ofxRemoteUIServer::update >> ERR!"; break;
 		}
 	}
+
 }
 
 void ofxRemoteUIServer::deletePreset(string name, string group){
@@ -1849,11 +1853,11 @@ void ofxRemoteUIServer::sendLogToClient(const char* format, ...){
 
 void ofxRemoteUIServer::sendLogToClient(string message){
 	if(readyToSend){
-		ofxOscMessage m;
-		m.setAddress("LOG_");
-		m.addStringArg(message);
+		ofxOscMessage *m = new ofxOscMessage();
+		m->setAddress("LOG_");
+		m->addStringArg(message);
 		try{
-			oscSender.sendMessage(m);
+			sendQueue.push_back(m);
 		}catch(exception e){
 			RUI_LOG_ERROR << "exception " << e.what() ;
 		}
