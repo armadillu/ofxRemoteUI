@@ -394,7 +394,8 @@ private:
 	float													uiColumnWidth;
 	float													uiAlpha;
 	float													uiScale;
-	float													xOffset;
+	float													xOffset;		 //my ghetto scrolling
+	float													xOffsetTarget; //smooth transitions
 	int														selectedColorComp; //[0..4]
 	#ifdef USE_OFX_FONTSTASH
 	bool													useFontStash;
