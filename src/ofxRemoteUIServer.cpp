@@ -887,7 +887,7 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 			case OF_KEY_DOWN:
 			case OF_KEY_UP:{
 				float skip = 1;
-				if(ofGetKeyPressed(OF_KEY_SHIFT)) skip = 10;
+				if(ofGetKeyPressed(' ')) skip = 10;
 				float sign = e.key == OF_KEY_DOWN ? 1.0 : -1.0;
 				selectedGroupPreset = 0;
 				uiAlpha = 1;
