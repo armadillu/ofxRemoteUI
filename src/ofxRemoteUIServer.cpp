@@ -245,7 +245,7 @@ void ofxRemoteUIServer::setDirectoryPrefix(string _directoryPrefix){
 }
 
 
-void ofxRemoteUIServer::saveParamToXmlSettings(RemoteUIParam t, string key, ofxXmlSettings & s, XmlCounter & c){
+void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string key, ofxXmlSettings & s, XmlCounter & c){
 
 	switch (t.type) {
 		case REMOTEUI_PARAM_FLOAT:
@@ -355,9 +355,12 @@ void ofxRemoteUIServer::saveToXML(string fileName){
 	s.pushTag(OFXREMOTEUI_XML_TAG);
 
 	XmlCounter counters;
-	for( unordered_map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
-		string key = (*ii).first;
+	//for( unordered_map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+	for(int i = 0; i < orderedKeys.size(); i++){
+
+		string key = orderedKeys[i];
 		RemoteUIParam t = params[key];
+		cout << "saving: " << key << endl;
 		saveParamToXmlSettings(t, key, s, counters);
 	}
 
@@ -1717,7 +1720,7 @@ void ofxRemoteUIServer::addSpacer(string title){
 	p.b = paramColor.b;
 	p.group = upcomingGroup; //to ignore those in the client app later when grouping
 	p.a = 255; //spacer has full alpha
-	addParamToDB(p, title + " - " + ofToString(rand()%1000000));
+	addParamToDB(p, title);
 	if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer Adding Group '" << title << "' #######################" ;
 }
 

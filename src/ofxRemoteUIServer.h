@@ -332,7 +332,7 @@ private:
 	void			(*callBack)(RemoteUIServerCallBackArg);
 	void			threadedFunction();
 
-	void			saveParamToXmlSettings(RemoteUIParam p, string key, ofxXmlSettings & s, XmlCounter & counter);
+	void			saveParamToXmlSettings(const RemoteUIParam & p, string key, ofxXmlSettings & s, XmlCounter & counter);
 	void			saveSettingsBackup();
 
 	string 			getFinalPath(string);
