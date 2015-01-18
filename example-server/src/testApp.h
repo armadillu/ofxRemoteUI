@@ -20,6 +20,7 @@ public:
 
 		float x;
 		float y;
+		float z;
 		bool drawOutlines;
 		int numCircles;
 		float circleSize;

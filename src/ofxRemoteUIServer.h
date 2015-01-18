@@ -225,6 +225,7 @@ public:
 	void update(float dt);
 	void draw(int x = 20, int y = 20); //draws important notifications on screen
 	void close();
+
 	vector<string> loadFromXML(string fileName); //returns list of param names in current setup but not set in XML
 
 	void saveToXML(string fileName); //save the whole list of params to an xml
@@ -319,6 +320,12 @@ private:
 		int numFloats, numInts, numStrings, numBools, numEnums, numColors;
 	};
 
+	vector<string> loadFromXMLv1(string fileName,  ofxXmlSettings & s); //returns list of param names in current setup but not set in XML
+	vector<string> loadFromXMLv2(string fileName); //returns list of param names in current setup but not set in XML
+
+	void			saveToXMLv1(string fileName); //save the whole list of params to an xml
+	void			saveToXMLv2(string fileName); //save the whole list of params to an xml
+
 	void			restoreAllParamsToInitialXML();
 	void			restoreAllParamsToDefaultValues();
 	void			connect(string address, int port);
@@ -333,6 +340,7 @@ private:
 	void			threadedFunction();
 
 	void			saveParamToXmlSettings(const RemoteUIParam & p, string key, ofxXmlSettings & s, XmlCounter & counter);
+	void			saveParamToXmlSettings(const RemoteUIParam & p, string key, ofXml & s);
 	void			saveSettingsBackup();
 
 	string 			getFinalPath(string);
