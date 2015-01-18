@@ -494,6 +494,8 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName){
 	if(!portIsSet){
 		if(!s.exists(OFXREMOTEUI_XML_PORT)){
 			s.addValue(OFXREMOTEUI_XML_PORT, port);
+		}else{
+			s.setValue(OFXREMOTEUI_XML_PORT, ofToString(port));
 		}
 	}
 	s.save(fileName );
@@ -993,12 +995,13 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		if(port_ == -1){ //if no port specified, pick a random one, but only the very first time we get launched!
 			portIsSet = false;
 			ofxXmlSettings s;
-			bool exists = s.loadFile(configFile);
-			if(exists){
+			bool xmlExists = s.loadFile(configFile);
+			bool portNeedsToBePicked = false;
+			bool newVersion = true;
+			if(xmlExists){
 
-				bool newVersion = s.getNumTags(string(OFXREMOTEUI_XML_ROOT_TAG) + ":" + string(OFXREMOTEUI_XML_PORT)) > 0;
-				bool portNeedsToBePicked = false;
-				if (exists){
+				newVersion = s.getNumTags(string(OFXREMOTEUI_XML_ROOT_TAG) + ":" + string(OFXREMOTEUI_XML_PORT)) > 0;
+				if (xmlExists){
 					if( s.getNumTags(string(OFXREMOTEUI_XML_ROOT_TAG) + ":" + string(OFXREMOTEUI_XML_PORT)) > 0 ){
 						port_ = s.getValue(string(OFXREMOTEUI_XML_ROOT_TAG) + ":" + string(OFXREMOTEUI_XML_PORT), 10000);
 					}else{
@@ -1007,24 +1010,28 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 				}else{
 					portNeedsToBePicked = true;
 				}
-				if(portNeedsToBePicked){
-					#ifdef OF_AVAILABLE
-					ofSeedRandom();
-					port_ = ofRandom(5000, 60000);
-					#else
-					srand (time(NULL));
-					port_ = 5000 + rand()%55000;
-					#endif
-					ofxXmlSettings s2;
-					s2.loadFile(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME));
-					if(newVersion){
-						s2.setValue(string(OFXREMOTEUI_XML_ROOT_TAG) + ":" + string(OFXREMOTEUI_XML_PORT), port_, 0);
-					}else{
-						s2.setValue(OFXREMOTEUI_XML_PORT, port_, 0);
-					}
-					s2.saveFile();
-				}
+			}else{
+				portNeedsToBePicked = true;
 			}
+			if(portNeedsToBePicked){
+				#ifdef OF_AVAILABLE
+				ofSeedRandom();
+				port_ = ofRandom(5000, 60000);
+				#else
+				srand (time(NULL));
+				port_ = 5000 + rand()%55000;
+				#endif
+				ofxXmlSettings s2;
+				s2.loadFile(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME));
+				if(!xmlExists)s2.clear();
+				if(newVersion){
+					s2.setValue(string(OFXREMOTEUI_XML_ROOT_TAG) + ":" + string(OFXREMOTEUI_XML_PORT), port_, 0);
+				}else{
+					s2.setValue(OFXREMOTEUI_XML_PORT, port_, 0);
+				}
+				s2.saveFile();
+			}
+
 		}else{
 			portIsSet = true;
 		}
