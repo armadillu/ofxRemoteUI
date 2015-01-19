@@ -86,9 +86,6 @@ void testApp::setup(){
 	RUI_REMOVE_PARAM(unloadTest);
 	cout << "unloadTest: '" << unloadTest << "'" << endl;
 
-	RUI_REMOVE_PARAM(x);
-	RUI_REMOVE_PARAM(circleSize);
-
 	RUI_WATCH_PARAM(currentMouseX); //this will print the supplied param all the time on screen,
 									//useful for debugging
 

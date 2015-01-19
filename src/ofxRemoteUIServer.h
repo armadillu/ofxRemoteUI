@@ -320,11 +320,14 @@ private:
 		int numFloats, numInts, numStrings, numBools, numEnums, numColors;
 	};
 
-	vector<string> loadFromXMLv1(string fileName,  ofxXmlSettings & s); //returns list of param names in current setup but not set in XML
+	vector<string> loadFromXMLv1(string fileName); //returns list of param names in current setup but not set in XML
 	vector<string> loadFromXMLv2(string fileName); //returns list of param names in current setup but not set in XML
 
 	void			saveToXMLv1(string fileName); //save the whole list of params to an xml
-	void			saveToXMLv2(string fileName); //save the whole list of params to an xml
+	void			saveToXMLv2(string fileName, string group); //save the whole list of params to an xml
+
+	void			saveGroupToXMLv1(string fileName, string groupName); //save only a subset of params into xml
+
 
 	void			restoreAllParamsToInitialXML();
 	void			restoreAllParamsToDefaultValues();
@@ -340,7 +343,7 @@ private:
 	void			threadedFunction();
 
 	void			saveParamToXmlSettings(const RemoteUIParam & p, string key, ofxXmlSettings & s, XmlCounter & counter);
-	void			saveParamToXmlSettings(const RemoteUIParam & p, string key, ofXml & s);
+	void			saveParamToXmlSettings(const RemoteUIParam & p, string key, ofXml & s, int index, bool active);
 	void			saveSettingsBackup();
 
 	string 			getFinalPath(string);
@@ -416,6 +419,11 @@ private:
 	void			drawString(const string & text, const float & x, const float & y);
 	void			drawString(const string & text, const ofVec2f & pos);
 #endif
+
+	//keep track of params we added and then removed
+	unordered_map<string, RemoteUIParam>		params_removed;
+	unordered_map<int, string>					orderedKeys_removed; // used to keep the order in which the params were added
+
 
 	static ofxRemoteUIServer* 							singleton;
 };
