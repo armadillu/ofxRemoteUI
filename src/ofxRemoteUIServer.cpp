@@ -306,23 +306,23 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string ke
 
 void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string key, ofXml & s, int index, bool active){
 
-	string path = "param[" + ofToString(index)  + "]";
+	string path = "P[" + ofToString(index)  + "]";
 	switch (t.type) {
 		case REMOTEUI_PARAM_FLOAT:
 			if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.floatValAddr <<") to XML" ;
-			s.addValue("param", *t.floatValAddr);
+			s.addValue("P", *t.floatValAddr);
 			s.setTo(path);
 			s.setAttribute("type", "float");
 			break;
 		case REMOTEUI_PARAM_INT:
 			if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.intValAddr <<") to XML" ;
-			s.addValue("param", *t.intValAddr);
+			s.addValue("P", *t.intValAddr);
 			s.setTo(path);
 			s.setAttribute("type", "int");
 			break;
 		case REMOTEUI_PARAM_COLOR:
 			if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer saving '" << key << "' (" << (int)*t.redValAddr << " " << (int)*(t.redValAddr+1) << " " << (int)*(t.redValAddr+2) << " " << (int)*(t.redValAddr+3) << ") to XML" ;
-			s.addChild("param");
+			s.addChild("P");
 			s.setTo(path);
 			s.setAttribute("type", "color");
 			s.setAttribute("c0.red", ofToString((int)*t.redValAddr));
@@ -332,25 +332,25 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string ke
 			break;
 		case REMOTEUI_PARAM_ENUM:
 			if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.intValAddr <<") to XML" ;
-			s.addValue("param", *t.intValAddr);
+			s.addValue("P", *t.intValAddr);
 			s.setTo(path);
 			s.setAttribute("type", "enum");
 			break;
 		case REMOTEUI_PARAM_BOOL:
 			if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.boolValAddr <<") to XML" ;
-			s.addValue("param", *t.boolValAddr);
+			s.addValue("P", *t.boolValAddr);
 			s.setTo(path);
 			s.setAttribute("type", "bool");
 			break;
 		case REMOTEUI_PARAM_STRING:
 			if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer saving '" << key << "' (" <<  *t.stringValAddr <<") to XML" ;
-			s.addValue("param", *t.stringValAddr);
+			s.addValue("P", *t.stringValAddr);
 			s.setTo(path);
 			s.setAttribute("type", "string");
 			break;
 		case REMOTEUI_PARAM_SPACER:
 			if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer save spacer '" << key << "' to XML" ;
-			s.addChild("param");
+			s.addChild("P");
 			s.setTo(path);
 			s.setAttribute("type", "group");
 			Poco::XML::Element *el = s.getPocoElement();
@@ -387,24 +387,11 @@ void ofxRemoteUIServer::saveGroupToXML(string fileName, string groupName){
 }
 
 
-
-
 void ofxRemoteUIServer::saveToXML(string fileName){
 
 	saveToXMLv2(fileName, ""); //upgrade xml files to the new format, never save with v1
 }
 
-
-/*
- 	for( unordered_map<string,RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
-		string key = (*ii).first;
-		RemoteUIParam t = params[key];
-		if( t.group != OFXREMOTEUI_DEFAULT_PARAM_GROUP && t.group == groupName ){
-			saveParamToXmlSettings(t, key, s, counters);
-		}
-	}
-
- */
 
 void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 
@@ -468,6 +455,7 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 	if(!savingGroupOnly){ //group presets dont embed port
 		s.addValue(OFXREMOTEUI_XML_PORT, port);
 	}
+	s.addValue(OFXREMOTEUI_XML_ENABLED_TAG, enabled);
 	s.save(fileName );
 }
 
@@ -513,7 +501,6 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 		string paramName = s.getAttribute("name");
 		string type = s.getAttribute("type");
 		bool inactive = s.getAttribute("disabled") == "1";
-		
 
 		unordered_map<string,RemoteUIParam>::iterator it = params.find(paramName);
 		bool isAParamWeKnowOf = it != params.end();
@@ -734,8 +721,8 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	configFile = ofToDataPath(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME));
 	bool exists = s.loadFile(configFile);
 	if(exists){
-		if( s.getNumTags(OFXREMOTEUI_XML_ENABLED) > 0 ){
-			enabled = ("true" == s.getValue(OFXREMOTEUI_XML_ENABLED, "true"));
+		if( s.getNumTags(OFXREMOTEUI_XML_ENABLED_TAG) > 0 ){
+			enabled = ("true" == s.getValue(OFXREMOTEUI_XML_ENABLED_TAG, "1"));
 			if (!enabled){
 				RUI_LOG_WARNING << "ofxRemoteUIServer launching disabled!" ;
 			}
@@ -803,15 +790,6 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 				srand (time(NULL));
 				port_ = 5000 + rand()%55000;
 				#endif
-				ofxXmlSettings s2;
-				s2.loadFile(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME));
-				if(!xmlExists)s2.clear();
-				if(newVersion){
-					s2.setValue(string(OFXREMOTEUI_XML_ROOT_TAG) + ":" + string(OFXREMOTEUI_XML_PORT), port_, 0);
-				}else{
-					s2.setValue(OFXREMOTEUI_XML_PORT, port_, 0);
-				}
-				s2.saveFile();
 			}
 
 		}else{
