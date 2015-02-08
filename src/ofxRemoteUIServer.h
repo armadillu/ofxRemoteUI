@@ -223,7 +223,7 @@ public:
 
 	//You shouldnt need to call any of these directly. Use the Macros supplied above instead.
 	void update(float dt);
-	void draw(int x = 20, int y = 20); //draws important notifications on screen
+	void draw(int x = 20, int y = ofGetHeight() - 20);
 	void close();
 	vector<string> loadFromXML(string fileName); //returns list of param names in current setup but not set in XML
 
@@ -266,6 +266,7 @@ public:
 	bool getSaveToXMLOnExit(){ return saveToXmlOnExit; }
 	void setSaveToXMLOnExit(bool save);
 	void setDrawsNotificationsAutomaticallly(bool draw);
+	void setShowUIDuringEdits(bool s){showUIduringEdits = s;} 
 	void setNetworkInterface(string iface);
 	void pushParamsToClient(); //pushes all param values to client, updating its UI
 	void sendLogToClient(const char* format, ...);
@@ -281,6 +282,7 @@ public:
 
 	void setShowInterfaceKey(char k);
 	void setAutomaticBackupsEnabled(bool enabled);
+	void setAutoDraw(bool d){autoDraw = d;};
 	#ifdef USE_OFX_FONTSTASH
 	void drawUiWithFontStash(string fontPath, float fontSize = 15 /*good with veraMono*/ );
 	void drawUiWithBitmapFont();
@@ -366,12 +368,15 @@ private:
 
 	bool			threadedUpdate;
 	bool			showUI; //displays all params on screen
+	bool			showUIduringEdits;
 	bool			clearXmlOnSaving;  //if false, allows you to keep defaults for old params that you are not sharing anymore
 
 	char			showInterfaceKey;
 
 	bool			enabled;
 	bool			autoBackups;
+
+	bool			autoDraw;
 
 	vector			<string> paramsToWatch;
 

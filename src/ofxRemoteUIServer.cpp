@@ -63,6 +63,8 @@ void ofxRemoteUIServer::setShowInterfaceKey(char k){
 ofxRemoteUIServer::ofxRemoteUIServer(){
 
 	enabled = true;
+	showUIduringEdits = false;
+	autoDraw = true;
 	readyToSend = false;
 	saveToXmlOnExit = true;
 	autoBackups = false; //off by default
@@ -1058,8 +1060,10 @@ void ofxRemoteUIServer::threadedFunction(){
 
 
 void ofxRemoteUIServer::_draw(ofEventArgs &e){
-	ofSetupScreen(); //mmm this is a bit scary //TODO!
-	draw( 20 / uiScale, ofGetHeight() / uiScale - 20 / uiScale);
+	if(autoDraw){
+		ofSetupScreen(); //mmm this is a bit scary //TODO!
+		draw( 20 / uiScale, ofGetHeight() / uiScale - 20 / uiScale);
+	}
 }
 
 void ofxRemoteUIServer::_update(ofEventArgs &e){
@@ -1106,8 +1110,8 @@ void ofxRemoteUIServer::draw(int x, int y){
 		int bottomBarHeight = padding + spacing + 36;
 
 		//bottom bar
-		if (uiAlpha > 0.99){
-			ofSetColor(11, 245 * uiAlpha);
+		if (uiAlpha > 0.99 || showUIduringEdits){
+			ofSetColor(11, 245);
 			ofRect(0,0, ofGetWidth() / uiScale, ofGetHeight() / uiScale);
 			ofSetColor(44, 245);
 			ofRect(0,ofGetHeight() / uiScale - bottomBarHeight, ofGetWidth() / uiScale, bottomBarHeight );
@@ -1163,7 +1167,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 
 		int linesInited = uiLines.getNumVertices() > 0 ;
 
-		if(uiAlpha > 0.99){
+		if(uiAlpha > 0.99 || showUIduringEdits){
 
 			ofTranslate(xOffset, 0);
 
@@ -1280,7 +1284,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 		}
 
 		//tiny clock top left
-		if (uiAlpha < 1.0){
+		if (uiAlpha < 1.0 && !showUIduringEdits){
 			ofMesh m;
 			int step = 30;
 			m.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
