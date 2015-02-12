@@ -408,7 +408,7 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 							RUI_LOG_ERROR << "ofxRemoteUIServer ERROR at loading FLOAT (" << paramName << ")" ;
 						}
 					}else{
-						RUI_LOG_ERROR << "ofxRemoteUIServer: float param '" << paramName << "' defined in xml not found in DB!" ;
+						RUI_LOG_WARNING << "ofxRemoteUIServer: float param '" << paramName << "' defined in xml not found in DB!" ;
 					}
 				}else{
 					RUI_LOG_ERROR << "ofxRemoteUIServer: float param '" << paramName << "' defined twice in xml! Using first definition only" ;
@@ -434,7 +434,7 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 							RUI_LOG_ERROR << "ofxRemoteUIServer ERROR at loading INT (" << paramName << ")" ;
 						}
 					}else{
-						RUI_LOG_ERROR << "ofxRemoteUIServer: int param '" <<paramName << "' defined in xml not found in DB!" ;
+						RUI_LOG_WARNING << "ofxRemoteUIServer: int param '" <<paramName << "' defined in xml not found in DB!" ;
 					}
 				}else{
 					RUI_LOG_ERROR << "ofxRemoteUIServer: int param '" << paramName << "' defined twice in xml! Using first definition only" ;
