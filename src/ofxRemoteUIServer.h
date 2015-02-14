@@ -225,10 +225,11 @@ public:
 	void update(float dt);
 	void draw(int x = 20, int y = ofGetHeight() - 20);
 	void close();
+
 	vector<string> loadFromXML(string fileName); //returns list of param names in current setup but not set in XML
 
-	void saveToXML(string fileName); //save the whole list of params to an xml
-	void saveGroupToXML(string fileName, string groupName); //save only a subset of params into xml
+	void saveToXML(string fileName, bool oldFormat = false); //save the whole list of params to an xml
+	void saveGroupToXML(string fileName, string groupName, bool oldFormat = false); //save only a subset of params into xml
 
 	void shareParam(string paramName, float* param, float min, float max, ofColor bgColor = ofColor(0,0,0,0) );
 	void shareParam(string paramName, bool* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
@@ -321,6 +322,15 @@ private:
 		int numFloats, numInts, numStrings, numBools, numEnums, numColors;
 	};
 
+	vector<string> loadFromXMLv1(string fileName); //returns list of param names in current setup but not set in XML
+	vector<string> loadFromXMLv2(string fileName); //returns list of param names in current setup but not set in XML
+
+	void			saveToXMLv1(string fileName); //save the whole list of params to an xml
+	void			saveToXMLv2(string fileName, string group); //save the whole list of params to an xml
+
+	void			saveGroupToXMLv1(string fileName, string groupName); //save only a subset of params into xml
+
+
 	void			restoreAllParamsToInitialXML();
 	void			restoreAllParamsToDefaultValues();
 	void			connect(string address, int port);
@@ -335,6 +345,7 @@ private:
 	void			threadedFunction();
 
 	void			saveParamToXmlSettings(const RemoteUIParam & p, string key, ofxXmlSettings & s, XmlCounter & counter);
+	void			saveParamToXmlSettings(const RemoteUIParam & p, string key, ofXml & s, int index, bool active);
 	void			saveSettingsBackup();
 
 	string 			getFinalPath(string);
@@ -413,6 +424,11 @@ private:
 	void			drawString(const string & text, const float & x, const float & y);
 	void			drawString(const string & text, const ofVec2f & pos);
 #endif
+
+	//keep track of params we added and then removed
+	unordered_map<string, RemoteUIParam>		params_removed;
+	unordered_map<int, string>					orderedKeys_removed; // used to keep the order in which the params were added
+
 
 	static ofxRemoteUIServer* 							singleton;
 };

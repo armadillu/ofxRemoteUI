@@ -25,6 +25,8 @@ void testApp::setup(){
 	// SETUP A CALLBACK ///////////////////////////////////////////
 	ofAddListener(RUI_GET_OF_EVENT(), this, &testApp::clientDidSomething);
 
+	RUI_GET_INSTANCE()->setVerbose(true);
+
 	// SET PARAM GROUPS / COLORS //////////////////////////////////
 	RUI_NEW_GROUP("POSITION");	//make a new group (optional)
 								//All items inside a group show the same background hue on the client
@@ -32,6 +34,8 @@ void testApp::setup(){
 	// SHARE A FLOAT PARAM ////////////////////////////////////////
 	RUI_SHARE_PARAM(x, 0, ofGetWidth() ); //add an "x" float param to the current group ("position")
 	RUI_SHARE_PARAM(y, 0, ofGetHeight()); //provide a variable, a rangeMin and a rangeMax
+
+	RUI_SHARE_PARAM_WCN("Z: what", z, 0, ofGetWidth() ); //add an "x" float param to the current group ("position")
 
 	RUI_NEW_GROUP("STYLE"); //make a new group (optional)
 
@@ -81,7 +85,6 @@ void testApp::setup(){
 	//need further editing, but still allowing you to load its value from the xml.
 	RUI_REMOVE_PARAM(unloadTest);
 	cout << "unloadTest: '" << unloadTest << "'" << endl;
-
 
 	RUI_WATCH_PARAM(currentMouseX); //this will print the supplied param all the time on screen,
 									//useful for debugging

@@ -40,6 +40,7 @@ Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 
 
 ## Compatibility
+
 Works in OpenFrameworks, but also in plain C++ projects.
 There a Cinder Block I created of as "proof of concept" but it's not even published. Ask me if you are interested.
 
@@ -135,7 +136,13 @@ You can set the built-in UI to be drawn using [ofxFontStash](https://github.com/
 RUI_GET_INSTANCE()->drawUiWithFontStash("myFont.ttf");
 ```
 
+##FILE FORMAT
 
+Commits before the Git Tag "LastCommitWithXMLv1" use the original file format for XML files. Commits after that tag, will automatically save in the new format, but will also parse files with the old format. You can also save files in the old format by pressing "E" from the built in client, either globally or on a per-group basis.
+
+The new file format is proper XML with a root node, it's more human readable, it keeps params listed in the same order they are added in so its easier to read changes on versioning systems, and it has comments showing the group they belong to.
+
+![g](https://farm8.staticflickr.com/7358/16344314099_97e5a68275_o_d.png)
 
 ## LICENSE and ATTRIBUTIONS
 
