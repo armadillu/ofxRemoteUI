@@ -249,10 +249,10 @@ struct myColor{
 
 
 #ifdef OF_AVAILABLE
-	#define RUI_LOG_NOTICE		(ofLogNotice())
-	#define RUI_LOG_ERROR		(ofLogError())
-	#define RUI_LOG_WARNING		(ofLogWarning())
-	#define RUI_LOG_VERBOSE		(ofLogVerbose())
+	#define RUI_LOG_NOTICE		(ofLogNotice("ofxRemoteUIServer"))
+	#define RUI_LOG_ERROR		(ofLogError("ofxRemoteUIServer"))
+	#define RUI_LOG_WARNING		(ofLogWarning("ofxRemoteUIServer"))
+	#define RUI_LOG_VERBOSE		(ofLogVerbose("ofxRemoteUIServer"))
 #else
 	#define RUI_LOG_NOTICE		(cout << endl) //TODO!
 	#define RUI_LOG_ERROR		(cout << endl)

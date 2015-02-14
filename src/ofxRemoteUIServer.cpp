@@ -366,7 +366,7 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string ke
 	s.setToParent();
 }
 
-void ofxRemoteUIServer::saveGroupToXML(string fileName, string groupName){
+void ofxRemoteUIServer::saveGroupToXML(string fileName, string groupName, bool oldFormat){
 	#ifdef OF_AVAILABLE
 	fileName = getFinalPath(fileName);
 	ofDirectory d;
@@ -383,13 +383,21 @@ void ofxRemoteUIServer::saveGroupToXML(string fileName, string groupName){
 	#endif
 	#endif
 
-	saveToXMLv2(fileName, groupName); //save to v2 no matter what
+	if(oldFormat){
+		saveGroupToXMLv1(fileName, groupName);
+	}else{
+		saveToXMLv2(fileName, groupName); //save to v2 no matter what
+	}
 }
 
 
-void ofxRemoteUIServer::saveToXML(string fileName){
+void ofxRemoteUIServer::saveToXML(string fileName, bool oldFormat){
 
-	saveToXMLv2(fileName, ""); //upgrade xml files to the new format, never save with v1
+	if(oldFormat){
+		saveToXMLv1(fileName); //upgrade xml files to the new format, never save with v1
+	}else{
+		saveToXMLv2(fileName, ""); //upgrade xml files to the new format, never save with v1
+	}
 }
 
 
@@ -453,7 +461,7 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 
 	s.setToParent(); //up 1 level
 	if(!savingGroupOnly){ //group presets dont embed port
-		s.addValue(OFXREMOTEUI_XML_PORT, port);
+		s.addValue(OFXREMOTEUI_XML_PORT_TAG, port);
 	}
 	s.addValue(OFXREMOTEUI_XML_ENABLED_TAG, enabled);
 	s.save(fileName );
@@ -765,24 +773,21 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 			portIsSet = false;
 			ofxXmlSettings s;
 			bool xmlExists = s.loadFile(configFile);
-			bool portNeedsToBePicked = false;
 			bool newVersion = true;
 			if(xmlExists){
 
-				newVersion = s.getNumTags(string(OFXREMOTEUI_XML_ROOT_TAG) + ":" + string(OFXREMOTEUI_XML_PORT)) > 0;
-				if (xmlExists){
-					if( s.getNumTags(string(OFXREMOTEUI_XML_ROOT_TAG) + ":" + string(OFXREMOTEUI_XML_PORT)) > 0 ){
-						port_ = s.getValue(string(OFXREMOTEUI_XML_ROOT_TAG) + ":" + string(OFXREMOTEUI_XML_PORT), 10000);
-					}else{
-						portNeedsToBePicked = true;
+				newVersion = s.getNumTags(string(OFXREMOTEUI_XML_ROOT_TAG)) > 0;
+				if (newVersion){
+					if( s.getNumTags(string(OFXREMOTEUI_XML_ROOT_TAG) + ":" + string(OFXREMOTEUI_XML_PORT_TAG)) > 0 ){
+						port_ = s.getValue(string(OFXREMOTEUI_XML_ROOT_TAG) + ":" + string(OFXREMOTEUI_XML_PORT_TAG), 10000);
 					}
 				}else{
-					portNeedsToBePicked = true;
+					if( s.getNumTags(string(OFXREMOTEUI_XML_PORT_TAG)) > 0 ){
+						port_ = s.getValue(string(OFXREMOTEUI_XML_PORT_TAG), 10000);
+					}
 				}
-			}else{
-				portNeedsToBePicked = true;
 			}
-			if(portNeedsToBePicked){
+			if(port_ == -1){ //port still undefined, lets choose a port
 				#ifdef OF_AVAILABLE
 				ofSeedRandom();
 				port_ = ofRandom(5000, 60000);
@@ -832,8 +837,11 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				onScreenNotifications.addNotification("SAVED CONFIG to default XML");
 				break;
 
+			case 'E': //e for export to older v
 			case 'S':{
+				bool saveInV1 = (e.key == 'E') ? true : false;
 				bool groupIsSelected = false;
+				string formatExt = string(saveInV1 ? "_v1" : "");
 				string groupName;
 				if (selectedItem >= 0){ //selection on params list
 					string key = orderedKeys[selectedItem];
@@ -851,23 +859,23 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				if(presetName.size()){
 					RemoteUIServerCallBackArg cbArg;
 					if (groupIsSelected){
-						saveGroupToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName + "/" + presetName + ".xml", groupName);
+						saveGroupToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName + "/" + presetName + formatExt + ".xml", groupName, saveInV1);
 						if(callBack) callBack(cbArg);
 						cbArg.action = CLIENT_SAVED_GROUP_PRESET;
 						cbArg.msg = presetName;
 						cbArg.group = groupName;
 						#ifdef OF_AVAILABLE
 						ofNotifyEvent(clientAction, cbArg, this);
-						onScreenNotifications.addNotification("SAVED PRESET '" + presetName + ".xml' FOR GROUP '" + groupName + "'");
+						onScreenNotifications.addNotification("SAVED PRESET '" + presetName + formatExt + ".xml' FOR GROUP '" + groupName + "'");
 						#endif
 
 					}else{
 						if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIServer: saving NEW preset: " << presetName ;
-						saveToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
+						saveToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + formatExt + ".xml", saveInV1);
 						cbArg.action = CLIENT_SAVED_PRESET;
 						cbArg.msg = presetName;
 						#ifdef OF_AVAILABLE
-						onScreenNotifications.addNotification("SAVED PRESET to '" + getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml'");
+						onScreenNotifications.addNotification("SAVED PRESET to '" + getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + formatExt + ".xml'");
 						ofNotifyEvent(clientAction, cbArg, this);
 						#endif
 						if(callBack) callBack(cbArg);
@@ -1156,11 +1164,10 @@ void ofxRemoteUIServer::draw(int x, int y){
 			drawString("ofxRemoteUI built in client. " +
 							   string(enabled ? ("Server reachable at " + computerIP + ":" + ofToString(port)) + "." :
 									  "Sever Disabled." ) +
-					   "\nPress 's' to save current config, 'S' to make a new preset.\n" +
+					   "\nPress 's' to save current config, 'S' to make a new preset. ('E' to save in old format)\n" +
 					   "Press 'r' to restore all params's launch state.\n" +
-					   "Press Arrow Keys to edit values. SPACEBAR + Arrow Keys for bigger increments when editing. ',' and '.' Keys to scroll.\n" +
-					   "Press 'TAB' to hide. Press 'RETURN' when on a color param to cycle through RGBA components.", padding, ofGetHeight() / uiScale - bottomBarHeight + 20);
-
+					   "Press Arrow Keys to edit values. SPACEBAR + Arrow Keys for bigger increments. ',' and '.' Keys to scroll.\n" +
+					   "Press 'TAB' to hide. Press 'RETURN' when editing a Color param to cycle through RGBA components.", padding, ofGetHeight() / uiScale - bottomBarHeight + 20);
 		}
 
 		//preset selection / top bar
@@ -1936,7 +1943,7 @@ void ofxRemoteUIServer::saveToXMLv1(string fileName){
 	s.popTag(); //pop OFXREMOTEUI_XML_TAG
 
 	if(!portIsSet){
-		s.setValue(OFXREMOTEUI_XML_PORT, port, 0);
+		s.setValue(OFXREMOTEUI_XML_PORT_TAG, port, 0);
 	}
 	s.saveFile(fileName);
 }
