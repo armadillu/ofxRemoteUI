@@ -32,7 +32,7 @@ bool ofxRemoteUIClient::setup(string address, int port_){
 	presetNames.clear();
 
 	if (port_ < 1000){
-		RUI_LOG_ERROR << "ofxRemoteUIClient cant use such low port";
+		RUI_LOG_ERROR << "cant use such low port";
 		OSCsetup = false;
 		return OSCsetup;
 	}
@@ -41,16 +41,16 @@ bool ofxRemoteUIClient::setup(string address, int port_){
 	avgTimeSinceLastReply = timeSinceLastReply = timeCounter = 0.0f;
 	waitingForReply = false;
 	host = address;
-	RUI_LOG_NOTICE << "ofxRemoteUIClient listening at port " << port + 1 << " ... " ;
+	RUI_LOG_NOTICE << "listening at port " << port + 1 << " ... " ;
 	clearOscReceiverMsgQueue();
 	oscReceiver.setup(port + 1);
 
-	if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIClient connecting to " << address;
+	if(verbose_) RUI_LOG_NOTICE << "connecting to " << address;
 	try{
 		oscSender.setup(address, port);
 		OSCsetup = true;
 	}catch(exception e){
-		RUI_LOG_ERROR << "ofxRemoteUIClient exception setting up oscSender" << e.what();
+		RUI_LOG_ERROR << "exception setting up oscSender" << e.what();
 		OSCsetup = false;
 	}
 	return OSCsetup;
@@ -66,12 +66,12 @@ void ofxRemoteUIClient::disconnect(){
 
 	OSC_CHECK;
 	if (readyToSend){
-		if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIClient: disconnect()" ;
+		if(verbose_) RUI_LOG_NOTICE << "disconnect()" ;
 		sendCIAO();
 		readyToSend = false;
 		presetNames.clear();
 	}else{
-		if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIClient: can't disconnect(); we arent connected!" ;
+		if(verbose_) RUI_LOG_NOTICE << "can't disconnect(); we arent connected!" ;
 	}
 }
 
@@ -79,13 +79,13 @@ void ofxRemoteUIClient::disconnect(){
 void ofxRemoteUIClient::connect(){
 	OSC_CHECK;
 	if(!readyToSend){
-		if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIClient: connect()" ;
+		if(verbose_) RUI_LOG_NOTICE << "connect()" ;
 		sendHELLO();	//on first connect, send HI!
 		sendTEST();		//and a lag test
 		readyToSend = true;
 		disconnectStrikes = OFXREMOTEUI_DISCONNECTION_STRIKES;
 	}else{
-		if(verbose_) RUI_LOG_NOTICE << "ofxRemoteUIClient: can't connect() now, we are already connected!" ;
+		if(verbose_) RUI_LOG_NOTICE << "can't connect() now, we are already connected!" ;
 	}
 }
 
@@ -160,7 +160,7 @@ void ofxRemoteUIClient::update(float dt){
 		if (timeCounter > OFXREMOTEUI_LATENCY_TEST_RATE){
 
 			if(waitingForReply){ //we never heard back from the client, keep count of how many we missed
-				RUI_LOG_NOTICE << "ofxRemoteUIClient: missed one TEST Packet... (" << disconnectStrikes << " left)" ;
+				RUI_LOG_NOTICE << "missed one TEST Packet... (" << disconnectStrikes << " left)" ;
 				disconnectStrikes--;
 			}else{
 				disconnectStrikes = OFXREMOTEUI_DISCONNECTION_STRIKES; //reset the strike count, we heard back from server
@@ -171,7 +171,7 @@ void ofxRemoteUIClient::update(float dt){
 				timeCounter = 0.0f; //reset timer
 				sendTEST();
 			}else{ //we tried for too long, out of strikes! assume server is gone
-				RUI_LOG_WARNING << "ofxRemoteUIClient: disconnecting bc server connection timed out!" ;
+				RUI_LOG_WARNING << "disconnecting bc server connection timed out!" ;
 				avgTimeSinceLastReply = -1;
 				disconnect(); // testing here
 				params.clear();
@@ -209,7 +209,7 @@ void ofxRemoteUIClient::update(float dt){
 				}break;
 
 				case REQUEST_ACTION: //server closed the REQU, so we should have all the params
-					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says REQUEST_ACTION!" ;
+					if(verbose_) RUI_LOG_VERBOSE << m.getRemoteIp() << " says REQUEST_ACTION!" ;
 					if(callBack != NULL){
 						cbArg.action = SERVER_SENT_FULL_PARAMS_UPDATE;
 						callBack(cbArg);
@@ -217,14 +217,14 @@ void ofxRemoteUIClient::update(float dt){
 					break;
 
 				case SEND_PARAM_ACTION:{ //server is sending us an updated val
-					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SEND_PARAM_ACTION!" ;
+					if(verbose_) RUI_LOG_VERBOSE << m.getRemoteIp() << " says SEND_PARAM_ACTION!" ;
 					updateParamFromDecodedMessage(m, dm);
 					gotNewInfo = true;
 				}
 					break;
 
 				case CIAO_ACTION:{
-					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says CIAO!" ;
+					if(verbose_) RUI_LOG_VERBOSE << m.getRemoteIp() << " says CIAO!" ;
 					if(callBack != NULL){
 						cbArg.action = SERVER_DISCONNECTED;
 						callBack(cbArg);
@@ -247,7 +247,7 @@ void ofxRemoteUIClient::update(float dt){
 					break;
 
 				case PRESET_LIST_ACTION: //server sends us the list of current presets
-					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says PRESET_LIST_ACTION!" ;
+					if(verbose_) RUI_LOG_VERBOSE << m.getRemoteIp() << " says PRESET_LIST_ACTION!" ;
 					fillPresetListFromMessage(m);
 					if(callBack != NULL){
 						cbArg.action = SERVER_PRESETS_LIST_UPDATED;
@@ -266,7 +266,7 @@ void ofxRemoteUIClient::update(float dt){
 					break;
 
 				case SET_PRESET_ACTION: // server confirms that it has set the preset, request a full update
-					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SET_PRESET_ACTION!" ;
+					if(verbose_) RUI_LOG_VERBOSE << m.getRemoteIp() << " says SET_PRESET_ACTION!" ;
 					requestCompleteUpdate();
 					if(callBack != NULL){
 						cbArg.action = SERVER_DID_SET_PRESET;
@@ -276,7 +276,7 @@ void ofxRemoteUIClient::update(float dt){
 					break;
 
 				case SAVE_PRESET_ACTION:{ // server confirms that it has save the preset,
-					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SAVE_PRESET_ACTION!" ;
+					if(verbose_) RUI_LOG_VERBOSE << m.getRemoteIp() << " says SAVE_PRESET_ACTION!" ;
 					vector<string> a;
 					sendPREL(a); //request preset list to server, send empty vector
 					cbArg.action = SERVER_SAVED_PRESET;
@@ -285,7 +285,7 @@ void ofxRemoteUIClient::update(float dt){
 				}break;
 
 				case DELETE_PRESET_ACTION:{ // server confirms that it has deleted preset
-					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says DELETE_PRESET_ACTION!" ;
+					if(verbose_) RUI_LOG_VERBOSE << m.getRemoteIp() << " says DELETE_PRESET_ACTION!" ;
 					vector<string> a;
 					sendPREL(a); //request preset list to server, send empty vector
 					if(callBack != NULL){
@@ -296,7 +296,7 @@ void ofxRemoteUIClient::update(float dt){
 				}break;
 
 				case RESET_TO_XML_ACTION:{ // server confrims
-					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says RESET_TO_XML_ACTION!" ;
+					if(verbose_) RUI_LOG_VERBOSE << m.getRemoteIp() << " says RESET_TO_XML_ACTION!" ;
 					requestCompleteUpdate();
 					if(callBack != NULL){
 						cbArg.action = SERVER_DID_RESET_TO_XML;
@@ -305,7 +305,7 @@ void ofxRemoteUIClient::update(float dt){
 				}break;
 
 				case RESET_TO_DEFAULTS_ACTION:{ // server confrims
-					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says RESET_TO_DEFAULTS_ACTION!" ;
+					if(verbose_) RUI_LOG_VERBOSE  << m.getRemoteIp() << " says RESET_TO_DEFAULTS_ACTION!" ;
 					requestCompleteUpdate();
 					if(callBack != NULL){
 						cbArg.action = SERVER_DID_RESET_TO_DEFAULTS;
@@ -314,7 +314,7 @@ void ofxRemoteUIClient::update(float dt){
 				}break;
 
 				case SAVE_CURRENT_STATE_ACTION: // server confirms that it has saved
-					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SAVE_CURRENT_STATE_ACTION!" ;
+					if(verbose_) RUI_LOG_VERBOSE << m.getRemoteIp() << " says SAVE_CURRENT_STATE_ACTION!" ;
 					if(callBack != NULL){
 						cbArg.action = SERVER_CONFIRMED_SAVE;
 						callBack(cbArg);
@@ -322,7 +322,7 @@ void ofxRemoteUIClient::update(float dt){
 					break;
 
 				case SET_GROUP_PRESET_ACTION: // server confirms that it has set the group preset, request a full update
-					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SET_GROUP_PRESET_ACTION!" ;
+					if(verbose_) RUI_LOG_VERBOSE << m.getRemoteIp() << " says SET_GROUP_PRESET_ACTION!" ;
 					requestCompleteUpdate();
 					if(callBack != NULL){
 						cbArg.action = SERVER_DID_SET_GROUP_PRESET;
@@ -333,7 +333,7 @@ void ofxRemoteUIClient::update(float dt){
 					break;
 
 				case SAVE_GROUP_PRESET_ACTION:{ // server confirms that it has saved the group preset,
-					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says SAVE_GROUP_PRESET_ACTION!" ;
+					if(verbose_) RUI_LOG_VERBOSE << m.getRemoteIp() << " says SAVE_GROUP_PRESET_ACTION!" ;
 					vector<string> a;
 					sendPREL(a); //request preset list to server, send empty vector
 					cbArg.action = SERVER_SAVED_GROUP_PRESET;
@@ -343,7 +343,7 @@ void ofxRemoteUIClient::update(float dt){
 				}break;
 
 				case DELETE_GROUP_PRESET_ACTION:{ // server confirms that it has deleted the group preset
-					if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUIClient: " << m.getRemoteIp() << " says DELETE_GROUP_PRESET_ACTION!" ;
+					if(verbose_) RUI_LOG_VERBOSE << m.getRemoteIp() << " says DELETE_GROUP_PRESET_ACTION!" ;
 					vector<string> a;
 					sendPREL(a); //request preset list to server, send empty vector
 					if(callBack != NULL){
@@ -354,7 +354,7 @@ void ofxRemoteUIClient::update(float dt){
 					}
 				}break;
 
-				default: RUI_LOG_ERROR << "ofxRemoteUIClient::update >> UNKNOWN ACTION!!" <<endl; break;
+				default: RUI_LOG_ERROR << "update >> UNKNOWN ACTION!!" <<endl; break;
 			}
 		}
 	}
@@ -514,7 +514,7 @@ void ofxRemoteUIClient::sendTrackedParamUpdate(string paramName){
 		syncParamToPointer(paramName);
 		sendParam(paramName, params[paramName]);
 	}else{
-		RUI_LOG_ERROR << "ofxRemoteUIClient::sendTrackedParamUpdate >> param '" + paramName + "' not found!" ;
+		RUI_LOG_ERROR << "sendTrackedParamUpdate >> param '" + paramName + "' not found!" ;
 	}
 }
 

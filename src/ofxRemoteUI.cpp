@@ -157,7 +157,7 @@ string ofxRemoteUI::getMyIP(string userChosenInteface){
 	//from https://github.com/jvcleave/LocalAddressGrabber/blob/master/src/LocalAddressGrabber.h
 	//and http://stackoverflow.com/questions/17288908/get-network-interface-name-from-ipv4-address
 	string output = RUI_LOCAL_IP_ADDRESS;
-	RUI_LOG_NOTICE << "ofxRemoteUI establishing local interface and IP @";
+	RUI_LOG_NOTICE << "establishing local interface and IP @";
 
 #if defined(__APPLE__) || defined(__linux__)
 	struct ifaddrs *myaddrs;
@@ -181,12 +181,12 @@ string ofxRemoteUI::getMyIP(string userChosenInteface){
 				printf("%s: inet_ntop failed!\n", ifa->ifa_name);
 			}else{
 				string interface = string(ifa->ifa_name);
-				if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUI found interface: " << interface ;
+				if(verbose_) RUI_LOG_VERBOSE << "found interface: " << interface ;
 				if( interface.length() > 2 || interface == userSuppliedNetInterface ){
 					if (userSuppliedNetInterface.length() > 0){
 						if (interface == userSuppliedNetInterface){
 							output = string(buf);
-							if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUI using user chosen interface: " << interface;
+							if(verbose_) RUI_LOG_VERBOSE << "using user chosen interface: " << interface;
 							break;
 						}
 					}else{
@@ -195,7 +195,7 @@ string ofxRemoteUI::getMyIP(string userChosenInteface){
 								bool is169 = buf[0] == '1' && buf[1] == '6' && buf[2] == '9';
 								if(!is169){ //avoid 169.x.x.x addresses
 									output = string(buf);
-									if(verbose_) RUI_LOG_VERBOSE << "ofxRemoteUI using interface: " << interface;
+									if(verbose_) RUI_LOG_VERBOSE << "using interface: " << interface;
 									break;
 								}
 							}
@@ -208,8 +208,8 @@ string ofxRemoteUI::getMyIP(string userChosenInteface){
 	freeifaddrs(myaddrs);
 	if (userSuppliedNetInterface.length() > 0){
 		if (output == RUI_LOCAL_IP_ADDRESS){
-			RUI_LOG_ERROR << "ofxRemoteUI could not find the user supplied net interface: " << userSuppliedNetInterface;
-			RUI_LOG_ERROR << "ofxRemoteUI automatic advertising will not work! ";
+			RUI_LOG_ERROR << "could not find the user supplied net interface: " << userSuppliedNetInterface;
+			RUI_LOG_ERROR << "automatic advertising will not work! ";
 		}
 	}
 #endif
@@ -537,7 +537,7 @@ bool ofxRemoteUI::hasParamChanged(RemoteUIParam p){
 		case REMOTEUI_PARAM_SPACER: return false;
 		default: break;
 	}
-	RUI_LOG_ERROR << "ofxRemoteUIServer::hasParamChanged >> something went wrong, unknown param type";
+	RUI_LOG_ERROR << "hasParamChanged >> something went wrong, unknown param type";
 	return false;
 }
 
@@ -553,7 +553,7 @@ string ofxRemoteUI::stringForParamType(RemoteUIParamType t){
 		case REMOTEUI_PARAM_SPACER: return "SPA";
 		default: break;
 	}
-	RUI_LOG_ERROR << "ofxRemoteUI::stringForParamType >> UNKNOWN TYPE!";
+	RUI_LOG_ERROR << "stringForParamType >> UNKNOWN TYPE!";
 	return "ERR";
 }
 
@@ -565,7 +565,7 @@ RemoteUIParam ofxRemoteUI::getParamForName(string paramName){
 	if ( it != params.end() ){	// found!
 		p = params[paramName];
 	}else{
-		RUI_LOG_ERROR << "ofxRemoteUIClient::getParamForName >> param " + paramName + " not found!";
+		RUI_LOG_ERROR << "getParamForName >> param " + paramName + " not found!";
 	}
 	return p;
 }
@@ -672,7 +672,7 @@ void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
 	try{
 		oscSender.sendMessage(m);
 	}catch(exception e){
-		RUI_LOG_ERROR << "exception";
+		RUI_LOG_ERROR << "exception sendParam " << paramName;
 	}
 }
 
