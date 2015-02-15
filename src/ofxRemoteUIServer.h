@@ -295,6 +295,7 @@ public:
 
 	void setUiColumnWidth(int w){ uiColumnWidth = w; }
 	void setBuiltInUiScale(float s){uiScale = s;}
+	void setCustomScreenHeight(int h){customScreenHeight = h;}
 
 	//of style event/callback
 	ofEvent<RemoteUIServerCallBackArg> clientAction;
@@ -411,7 +412,8 @@ private:
 	float													uiAlpha;
 	float													uiScale;
 	float													xOffset;		 //my ghetto scrolling
-	float													xOffsetTarget; //smooth transitions
+	float													xOffsetTarget; //smooth transitions scrolling
+	int														customScreenHeight;
 	int														selectedColorComp; //[0..4]
 	#ifdef USE_OFX_FONTSTASH
 	bool													useFontStash;

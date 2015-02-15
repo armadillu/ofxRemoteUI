@@ -88,6 +88,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	newColorInGroupCounter = 1;
 	showInterfaceKey = '\t';
 	uiScale = 1;
+	customScreenHeight = -1;
 
 #ifdef OF_AVAILABLE
 	#ifdef USE_OFX_FONTSTASH
@@ -530,41 +531,47 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 						switch (type[0]){
 
 							case 'f':{ //float
+								if(p.type != REMOTEUI_PARAM_FLOAT){ RUI_LOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
 								float val = ofClamp(s.getFloatValue(), p.minFloat, p.maxFloat);
 								p.floatVal = *p.floatValAddr = val;
 								if(verbose_) RUI_LOG_NOTICE << "loading a FLOAT '" << paramName <<"' (" << ofToString( *p.floatValAddr, 3) << ") from XML" ;
 								}break;
 
 							case 'i':{ //int
+								if(p.type != REMOTEUI_PARAM_INT){ RUI_LOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
 								int val = ofClamp(s.getIntValue(), p.minInt, p.maxInt);
 								p.intVal = *p.intValAddr = val;
 								if(verbose_) RUI_LOG_NOTICE << "loading an INT '" << paramName <<"' (" << (int) *p.intValAddr << ") from XML" ;
 								}break;
 
 							case 's':{ //string
+								if(p.type != REMOTEUI_PARAM_STRING){ RUI_LOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
 								string val = s.getValue();
 								p.stringVal = *p.stringValAddr = val;
 								if(verbose_) RUI_LOG_NOTICE << "loading a STRING '" << paramName <<"' (" << (string) *p.stringValAddr << ") from XML" ;
 								}break;
 
 							case 'e':{ //enum
+								if(p.type != REMOTEUI_PARAM_ENUM){ RUI_LOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
 								int val = ofClamp(s.getIntValue(), p.minInt, p.maxInt);
 								p.intVal = *p.intValAddr = val;
 								if(verbose_) RUI_LOG_NOTICE << "loading an ENUM '" << paramName <<"' (" << (int) *p.intValAddr << ") from XML" ;
 								}break;
 
 							case 'b':{ //bool
+								if(p.type != REMOTEUI_PARAM_BOOL){ RUI_LOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
 								bool val = s.getIntValue();
 								p.boolVal = *p.boolValAddr = val;
 								if(verbose_) RUI_LOG_NOTICE << "loading a BOOL '" << paramName <<"' (" << (bool) *p.boolValAddr << ") from XML" ;
 								}break;
 
 							case 'g':{ //group
-								if(verbose_) RUI_LOG_NOTICE << "skipping GROUP '" << paramName <<"' from XML" ;
+								if(verbose_) RUI_LOG_NOTICE << "skipping GROUP '" << paramName << "' from XML" ;
 							}break;
 
 
 							case 'c':{ //color
+								if(p.type != REMOTEUI_PARAM_COLOR){ RUI_LOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
 								unsigned char r = ofToInt(s.getAttribute("c0.red"));
 								unsigned char g = ofToInt(s.getAttribute("c1.green"));
 								unsigned char b = ofToInt(s.getAttribute("c2.blue"));
@@ -1108,7 +1115,9 @@ void ofxRemoteUIServer::threadedFunction(){
 void ofxRemoteUIServer::_draw(ofEventArgs &e){
 	if(autoDraw){
 		ofSetupScreen(); //mmm this is a bit scary //TODO!
-		draw( 20 / uiScale, ofGetHeight() / uiScale - 20 / uiScale);
+		int h = customScreenHeight;
+		if(h < 0) h = ofGetHeight();
+		draw( 20 / uiScale, h / uiScale - 20 / uiScale);
 	}
 }
 
@@ -1141,6 +1150,8 @@ void ofxRemoteUIServer::draw(int x, int y){
 
 	ofFill();
 	ofEnableAlphaBlending();
+	int screenH = customScreenHeight;
+	if (screenH < 0) screenH = ofGetHeight();
 
 	if(showUI){
 
@@ -1158,9 +1169,9 @@ void ofxRemoteUIServer::draw(int x, int y){
 		//bottom bar
 		if (uiAlpha > 0.99 || showUIduringEdits){
 			ofSetColor(11, 245);
-			ofRect(0,0, ofGetWidth() / uiScale, ofGetHeight() / uiScale);
+			ofRect(0,0, ofGetWidth() / uiScale, screenH / uiScale);
 			ofSetColor(44, 245);
-			ofRect(0,ofGetHeight() / uiScale - bottomBarHeight, ofGetWidth() / uiScale, bottomBarHeight );
+			ofRect(0,screenH / uiScale - bottomBarHeight, ofGetWidth() / uiScale, bottomBarHeight );
 
 			ofSetColor(255);
 			drawString("ofxRemoteUI built in client. " +
@@ -1169,7 +1180,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 					   "\nPress 's' to save current config, 'S' to make a new preset. ('E' to save in old format)\n" +
 					   "Press 'r' to restore all params's launch state.\n" +
 					   "Press Arrow Keys to edit values. SPACEBAR + Arrow Keys for bigger increments. ',' and '.' Keys to scroll.\n" +
-					   "Press 'TAB' to hide. Press 'RETURN' when editing a Color param to cycle through RGBA components.", padding, ofGetHeight() / uiScale - bottomBarHeight + 20);
+					   "Press 'TAB' to hide. Press 'RETURN' when editing a Color param to cycle through RGBA components.", padding, screenH / uiScale - bottomBarHeight + 20);
 		}
 
 		//preset selection / top bar
@@ -1319,7 +1330,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 					uiLines.addVertex(ofVec2f(x + realColW, y + spacing * 0.33));
 				}
 				y += spacing;
-				if (y > ofGetHeight() / uiScale - padding * 0.5 - bottomBarHeight){
+				if (y > screenH / uiScale - padding * 0.5 - bottomBarHeight){
 					x += colw;
 					y = initialY;
 				}
