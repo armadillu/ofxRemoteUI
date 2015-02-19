@@ -591,14 +591,12 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 						params[paramName] = p;
 					}
 					if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
-
-					s.setToParent();
 				}
 			}
 		}else{ //params not defined from code! ignore!
 			RUI_LOG_WARNING << "ignoring param '" << paramName << "' defined in xml but found in DB!" ;
-			s.setToParent();
 		}
+		s.setToParent();
 	}
 
 	vector<string> paramsNotInXML;
