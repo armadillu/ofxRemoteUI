@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		73002CDB140ABCF60035299A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73002CDA140ABCF60035299A /* Cocoa.framework */; };
 		BB09FCA9198DDB8000E04B02 /* uriencode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB09FCA8198DDB8000E04B02 /* uriencode.cpp */; };
-		BB37FC98185E0FDB008DA8DD /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB37FC97185E0FDB008DA8DD /* IOKit.framework */; };
-		BB395E96173E6326002FA815 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB395E95173E6326002FA815 /* QuartzCore.framework */; };
 		BB5CC60C177E49D500B595F8 /* IpEndpointName.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5DD177E49D500B595F8 /* IpEndpointName.cpp */; };
 		BB5CC60D177E49D500B595F8 /* NetworkingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5E2177E49D500B595F8 /* NetworkingUtils.cpp */; };
 		BB5CC60E177E49D500B595F8 /* UdpSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5E3177E49D500B595F8 /* UdpSocket.cpp */; };
@@ -63,6 +61,8 @@
 		BBB62807191C4D75005F95BF /* VVMIDI.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = BBB62800191C4D3B005F95BF /* VVMIDI.framework */; };
 		BBB6280A191C4EC9005F95BF /* ofxRemoteUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBB62808191C4EC9005F95BF /* ofxRemoteUI.cpp */; };
 		BBD3270F173BFFF200D59359 /* ofxRemoteUIClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */; };
+		BBD789A61AA148700061EC66 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBD789A51AA148700061EC66 /* IOKit.framework */; };
+		BBD789AA1AA1489C0061EC66 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBD789A91AA1489C0061EC66 /* QuartzCore.framework */; };
 		BBEE7856182302FF00D93161 /* ofxRemoteUINeigbors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBEE7854182302FF00D93161 /* ofxRemoteUINeigbors.cpp */; };
 		BBF0A82D191C56030048DB4F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = BBF0A82C191C56030048DB4F /* main.m */; };
 /* End PBXBuildFile section */
@@ -90,8 +90,6 @@
 		73002CDE140ABCF60035299A /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		73002CDF140ABCF60035299A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		BB09FCA8198DDB8000E04B02 /* uriencode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = uriencode.cpp; sourceTree = "<group>"; };
-		BB37FC97185E0FDB008DA8DD /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = ../../../../../../../../Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/IOKit.framework; sourceTree = "<group>"; };
-		BB395E95173E6326002FA815 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
 		BB4B54F0177FAD5D004838E4 /* ToDo.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ToDo.txt; sourceTree = "<group>"; };
 		BB5CC5D7177E49D500B595F8 /* ofStolenUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofStolenUtils.h; sourceTree = "<group>"; };
 		BB5CC5DD177E49D500B595F8 /* IpEndpointName.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IpEndpointName.cpp; sourceTree = "<group>"; };
@@ -182,6 +180,9 @@
 		BBB62800191C4D3B005F95BF /* VVMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VVMIDI.framework; path = Frameworks/VVMIDI.framework; sourceTree = "<group>"; };
 		BBB62808191C4EC9005F95BF /* ofxRemoteUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUI.cpp; sourceTree = "<group>"; };
 		BBB62809191C4EC9005F95BF /* ofxRemoteUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUI.h; sourceTree = "<group>"; };
+		BBD789A51AA148700061EC66 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		BBD789A71AA148850061EC66 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		BBD789A91AA1489C0061EC66 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		BBDCBE2716A063A400F1C5EC /* ReadMe.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ReadMe.txt; sourceTree = "<group>"; };
 		BBEE7854182302FF00D93161 /* ofxRemoteUINeigbors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUINeigbors.cpp; sourceTree = "<group>"; };
 		BBEE7855182302FF00D93161 /* ofxRemoteUINeigbors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUINeigbors.h; sourceTree = "<group>"; };
@@ -195,8 +196,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB37FC98185E0FDB008DA8DD /* IOKit.framework in Frameworks */,
-				BB395E96173E6326002FA815 /* QuartzCore.framework in Frameworks */,
+				BBD789AA1AA1489C0061EC66 /* QuartzCore.framework in Frameworks */,
+				BBD789A61AA148700061EC66 /* IOKit.framework in Frameworks */,
 				BBB62803191C4D3B005F95BF /* VVMIDI.framework in Frameworks */,
 				BBB62801191C4D3B005F95BF /* Growl.framework in Frameworks */,
 				73002CDB140ABCF60035299A /* Cocoa.framework in Frameworks */,
@@ -233,9 +234,10 @@
 		73002CD9140ABCF60035299A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BBD789A91AA1489C0061EC66 /* QuartzCore.framework */,
+				BBD789A71AA148850061EC66 /* CoreGraphics.framework */,
+				BBD789A51AA148700061EC66 /* IOKit.framework */,
 				BBB62804191C4D42005F95BF /* 3rd Party */,
-				BB37FC97185E0FDB008DA8DD /* IOKit.framework */,
-				BB395E95173E6326002FA815 /* QuartzCore.framework */,
 				73002CDA140ABCF60035299A /* Cocoa.framework */,
 				73002CDC140ABCF60035299A /* Other Frameworks */,
 			);
