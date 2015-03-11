@@ -221,7 +221,7 @@ void ofxRemoteUIServer::removeParamFromDB(string paramName){
 
 		//re-create orderedKeys
 		vector<string> myOrderedKeys;
-		unordered_map<int, string>::iterator iterator;
+		map<int, string>::iterator iterator;
 
 		for(iterator = orderedKeys.begin(); iterator != orderedKeys.end(); iterator++) {
 

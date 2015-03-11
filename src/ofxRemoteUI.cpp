@@ -366,7 +366,7 @@ vector<string> ofxRemoteUI::getAllParamNamesList(){
 
 	vector<string>paramsList;
 	//get list of params in add order
-	for( unordered_map<int,string>::iterator ii = orderedKeys.begin(); ii != orderedKeys.end(); ++ii ){
+	for( map<int,string>::iterator ii = orderedKeys.begin(); ii != orderedKeys.end(); ++ii ){
 		string paramName = (*ii).second;
 		paramsList.push_back(paramName);
 	}
@@ -573,7 +573,7 @@ RemoteUIParam ofxRemoteUI::getParamForName(string paramName){
 
 string ofxRemoteUI::getValuesAsString(){
 	stringstream out;
-	unordered_map<int,string>::iterator it = orderedKeys.begin();
+	map<int,string>::iterator it = orderedKeys.begin();
 	while( it != orderedKeys.end() ){
 		RemoteUIParam param = params[it->second];
 		if(param.type != REMOTEUI_PARAM_SPACER){

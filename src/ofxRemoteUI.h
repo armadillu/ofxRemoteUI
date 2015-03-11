@@ -281,7 +281,7 @@ protected:
 	string							userSuppliedNetInterface; //store user preference on network interface to use
 
 	unordered_map<string, RemoteUIParam>		params;
-	unordered_map<int, string>					orderedKeys; // used to keep the order in which the params were added
+	map<int, string>							orderedKeys; // used to keep the order in which the params were added
 	vector<string>								presetNames;
 
 	set<string>									paramsChangedSinceLastCheck;
