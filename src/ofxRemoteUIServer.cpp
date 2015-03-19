@@ -415,7 +415,7 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 	fileName = getFinalPath(fileName);
 	#endif
 
-	RUI_LOG_NOTICE << "saving to xml (using the NEW FORMAT) '" << fileName << "'" ;
+	RUI_LOG_NOTICE << "saving to xml (using the V2 format) '" << fileName << "'" ;
 	ofXml s;
 
 	s.addChild(OFXREMOTEUI_XML_ROOT_TAG);
