@@ -263,6 +263,8 @@ protected:
 
 	string getMyIP(string userChosenInteface = "");
 
+	void printAllParamsDebug();
+
 	bool							verbose_;
 	bool							readyToSend;
 	ofxOscSender					oscSender;
