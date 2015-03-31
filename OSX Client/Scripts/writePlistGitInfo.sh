@@ -4,7 +4,7 @@
 gitCommitNum=$(git rev-list HEAD --count)
 gitBranch=$(git rev-parse --abbrev-ref HEAD)
 gitCommitHash=$(git rev-parse --verify HEAD --short)
-gitIsDirty=$([[ $(git diff --shortstat 2> /dev/null | tail -n1) != "" ]] && echo " *Dirty!")
+gitIsDirty=$([[ $(git diff --shortstat 2> /dev/null | tail -n1) != "" ]] && echo " *Dirty Repo")
 
 if [ -z "$gitCommitNum" ]; then
 gitCommitNum="Unknown Version"
