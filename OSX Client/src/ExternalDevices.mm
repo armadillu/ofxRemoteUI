@@ -110,7 +110,7 @@ float convertHueToMidiFigtherHue(float hue){
 				if (onlyColor && p.type != REMOTEUI_PARAM_COLOR){
 					send = FALSE;
 				}
-
+				int channelOffset = 0;
 				if(send){
 					if(!reset){
 						switch(p.type){
@@ -128,7 +128,8 @@ float convertHueToMidiFigtherHue(float hue){
 								float hue = [c hueComponent];
 								//the midifigter has a weird color mapping, 0 is blue, 1 is blue;
 								//usually hue is 0 is red, 1 is red. so we apply offset to the hue we get
-								midiOutConfig.channelInt ++; //this is a hack for the MidiFighterTwister! TODO make UI to enable this!!
+								//midiOutConfig.channelInt ++; //this is a hack for the MidiFighterTwister! TODO make UI to enable this!!
+								channelOffset = 1;
 								hue = convertHueToMidiFigtherHue(hue);
 								value = hue * 127;
 							}break;
@@ -137,7 +138,7 @@ float convertHueToMidiFigtherHue(float hue){
 						}
 					}
 					//send out on the same channel we got the message in + 1
-					VVMIDIMessage * msg = [VVMIDIMessage createWithType:0xB0 channel:midiOutConfig.channelInt ];
+					VVMIDIMessage * msg = [VVMIDIMessage createWithType:0xB0 channel: channelOffset /* + midiOutConfig.channelInt*/ ];
 					[msg setData1:(unsigned char)(midiOutConfig.controlIDInt)]; //knob id
 					[msg setData2:(unsigned char)(value)]; //value
 					[device sendMsg:msg];
@@ -147,7 +148,7 @@ float convertHueToMidiFigtherHue(float hue){
 						NSColor * paramColor = [NSColor colorWithDeviceRed:p.r/255.0f green:p.g/255.0f blue:p.b/255.0f alpha:1.0];
 						float hue = convertHueToMidiFigtherHue([paramColor hueComponent]);
 						//param hue
-						msg = [VVMIDIMessage createWithType:0xB0 channel:midiOutConfig.channelInt + 1];
+						msg = [VVMIDIMessage createWithType:0xB0 channel:/*midiOutConfig.channelInt*/ + 1];
 						[msg setData1:(unsigned char)(midiOutConfig.controlIDInt)]; //knob id
 						[msg setData2:(unsigned char)(hue * 127)]; //value
 						[device sendMsg:msg];
@@ -156,7 +157,7 @@ float convertHueToMidiFigtherHue(float hue){
 						float a = p.a / 96.0f; //remote ui sends (a == 96 || a = 55)
 						if (a > 1.0) a = 1.0f;
 						if (a < 0.8) a = 0.8;
-						msg = [VVMIDIMessage createWithType:0xB0 channel:midiOutConfig.channelInt + 2];
+						msg = [VVMIDIMessage createWithType:0xB0 channel:/*midiOutConfig.channelInt*/ + 2];
 						[msg setData1:(unsigned char)(midiOutConfig.controlIDInt)]; //knob id
 						//[msg setData2:(unsigned char)(17 + 30 * a)]; //value
 						[msg setData2:(unsigned char)(17 + 30 * a)]; //value
@@ -215,7 +216,7 @@ float convertHueToMidiFigtherHue(float hue){
 		if(device){
 			if(client->paramExistsForName(paramName)){
 				RemoteUIParam p = client->getParamForName(paramName);
-				VVMIDIMessage * msg = [VVMIDIMessage createWithType:0xB0 channel:midiOutConfig.channelInt + 2];
+				VVMIDIMessage * msg = [VVMIDIMessage createWithType:0xB0 channel:/*midiOutConfig.channelInt*/ + 2];
 				[msg setData1:(unsigned char)(midiOutConfig.controlIDInt)]; //knob id
 				[msg setData2:(unsigned char)(6)]; //value
 				[device sendMsg:msg];
@@ -224,7 +225,7 @@ float convertHueToMidiFigtherHue(float hue){
 				dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, 1.5 * NSEC_PER_SEC);
 				dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
 					RemoteUIParam p = client->getParamForName(paramName);
-					VVMIDIMessage * msg = [VVMIDIMessage createWithType:0xB0 channel:midiOutConfig.channelInt + 2];
+					VVMIDIMessage * msg = [VVMIDIMessage createWithType:0xB0 channel:/*midiOutConfig.channelInt*/ + 2];
 					[msg setData1:(unsigned char)(midiOutConfig.controlIDInt)]; //knob id
 					[msg setData2:(unsigned char)(47)]; //value
 					[device sendMsg:msg];
