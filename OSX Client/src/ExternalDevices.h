@@ -11,7 +11,7 @@
 #import "JoystickNotificationDelegate.h"
 #include "ofxRemoteUIClient.h"
 #import "ParamUI.h"
-
+#include "constants.h"
 
 @interface ExternalDevices : NSObject <VVMIDIDelegateProtocol, JoystickNotificationDelegate>{
 
@@ -26,13 +26,27 @@
 	map<string, ParamUI*> *			widgets;
 	ofxRemoteUIClient *				client;
 	BOOL							externalButtonsBehaveAsToggle;	//if true, one press on midi or joystick toggles a bool;
+
+	struct MidiOutCache{
+		string deviceName;
+		string channel;
+		string controlID;
+		int channelInt;
+		int controlIDInt;
+	};
+
+	map<string,MidiOutCache>		midiDevCache;
+
 }
 
+-(void)updateDevicesWithClientValues:(BOOL)onlyColor resetToZero:(BOOL)reset;
 
 -(void)initWithWidgets:(map<string, ParamUI*>*) widgets andClient:(ofxRemoteUIClient*) client;
 -(void)savePrefs:(id)sender;
 -(IBAction)applyPrefs:(id)sender;
 -(void)loadPrefs;
+
+
 
 -(BOOL)parseDeviceBindingsFromFile:(NSURL*) file;
 -(void)saveDeviceBindingsToFile:(NSURL*) path;
