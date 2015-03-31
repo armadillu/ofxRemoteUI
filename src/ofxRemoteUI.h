@@ -209,6 +209,7 @@ public:
 	vector<string> getAllParamNamesList();
 	vector<string> getChangedParamsList(); //in user add order
 	RemoteUIParam getParamForName(string paramName);
+	bool paramExistsForName(string paramName);
 	vector<string> getPresetsList();
 
 	string getValuesAsString();

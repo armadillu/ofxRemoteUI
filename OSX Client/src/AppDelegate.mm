@@ -56,6 +56,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 			if(me->needFullParamsUpdate){ //a bit ugly here...
 				[me fullParamsUpdate];
 				me->needFullParamsUpdate = NO;
+			}else{
+				[[me getExternalDevices] updateDevicesWithClientValues:FALSE resetToZero: FALSE]; //udpate midi motors to match values
 			}
 			[me partialParamsUpdate];
 			[me updateGroupPopup];
@@ -339,15 +341,14 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	//[scroll setScrollerStyle:NSScrollerStyleOverlay];
 	//[scroll setScrollerKnobStyle:NSScrollerKnobStyleDefault];
 
-	[externalDevices parseDeviceBindingsFromFile:[NSURL fileURLWithPath:[DEFAULT_BINDINGS_FOLDER stringByAppendingString:DEFAULT_BINDINGS_FILE]]];//load last used midi bindings
-
 	[self loadPrefs];
 	[self recalcWindowSize];
 
 	[window setAllowsToolTipsWhenApplicationIsInactive:YES];
 
-
 	[externalDevices initWithWidgets:&widgets andClient:client];
+	[externalDevices parseDeviceBindingsFromFile:[NSURL fileURLWithPath:[DEFAULT_BINDINGS_FOLDER stringByAppendingString:DEFAULT_BINDINGS_FILE]]];//load last used midi bindings
+
 	launched = TRUE;
 
 	NSLog(@"Launched ofxRemoteUI version %@", GIT_COMMIT_NUMBER);

@@ -40,6 +40,7 @@
 }
 
 -(void)updateDevicesWithClientValues:(BOOL)onlyColor resetToZero:(BOOL)reset;
+-(IBAction)flashBoundControllers:(id)sender; //for n seconds
 
 -(void)initWithWidgets:(map<string, ParamUI*>*) widgets andClient:(ofxRemoteUIClient*) client;
 -(void)savePrefs:(id)sender;
@@ -65,5 +66,7 @@
 - (void)joystickAdded:(Joystick *)joystick ;
 - (void)joystickAxisChanged:(Joystick *)joystick atAxisIndex:(int)axis;
 - (void)joystickButton:(int)buttonIndex state:(BOOL)pressed onJoystick:(Joystick*)joystick;
+
+- (MidiOutCache) cacheForControlURL:(string) url;
 
 @end

@@ -568,6 +568,11 @@ string ofxRemoteUI::stringForParamType(RemoteUIParamType t){
 }
 
 
+bool ofxRemoteUI::paramExistsForName(string paramName){
+	unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+	return  it != params.end();
+}
+
 RemoteUIParam ofxRemoteUI::getParamForName(string paramName){
 
 	RemoteUIParam p;
