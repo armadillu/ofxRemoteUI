@@ -180,6 +180,7 @@
 		BBB62800191C4D3B005F95BF /* VVMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VVMIDI.framework; path = Frameworks/VVMIDI.framework; sourceTree = "<group>"; };
 		BBB62808191C4EC9005F95BF /* ofxRemoteUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUI.cpp; sourceTree = "<group>"; };
 		BBB62809191C4EC9005F95BF /* ofxRemoteUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUI.h; sourceTree = "<group>"; };
+		BBD134211ACA50EA0005FCE4 /* constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = constants.h; sourceTree = "<group>"; };
 		BBD789A51AA148700061EC66 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		BBD789A71AA148850061EC66 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		BBD789A91AA1489C0061EC66 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -463,6 +464,7 @@
 				BBB627D0191C4CC9005F95BF /* MyScrollView.m */,
 				BB8776ED17C9A39100CC74B8 /* ColoredWindow */,
 				BBD9D9111903369500C553D7 /* ExternalDevices */,
+				BBD134211ACA50EA0005FCE4 /* constants.h */,
 			);
 			name = ofxRemoteUIClientOSX;
 			sourceTree = "<group>";

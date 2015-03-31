@@ -163,7 +163,7 @@ public:
 			case REMOTEUI_PARAM_ENUM: printf("enum: %d [%d, %d]\n", intVal, minInt, maxInt); break;
 			case REMOTEUI_PARAM_BOOL: printf("bool: %s\n", boolVal ? "TRUE" : "FALSE"); break;
 			case REMOTEUI_PARAM_STRING: printf("string: %s\n", stringVal.c_str()); break;
-			case REMOTEUI_PARAM_SPACER: printf("\n"); break;
+			case REMOTEUI_PARAM_SPACER: printf("Spacer\n"); break;
 			default: printf("weird RemoteUIParam at print()!\n"); break;
 		}
 	};

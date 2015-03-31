@@ -10,6 +10,11 @@
 #import "Joystick.h"
 #import "JoystickManager.h"
 
+float valMap(float value, float inputMin, float inputMax, float outputMin, float outputMax);
+
+float valMap(float value, float inputMin, float inputMax, float outputMin, float outputMax){
+	return ((value - inputMin) / (inputMax - inputMin) * (outputMax - outputMin) + outputMin);
+}
 
 @implementation ExternalDevices
 
@@ -71,10 +76,100 @@
 
 //midi setup delegate
 - (void) setupChanged{
+	[self updateDevicesWithClientValues:FALSE resetToZero:FALSE];
+}
+
+-(IBAction)updateDevicesWithClientValues:(BOOL)onlyColor resetToZero:(BOOL)reset{
+
+	map<string, string>::iterator it = bindingsMap.begin();
+	while(it != bindingsMap.end()){ //all bindings
+
+		string devNameAndAddress = it->first; //looks like "[controlID # channel] @ deviceName]"
+		string paramName = it->second;
+		MidiOutCache midiOutConfig;
+
+		map<string,MidiOutCache>::iterator cacheIt = midiDevCache.find(devNameAndAddress);
+
+		if(cacheIt == midiDevCache.end()){ //not in cache, lets cache it
+			std::size_t found = devNameAndAddress.find_first_of("@");
+			if( found > 0){
+				midiOutConfig.deviceName = devNameAndAddress.substr(found + 1, devNameAndAddress.size() - found - 1);
+				int i;
+				for(i = 1; i < devNameAndAddress.size(); i++){
+					if (devNameAndAddress[i] == '#') break;
+					midiOutConfig.controlID += devNameAndAddress[i];
+				}
+				for(i = i + 1; i < devNameAndAddress.size(); i++){
+					if (devNameAndAddress[i] == ']') break;
+					midiOutConfig.channel += devNameAndAddress[i];
+				}
+			}
+
+			for(int i = 0; i < midiOutConfig.deviceName.size(); i++){
+				if(midiOutConfig.deviceName[i] == '_') midiOutConfig.deviceName[i] = ' '; //replace dashes for spaces , undo what we did before
+			}
+			midiOutConfig.channelInt = atoi(midiOutConfig.channel.c_str());
+			midiOutConfig.controlIDInt = atoi(midiOutConfig.controlID.c_str());
+			midiDevCache[devNameAndAddress] = midiOutConfig;
+		}else{
+			midiOutConfig = cacheIt->second;
+		}
+
+		VVMIDINode *device = [midiManager findDestNodeWithDeviceName:[NSString stringWithUTF8String:midiOutConfig.deviceName.c_str()]];
+		if(device){
+			//cc @ channel 0 (1)
+
+			RemoteUIParam p = client->getParamForName(paramName);
+			unsigned char value = 0; //have to map to [0..127]
+			BOOL send = true;
+			if (onlyColor && p.type != REMOTEUI_PARAM_COLOR){
+				send = FALSE;
+			}
+
+			if(send){
+				if(!reset){
+					switch(p.type){
+						case REMOTEUI_PARAM_BOOL:
+							if(p.boolVal) value = 127; break;
+						case REMOTEUI_PARAM_FLOAT:
+							value = valMap(p.floatVal, p.minFloat, p.maxFloat, 0, 127);
+							break;
+						case REMOTEUI_PARAM_ENUM:
+						case REMOTEUI_PARAM_INT:
+							value = valMap(p.intVal, p.minInt, p.maxInt, 0, 127);
+							break;
+						case REMOTEUI_PARAM_COLOR:{
+							NSColor * c = [NSColor colorWithDeviceRed:p.redVal/255.0f green:p.greenVal/255.0f blue:p.blueVal/255.0f alpha:p.alphaVal/255.0f];
+							float hue = [c hueComponent];
+							//the midifigter has a weird color mapping, 0 is blue, 1 is blue;
+							//usually hue is 0 is red, 1 is red. so we apply offset to the hue we get
+							midiOutConfig.channelInt ++; //this is a hack for the MidiFighterTwister! TODO make UI to enable this!!
+							hue = 1 - hue;
+							hue += 0.66;
+							if(hue > 1.0){
+								hue = hue - 1.0;
+							}
+							value = hue * 127;
+						}break;
+						default:
+							break;//ignore other types
+					}
+				}
+				//send out on the same channel we got the message in + 1
+				VVMIDIMessage * msg = [VVMIDIMessage createWithType:0xB0 channel:midiOutConfig.channelInt ];
+				[msg setData1:(unsigned char)(midiOutConfig.controlIDInt)]; //knob id
+				[msg setData2:(unsigned char)(value)]; //value
+				[device sendMsg:msg];
+			}
+		}
+		++it;
+	}
 }
 
 - (void) receivedMIDI:(NSArray *)a fromNode:(VVMIDINode *)n	{
 
+	if(!client->isReadyToSend()) return;
+	
 	NSEnumerator		*it = [a objectEnumerator];
 	VVMIDIMessage		*msgPtr;
 
@@ -160,9 +255,18 @@
 					upcomingDeviceParam = nil;
 					//[window setTitle:@"ofxRemoteUI"];
 				}
+
+				//save to default bindings
+				NSFileManager * fm = [NSFileManager defaultManager];
+				[fm createDirectoryAtPath:DEFAULT_BINDINGS_FOLDER withIntermediateDirectories:YES attributes:Nil error:nil];
+				NSString * fullPath = [DEFAULT_BINDINGS_FOLDER stringByAppendingString:DEFAULT_BINDINGS_FILE];
+				[self saveDeviceBindingsToFile: [NSURL fileURLWithPath:fullPath]];
+				[midiBindingsTable reloadData];
 			}
 		}
 	}
+
+	[self updateDevicesWithClientValues:TRUE resetToZero:FALSE];
 }
 
 

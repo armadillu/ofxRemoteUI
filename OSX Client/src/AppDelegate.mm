@@ -456,6 +456,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		}
 		[self layoutWidgetsWithConfig: [self calcLayoutParams]];
 	}
+	[externalDevices updateDevicesWithClientValues:FALSE resetToZero: FALSE]; //udpate midi motors to match values
 }
 
 
@@ -1016,6 +1017,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		connectButton.title = CONNECT_STRING;
 		[self layoutWidgetsWithConfig: [self calcLayoutParams]]; //update scrollbar
 		[logs appendToServerLog:[NSString stringWithFormat:@"%@ >> ## CLIENT DISCONNECTED ###################\n", date]];
+		[externalDevices updateDevicesWithClientValues:FALSE resetToZero: TRUE];
 	}
 }
 

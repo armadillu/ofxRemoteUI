@@ -14,6 +14,7 @@
 #include "ofxOsc.h"
 #include <set>
 #include <vector>
+#include <map>
 
 #if __cplusplus>=201103L || defined(_MSC_VER)
 	#include <unordered_map>
@@ -263,6 +264,8 @@ protected:
 
 	string getMyIP(string userChosenInteface = "");
 
+	void printAllParamsDebug();
+
 	bool							verbose_;
 	bool							readyToSend;
 	ofxOscSender					oscSender;
@@ -281,7 +284,7 @@ protected:
 	string							userSuppliedNetInterface; //store user preference on network interface to use
 
 	unordered_map<string, RemoteUIParam>		params;
-	unordered_map<int, string>					orderedKeys; // used to keep the order in which the params were added
+	map<int, string>							orderedKeys; // used to keep the order in which the params were added
 	vector<string>								presetNames;
 
 	set<string>									paramsChangedSinceLastCheck;
