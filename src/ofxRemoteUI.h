@@ -14,6 +14,7 @@
 #include "ofxOsc.h"
 #include <set>
 #include <vector>
+#include <map>
 
 #if __cplusplus>=201103L || defined(_MSC_VER)
 	#include <unordered_map>
