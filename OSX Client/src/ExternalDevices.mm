@@ -168,6 +168,8 @@ float valMap(float value, float inputMin, float inputMax, float outputMin, float
 
 - (void) receivedMIDI:(NSArray *)a fromNode:(VVMIDINode *)n	{
 
+	if(!client->isReadyToSend()) return;
+	
 	NSEnumerator		*it = [a objectEnumerator];
 	VVMIDIMessage		*msgPtr;
 
