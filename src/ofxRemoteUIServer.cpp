@@ -820,6 +820,8 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	ofAddListener(ofEvents().keyPressed, this, &ofxRemoteUIServer::_keyPressed);
 	ofAddListener(ofEvents().update, this, &ofxRemoteUIServer::_update);
 	ofAddListener(ofEvents().draw, this, &ofxRemoteUIServer::_draw, OF_EVENT_ORDER_AFTER_APP + 110);
+
+	setParamGroup("Default Group");
 	#endif
 }
 
