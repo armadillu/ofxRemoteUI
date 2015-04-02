@@ -820,11 +820,8 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	ofAddListener(ofEvents().keyPressed, this, &ofxRemoteUIServer::_keyPressed);
 	ofAddListener(ofEvents().update, this, &ofxRemoteUIServer::_update);
 	ofAddListener(ofEvents().draw, this, &ofxRemoteUIServer::_draw, OF_EVENT_ORDER_AFTER_APP + 110);
-
-	setParamGroup("Default Group");
 	#endif
 
-	//setParamGroup(OFXREMOTEUI_DEFAULT_PARAM_GROUP);
 	setNewParamColor(1);
 	setNewParamColorVariation(true);
 }
@@ -1775,6 +1772,15 @@ void ofxRemoteUIServer::watchParamOnScreen(string paramName){
 	}else{
 		RUI_LOG_ERROR << "can't watch that param; it doesnt exist! " << paramName << endl;
 	}
+}
+
+
+void ofxRemoteUIServer::addParamToDB(RemoteUIParam p, string thisParamName){
+
+	if(p.type != REMOTEUI_PARAM_SPACER && params.size() == 0){ //adding first param! and its not spacer!
+		setParamGroup(OFXREMOTEUI_DEFAULT_PARAM_GROUP);
+	}
+	ofxRemoteUI::addParamToDB(p, thisParamName);
 }
 
 void ofxRemoteUIServer::addSpacer(string title){
