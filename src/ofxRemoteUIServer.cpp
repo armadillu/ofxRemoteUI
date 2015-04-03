@@ -1241,10 +1241,16 @@ void ofxRemoteUIServer::draw(int x, int y){
 				if (stringw > valOffset){
 					key = key.substr(0, (valOffset) / charw );
 				}
+
+				if(p.type == REMOTEUI_PARAM_SPACER){
+					ofColor c = ofColor(p.r, p.g, p.b);
+					ofSetColor(c * 0.3);
+					ofRect(x , -spacing + y + spacing * 0.33, realColW, spacing);
+				}
 				if (selectedItem != i){
 					ofSetColor(p.r, p.g, p.b);
 				}else{
-					if(ofGetFrameNum()%5 < 1) ofSetColor(222);
+					if(ofGetFrameNum()%5 < 1) ofSetColor(255);
 					else ofSetColor(255,0,0);
 				}
 
@@ -1252,11 +1258,6 @@ void ofxRemoteUIServer::draw(int x, int y){
 					string sel = (selectedItem == i) ? ">>" : "  ";
 					drawString(sel + key, x, y);
 				}else{
-					ofPushStyle();
-					ofColor c = ofColor(p.r, p.g, p.b);
-					ofSetColor(c * 0.3);
-					ofRect(x , -spacing + y + spacing * 0.33, realColW, spacing);
-					ofPopStyle();
 					drawString("+ " + p.stringVal, x,y);
 				}
 
