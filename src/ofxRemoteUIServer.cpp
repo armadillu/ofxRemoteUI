@@ -88,7 +88,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	newColorInGroupCounter = 1;
 	showInterfaceKey = '\t';
 	uiScale = 1;
-	customScreenHeight = -1;
+	customScreenWidth = customScreenHeight = -1;
 
 #ifdef OF_AVAILABLE
 	#ifdef USE_OFX_FONTSTASH
@@ -1094,7 +1094,8 @@ void ofxRemoteUIServer::drawUiWithFontStash(string fontPath, float fontSize_){
 	useFontStash = true;
 	fontFile = ofToDataPath(fontPath, true);
 	fontSize = fontSize_;
-	font.setup(fontFile, 1.0, 512, false, 0, uiScale);
+	font.setup(fontFile, 1.0, 512, (uiScale > 1.0), 4, uiScale);
+	if(uiScale > 1.0) font.setLodBias(-0.5);
 	onScreenNotifications.drawUiWithFontStash(&font);
 }
 
@@ -1118,7 +1119,9 @@ void ofxRemoteUIServer::_draw(ofEventArgs &e){
 	if(autoDraw){
 		ofSetupScreen(); //mmm this is a bit scary //TODO!
 		int h = customScreenHeight;
+		int w = customScreenWidth;
 		if(h < 0) h = ofGetHeight();
+		if(w < 0) w = ofGetWidth();
 		draw( 20 / uiScale, h / uiScale - 20 / uiScale);
 	}
 }
@@ -1154,6 +1157,8 @@ void ofxRemoteUIServer::draw(int x, int y){
 	ofEnableAlphaBlending();
 	int screenH = customScreenHeight;
 	if (screenH < 0) screenH = ofGetHeight();
+	int screenW = customScreenWidth;
+	if (screenW < 0) screenW = ofGetWidth();
 
 	if(showUI){
 
@@ -1171,9 +1176,9 @@ void ofxRemoteUIServer::draw(int x, int y){
 		//bottom bar
 		if (uiAlpha > 0.99 || showUIduringEdits){
 			ofSetColor(11, 245);
-			ofRect(0,0, ofGetWidth() / uiScale, screenH / uiScale);
+			ofRect(0,0, screenW / uiScale, screenH / uiScale);
 			ofSetColor(44, 245);
-			ofRect(0,screenH / uiScale - bottomBarHeight, ofGetWidth() / uiScale, bottomBarHeight );
+			ofRect(0,screenH / uiScale - bottomBarHeight, screenW / uiScale, bottomBarHeight );
 
 			ofSetColor(255);
 			drawString("ofxRemoteUI built in client. " +
@@ -1187,7 +1192,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 
 		//preset selection / top bar
 		ofSetColor(64);
-		ofRect(0 , 0, ofGetWidth() / uiScale, 22);
+		ofRect(0 , 0, screenW / uiScale, 22);
 		ofColor textBlinkC ;
 		if(ofGetFrameNum()%6 < 4) textBlinkC = ofColor(0,0);
 		else textBlinkC = ofColor(255,0,0);
@@ -1377,6 +1382,30 @@ void ofxRemoteUIServer::draw(int x, int y){
 	ofPopStyle();
 }
 #endif
+
+
+
+void ofxRemoteUIServer::setUiColumnWidth(int w){
+	if(fabs(uiColumnWidth - w) < 0.1) uiLines.clear();
+	uiColumnWidth = w;
+}
+
+void ofxRemoteUIServer::setBuiltInUiScale(float s){
+	if(fabs(uiScale - s) < 0.1) uiLines.clear();
+	uiScale = s;
+}
+
+
+void ofxRemoteUIServer::setCustomScreenHeight(int h){
+	if(fabs(customScreenHeight - h) < 0.1) uiLines.clear();
+	customScreenHeight = h;
+}
+
+
+void ofxRemoteUIServer::setCustomScreenWidth(int w){
+	if(fabs(customScreenWidth - w) < 0.1) uiLines.clear();
+	customScreenWidth = w;
+}
 
 
 void ofxRemoteUIServer::handleBroadcast(){

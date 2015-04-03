@@ -223,7 +223,7 @@ public:
 
 	//You shouldnt need to call any of these directly. Use the Macros supplied above instead.
 	void update(float dt);
-	void draw(int x = 20, int y = ofGetHeight() - 20);
+	void draw(int x = 20, int y = ofGetHeight() - 20); //x and y of where the notifications will get draw
 	void close();
 
 	vector<string> loadFromXML(string fileName); //returns list of param names in current setup but not set in XML
@@ -293,9 +293,10 @@ public:
 
 #ifdef OF_AVAILABLE
 
-	void setUiColumnWidth(int w){ uiColumnWidth = w; }
-	void setBuiltInUiScale(float s){uiScale = s;}
-	void setCustomScreenHeight(int h){customScreenHeight = h;}
+	void setUiColumnWidth(int w);
+	void setBuiltInUiScale(float s);
+	void setCustomScreenHeight(int h);
+	void setCustomScreenWidth(int w);
 
 	//of style event/callback
 	ofEvent<RemoteUIServerCallBackArg> clientAction;
@@ -416,6 +417,7 @@ private:
 	float													xOffset;		 //my ghetto scrolling
 	float													xOffsetTarget; //smooth transitions scrolling
 	int														customScreenHeight;
+	int														customScreenWidth;
 	int														selectedColorComp; //[0..4]
 	#ifdef USE_OFX_FONTSTASH
 	bool													useFontStash;
