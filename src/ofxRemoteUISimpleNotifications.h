@@ -12,7 +12,7 @@
 
 #if defined OF_VERSION_MINOR /*if OF exists*/
 
-#define NOTIFICATION_ALPHA_OVEFLOW		3.0
+#define NOTIFICATION_ALPHA_OVERFLOW		3.0
 #define NOTIFICATION_COLOR				ofColor(200,16,16, 255 * a)
 
 #define PARAM_UPDATE_COLOR				ofColor(0, 200, 0, 255 * a)
@@ -39,6 +39,7 @@ public:
 		string value;
 		float time;
 		ofColor color;
+		ofColor bgColor;
 	};
 
 
@@ -83,7 +84,7 @@ public:
 		float spacing = NOTIFICATION_LINEHEIGHT;
 
 		for(int i = 0; i < notifications.size(); i++){
-			float a = ofClamp( NOTIFICATION_ALPHA_OVEFLOW * notifications[i].time, 0.0f, 1.0f);
+			float a = ofClamp( NOTIFICATION_ALPHA_OVERFLOW * notifications[i].time, 0.0f, 1.0f);
 			drawStringWithBox("ofxRemoteUIServer: " + notifications[i].msg,
 										x,
 										y - spacing * (notifications.size() - 1) + i * spacing,
@@ -95,15 +96,17 @@ public:
 		typedef std::map<string, ParamNotification>::iterator it_type;
 		int c = 0;
 		for(it_type it = paramNotifications.begin(); it != paramNotifications.end(); it++){
-			float a = ofClamp( NOTIFICATION_ALPHA_OVEFLOW * it->second.time, 0.0f, 1.0f);
-			float fresh = 1.0f - ofClamp(OFXREMOTEUI_PARAM_UPDATE_NOTIFICATION_SCREENTIME - it->second.time, 0.0f, 1.0f);
+
+			float a = ofClamp( NOTIFICATION_ALPHA_OVERFLOW * it->second.time, 0.0f, 1.0f);
+			float fresh = 1.0f - ofClamp((screenTime + 1) - it->second.time, 0.0f, 1.0f);
+
 			string total = it->first + ": " + it->second.value ;
 			float yy = y - spacing * ( notifications.size() + (paramNotifications.size()-1) - c );
 			drawStringWithBox( total,
 										x,
 										yy,
-										(fresh > 0.1 ) ? ofColor(0,255,0) : ofColor(0, 255 * a),
-										(fresh > 0.1 ) ? FRESH_COLOR : PARAM_UPDATE_COLOR
+										(fresh > 0.1 ) ? it->second.bgColor : ofColor(it->second.bgColor, 255 * a),
+									  	ofColor(0)
 										);
 			if (it->second.color.a != 0){
 				ofPushStyle();
@@ -128,23 +131,25 @@ public:
 	void addNotification(string msg){
 		SimpleNotification n;
 		n.msg = msg;
-		n.time = OFXREMOTEUI_EVENT_NOTIFICATION_SCREENTIME;
+		n.time = screenTime;
 		notifications.push_back(n);
 	};
 
-	void addParamUpdate(string paramName, string paramValue, ofColor c = ofColor(0,0,0,0)){
+	void addParamUpdate(string paramName, string paramValue, ofColor bgColor, ofColor paramC = ofColor(0,0)){
 		ParamNotification n;
-		n.color = c;
+		n.color = paramC;
+		n.bgColor = bgColor;
 		n.value = paramValue;
-		n.time = OFXREMOTEUI_PARAM_UPDATE_NOTIFICATION_SCREENTIME;
+		n.time = screenTime;
 		paramNotifications[paramName] = n;
 	};
 
-	void addParamWatch(string paramName, string paramValue){
+	void addParamWatch(string &paramName, string paramValue){
 		ParamNotification n;
-		n.color = ofColor(0,0,0,0);
+		n.color = ofColor(0,0);
+		n.bgColor = ofColor(0);
 		n.value = paramValue;
-		n.time = OFXREMOTEUI_PARAM_UPDATE_NOTIFICATION_SCREENTIME;
+		n.time = screenTime;
 		paramWatch[paramName] = n;
 	};
 
@@ -157,6 +162,8 @@ public:
 		font = NULL;
 	}
 	#endif
+
+	void setNotificationScreenTime(float t){screenTime = t;}
 
 private:
 
@@ -193,6 +200,7 @@ private:
 	vector<SimpleNotification> notifications;
 	map<string, ParamNotification> paramNotifications;
 	map<string, ParamNotification> paramWatch;
+	float screenTime = 5.0;
 };
 
 #endif

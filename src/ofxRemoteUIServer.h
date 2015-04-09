@@ -298,6 +298,8 @@ public:
 	void setCustomScreenHeight(int h);
 	void setCustomScreenWidth(int w);
 
+	void setNotificationScreenTime(float t){onScreenNotifications.setNotificationScreenTime(t);}
+
 	//of style event/callback
 	ofEvent<RemoteUIServerCallBackArg> clientAction;
 
@@ -429,6 +431,7 @@ private:
 	void			refreshPresetsCache();
 	void			drawString(const string & text, const float & x, const float & y);
 	void			drawString(const string & text, const ofVec2f & pos);
+
 #endif
 
 	//keep track of params we added and then removed

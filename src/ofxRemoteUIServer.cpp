@@ -642,6 +642,7 @@ void ofxRemoteUIServer::pushParamsToClient(){
 		string pName = changedParams[i];
 		RemoteUIParam p = params[pName];
 		onScreenNotifications.addParamUpdate(pName, p.getValueAsString(),
+											 ofColor(p.r, p.g, p.b, p.a),
 			p.type == REMOTEUI_PARAM_COLOR ?
 			ofColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal) :
 			ofColor(0,0,0,0)
@@ -1005,7 +1006,7 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 						cbArg.paramName = key;
 						cbArg.param = params[key];  //copy the updated param to the callbakc arg
 						#ifdef OF_AVAILABLE
-						onScreenNotifications.addParamUpdate(key, cbArg.param.getValueAsString());
+						onScreenNotifications.addParamUpdate(key, cbArg.param.getValueAsString(), ofColor(p.r, p.g, p.b, p.a));
 						ofNotifyEvent(clientAction, cbArg, this);
 						#endif
 						if(callBack) callBack(cbArg);
@@ -1122,7 +1123,7 @@ void ofxRemoteUIServer::_draw(ofEventArgs &e){
 		int w = customScreenWidth;
 		if(h < 0) h = ofGetHeight();
 		if(w < 0) w = ofGetWidth();
-		draw( 20 / uiScale, h / uiScale - 20 / uiScale);
+		draw( 20 / uiScale, (h - 20)/ uiScale );
 	}
 }
 
@@ -1146,6 +1147,7 @@ void ofxRemoteUIServer::drawString(const string & text, const float & x, const f
 	#endif
 }
 
+//x and y of where the notifications will get draw
 void ofxRemoteUIServer::draw(int x, int y){
 
 	ofPushStyle();
@@ -1520,6 +1522,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				#ifdef OF_AVAILABLE
 				RemoteUIParam p = params[dm.paramName];
 				onScreenNotifications.addParamUpdate(dm.paramName, p.getValueAsString(),
+													 ofColor(p.r, p.g, p.b, p.a),
 													 p.type == REMOTEUI_PARAM_COLOR ?
 													 ofColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal):
 													 ofColor(0,0,0,0)
