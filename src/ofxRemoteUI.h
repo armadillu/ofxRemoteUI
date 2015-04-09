@@ -224,6 +224,8 @@ public:
 
 	virtual void sendUntrackedParamUpdate(RemoteUIParam p, string paramName){};
 
+	string getMyIP(string userChosenInteface = "");
+
 protected:
 
 	virtual void update(float dt) = 0;
@@ -262,8 +264,6 @@ protected:
 	void sendSAVp(string presetName, string group, bool confirm = false);
 	void sendSETp(string presetName, string group, bool confirm = false);
 	void sendDELp(string presetName, string group, bool confirm = false);
-
-	string getMyIP(string userChosenInteface = "");
 
 	void printAllParamsDebug();
 
