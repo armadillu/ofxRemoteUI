@@ -946,12 +946,16 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 -(void) autoConnectToNeighbor:(string)host_ port:(int)port_{
 	if(autoConnectToggle){
-		if ([[connectButton title] isEqualToString:CONNECT_STRING] || connecting){ //we are not connected, let's connect to this newly launched neighbor!
-			NSString * host = [NSString stringWithFormat:@"%s", host_.c_str()];
-			NSString * port = [NSString stringWithFormat:@"%d", port_];
-			[addressField setStringValue: host];
-			[portField setStringValue: port];
-			[self connect];
+		string localIP = client->getMyIP("");
+
+		if (host_ == localIP){
+			if ([[connectButton title] isEqualToString:CONNECT_STRING] || connecting){ //we are not connected, let's connect to this newly launched neighbor!
+				NSString * host = [NSString stringWithFormat:@"%s", host_.c_str()];
+				NSString * port = [NSString stringWithFormat:@"%d", port_];
+				[addressField setStringValue: host];
+				[portField setStringValue: port];
+				[self connect];
+			}
 		}
 	}
 }
