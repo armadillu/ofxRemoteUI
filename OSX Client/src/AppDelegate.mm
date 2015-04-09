@@ -57,7 +57,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 				[me fullParamsUpdate];
 				me->needFullParamsUpdate = NO;
 			}else{
-				[[me getExternalDevices] updateDevicesWithClientValues:FALSE resetToZero: FALSE]; //udpate midi motors to match values
+				[[me getExternalDevices] updateDevicesWithClientValues:FALSE resetToZero: FALSE paramName:""]; //udpate midi motors to match values
 			}
 			[me partialParamsUpdate];
 			[me updateGroupPopup];
@@ -457,7 +457,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		}
 		[self layoutWidgetsWithConfig: [self calcLayoutParams]];
 	}
-	[externalDevices updateDevicesWithClientValues:FALSE resetToZero: FALSE]; //udpate midi motors to match values
+	[externalDevices updateDevicesWithClientValues:FALSE resetToZero: FALSE paramName:""]; //udpate midi motors to match values
 }
 
 
@@ -1018,7 +1018,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		connectButton.title = CONNECT_STRING;
 		[self layoutWidgetsWithConfig: [self calcLayoutParams]]; //update scrollbar
 		[logs appendToServerLog:[NSString stringWithFormat:@"%@ >> ## CLIENT DISCONNECTED ###################\n", date]];
-		[externalDevices updateDevicesWithClientValues:FALSE resetToZero: TRUE];
+		[externalDevices updateDevicesWithClientValues:FALSE resetToZero: TRUE paramName:""];
 	}
 }
 
@@ -1197,6 +1197,8 @@ bool resizeWindowUpDown = false; //if you keep changing paramUI size, with this 
 		currentPreset = "";
 		//printf("client sending: "); p.print();
 		client->sendUntrackedParamUpdate(p, name);
+
+		[externalDevices updateDevicesWithClientValues:FALSE resetToZero: FALSE paramName:name]; //udpate midi motors to match values
 
 		if (spacerGroups.count(p.group) == 1){ //if the group of the param is there
 			ParamUI* pp = spacerGroups[p.group];

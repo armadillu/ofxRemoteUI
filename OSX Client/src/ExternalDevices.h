@@ -39,7 +39,7 @@
 
 }
 
--(void)updateDevicesWithClientValues:(BOOL)onlyColor resetToZero:(BOOL)reset;
+-(void)updateDevicesWithClientValues:(BOOL)onlyColor resetToZero:(BOOL)reset paramName:(string)pName;
 -(IBAction)flashBoundControllers:(id)sender; //for n seconds
 
 -(void)initWithWidgets:(map<string, ParamUI*>*) widgets andClient:(ofxRemoteUIClient*) client;
