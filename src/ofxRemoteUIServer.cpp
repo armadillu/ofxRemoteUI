@@ -215,7 +215,7 @@ void ofxRemoteUIServer::removeParamFromDB(string paramName){
 
 		it = paramsFromXML.find(paramName);
 		if (it != paramsFromXML.end()){
-			paramsFromXML.erase(paramsFromXML.find(paramName));
+			paramsFromXML.erase(it);
 		}
 
 
@@ -620,8 +620,10 @@ void ofxRemoteUIServer::restoreAllParamsToInitialXML(){
 	for( unordered_map<string, RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		string key = (*ii).first;
 		if (params[key].type != REMOTEUI_PARAM_SPACER){
-			params[key] = paramsFromXML[key];
-			syncPointerToParam(key);
+			if (paramsFromXML.find(key) != paramsFromXML.end()){
+				params[key] = paramsFromXML[key];
+				syncPointerToParam(key);
+			}
 		}
 	}
 }
@@ -2030,7 +2032,10 @@ vector<string> ofxRemoteUIServer::loadFromXMLv1(string fileName){
 							*params[paramName].floatValAddr = val;
 							params[paramName].floatVal = val;
 							*params[paramName].floatValAddr = ofClamp(*params[paramName].floatValAddr, params[paramName].minFloat, params[paramName].maxFloat);
-							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
+							if(!paramsLoadedFromXML[paramName]){
+								paramsFromXML[paramName] = params[paramName];
+								paramsLoadedFromXML[paramName] = true;
+							}
 							if(verbose_) RUI_LOG_VERBOSE << "loading a FLOAT '" << paramName <<"' (" << ofToString( *params[paramName].floatValAddr, 3) << ") from XML" ;
 						}else{
 							RUI_LOG_ERROR << "ERROR at loading FLOAT (" << paramName << ")" ;
@@ -2056,7 +2061,10 @@ vector<string> ofxRemoteUIServer::loadFromXMLv1(string fileName){
 							*params[paramName].intValAddr = val;
 							params[paramName].intVal = val;
 							*params[paramName].intValAddr = ofClamp(*params[paramName].intValAddr, params[paramName].minInt, params[paramName].maxInt);
-							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
+							if(!paramsLoadedFromXML[paramName]){
+								paramsFromXML[paramName] = params[paramName];
+								paramsLoadedFromXML[paramName] = true;
+							}
 							if(verbose_) RUI_LOG_VERBOSE << "loading an INT '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" ;
 						}else{
 							RUI_LOG_ERROR << "ERROR at loading INT (" << paramName << ")" ;
@@ -2091,7 +2099,10 @@ vector<string> ofxRemoteUIServer::loadFromXMLv1(string fileName){
 							params[paramName].blueVal = b;
 							*(params[paramName].redValAddr+3) = a;
 							params[paramName].alphaVal = a;
-							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
+							if(!paramsLoadedFromXML[paramName]){
+								paramsFromXML[paramName] = params[paramName];
+								paramsLoadedFromXML[paramName] = true;
+							}
 							if(verbose_) RUI_LOG_VERBOSE << "loading a COLOR '" << paramName <<"' (" << (int)*params[paramName].redValAddr << " " << (int)*(params[paramName].redValAddr+1) << " " << (int)*(params[paramName].redValAddr+2) << " " << (int)*(params[paramName].redValAddr+3)  << ") from XML" ;
 						}else{
 							RUI_LOG_ERROR << "ERROR at loading COLOR (" << paramName << ")" ;
@@ -2118,7 +2129,10 @@ vector<string> ofxRemoteUIServer::loadFromXMLv1(string fileName){
 							*params[paramName].intValAddr = val;
 							params[paramName].intVal = val;
 							*params[paramName].intValAddr = ofClamp(*params[paramName].intValAddr, params[paramName].minInt, params[paramName].maxInt);
-							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
+							if(!paramsLoadedFromXML[paramName]){
+								paramsFromXML[paramName] = params[paramName];
+								paramsLoadedFromXML[paramName] = true;
+							}
 							if(verbose_) RUI_LOG_VERBOSE << "loading an ENUM '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" ;
 						}else{
 							RUI_LOG_ERROR << "ERROR at loading ENUM (" << paramName << ")" ;
@@ -2144,7 +2158,10 @@ vector<string> ofxRemoteUIServer::loadFromXMLv1(string fileName){
 						if(params[paramName].boolValAddr != NULL){
 							*params[paramName].boolValAddr = val;
 							params[paramName].boolVal = val;
-							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
+							if(!paramsLoadedFromXML[paramName]){
+								paramsFromXML[paramName] = params[paramName];
+								paramsLoadedFromXML[paramName] = true;
+							}
 							if(verbose_) RUI_LOG_VERBOSE << "loading a BOOL '" << paramName <<"' (" << (bool) *params[paramName].boolValAddr << ") from XML" ;
 						}else{
 							RUI_LOG_ERROR << "ERROR at loading BOOL (" << paramName << ")" ;
@@ -2169,7 +2186,10 @@ vector<string> ofxRemoteUIServer::loadFromXMLv1(string fileName){
 						if(params[paramName].stringValAddr != NULL){
 							params[paramName].stringVal = val;
 							*params[paramName].stringValAddr = val;
-							if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
+							if(!paramsLoadedFromXML[paramName]){
+								paramsFromXML[paramName] = params[paramName];
+								paramsLoadedFromXML[paramName] = true;
+							}
 							if(verbose_) RUI_LOG_VERBOSE << "loading a STRING '" << paramName <<"' (" << (string) *params[paramName].stringValAddr << ") from XML" ;
 						}
 						else RUI_LOG_ERROR << "ERROR at loading STRING (" << paramName << ")" ;

@@ -290,6 +290,7 @@ protected:
 
 	unordered_map<string, RemoteUIParam>		paramsFromCode; //this will hold a copy of all the params as they where when shared first
 	unordered_map<string, RemoteUIParam>		paramsFromXML; //this will hold a copy of all the params as they where when first loaded from XML
+	unordered_map<string, bool>					paramsLoadedFromXML;
 
 private:
 
