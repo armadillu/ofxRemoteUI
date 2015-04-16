@@ -411,9 +411,11 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 		saveSettingsBackup(); //every time , before we save
 	}
 
-	#ifdef OF_AVAILABLE
-	fileName = getFinalPath(fileName);
-	#endif
+	if(!savingGroupOnly){
+		#ifdef OF_AVAILABLE
+		fileName = getFinalPath(fileName);
+		#endif
+	}
 
 	RUI_LOG_NOTICE << "saving to xml (using the V2 format) '" << fileName << "'" ;
 	ofXml s;
