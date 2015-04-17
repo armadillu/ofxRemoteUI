@@ -105,7 +105,6 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	int numHues = 9;
 	for(int i = 0; i < numHues; i++){
 		float hue = fmod( 0 + i * ( 255.0f / float(numHues)), 255.0f );
-		cout << hue << endl;
 		ofColor c = ofColor::fromHsb(hue, 255.0f, 230.0f, BG_COLOR_ALPHA);
 		colorTables.push_back( c );
 	}
