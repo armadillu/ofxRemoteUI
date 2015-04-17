@@ -101,16 +101,14 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	selectedPreset = selectedGroupPreset = 0;
 	selectedItem = -1;
 	ofSeedRandom(1979);
-	ofColor prevColor = ofColor::fromHsb(35, 255, 200, BG_COLOR_ALPHA);
-	for(int i = 0; i < 30; i++){
-		ofColor c = ofColor::fromHsb(prevColor.getHue() + 10, 255, 210, BG_COLOR_ALPHA);
+
+	int numHues = 9;
+	for(int i = 0; i < numHues; i++){
+		float hue = fmod( 0 + i * ( 255.0f / float(numHues)), 255.0f );
+		cout << hue << endl;
+		ofColor c = ofColor::fromHsb(hue, 255.0f, 230.0f, BG_COLOR_ALPHA);
 		colorTables.push_back( c );
-		prevColor = c;
 	}
-	//shuffle
-	std::srand(1979);
-	std::random_shuffle ( colorTables.begin(), colorTables.end() );
-	ofSeedRandom();
 	uiLines.setMode(OF_PRIMITIVE_LINES);
 #else
 	colorTables.push_back(ofColor(194,144,221,a) );
