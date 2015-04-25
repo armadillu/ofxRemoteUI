@@ -57,6 +57,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 	IBOutlet NSButton *				alwaysOnTopCheckbox;
 	IBOutlet NSButton *				showNotificationsCheckbox;
 	IBOutlet NSButton *				autoConnectCheckbox;
+	IBOutlet NSButton *				onlyAutoConnectLocalCheckbox;
 	IBOutlet NSPopUpButton *		rowHeightMenu;
 
 
@@ -85,6 +86,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 	BOOL							showNotifications;
 																	//otherwise, it is true for as long as its pressed
 	BOOL							autoConnectToggle;
+	BOOL							onlyAutoConnectToLocalHost;
 
 	bool							needFullParamsUpdate;
 

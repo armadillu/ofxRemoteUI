@@ -11,7 +11,6 @@
 @implementation LogWindows
 
 -(id)init{
-	NSLog(@"Init LogWindows");
 
 	NSFont * font = [NSFont fontWithName:@"Monaco" size:10];
 	[[serverLogView textStorage] setFont:font];
