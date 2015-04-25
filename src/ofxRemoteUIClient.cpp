@@ -129,8 +129,8 @@ void ofxRemoteUIClient::updateAutoDiscovery(float dt){
 				callBack(cbArg);
 			}
 		}
-		cout << "got broadcast message from " << m.getRemoteIp() << ":" << m.getArgAsInt32(0) ;
-		closebyServers.print();
+		//cout << "got broadcast message from " << m.getRemoteIp() << ":" << m.getArgAsInt32(0) ;
+		//closebyServers.print();
 	}
 
 	neigbhorChange |= closebyServers.update(dt);
