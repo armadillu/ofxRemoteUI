@@ -948,7 +948,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	if(autoConnectToggle){
 		string localIP = client->getMyIP("");
 
-		if (host_ == localIP){
+		if (host_ == localIP && onlyAutoConnectToLocalHost || !onlyAutoConnectToLocalHost){
 			if ([[connectButton title] isEqualToString:CONNECT_STRING] || connecting){ //we are not connected, let's connect to this newly launched neighbor!
 				NSString * host = [NSString stringWithFormat:@"%s", host_.c_str()];
 				NSString * port = [NSString stringWithFormat:@"%d", port_];
@@ -1094,7 +1094,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	NSString * winColor = [d stringForKey:@"windowColor"];
 	NSColor * col;
 	if (winColor == nil) {
-		col = [NSColor colorWithCalibratedWhite:1 alpha:0.5 ];
+		col = [NSColor colorWithDeviceRed:0.0f green:78.0f/255.0f blue:0.0f alpha:1.0f];
 	}else{
 		col = [NSColor colorFromString:winColor forColorSpace:[NSColorSpace deviceRGBColorSpace]];
 	}
@@ -1104,6 +1104,9 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	autoConnectToggle = (int)[d integerForKey:@"autoConnectToJustLaunchedApps"];
 	[autoConnectCheckbox setState: autoConnectToggle];
+
+	onlyAutoConnectToLocalHost = (int)[d integerForKey:@"onlyAutoConnectToLocalHost"];
+	[onlyAutoConnectLocalCheckbox setState: onlyAutoConnectToLocalHost];
 
 	rowHeight = (RowHeightSize)[d integerForKey:@"rowHeightSize"];
 	[rowHeightMenu selectItemWithTag:(int)rowHeight];
@@ -1136,7 +1139,9 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	showNotifications = (int)[showNotificationsCheckbox state];
 	[window setColor:[colorWell color]];
+
 	autoConnectToggle = [autoConnectCheckbox state];
+	onlyAutoConnectToLocalHost = [onlyAutoConnectLocalCheckbox state];
 	[externalDevices applyPrefs:self];
 }
 
@@ -1147,6 +1152,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	[d setInteger: ([window level] == NSScreenSaverWindowLevel) ? 1 : 0   forKey:@"alwaysOnTop"];
 	[d setInteger: showNotifications  forKey:@"showNotifications"];
 	[d setInteger: autoConnectToggle forKey:@"autoConnectToJustLaunchedApps"];
+	[d setInteger: onlyAutoConnectToLocalHost forKey:@"onlyAutoConnectToLocalHost"];
 	[d setInteger: (int)rowHeight forKey:@"rowHeightSize"];
 	[externalDevices savePrefs:self];
 	[d synchronize];
