@@ -1376,7 +1376,8 @@ void ofxRemoteUIServer::draw(int x, int y){
 	if (!showUI || uiAlpha < 1.0){
 		if (drawNotifications){
 			for(int i = 0; i < paramsToWatch.size(); i++){
-				onScreenNotifications.addParamWatch(paramsToWatch[i], params[paramsToWatch[i]].getValueAsStringFromPointer());
+				string v = params[paramsToWatch[i]].getValueAsStringFromPointer();
+				onScreenNotifications.addParamWatch(paramsToWatch[i], v);
 			}
 			onScreenNotifications.draw(x, y);
 		}
