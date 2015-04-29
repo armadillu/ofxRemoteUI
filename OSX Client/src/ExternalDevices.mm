@@ -96,6 +96,16 @@ float convertHueToMidiFigtherHue(float hue){
 	VVMIDINode *midiFighter = [midiManager findDestNodeWithDeviceName:@"Midi Fighter Twister"];
 	if(midiFighter){
 
+		//hide all colors that are not used
+		if(reset && pName == ""){
+			for(int i = 0; i < 16 * 4; i++){
+			VVMIDIMessage * msg = [VVMIDIMessage createWithType:0xB0 channel:2];
+			[msg setData1:(unsigned char)(i)]; //knob id
+			[msg setData2:(unsigned char)(17 + 15)]; //value
+			[midiFighter sendMsg:msg];
+			}
+		}
+
 		map<string, string>::iterator it = bindingsMap.begin();
 		while(it != bindingsMap.end()){ //all bindings
 
@@ -226,6 +236,10 @@ float convertHueToMidiFigtherHue(float hue){
 
 			if(device){
 				if(client->paramExistsForName(paramName)){
+
+					ParamUI * item = widgets->at(paramName);
+					[item flashBackground:[NSNumber numberWithInt:NUM_BOUND_FLASH]];
+
 					RemoteUIParam p = client->getParamForName(paramName);
 					VVMIDIMessage * msg = [VVMIDIMessage createWithType:0xB0 channel:/*midiOutConfig.channelInt*/ + 2];
 					[msg setData1:(unsigned char)(midiOutConfig.controlIDInt)]; //knob id
@@ -235,7 +249,6 @@ float convertHueToMidiFigtherHue(float hue){
 					//disable animation after 2 seconds
 					dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, 1.5 * NSEC_PER_SEC);
 					dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-						RemoteUIParam p = client->getParamForName(paramName);
 						VVMIDIMessage * msg = [VVMIDIMessage createWithType:0xB0 channel:/*midiOutConfig.channelInt*/ + 2];
 						[msg setData1:(unsigned char)(midiOutConfig.controlIDInt)]; //knob id
 						[msg setData2:(unsigned char)(47)]; //value

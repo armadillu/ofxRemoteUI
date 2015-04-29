@@ -140,6 +140,57 @@
 	//[[NSRunLoop currentRunLoop] performSelector:@selector(commit) target:[CATransaction class] argument:nil order:0 modes:[NSArray arrayWithObjects:NSDefaultRunLoopMode, NSEventTrackingRunLoopMode, nil]];
 }
 
+-(void)flashBackground:(NSNumber *) times{
+
+	__block int localTimes = (int)[times integerValue];
+	if([times intValue] == NUM_BOUND_FLASH) shouldBeFlashing = true; //this is the 1st call, force flash
+	else{	//not first call, we've been flashing for a while!
+		if (shouldBeFlashing == false){
+			[bg setBackgroundColor:[NSColor colorWithDeviceRed: param.r/255.
+														 green: param.g/255.
+														  blue: param.b/255.
+														 alpha: param.a/255.]];
+			return;
+		}
+	}
+	float duration = 0.1;
+	[CATransaction begin];
+	[CATransaction setAnimationDuration: duration];
+	[CATransaction setCompletionBlock:^{
+
+		[CATransaction begin];
+		[CATransaction setAnimationDuration:duration];
+		[CATransaction setCompletionBlock:^{
+			localTimes--;
+			if(localTimes > 0){
+
+				[self performSelector:@selector(flashBackground:) withObject:[NSNumber numberWithInt:localTimes] afterDelay:duration];
+
+			}else{ //last fadeout is really long
+				[CATransaction begin];
+				[CATransaction setAnimationDuration: duration];
+				[bg setBackgroundColor:[NSColor colorWithDeviceRed: param.r/255.
+															 green: param.g/255.
+															  blue: param.b/255.
+															 alpha: param.a/255.]];
+				[CATransaction commit];
+			}
+		}];
+		if(localTimes%2 == 1){
+			[bg setBackgroundColor:[NSColor colorWithDeviceRed: param.r/255.
+														 green: param.g/255.
+														  blue: param.b/255.
+														 alpha: 0.7]];
+		}else{
+			[bg setBackgroundColor:[NSColor colorWithDeviceRed: param.r/255.
+														 green: param.g/255.
+														  blue: param.b/255.
+														 alpha: param.a/255.]];
+		}
+		[CATransaction commit];
+	}];
+	[CATransaction commit];
+}
 
 -(void)awakeFromNib{
 
