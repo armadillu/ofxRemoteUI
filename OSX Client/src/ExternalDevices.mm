@@ -282,24 +282,26 @@ float convertHueToMidiFigtherHue(float hue){
 					}else{
 						ParamUI * item = widgets->at(paramName);
 						RemoteUIParam p = client->getParamForName(paramName);
+						float val = [msgPtr doubleValue];
+
 						if(slider){ //control type midi msg (slider)
 							switch(p.type){
 								case REMOTEUI_PARAM_BOOL:
-									p.boolVal = [msgPtr doubleValue] > 0.5;
+									p.boolVal = val > 0.5f;
 									break;
 								case REMOTEUI_PARAM_FLOAT:
-									p.floatVal = p.minFloat + (p.maxFloat - p.minFloat) * [msgPtr doubleValue];
+									p.floatVal = p.minFloat + (p.maxFloat - p.minFloat) * val;
 									break;
 								case REMOTEUI_PARAM_ENUM:
-								case REMOTEUI_PARAM_INT:
-									p.intVal = p.minInt + (p.maxInt - p.minInt) * [msgPtr doubleValue];
-									break;
+								case REMOTEUI_PARAM_INT:{
+									p.intVal = round(p.minInt + (p.maxInt - p.minInt) * val);
+									}break;
 								case REMOTEUI_PARAM_COLOR:{
 									NSColor * c = [NSColor colorWithDeviceRed:p.redVal/255.0f green:p.greenVal/255.0f blue:p.blueVal/255.0f alpha:p.alphaVal/255.0f];
 									float sat = [c saturationComponent];
 									float bri = [c brightnessComponent];
 									float a = [c alphaComponent];
-									NSColor * c2 = [NSColor colorWithDeviceHue:[msgPtr doubleValue] saturation:sat brightness:bri alpha:a];
+									NSColor * c2 = [NSColor colorWithDeviceHue:val saturation:sat brightness:bri alpha:a];
 									p.redVal = [c2 redComponent] * 255.0f;
 									p.greenVal = [c2 greenComponent] * 255.0f;
 									p.blueVal = [c2 blueComponent] * 255.0f;
