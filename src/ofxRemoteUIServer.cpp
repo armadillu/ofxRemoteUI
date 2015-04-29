@@ -429,7 +429,7 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 	int numSaved = 0;
 	for(int i = 0; i < orderedKeys.size(); i++){
 		string key = orderedKeys[i];
-		RemoteUIParam t = params[key];
+		RemoteUIParam &t = params[key];
 		bool save = false;
 		if(savingGroupOnly){
 			if( t.group != OFXREMOTEUI_DEFAULT_PARAM_GROUP && t.group == groupName ){
@@ -454,7 +454,7 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 		//save removed params
 		for(int i = 0; i < orderedKeys_removed.size(); i++){
 			string key = orderedKeys_removed[i];
-			RemoteUIParam t = params_removed[key];
+			RemoteUIParam &t = params_removed[key];
 			saveParamToXmlSettings(t, key, s, i + orderedKeys.size(), false);
 		}
 	}
@@ -525,7 +525,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 
 						readKeys[paramName] = true;
 						loadedParams.push_back(paramName);
-						RemoteUIParam p = params[paramName];
+						RemoteUIParam &p = params[paramName];
 
 						switch (type[0]){
 
@@ -587,7 +587,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 								}break;
 							}
 
-						params[paramName] = p;
+						//params[paramName] = p;
 					}
 					if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
 				}
@@ -641,7 +641,7 @@ void ofxRemoteUIServer::pushParamsToClient(){
 	#ifdef OF_AVAILABLE
 	for(int i = 0 ; i < changedParams.size(); i++){
 		string pName = changedParams[i];
-		RemoteUIParam p = params[pName];
+		RemoteUIParam &p = params[pName];
 		onScreenNotifications.addParamUpdate(pName, p.getValueAsString(),
 											 ofColor(p.r, p.g, p.b, p.a),
 			p.type == REMOTEUI_PARAM_COLOR ?
@@ -856,7 +856,7 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				string groupName;
 				if (selectedItem >= 0){ //selection on params list
 					string key = orderedKeys[selectedItem];
-					RemoteUIParam p = params[key];
+					RemoteUIParam &p = params[key];
 					if (p.type == REMOTEUI_PARAM_SPACER){
 						groupIsSelected = true;
 						groupName = p.group;
@@ -924,7 +924,7 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				}
 				if (selectedItem >= 0){ //selection on params list
 					string key = orderedKeys[selectedItem];
-					RemoteUIParam p = params[key];
+					RemoteUIParam & p = params[key];
 					if(p.type == REMOTEUI_PARAM_SPACER && groupPresetsCached[p.group].size() > 0){
 						string presetName = p.group + "/" + groupPresetsCached[p.group][selectedGroupPreset];
 						loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
@@ -970,7 +970,7 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				}
 				if (selectedItem >= 0){ //params
 					string key = orderedKeys[selectedItem];
-					RemoteUIParam p = params[key];
+					RemoteUIParam & p = params[key];
 					if (p.type != REMOTEUI_PARAM_SPACER){
 						uiAlpha = 0;
 						switch (p.type) {
@@ -1209,7 +1209,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 				ofSetColor(textBlinkC);
 				drawString("                                     " + presetsCached[selectedPreset], dpos);
 			}else{
-				RemoteUIParam p = params[orderedKeys[selectedItem]];
+				RemoteUIParam & p = params[orderedKeys[selectedItem]];
 				int howMany = 0;
 				if(p.type == REMOTEUI_PARAM_SPACER){
 					howMany = groupPresetsCached[p.group].size();
@@ -1241,7 +1241,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 			for(int i = 0; i < orderedKeys.size(); i++){
 
 				string key = orderedKeys[i];
-				RemoteUIParam p = params[key];
+				RemoteUIParam & p = params[key];
 				int chars = key.size();
 				int charw = 9;
 				int column2MaxLen = ceil(valSpaceW / charw) + 1;
@@ -1376,8 +1376,10 @@ void ofxRemoteUIServer::draw(int x, int y){
 	if (!showUI || uiAlpha < 1.0){
 		if (drawNotifications){
 			for(int i = 0; i < paramsToWatch.size(); i++){
-				string v = params[paramsToWatch[i]].getValueAsStringFromPointer();
-				onScreenNotifications.addParamWatch(paramsToWatch[i], v);
+				RemoteUIParam & p = params[paramsToWatch[i]];
+				string v = p.getValueAsStringFromPointer();
+				ofColor c = ofColor(p.r, p.g, p.b, 255);
+				onScreenNotifications.addParamWatch(paramsToWatch[i], v, c);
 			}
 			onScreenNotifications.draw(x, y);
 		}
@@ -1522,7 +1524,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				cbArg.param = params[dm.paramName];  //copy the updated param to the callbakc arg
 				if(callBack) callBack(cbArg);
 				#ifdef OF_AVAILABLE
-				RemoteUIParam p = params[dm.paramName];
+				RemoteUIParam & p = params[dm.paramName];
 				onScreenNotifications.addParamUpdate(dm.paramName, p.getValueAsString(),
 													 ofColor(p.r, p.g, p.b, p.a),
 													 p.type == REMOTEUI_PARAM_COLOR ?
@@ -1810,7 +1812,7 @@ void ofxRemoteUIServer::watchParamOnScreen(string paramName){
 }
 
 
-void ofxRemoteUIServer::addParamToDB(RemoteUIParam p, string thisParamName){
+void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamName){
 
 	if(p.type != REMOTEUI_PARAM_SPACER && params.size() == 0){ //adding first param! and its not spacer!
 		setParamGroup(OFXREMOTEUI_DEFAULT_PARAM_GROUP);
@@ -1995,7 +1997,7 @@ void ofxRemoteUIServer::saveToXMLv1(string fileName){
 	for(int i = 0; i < orderedKeys.size(); i++){
 
 		string key = orderedKeys[i];
-		RemoteUIParam t = params[key];
+		RemoteUIParam &t = params[key];
 		saveParamToXmlSettings(t, key, s, counters);
 	}
 
