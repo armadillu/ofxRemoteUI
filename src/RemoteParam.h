@@ -142,7 +142,14 @@ public:
 		char aux[50];
 		switch (type) {
 			case REMOTEUI_PARAM_FLOAT: ss << *floatValAddr; return ss.str();
-			case REMOTEUI_PARAM_ENUM:
+			case REMOTEUI_PARAM_ENUM:{
+				int v = *intValAddr;
+				if (v >= 0 && v < enumList.size())
+					ss << enumList[v];
+				else
+					ss << "Invalid Enum!";
+				return ss.str();
+			}
 			case REMOTEUI_PARAM_INT: ss << *intValAddr; return ss.str();
 			case REMOTEUI_PARAM_BOOL: return *boolValAddr ? "TRUE" : "FALSE";
 			case REMOTEUI_PARAM_STRING: return *stringValAddr;
