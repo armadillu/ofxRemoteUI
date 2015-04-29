@@ -352,7 +352,7 @@ private:
 	void			saveParamToXmlSettings(const RemoteUIParam & p, string key, ofXml & s, int index, bool active);
 	void			saveSettingsBackup();
 
-	void addParamToDB(RemoteUIParam p, string thisParamName);
+	void addParamToDB(const RemoteUIParam & p, string thisParamName);
 
 	string 			getFinalPath(string);
 

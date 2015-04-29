@@ -82,49 +82,55 @@ public:
 	void draw(float x, float y){
 
 		float spacing = NOTIFICATION_LINEHEIGHT;
+		float yy = y;
 
 		for(int i = 0; i < notifications.size(); i++){
 			float a = ofClamp( NOTIFICATION_ALPHA_OVERFLOW * notifications[i].time, 0.0f, 1.0f);
-			drawStringWithBox("ofxRemoteUIServer: " + notifications[i].msg,
+			float hh = drawStringWithBox("ofxRemoteUIServer: " + notifications[i].msg,
 										x,
-										y - spacing * (notifications.size() - 1) + i * spacing,
+										yy,
 										ofColor(0, 255 * a),
 										NOTIFICATION_COLOR
 										);
+			yy -= hh;
 		}
 
 		typedef std::map<string, ParamNotification>::iterator it_type;
-		int c = 0;
 		for(it_type it = paramNotifications.begin(); it != paramNotifications.end(); it++){
 
 			float a = ofClamp( NOTIFICATION_ALPHA_OVERFLOW * it->second.time, 0.0f, 1.0f);
 			float fresh = 1.0f - ofClamp((screenTime + 1) - it->second.time, 0.0f, 1.0f);
 
 			string total = it->first + ": " + it->second.value ;
-			float yy = y - spacing * ( notifications.size() + (paramNotifications.size()-1) - c );
-			drawStringWithBox( total,
-										x,
-										yy,
-										(fresh > 0.1 ) ? it->second.bgColor : ofColor(it->second.bgColor, 255 * a),
-									  	ofColor(0)
-										);
+			float hh = drawStringWithBox( total,
+								x,
+								yy,
+								(fresh > 0.1 ) ? it->second.bgColor : ofColor(it->second.bgColor, 255 * a),
+								ofColor::black
+								);
+			yy -= hh;
+
 			if (it->second.color.a != 0){
 				ofPushStyle();
 				ofSetColor(it->second.color, a * 255);
 				ofRect(x + total.length() * 8 + 4, yy - 14, 40, 20);
 				ofPopStyle();
 			}
-			c++;
 		}
 
-		c = 0;
-		for(it_type it = paramWatch.begin(); it != paramWatch.end(); it++){
-			drawStringWithBox( "[" + it->first + "] " + it->second.value,
-										x,
-										y - spacing * ( notifications.size() + paramNotifications.size() + (paramWatch.size()-1) - c ),
-										ofColor(0), PARAM_WATCH_COLOR
-										);
-			c++;
+		map<int, string>::iterator it2 = paramWatchOrder.begin();
+		while(it2 != paramWatchOrder.end()){
+
+			int order = it2->first;
+			string name = it2->second;
+
+			float hh = drawStringWithBox( "[" + it2->second + "] " + paramWatch[name].value,
+								x,
+								yy,
+								ofColor::black, paramWatch[name].color
+								);
+			yy -= hh;
+			++it2;
 		}
 	};
 
@@ -144,13 +150,16 @@ public:
 		paramNotifications[paramName] = n;
 	};
 
-	void addParamWatch(string &paramName, string paramValue){
+	void addParamWatch(const string &paramName, const  string& paramValue, const ofColor & paramC){
 		ParamNotification n;
-		n.color = ofColor(0,0);
+		n.color = paramC;
 		n.bgColor = ofColor(0);
 		n.value = paramValue;
 		n.time = screenTime;
-		paramWatch[paramName] = n;
+		if(paramWatch.find(paramName) == paramWatch.end()){
+			paramWatchOrder[paramWatchOrder.size()] = paramName;
+			paramWatch[paramName] = n;
+		}
 	};
 
 
@@ -167,6 +176,7 @@ public:
 
 private:
 
+	//return height of box
 	float drawStringWithBox(string text, int x, int y, const ofColor& background, const ofColor& foreground ){
 		#ifdef USE_OFX_FONTSTASH
 		if(font == NULL){
@@ -185,7 +195,7 @@ private:
 			ofSetColor(foreground);
 			font->draw(text, 15, x, y);
 			ofPopStyle();
-			return r.height + r.y - y;
+			return floor(r.height);
 		}
 		#else
 		ofDrawBitmapStringHighlight(text, x, y, background, foreground);
@@ -200,6 +210,7 @@ private:
 	vector<SimpleNotification> notifications;
 	map<string, ParamNotification> paramNotifications;
 	map<string, ParamNotification> paramWatch;
+	map<int, string> paramWatchOrder;
 	float screenTime = 5.0;
 };
 
