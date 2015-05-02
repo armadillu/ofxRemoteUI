@@ -16,27 +16,28 @@ Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 
 * Edit & Track variables remotely through UDP/OSC (bool, int, float, string, Enum, ofColor).
 * Allows to save/load your variable states across app launches.
-* MIDI and Joystick controller bindings. Bind any parameter to any MIDI controller knob/slider or HID Joystick.
+* MIDI and Joystick controller bindings. Bind any parameter to any MIDI controller knob/slider/note or HID Joystick. (OSX Client)
 * Parameter values are saved in your app's data folder, in xml format.
 * Allows creation/deletion of Presets, variable states that you can switch from and to quickly.
 * Presets can be created globally (saving all parameter values at once), or for a subset of params (param group).
-* Easily create Parameter Groups, and access them through keyboard shortcuts from the OSX Client.
-* Colorize your variables to visually group them in the OSX client.
-* Realtime Filter your params by name to find things quickly.
+* Easily create Parameter Groups, and access them through keyboard shortcuts (OSX Client).
+* Parameter Groups are automatically colorized to easily identify them.
+* Realtime Filter your params by name to find things quickly (OSX Client).
 * Automatic discovery of servers in the network; easily control multiple apps from one Client interface.
-* Press "tab" on your OF app to see/edit your params from within your OF app. Allows you to do quick clientless edits, and load global and group presets.
+* Press "tab" on your OF app to see/edit your params from within your OF app. Allows you to do quick client-less edits; and also load and save Global and Group Presets.
 * Event notifications in both OSX client (through growl) and on your OF app.
 * You can always restore your parameters to the "previous launch" state, or to the default values.
 * Log remotely - ofxRemoteUIServer allows you to log messages to you client with RUI_LOG(); which accepts printf-like formatted writing.
 * ofxRemoteUI can be used outside OF in any C++ project, and in Processing thx to [@kritzikratzi](http://github.com/kirtzikratzi)
 * Easy to use C++ Macros hide complexity away, very easy to plug into any existing project.
+* Initial support for ofParameters; allows you to edit native OF parameters from RemoteUI. See "example-ofParameter".
 
 ##Available Clients
 
 * Native OSX client, feature complete (this should be your first choice)
-* Alternative mutliplatform (iOS/win) client built on top of ofxUI (less features & less robust)
-* Native iOS client WIP
-* built in client (inside the OF app) for basic client-less edits, saving, resetting, and global and group preset loading and saving
+* Alternative mutliplatform (iOS/win) client built on top of ofxUI (less features & less robust, stale)
+* Native iOS client (WIP - OSC is not very reliable over WIFI).
+* built in client (inside the OF app) for basic edits, saving, resetting, and global and group preset loading and saving.
 
 
 ## Compatibility
@@ -103,28 +104,28 @@ The ofxRemoteUI OSX client allows to bind any midi control / joystick axis / but
 
 You can Save/Load/Edit/Clear your midi bindings from the "MIDI Bindings" window. 
 
-For now, only ints, floats, enums, bools and colors can be controlled from a midi controller. MIDI Sliders/ Knobs can be binded to floats, ints, enums, bools and colors. For ints, floats and enums, the mapping is obvious; for bools, the lower half of a slider/knob sets the param to false, the upper half to true. For colors, the slider shifts the hue of the color parameter.
+MIDI Sliders/Knobs/etc can be bound to floats, ints, enums, bools and colors. For ints, floats and enums, the mapping is obvious; for bools, the lower half of a slider/knob sets the param to false, the upper half to true. For colors, the slider shifts the hue of the color parameter.
 
-Bools can also be binded to "piano keys"; params being set to true for as long as a key is held down.
+Bools can also be bound to "piano keys"; params being set to true for as long as a key is held down.
 
-Bindings are saved when the app is quit. You can also double-click any .midiBind file form the finder to load your previously saved bindings. There is a "bindings" window that allows you to delete particular bindings.
+Bindings are saved when the app is quit. You can also save any particular device binding configuration into a ".midiBind" file. You can also double-click any .midiBind file form the finder to load your previously saved bindings. There is a "bindings" window that allows you to delete particular bindings. You can see what parameters are currently bound by choosing "File->Blink Bound Midi Controls".
 
 ## Random Notes
 
 **"Restore to initial XML Values"** sets alls params to whatever values they had at server app launch.  
 **"Restore to Default Values"** sets alls params to whatever values the shared variable had before sharing it with RUI_SHARE_PARAM().
 
-Enums must be consecutive so that each enum item is +1 the previous one for them to work. This is usually the default c++ behavior if you don't set specific values when defining your enums.
+Enums must be consecutive so that each enum item is +1 the previous one for them to work. This is usually the default c++ behavior if you don't set specific values when defining your enums. Break this rule and you will get crashes.
 
-When loading a preset, it might be that the preset doesn't specify values for all your current params (because it was created when that param didn't exist). If so, the params whose values haven't been modified by the preset will show a small warning sign for a few seconds.
+When loading a preset, it might be that the preset doesn't specify values for all your current params (because it was created when that param didn't exist). If so, the params whose values haven't been modified by the preset will show a small warning sign for a few seconds, so that you are aware.
 
 Automatic discovery relies on each server advertising itself (its hostname, app name and port) on port 25748 over OSC.
 
-There is a setting in the OSX client that allows for it to automatically connect to a server app when it launches in the local network. Look into the OSX Client preferences window.
+There is a setting in the OSX client that allows for it to automatically connect to a server app when it launches in the local network, or only on your local computer. Look into the OSX Client preferences window.
 
 RUI_SETUP() assigns a random port the first time the app is launched, and it uses that same port on successive launches. You can also manually specify a port by supplying it RUI_SETUP(10000);
 
-ofxRemoteUIServer listens for the keyDown event, and if "tab" is pressed, it displays a built-in client with some basic features. You can interact with the built-in client using arrow keys, return, and some other keystrokes depending on the context. Read the on-screen help.
+ofxRemoteUIServer listens for the keyDown event, and if "tab" is pressed, it displays a built-in client with some basic features. You can interact with the built-in client using arrow keys, return, and some other keystrokes depending on the context. Read the on-screen help at the bottom.
 
 The built-in UI can be set to draw in any scale (useful for retina screens) by using:
 ```
@@ -136,9 +137,9 @@ You can set the built-in UI to be drawn using [ofxFontStash](https://github.com/
 RUI_GET_INSTANCE()->drawUiWithFontStash("myFont.ttf");
 ```
 
-##FILE FORMAT
+##XML FILE FORMAT
 
-Commits before the Git Tag "LastCommitWithXMLv1" use the original file format for XML files. Commits after that tag, will automatically save in the new format, but will also parse files with the old format. You can also save files in the old format by pressing "E" from the built in client, either globally or on a per-group basis.
+Commits before the Git Tag "LastCommitWithXMLv1" use the original file format for XML files. Commits after that tag, will automatically save in the new format (v2), but will also parse files with the old format. You can also save files in the old format by pressing "E" (for export) from the built in client, either globally or on a per-group basis.
 
 The new file format is proper XML with a root node, it's more human readable, it keeps params listed in the same order they are added in so its easier to read changes on versioning systems, and it has comments showing the group they belong to.
 
@@ -152,4 +153,4 @@ The OSX Client uses the [vvMidi](https://github.com/mrRay/vvopensource) framewor
 
 The OSX Client's HID capabilities come mostly from [@jotapeh](https://github.com/jotapeh/MacJoystickHIDTest).
 
-ofxRemoteUI bundles ofxXmlSettings and ofxOSC, taken from [OpenFrameworks](http://openframeworks.cc).
+ofxRemoteUI bundles ofxXmlSettings and ofxOSC from [OpenFrameworks](http://openframeworks.cc) to allow non-OF C++ projects to use ofxRemoteUI.
