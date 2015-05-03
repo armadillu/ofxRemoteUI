@@ -13,6 +13,8 @@
 #include "ofxRemoteUIServer.h"
 #include "ofxRemoteUIVars.h"
 
+
+
 class ofxRemoteUIofParamaterSync{
 
 public:
@@ -23,11 +25,15 @@ public:
 protected:
 
 	ofParameterGroup * syncGroup;
+	
 
 	void remoteUIClientDidSomething(RemoteUIServerCallBackArg & arg);
 	void parameterChanged( ofAbstractParameter & parameter );
 
 	void recursiveSetup(ofParameterGroup & group);
+
+	const string SEP = "/";
+
 };
 
 #endif /* defined(__oscParametersReceiver__ofxRemoteUIofParamaterSync__) */
