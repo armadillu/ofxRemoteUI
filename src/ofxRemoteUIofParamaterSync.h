@@ -34,6 +34,17 @@ protected:
 
 	const string SEP = "/";
 
+	ofAbstractParameter& findInChildren(ofParameterGroup & group,
+										vector<string>& groupPathName,
+										const string& paramNane);
+
+	map<string, string> groupClusterID; //full param group path to shortVersion.
+	map<string, int> uniqueWords;
+
+	string getShortVersionForGroupPath(const string & groupPath);
+	string getFullGroupPathForShortVersion(const string & shortV);
+
+	string cleanParamName(string p);
 };
 
 #endif /* defined(__oscParametersReceiver__ofxRemoteUIofParamaterSync__) */
