@@ -209,7 +209,10 @@ void ofxRemoteUIofParamaterSync::remoteUIClientDidSomething(RemoteUIServerCallBa
 		updateOfParamFromRuiParam(arg.paramName);
 	}
 
-	if (arg.action == CLIENT_DID_SET_PRESET || arg.action == CLIENT_DID_RESET_TO_XML ||  arg.action == CLIENT_DID_SET_GROUP_PRESET ) {
+	if (arg.action == CLIENT_DID_SET_PRESET ||
+		arg.action == CLIENT_DID_RESET_TO_XML ||
+		arg.action == CLIENT_DID_SET_GROUP_PRESET ||
+		arg.action == CLIENT_CONNECTED) {
 		forceRuiToOfParamSync();
 	}
 }
