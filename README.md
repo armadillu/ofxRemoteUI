@@ -30,7 +30,7 @@ Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 * Log remotely - ofxRemoteUIServer allows you to log messages to you client with RUI_LOG(); which accepts printf-like formatted writing.
 * ofxRemoteUI can be used outside OF in any C++ project, and in Processing thx to [@kritzikratzi](http://github.com/kirtzikratzi)
 * Easy to use C++ Macros hide complexity away, very easy to plug into any existing project.
-* Initial support for ofParameters; allows you to edit native OF parameters from RemoteUI. See "example-ofParameter".
+* Support for native ofParameters of compatible types (int, float, bool, string ofColor, ofVec). Allows you to edit native OF ofParamater types from RemoteUI. See "example-ofParameter".
 
 ##Available Clients
 
