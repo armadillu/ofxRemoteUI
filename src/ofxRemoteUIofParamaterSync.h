@@ -21,11 +21,12 @@ public:
 	
 	ofxRemoteUIofParamaterSync();
 	void setup(ofParameterGroup & group);
-	
+
+	void forceRuiToOfParamSync();
+
 protected:
 
 	ofParameterGroup * syncGroup;
-	
 
 	void remoteUIClientDidSomething(RemoteUIServerCallBackArg & arg);
 	void parameterChanged( ofAbstractParameter & parameter );
@@ -40,7 +41,9 @@ protected:
 
 	map<string, string> groupClusterID; //full param group path to shortVersion.
 	map<string, int> uniqueWords;
+	vector<string>	ofParamRuiList;
 
+	void updateOfParamFromRuiParam(string ruiParamName);
 	string getShortVersionForGroupPath(const string & groupPath);
 	string getFullGroupPathForShortVersion(const string & shortV);
 

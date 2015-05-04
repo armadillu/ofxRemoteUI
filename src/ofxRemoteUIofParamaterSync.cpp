@@ -72,45 +72,64 @@ void ofxRemoteUIofParamaterSync::recursiveSetup(ofParameterGroup & _parameters){
 		if(type==typeid(ofParameter<int>).name()){ //INT
 			ofParameter<int> p = _parameters.getInt(i);
 			RUI_DEFINE_VAR_WV(int, fullRUIparamName, p, p.getMin(), p.getMax());
+			ofParamRuiList.push_back(fullRUIparamName);
 
 		}else if(type==typeid(ofParameter<float>).name()){ //FLOAT
 			ofParameter<float> p = _parameters.getFloat(i);
 			RUI_DEFINE_VAR_WV(float, fullRUIparamName, p, p.getMin(), p.getMax());
+			ofParamRuiList.push_back(fullRUIparamName);
 
 		}else if(type==typeid(ofParameter<bool>).name()){ //BOOL
 			ofParameter<bool> p = _parameters.getBool(i);
 			RUI_DEFINE_VAR_WV(bool, fullRUIparamName, p);
+			ofParamRuiList.push_back(fullRUIparamName);
 
 		}else if(type==typeid(ofParameter<string>).name()){ //STRING
 			ofParameter<string> p = _parameters.getString(i);
 			RUI_DEFINE_VAR_WV(string, fullRUIparamName, p);
+			ofParamRuiList.push_back(fullRUIparamName);
 
 		}else if(type==typeid(ofParameter<ofColor>).name()){ //COLOR
 			ofParameter<ofColor> p = _parameters.getColor(i);
 			ofColor * c = ofxRemoteUIVars<ofColor>::one().defineParam(fullRUIparamName, p);
 			server->shareParam(fullRUIparamName, &(*c)[0] );
+			ofParamRuiList.push_back(fullRUIparamName);
 
 		}else if(type==typeid(ofParameter<ofVec2f>).name()){ //ofVec2f
 			ofParameter<ofVec2f> p = _parameters.getVec2f(i);
-			ofVec2f * v = ofxRemoteUIVars<ofVec2f>::one().defineParam(fullRUIparamName, p);
-			server->shareParam(fullRUIparamName + ".2x", &(v->x), p.getMin().x, p.getMax().x);
-			server->shareParam(fullRUIparamName + ".2y", &(v->y), p.getMin().y, p.getMax().y);
+			float * x = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + ".2x", p->x);
+			float * y = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + ".2y", p->y);
+			server->shareParam(fullRUIparamName + ".2x", x, p.getMin().x, p.getMax().x);
+			server->shareParam(fullRUIparamName + ".2y", y, p.getMin().y, p.getMax().y);
+			ofParamRuiList.push_back(fullRUIparamName + ".2x");
+			ofParamRuiList.push_back(fullRUIparamName + ".2y");
 
 		}else if(type==typeid(ofParameter<ofVec3f>).name()){ //ofVec3f
 			ofParameter<ofVec3f> p = _parameters.getVec3f(i);
-			ofVec3f * v = ofxRemoteUIVars<ofVec3f>::one().defineParam(fullRUIparamName, p);
-			server->shareParam(fullRUIparamName + ".3x", &(v->x), p.getMin().x, p.getMax().x);
-			server->shareParam(fullRUIparamName + ".3y", &(v->y), p.getMin().y, p.getMax().y);
-			server->shareParam(fullRUIparamName + ".3z", &(v->z), p.getMin().z, p.getMax().z);
+			float * x = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + ".3x", p->x);
+			float * y = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + ".3y", p->y);
+			float * z = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + ".3z", p->z);
+			server->shareParam(fullRUIparamName + ".3x", x, p.getMin().x, p.getMax().x);
+			server->shareParam(fullRUIparamName + ".3y", y, p.getMin().y, p.getMax().y);
+			server->shareParam(fullRUIparamName + ".3z", z, p.getMin().z, p.getMax().z);
+			ofParamRuiList.push_back(fullRUIparamName + ".3x");
+			ofParamRuiList.push_back(fullRUIparamName + ".3y");
+			ofParamRuiList.push_back(fullRUIparamName + ".3z");
 
 		}else if(type==typeid(ofParameter<ofVec4f>).name()){ //ofVec4f
 			ofParameter<ofVec4f> p = _parameters.getVec4f(i);
-			ofVec4f * v = ofxRemoteUIVars<ofVec4f>::one().defineParam(fullRUIparamName, p);
-			server->shareParam(fullRUIparamName + ".4x", &(v->x), p.getMin().x, p.getMax().x);
-			server->shareParam(fullRUIparamName + ".4y", &(v->y), p.getMin().y, p.getMax().y);
-			server->shareParam(fullRUIparamName + ".4z", &(v->z), p.getMin().z, p.getMax().z);
-			server->shareParam(fullRUIparamName + ".4w", &(v->w), p.getMin().w, p.getMax().w);
-
+			float * x = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + ".4x", p->x);
+			float * y = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + ".4y", p->y);
+			float * z = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + ".4z", p->z);
+			float * w = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + ".4w", p->z);
+			server->shareParam(fullRUIparamName + ".4x", x, p.getMin().x, p.getMax().x);
+			server->shareParam(fullRUIparamName + ".4y", y, p.getMin().y, p.getMax().y);
+			server->shareParam(fullRUIparamName + ".4z", x, p.getMin().z, p.getMax().z);
+			server->shareParam(fullRUIparamName + ".4w", x, p.getMin().w, p.getMax().w);
+			ofParamRuiList.push_back(fullRUIparamName + ".4x");
+			ofParamRuiList.push_back(fullRUIparamName + ".4y");
+			ofParamRuiList.push_back(fullRUIparamName + ".4z");
+			ofParamRuiList.push_back(fullRUIparamName + ".4w");
 		}else if(type==typeid(ofParameterGroup).name()){
 			ofParameterGroup p = _parameters.getGroup(i);
 			recursiveSetup(p);
@@ -186,105 +205,115 @@ void ofxRemoteUIofParamaterSync::parameterChanged( ofAbstractParameter & paramet
 
 void ofxRemoteUIofParamaterSync::remoteUIClientDidSomething(RemoteUIServerCallBackArg &arg){
 
-	if (arg.action == CLIENT_UPDATED_PARAM) {
+	if (arg.action == CLIENT_UPDATED_PARAM){
+		updateOfParamFromRuiParam(arg.paramName);
+	}
 
-		string paramName = ofFilePath::getFileName(arg.paramName, false);
-		if(paramName.size() == 0){
-			ofLogError("ofxRemoteUIofParamaterSync") << "no name!";
-		}
-		string shortGroupPath = ofFilePath::getEnclosingDirectory(arg.paramName, false);
-		//shortGroupPath = ofFilePath::removeTrailingSlash(shortGroupPath);
-		string fullGroupPath = getFullGroupPathForShortVersion(shortGroupPath);
-
-		vector<string> split = ofSplitString(fullGroupPath, SEP); //separate group;
-
-		ofAbstractParameter * myParam = NULL;;
-
-		if (split.size() == 1){ //not part of group - dont think its possible?
-			paramName = arg.paramName;
-
-		}else{ //part of group
-			myParam = &findInChildren(*syncGroup, split, cleanParamName(paramName));
-		}
-
-		if(myParam == NULL){
-			ofLogError("ofxRemoteUIofParamaterSync") << "cant get ofParameter! " << arg.paramName;
-			return;
-		}
+	if (arg.action == CLIENT_DID_SET_PRESET || arg.action == CLIENT_DID_RESET_TO_XML ||  arg.action == CLIENT_DID_SET_GROUP_PRESET ) {
+		forceRuiToOfParamSync();
+	}
+}
 
 
-		switch (arg.param.type) {
+void ofxRemoteUIofParamaterSync::updateOfParamFromRuiParam(string ruiParamName){
 
-			case REMOTEUI_PARAM_FLOAT:{
+	RemoteUIParam ruiP = RUI_GET_PARAM(ruiParamName);
 
-				//most likely an ofVecN suffix ".Dx" - TODO  #############################
-				if(paramName[paramName.size() - 3] == '.'){
-					char vecComp = paramName[paramName.size() - 1]; // x | y | z | w
-					char vecType = paramName[paramName.size() - 2]; // 2 | 3 | 4
-					string noCompPname = paramName.substr(0, paramName.size() - 3);
+	string paramName = ofFilePath::getFileName(ruiParamName, false);
+	if(paramName.size() == 0){
+		ofLogError("ofxRemoteUIofParamaterSync") << "no name!";
+	}
+	string shortGroupPath = ofFilePath::getEnclosingDirectory(ruiParamName, false);
+	//shortGroupPath = ofFilePath::removeTrailingSlash(shortGroupPath);
+	string fullGroupPath = getFullGroupPathForShortVersion(shortGroupPath);
 
-					switch (vecType) {
-						case '2':{
-							ofParameter<ofVec2f> p = myParam->cast<ofVec2f>();
-							ofVec2f v = p.get();
-							switch (vecComp) {
-								case 'x': v.x = arg.param.floatVal; p.set(v); break;
-								case 'y': v.y = arg.param.floatVal; p.set(v); break;
-								default: break;
+	vector<string> split = ofSplitString(fullGroupPath, SEP); //separate group;
+
+	ofAbstractParameter * myParam = NULL;;
+
+	if (split.size() == 1){ //not part of group - dont think its possible?
+		paramName = ruiParamName;
+
+	}else{ //part of group
+		myParam = &findInChildren(*syncGroup, split, cleanParamName(paramName));
+	}
+
+	if(myParam == NULL){
+		ofLogError("ofxRemoteUIofParamaterSync") << "cant get ofParameter! " << ruiParamName;
+		return;
+	}
+
+	switch (ruiP.type) {
+
+		case REMOTEUI_PARAM_FLOAT:{
+
+			//most likely an ofVecN suffix ".Dx" - TODO  #############################
+			if(paramName[paramName.size() - 3] == '.'){
+				char vecComp = paramName[paramName.size() - 1]; // x | y | z | w
+				char vecType = paramName[paramName.size() - 2]; // 2 | 3 | 4
+				string noCompPname = paramName.substr(0, paramName.size() - 3);
+
+				switch (vecType) {
+					case '2':{
+						ofParameter<ofVec2f> p = myParam->cast<ofVec2f>();
+						ofVec2f v = p.get();
+						switch (vecComp) {
+							case 'x': v.x = ruiP.floatVal; p.set(v); break;
+							case 'y': v.y = ruiP.floatVal; p.set(v); break;
+							default: break;
 						}}break;
 
-						case '3':{
-							ofParameter<ofVec3f> p = myParam->cast<ofVec3f>();
-							ofVec3f v = p.get();
-							switch (vecComp) {
-								case 'x': v.x = arg.param.floatVal; p.set(v); break;
-								case 'y': v.y = arg.param.floatVal; p.set(v); break;
-								case 'z': v.z = arg.param.floatVal; p.set(v); break;
-								default: break;
+					case '3':{
+						ofParameter<ofVec3f> p = myParam->cast<ofVec3f>();
+						ofVec3f v = p.get();
+						switch (vecComp) {
+							case 'x': v.x = ruiP.floatVal; p.set(v); break;
+							case 'y': v.y = ruiP.floatVal; p.set(v); break;
+							case 'z': v.z = ruiP.floatVal; p.set(v); break;
+							default: break;
 						}}break;
 
-						case '4':{
-							ofParameter<ofVec4f> p = myParam->cast<ofVec4f>();
-							ofVec4f v = p.get();
-							switch (vecComp) {
-								case 'x': v.x = arg.param.floatVal; p.set(v); break;
-								case 'y': v.y = arg.param.floatVal; p.set(v); break;
-								case 'z': v.z = arg.param.floatVal; p.set(v); break;
-								case 'w': v.w = arg.param.floatVal; p.set(v); break;
-								default: break;
-							}}break;
-					}
-
-				}else{ // regular float - not a vector #####################################
-					ofParameter<float> p = myParam->cast<float>();
-					p.set(arg.param.floatVal);
+					case '4':{
+						ofParameter<ofVec4f> p = myParam->cast<ofVec4f>();
+						ofVec4f v = p.get();
+						switch (vecComp) {
+							case 'x': v.x = ruiP.floatVal; p.set(v); break;
+							case 'y': v.y = ruiP.floatVal; p.set(v); break;
+							case 'z': v.z = ruiP.floatVal; p.set(v); break;
+							case 'w': v.w = ruiP.floatVal; p.set(v); break;
+							default: break;
+						}}break;
 				}
-			}break;
 
-			case REMOTEUI_PARAM_INT:{
-				ofParameter<int> p = myParam->cast<int>();
-				p.set(arg.param.intVal);
-			}break;
+			}else{ // regular float - not a vector #####################################
+				ofParameter<float> p = myParam->cast<float>();
+				p.set(ruiP.floatVal);
+			}
+		}break;
 
-			case REMOTEUI_PARAM_BOOL:{
-				ofParameter<bool> p = myParam->cast<bool>();
-				p.set(arg.param.boolVal);
-			}break;
+		case REMOTEUI_PARAM_INT:{
+			ofParameter<int> p = myParam->cast<int>();
+			p.set(ruiP.intVal);
+		}break;
 
-			case REMOTEUI_PARAM_STRING:{
-				ofParameter<string> p = myParam->cast<string>();
-				p.set(arg.param.stringVal);
-			}break;
+		case REMOTEUI_PARAM_BOOL:{
+			ofParameter<bool> p = myParam->cast<bool>();
+			p.set(ruiP.boolVal);
+		}break;
 
-			case REMOTEUI_PARAM_COLOR:{
-				ofParameter<ofColor> p = myParam->cast<ofColor>();
-				p.set(ofColor(arg.param.redVal, arg.param.blueVal, arg.param.greenVal, arg.param.alphaVal));
-			}break;
+		case REMOTEUI_PARAM_STRING:{
+			ofParameter<string> p = myParam->cast<string>();
+			p.set(ruiP.stringVal);
+		}break;
 
-			default:
-				ofLogError("ofxRemoteUIofParamaterSync") << "Unknown RemoteUIParamType ?";
-				break;
-		}
+		case REMOTEUI_PARAM_COLOR:{
+			ofParameter<ofColor> p = myParam->cast<ofColor>();
+			p.set(ofColor(ruiP.redVal, ruiP.greenVal, ruiP.blueVal, ruiP.alphaVal));
+		}break;
+
+		default:
+			ofLogError("ofxRemoteUIofParamaterSync") << "Unknown RemoteUIParamType ?";
+			break;
 	}
 }
 
@@ -309,3 +338,11 @@ ofAbstractParameter& ofxRemoteUIofParamaterSync::findInChildren(ofParameterGroup
 	ofAbstractParameter & param = g.get(paramNane);
 	return param;
 }
+
+void ofxRemoteUIofParamaterSync::forceRuiToOfParamSync(){
+
+	for(int i = 0; i < ofParamRuiList.size(); i++ ){
+		updateOfParamFromRuiParam(ofParamRuiList[i]);
+	}
+}
+
