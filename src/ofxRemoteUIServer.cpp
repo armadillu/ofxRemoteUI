@@ -1522,6 +1522,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				cbArg.action = CLIENT_UPDATED_PARAM;
 				cbArg.paramName = dm.paramName;
 				cbArg.param = params[dm.paramName];  //copy the updated param to the callbakc arg
+				cbArg.group = cbArg.param.group;
 				if(callBack) callBack(cbArg);
 				#ifdef OF_AVAILABLE
 				RemoteUIParam & p = params[dm.paramName];
