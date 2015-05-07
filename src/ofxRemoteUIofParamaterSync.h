@@ -33,7 +33,9 @@ protected:
 
 	void recursiveSetup(ofParameterGroup & group);
 
-	const string SEP = "/";
+	const string SEP = "."; //to separate ofParameter group hierarcy
+	const string compSEP = "_"; //for ofVec _2x, _2y, etc
+
 
 	ofAbstractParameter& findInChildren(ofParameterGroup & group,
 										vector<string>& groupPathName,
@@ -48,6 +50,9 @@ protected:
 	string getFullGroupPathForShortVersion(const string & shortV);
 
 	string cleanParamName(string p);
+
+	string goUpOneLevel(const string & path);
+	string getFileName(const string & path);
 };
 
 #endif /* defined(__oscParametersReceiver__ofxRemoteUIofParamaterSync__) */

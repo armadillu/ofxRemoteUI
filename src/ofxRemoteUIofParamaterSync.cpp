@@ -67,7 +67,7 @@ void ofxRemoteUIofParamaterSync::recursiveSetup(ofParameterGroup & _parameters){
 		string shortedGroupName = getShortVersionForGroupPath(fullGroupTreeName);
 		string fullRUIparamName = shortedGroupName + absP.getName();
 
-		if(fullGroupTreeName.size() && i == 0) RUI_NEW_GROUP(fullGroupTreeName);
+		if(fullGroupTreeName.size() && i == 0) RUI_NEW_GROUP(fullGroupTreeName.substr(0, fullGroupTreeName.size() - 1));
 
 		if(type==typeid(ofParameter<int>).name()){ //INT
 			ofParameter<int> p = _parameters.getInt(i);
@@ -97,39 +97,39 @@ void ofxRemoteUIofParamaterSync::recursiveSetup(ofParameterGroup & _parameters){
 
 		}else if(type==typeid(ofParameter<ofVec2f>).name()){ //ofVec2f
 			ofParameter<ofVec2f> p = _parameters.getVec2f(i);
-			float * x = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + ".2x", p->x);
-			float * y = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + ".2y", p->y);
-			server->shareParam(fullRUIparamName + ".2x", x, p.getMin().x, p.getMax().x);
-			server->shareParam(fullRUIparamName + ".2y", y, p.getMin().y, p.getMax().y);
-			ofParamRuiList.push_back(fullRUIparamName + ".2x");
-			ofParamRuiList.push_back(fullRUIparamName + ".2y");
+			float * x = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "2x", p->x);
+			float * y = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "2y", p->y);
+			server->shareParam(fullRUIparamName + compSEP + "2x", x, p.getMin().x, p.getMax().x);
+			server->shareParam(fullRUIparamName + compSEP + "2y", y, p.getMin().y, p.getMax().y);
+			ofParamRuiList.push_back(fullRUIparamName + compSEP + "2x");
+			ofParamRuiList.push_back(fullRUIparamName + compSEP + "2y");
 
 		}else if(type==typeid(ofParameter<ofVec3f>).name()){ //ofVec3f
 			ofParameter<ofVec3f> p = _parameters.getVec3f(i);
-			float * x = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + ".3x", p->x);
-			float * y = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + ".3y", p->y);
-			float * z = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + ".3z", p->z);
-			server->shareParam(fullRUIparamName + ".3x", x, p.getMin().x, p.getMax().x);
-			server->shareParam(fullRUIparamName + ".3y", y, p.getMin().y, p.getMax().y);
-			server->shareParam(fullRUIparamName + ".3z", z, p.getMin().z, p.getMax().z);
-			ofParamRuiList.push_back(fullRUIparamName + ".3x");
-			ofParamRuiList.push_back(fullRUIparamName + ".3y");
-			ofParamRuiList.push_back(fullRUIparamName + ".3z");
+			float * x = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "3x", p->x);
+			float * y = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "3y", p->y);
+			float * z = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "3z", p->z);
+			server->shareParam(fullRUIparamName + compSEP + "3x", x, p.getMin().x, p.getMax().x);
+			server->shareParam(fullRUIparamName + compSEP + "3y", y, p.getMin().y, p.getMax().y);
+			server->shareParam(fullRUIparamName + compSEP + "3z", z, p.getMin().z, p.getMax().z);
+			ofParamRuiList.push_back(fullRUIparamName + compSEP + "3x");
+			ofParamRuiList.push_back(fullRUIparamName + compSEP + "3y");
+			ofParamRuiList.push_back(fullRUIparamName + compSEP + "3z");
 
 		}else if(type==typeid(ofParameter<ofVec4f>).name()){ //ofVec4f
 			ofParameter<ofVec4f> p = _parameters.getVec4f(i);
-			float * x = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + ".4x", p->x);
-			float * y = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + ".4y", p->y);
-			float * z = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + ".4z", p->z);
-			float * w = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + ".4w", p->z);
-			server->shareParam(fullRUIparamName + ".4x", x, p.getMin().x, p.getMax().x);
-			server->shareParam(fullRUIparamName + ".4y", y, p.getMin().y, p.getMax().y);
-			server->shareParam(fullRUIparamName + ".4z", x, p.getMin().z, p.getMax().z);
-			server->shareParam(fullRUIparamName + ".4w", x, p.getMin().w, p.getMax().w);
-			ofParamRuiList.push_back(fullRUIparamName + ".4x");
-			ofParamRuiList.push_back(fullRUIparamName + ".4y");
-			ofParamRuiList.push_back(fullRUIparamName + ".4z");
-			ofParamRuiList.push_back(fullRUIparamName + ".4w");
+			float * x = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "4x", p->x);
+			float * y = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "4y", p->y);
+			float * z = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "4z", p->z);
+			float * w = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "4w", p->z);
+			server->shareParam(fullRUIparamName + compSEP + "4x", x, p.getMin().x, p.getMax().x);
+			server->shareParam(fullRUIparamName + compSEP + "4y", y, p.getMin().y, p.getMax().y);
+			server->shareParam(fullRUIparamName + compSEP + "4z", x, p.getMin().z, p.getMax().z);
+			server->shareParam(fullRUIparamName + compSEP + "4w", x, p.getMin().w, p.getMax().w);
+			ofParamRuiList.push_back(fullRUIparamName + compSEP + "4x");
+			ofParamRuiList.push_back(fullRUIparamName + compSEP + "4y");
+			ofParamRuiList.push_back(fullRUIparamName + compSEP + "4z");
+			ofParamRuiList.push_back(fullRUIparamName + compSEP + "4w");
 		}else if(type==typeid(ofParameterGroup).name()){
 			ofParameterGroup p = _parameters.getGroup(i);
 			recursiveSetup(p);
@@ -137,6 +137,24 @@ void ofxRemoteUIofParamaterSync::recursiveSetup(ofParameterGroup & _parameters){
 			ofLogError("ofxRemoteUIofParamaterSync") << "Sorry I don't support " << type << " type.";
 		}
 	}
+}
+
+string ofxRemoteUIofParamaterSync::goUpOneLevel(const string & path){
+
+	string newPath;
+	vector<string> split = ofSplitString(path, SEP);
+	for(int i = 0; i < split.size() - 1; i++){
+		newPath += split[i] + SEP;
+	}
+	//newPath = newPath.substr(0, newPath.size() -1 );
+	return newPath;
+}
+
+
+string ofxRemoteUIofParamaterSync::getFileName(const string & path){
+	string newPath;
+	vector<string> split = ofSplitString(path, SEP);
+	return split[split.size() -1];
 }
 
 
@@ -150,7 +168,9 @@ void ofxRemoteUIofParamaterSync::parameterChanged( ofAbstractParameter & paramet
 	}
 
 	string pName = parameter.getName();
-	string groupTree = ofFilePath::getEnclosingDirectory(fullGroupTreeName, false);
+	//string groupTree = ofFilePath::getEnclosingDirectory(fullGroupTreeName, false);
+	string groupTree = goUpOneLevel(fullGroupTreeName);
+
 	string shortGroupTree = getShortVersionForGroupPath(fullGroupTreeName);
 
 	string type = parameter.type();
@@ -222,17 +242,17 @@ void ofxRemoteUIofParamaterSync::updateOfParamFromRuiParam(string ruiParamName){
 
 	RemoteUIParam ruiP = RUI_GET_PARAM(ruiParamName);
 
-	string paramName = ofFilePath::getFileName(ruiParamName, false);
+	string paramName = getFileName(ruiParamName);
 	if(paramName.size() == 0){
 		ofLogError("ofxRemoteUIofParamaterSync") << "no name!";
 	}
-	string shortGroupPath = ofFilePath::getEnclosingDirectory(ruiParamName, false);
+	string shortGroupPath = goUpOneLevel(ruiParamName);
 	//shortGroupPath = ofFilePath::removeTrailingSlash(shortGroupPath);
 	string fullGroupPath = getFullGroupPathForShortVersion(shortGroupPath);
 
 	vector<string> split = ofSplitString(fullGroupPath, SEP); //separate group;
 
-	ofAbstractParameter * myParam = NULL;;
+	ofAbstractParameter * myParam = NULL;
 
 	if (split.size() == 1){ //not part of group - dont think its possible?
 		paramName = ruiParamName;
@@ -250,8 +270,8 @@ void ofxRemoteUIofParamaterSync::updateOfParamFromRuiParam(string ruiParamName){
 
 		case REMOTEUI_PARAM_FLOAT:{
 
-			//most likely an ofVecN suffix ".Dx" - TODO  #############################
-			if(paramName[paramName.size() - 3] == '.'){
+			//most likely an ofVecN suffix compSEP + "Dx" - TODO  #############################
+			if(paramName[paramName.size() - 3] == compSEP[0]){
 				char vecComp = paramName[paramName.size() - 1]; // x | y | z | w
 				char vecType = paramName[paramName.size() - 2]; // 2 | 3 | 4
 				string noCompPname = paramName.substr(0, paramName.size() - 3);
@@ -321,7 +341,7 @@ void ofxRemoteUIofParamaterSync::updateOfParamFromRuiParam(string ruiParamName){
 }
 
 string ofxRemoteUIofParamaterSync::cleanParamName(string p){
-	if(p[p.size() - 3] == '.'){ //most likely
+	if(p[p.size() - 3] == compSEP[0]){ //most likely
 		p = p.substr(0, p.size() - 3);
 	}
 	return p;
