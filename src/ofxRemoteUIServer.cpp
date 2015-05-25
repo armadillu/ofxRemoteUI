@@ -737,12 +737,18 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	configFile = ofToDataPath(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME));
 	bool exists = s.loadFile(configFile);
 	if(exists){
+		bool pushed = false;
+		if(s.getNumTags(OFXREMOTEUI_XML_ROOT_TAG)){ //v2
+			s.pushTag(OFXREMOTEUI_XML_ROOT_TAG);
+			pushed = true;
+		}
 		if( s.getNumTags(OFXREMOTEUI_XML_ENABLED_TAG) > 0 ){
-			enabled = ("true" == s.getValue(OFXREMOTEUI_XML_ENABLED_TAG, "1"));
+			enabled = (1 == s.getValue(OFXREMOTEUI_XML_ENABLED_TAG, 0));
 			if (!enabled){
 				RUI_LOG_WARNING << "launching disabled!" ;
 			}
 		}
+		if(pushed) s.popTag();
 	}
 	#else
 	configFile = getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME);
@@ -779,10 +785,8 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 
 		if(port_ == -1){ //if no port specified, pick a random one, but only the very first time we get launched!
 			portIsSet = false;
-			ofxXmlSettings s;
-			bool xmlExists = s.loadFile(configFile);
 			bool newVersion = true;
-			if(xmlExists){
+			if(exists){
 
 				newVersion = s.getNumTags(string(OFXREMOTEUI_XML_ROOT_TAG)) > 0;
 				if (newVersion){
