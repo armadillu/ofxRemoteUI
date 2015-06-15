@@ -109,6 +109,11 @@ vector<string> ofxRemoteUI::getChangedParamsList(){
 DecodedMessage ofxRemoteUI::decode(ofxOscMessage m){
 
 	string msgAddress = m.getAddress();
+	if(msgAddress.size() > 0){
+		if(msgAddress[0] == '/'){
+			msgAddress = msgAddress.substr(1, msgAddress.size() - 1);
+		}
+	}
 	string action = msgAddress.substr(0, 4);
 
 	//cout <<"Decode: "<< msgAddress << " action >> " << action << endl;
@@ -284,8 +289,10 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 		case FLT_ARG:
 			p.type = REMOTEUI_PARAM_FLOAT;
  			p.floatVal = m.getArgAsFloat(arg); arg++;
-			p.minFloat = m.getArgAsFloat(arg); arg++;
-			p.maxFloat = m.getArgAsFloat(arg); arg++;
+			if(m.getNumArgs() > 1){
+				p.minFloat = m.getArgAsFloat(arg); arg++;
+				p.maxFloat = m.getArgAsFloat(arg); arg++;
+			}
 			if (p.floatValAddr){
 				*p.floatValAddr = p.floatVal;
 			}break;
@@ -353,11 +360,13 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 		default: RUI_LOG_ERROR << "updateParamFromDecodedMessage unknown type!"; break;
 	}
 
-	p.r = m.getArgAsInt32(arg); arg++;
-	p.g = m.getArgAsInt32(arg); arg++;
-	p.b = m.getArgAsInt32(arg); arg++;
-	p.a = m.getArgAsInt32(arg); arg++;
-	p.group = m.getArgAsString(arg); arg++;
+	if(m.getNumArgs() > 1){
+		p.r = m.getArgAsInt32(arg); arg++;
+		p.g = m.getArgAsInt32(arg); arg++;
+		p.b = m.getArgAsInt32(arg); arg++;
+		p.a = m.getArgAsInt32(arg); arg++;
+		p.group = m.getArgAsString(arg); arg++;
+	}
 
 	if ( !p.isEqualTo(original)  || newParam ){ // if the udpdate changed the param, keep track of it
 		paramsChangedSinceLastCheck.insert(paramName);
