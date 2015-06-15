@@ -110,7 +110,7 @@ DecodedMessage ofxRemoteUI::decode(ofxOscMessage m){
 
 	string msgAddress = m.getAddress();
 	if(msgAddress.size() > 0){
-		if(msgAddress[0] == '/'){
+		if(msgAddress[0] == '/'){ //if address starts with "/", drop it to match the fucked up remoteUI protocol
 			msgAddress = msgAddress.substr(1, msgAddress.size() - 1);
 		}
 	}
