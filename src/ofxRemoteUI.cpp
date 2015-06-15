@@ -138,6 +138,7 @@ DecodedMessage ofxRemoteUI::decode(ofxOscMessage m){
 		else if (action == "DELp") dm.action = DELETE_GROUP_PRESET_ACTION;
 		else if (action == "SAVp") dm.action = SAVE_GROUP_PRESET_ACTION;
 		else if (action == "SETp") dm.action = SET_GROUP_PRESET_ACTION;
+		//log
 		else if (action == "LOG_") dm.action = SEND_LOG_LINE_ACTION;
 	}
 
