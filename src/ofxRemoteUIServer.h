@@ -70,6 +70,11 @@
 #define OFX_REMOTEUI_SERVER_GET_PARAM(pname)							\
 ( ofxRemoteUIServer::instance()->getParamForName(pname) )
 
+/*allows you to get a param ref from anywhere in your code*/
+#define OFX_REMOTEUI_SERVER_GET_PARAM_REF(pname)							\
+( ofxRemoteUIServer::instance()->getParamRefForName(pname) )
+
+
 /*setup the server-client callback. This will be called on important events
  and param updates from the UI. Supplied method should look like:
 	void serverCallback(RemoteUIServerCallBackArg arg);
@@ -202,6 +207,7 @@
 #define RUI_SET_CONFIGS_DIR			OFX_REMOTEUI_SERVER_SET_CONFIGS_DIR
 #define RUI_GET_OF_EVENT			OFX_REMOTEUI_SERVER_GET_CLIENT_OF_EVENT
 #define RUI_GET_PARAM				OFX_REMOTEUI_SERVER_GET_PARAM
+#define RUI_GET_PARAM_REF			OFX_REMOTEUI_SERVER_GET_PARAM_REF
 #define RUI_UPDATE					OFX_REMOTEUI_SERVER_UPDATE
 #define	RUI_CLOSE					OFX_REMOTEUI_SERVER_CLOSE
 //

@@ -596,6 +596,15 @@ RemoteUIParam ofxRemoteUI::getParamForName(string paramName){
 	return p;
 }
 
+RemoteUIParam& ofxRemoteUI::getParamRefForName(string paramName){
+	unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+	if ( it != params.end() ){	// found!
+		return params[paramName];
+	}else{
+		RUI_LOG_ERROR << "getParamForName >> param " + paramName + " not found!";
+	}
+	return nullParam;
+}
 
 string ofxRemoteUI::getValuesAsString(){
 	stringstream out;

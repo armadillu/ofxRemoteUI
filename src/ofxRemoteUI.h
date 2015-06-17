@@ -207,6 +207,7 @@ public:
 	vector<string> getAllParamNamesList();
 	vector<string> getChangedParamsList(); //in user add order
 	RemoteUIParam getParamForName(string paramName);
+	RemoteUIParam& getParamRefForName(string paramName); //careful with this!
 	bool paramExistsForName(string paramName);
 	vector<string> getPresetsList();
 
@@ -295,6 +296,7 @@ protected:
 private:
 
 	string stringForParamType(RemoteUIParamType t);
+	RemoteUIParam nullParam;
 
 };
 
