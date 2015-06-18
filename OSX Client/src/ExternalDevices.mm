@@ -101,7 +101,7 @@ float convertHueToMidiFigtherHue(float hue){
 			for(int i = 0; i < 16 * 4; i++){
 			VVMIDIMessage * msg = [VVMIDIMessage createWithType:0xB0 channel:2];
 			[msg setData1:(unsigned char)(i)]; //knob id
-			[msg setData2:(unsigned char)(17 + 15)]; //value
+			[msg setData2:(unsigned char)(17 + 5)]; //value brightness
 			[midiFighter sendMsg:msg];
 			}
 		}
