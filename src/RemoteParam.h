@@ -175,6 +175,13 @@ public:
 		}
 	};
 
+
+	void setBgColor(const ofColor & c){
+		r = c.r;
+		g = c.g;
+		b = c.b;
+		a = c.a;
+	}
 	RemoteUIParamType type;
 
 	float * floatValAddr;	//used in server
