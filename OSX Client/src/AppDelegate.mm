@@ -946,7 +946,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 -(void) autoConnectToNeighbor:(string)host_ port:(int)port_{
 	if(autoConnectToggle){
-		string localIP = client->getMyIP("");
+		string subnet;
+		string localIP = client->getMyIP("", subnet);
 
 		if (host_ == localIP && onlyAutoConnectToLocalHost || !onlyAutoConnectToLocalHost){
 			if ([[connectButton title] isEqualToString:CONNECT_STRING] || connecting){ //we are not connected, let's connect to this newly launched neighbor!
