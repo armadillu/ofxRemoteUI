@@ -758,15 +758,37 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	if(enabled){
 
 		//setup the broadcasting
-		computerIP = getMyIP(userSuppliedNetInterface);
+		string subnetMask;
+		computerIP = getMyIP(userSuppliedNetInterface, subnetMask);
 		doBroadcast = true;
 		string multicastIP;
-		if (computerIP != RUI_LOCAL_IP_ADDRESS){
-			vector<string>comps;
-			split(comps, computerIP, '.');
-			multicastIP = comps[0] + "." + comps[1] + "." + comps[2] + "." + "255";
-		}else{
-			multicastIP = "255.255.255.255";
+		if(subnetMask == ""){ //old way, we ignore subnet mask and assume the net's subnet mask is 255.255.255.0
+			if (computerIP != RUI_LOCAL_IP_ADDRESS){ //this only handles 255.255.255.0 style networks
+				vector<string>comps;
+				split(comps, computerIP, '.');
+				multicastIP = comps[0] + "." + comps[1] + "." + comps[2] + "." + "255";
+			}else{
+				multicastIP = "255.255.255.255";
+			}
+
+		}else{ //new stuff, we actually build the multicast IP based on the subnet mask too
+			//this assumes all subnet components are either 0 or 255, the multicast @ will not be correct otherwise! TODO!
+			if (computerIP != RUI_LOCAL_IP_ADDRESS){ //if addr is not 127.0.0.1
+				vector<string>addComps;
+				split(addComps, computerIP, '.');
+				vector<string>subnetComps;
+				split(subnetComps, subnetMask, '.');
+				for(int i = 0; i < 4; i++){
+					if(subnetComps[i] == "255"){
+						multicastIP += addComps[i];
+					}else{
+						multicastIP += "255";
+					}
+					if (i < 3) multicastIP += ".";
+				}
+			}else{
+				multicastIP = "255.255.255.255";
+			}
 		}
 
 		ofTargetPlatform platform = ofGetTargetPlatform();
@@ -774,8 +796,8 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 			&&
 			multicastIP == "255.255.255.255"
 			){
-				doBroadcast = false; //windows crashes on bradcast if no devices are up!
-				RUI_LOG_WARNING << "no network interface found, we will not broadcast ourselves";
+			doBroadcast = false; //windows crashes on bradcast if no devices are up!
+			RUI_LOG_WARNING << "no network interface found, we will not broadcast ourselves";
 		}
 
 		if(doBroadcast){

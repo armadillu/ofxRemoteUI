@@ -223,7 +223,7 @@ public:
 
 	virtual void sendUntrackedParamUpdate(RemoteUIParam p, string paramName){};
 
-	string getMyIP(string userChosenInteface = "");
+	string getMyIP(string userChosenInteface, string & subnetMask);
 
 protected:
 

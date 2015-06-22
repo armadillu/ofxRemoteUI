@@ -169,11 +169,12 @@ DecodedMessage ofxRemoteUI::decode(ofxOscMessage m){
 }
 
 
-string ofxRemoteUI::getMyIP(string userChosenInteface){
+string ofxRemoteUI::getMyIP(string userChosenInteface, string & subnetMask){
 
 	//from https://github.com/jvcleave/LocalAddressGrabber/blob/master/src/LocalAddressGrabber.h
 	//and http://stackoverflow.com/questions/17288908/get-network-interface-name-from-ipv4-address
 	string output = RUI_LOCAL_IP_ADDRESS;
+	string subnetOutput = "255.255.255.0";
 	RUI_LOG_NOTICE << "establishing local interface and IP @";
 
 #if defined(__APPLE__) || defined(__linux__)
@@ -195,7 +196,17 @@ string ofxRemoteUI::getMyIP(string userChosenInteface){
 		if (ifa->ifa_addr->sa_family == AF_INET){
 			s4 = (struct sockaddr_in *)(ifa->ifa_addr);
 			if (inet_ntop(ifa->ifa_addr->sa_family, (void *)&(s4->sin_addr), buf, sizeof(buf)) == NULL){
-				printf("%s: inet_ntop failed!\n", ifa->ifa_name);
+				RUI_LOG_ERROR <<ifa->ifa_name << ": inet_ntop failed!";
+			}
+
+			void * tmpAddrPtr = &((struct sockaddr_in *)ifa->ifa_netmask)->sin_addr;
+			char SnAddressBuffer[INET_ADDRSTRLEN];
+			if(inet_ntop(AF_INET, tmpAddrPtr, SnAddressBuffer, INET_ADDRSTRLEN) == NULL){
+				RUI_LOG_ERROR <<ifa->ifa_name << ": inet_ntop for subnet failed!";
+			}
+
+			if(inet_ntop(ifa->ifa_addr->sa_family, (void *)&(s4->sin_addr), buf, sizeof(buf)) == NULL){
+				RUI_LOG_ERROR <<ifa->ifa_name << ": inet_ntop for address failed!";
 			}else{
 				string interface = string(ifa->ifa_name);
 				if(verbose_) RUI_LOG_VERBOSE << "found interface: " << interface ;
@@ -203,6 +214,7 @@ string ofxRemoteUI::getMyIP(string userChosenInteface){
 					if (userSuppliedNetInterface.length() > 0){
 						if (interface == userSuppliedNetInterface){
 							output = string(buf);
+							subnetMask = string(SnAddressBuffer);
 							if(verbose_) RUI_LOG_VERBOSE << "using user chosen interface: " << interface;
 							break;
 						}
@@ -212,6 +224,7 @@ string ofxRemoteUI::getMyIP(string userChosenInteface){
 								bool is169 = buf[0] == '1' && buf[1] == '6' && buf[2] == '9';
 								if(!is169){ //avoid 169.x.x.x addresses
 									output = string(buf);
+									subnetMask = string(SnAddressBuffer);
 									if(verbose_) RUI_LOG_VERBOSE << "using interface: " << interface;
 									break;
 								}
