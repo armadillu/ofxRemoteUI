@@ -14,13 +14,6 @@
 
 #include "ofxOsc.h"
 
-#if __cplusplus>=201103L || defined(_MSC_VER)
-	#include <unordered_map>
-	#include <memory>
-#else
-	#include <tr1/unordered_map>
-	using std::tr1::unordered_map;
-#endif
 
 
 struct Neighbor{

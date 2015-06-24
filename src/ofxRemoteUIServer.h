@@ -66,6 +66,10 @@
 #define OFX_REMOTEUI_SERVER_SET_NEW_TONE()/*deprecated!*/				\
 ( ofxRemoteUIServer::instance()->setNewParamColorVariation() )
 
+/*find out if a param exists*/
+#define OFX_REMOTEUI_SERVER_PARAM_EXISTS(pname)							\
+( ofxRemoteUIServer::instance()->paramExistsForName(pname) )
+
 /*allows you to get a param from anywhere in your code*/
 #define OFX_REMOTEUI_SERVER_GET_PARAM(pname)							\
 ( ofxRemoteUIServer::instance()->getParamForName(pname) )
@@ -206,6 +210,7 @@
 #define RUI_SET_INTERFACE_KEY       OFX_REMOTE_UI_SERVER_SET_SHOW_INTERFACE_KEY
 #define RUI_SET_CONFIGS_DIR			OFX_REMOTEUI_SERVER_SET_CONFIGS_DIR
 #define RUI_GET_OF_EVENT			OFX_REMOTEUI_SERVER_GET_CLIENT_OF_EVENT
+#define RUI_PARAM_EXISTS			OFX_REMOTEUI_SERVER_PARAM_EXISTS
 #define RUI_GET_PARAM				OFX_REMOTEUI_SERVER_GET_PARAM
 #define RUI_GET_PARAM_REF			OFX_REMOTEUI_SERVER_GET_PARAM_REF
 #define RUI_UPDATE					OFX_REMOTEUI_SERVER_UPDATE
@@ -229,7 +234,11 @@ public:
 
 	//You shouldnt need to call any of these directly. Use the Macros supplied above instead.
 	void update(float dt);
+	#ifdef OF_AVAILABLE
 	void draw(int x = 20, int y = ofGetHeight() - 20); //x and y of where the notifications will get draw
+	#else
+	void draw(int x = 20, int y = 0); //x and y of where the notifications will get draw
+	#endif
 	void close();
 
 	vector<string> loadFromXML(string fileName); //returns list of param names in current setup but not set in XML
@@ -333,10 +342,14 @@ private:
 	};
 
 	vector<string> loadFromXMLv1(string fileName); //returns list of param names in current setup but not set in XML
+	#ifdef OF_AVAILABLE
 	vector<string> loadFromXMLv2(string fileName); //returns list of param names in current setup but not set in XML
+	#endif
 
 	void			saveToXMLv1(string fileName); //save the whole list of params to an xml
+	#ifdef OF_AVAILABLE
 	void			saveToXMLv2(string fileName, string group); //save the whole list of params to an xml
+	#endif
 
 	void			saveGroupToXMLv1(string fileName, string groupName); //save only a subset of params into xml
 
@@ -355,7 +368,9 @@ private:
 	void			threadedFunction();
 
 	void			saveParamToXmlSettings(const RemoteUIParam & p, string key, ofxXmlSettings & s, XmlCounter & counter);
+	#ifdef OF_AVAILABLE
 	void			saveParamToXmlSettings(const RemoteUIParam & p, string key, ofXml & s, int index, bool active);
+	#endif
 	void			saveSettingsBackup();
 
 	void addParamToDB(const RemoteUIParam & p, string thisParamName);

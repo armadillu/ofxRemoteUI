@@ -9,6 +9,10 @@
 #ifndef __oscParametersReceiver__ofxRemoteUIofParamaterSync__
 #define __oscParametersReceiver__ofxRemoteUIofParamaterSync__
 
+#include "ofxRemoteUI.h"
+
+#ifdef OF_AVAILABLE
+
 #include "ofMain.h"
 #include "ofxRemoteUIServer.h"
 #include "ofxRemoteUIVars.h"
@@ -18,7 +22,7 @@
 class ofxRemoteUIofParamaterSync{
 
 public:
-	
+
 	ofxRemoteUIofParamaterSync();
 	void setup(ofParameterGroup & group);
 
@@ -55,4 +59,6 @@ protected:
 	string getFileName(const string & path);
 };
 
+#endif
 #endif /* defined(__oscParametersReceiver__ofxRemoteUIofParamaterSync__) */
+

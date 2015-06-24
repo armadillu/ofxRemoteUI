@@ -87,10 +87,10 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	broadcastCount = 0;
 	newColorInGroupCounter = 1;
 	showInterfaceKey = '\t';
+#ifdef OF_AVAILABLE
 	uiScale = 1;
 	customScreenWidth = customScreenHeight = -1;
 
-#ifdef OF_AVAILABLE
 	#ifdef USE_OFX_FONTSTASH
 	useFontStash = false;
 	#endif
@@ -110,6 +110,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	}
 	uiLines.setMode(OF_PRIMITIVE_LINES);
 #else
+	int a = 44;
 	colorTables.push_back(ofColor(194,144,221,a) );
 	colorTables.push_back(ofColor(202,246,70,a)  );
 	colorTables.push_back(ofColor(74,236,173,a)  );
@@ -303,7 +304,7 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string ke
 	}
 }
 
-
+#ifdef OF_AVAILABLE
 void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string key, ofXml & s, int index, bool active){
 
 	string path = "P[" + ofToString(index)  + "]";
@@ -365,6 +366,7 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string ke
 	}
 	s.setToParent();
 }
+#endif
 
 void ofxRemoteUIServer::saveGroupToXML(string fileName, string groupName, bool oldFormat){
 	#ifdef OF_AVAILABLE
@@ -383,24 +385,33 @@ void ofxRemoteUIServer::saveGroupToXML(string fileName, string groupName, bool o
 	#endif
 	#endif
 
+	#ifdef OF_AVAILABLE
 	if(oldFormat){
 		saveGroupToXMLv1(fileName, groupName);
 	}else{
 		saveToXMLv2(fileName, groupName); //save to v2 no matter what
 	}
+	#else
+	saveGroupToXMLv1(fileName, groupName);
+	#endif
 }
 
 
 void ofxRemoteUIServer::saveToXML(string fileName, bool oldFormat){
 
+	#ifdef OF_AVAILABLE
 	if(oldFormat){
-		saveToXMLv1(fileName); //upgrade xml files to the new format, never save with v1
+		saveToXMLv1(fileName);
 	}else{
 		saveToXMLv2(fileName, ""); //upgrade xml files to the new format, never save with v1
 	}
+	#else
+	saveToXMLv1(fileName);
+	#endif
 }
 
 
+#ifdef OF_AVAILABLE
 void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 
 	bool savingGroupOnly = groupName.size() != 0;
@@ -409,9 +420,7 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 	}
 
 	if(!savingGroupOnly){
-		#ifdef OF_AVAILABLE
 		fileName = getFinalPath(fileName);
-		#endif
 	}
 
 	RUI_LOG_NOTICE << "saving to xml (using the V2 format) '" << fileName << "'" ;
@@ -466,7 +475,7 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 	s.addValue(OFXREMOTEUI_XML_ENABLED_TAG, enabled);
 	s.save(fileName );
 }
-
+#endif
 
 vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 
@@ -480,16 +489,21 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 	bool newVersion = s.getNumTags(string(OFXREMOTEUI_XML_ROOT_TAG) + ":" + string(OFXREMOTEUI_XML_V_TAG)) > 0;
 
 	if (exists){
+		#ifdef OF_AVAILABLE
 		if( newVersion ){ //if we have a version tag, it must be v2
 			return loadFromXMLv2(fileName);
 		}else{ //no version tag, so this is v1
 			return loadFromXMLv1(fileName);
 		}
+		#else
+		loadFromXMLv1(fileName);
+		newVersion = false;
+		#endif
 	}
 	return empty;
 }
 
-
+#ifdef OF_AVAILABLE
 vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 
 	vector<string> loadedParams;
@@ -613,6 +627,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 	loadedFromXML = true;
 	return paramsNotInXML;
 }
+#endif
 
 
 void ofxRemoteUIServer::restoreAllParamsToInitialXML(){
@@ -732,10 +747,11 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	
 	//check for enabled
 	string configFile;
-	#ifdef OF_AVAILABLE
+	bool exists = true;
 	ofxXmlSettings s;
+	#ifdef OF_AVAILABLE
 	configFile = ofToDataPath(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME));
-	bool exists = s.loadFile(configFile);
+	exists = s.loadFile(configFile);
 	if(exists){
 		bool pushed = false;
 		if(s.getNumTags(OFXREMOTEUI_XML_ROOT_TAG)){ //v2
@@ -791,6 +807,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 			}
 		}
 
+		#ifdef OF_AVAILABLE
 		ofTargetPlatform platform = ofGetTargetPlatform();
 		if ( (platform == OF_TARGET_WINVS || platform == OF_TARGET_WINGCC)
 			&&
@@ -799,6 +816,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 			doBroadcast = false; //windows crashes on bradcast if no devices are up!
 			RUI_LOG_WARNING << "no network interface found, we will not broadcast ourselves";
 		}
+		#endif
 
 		if(doBroadcast){
 			broadcastSender.setup( multicastIP, OFXREMOTEUI_BROADCAST_PORT ); //multicast @
@@ -1415,7 +1433,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 }
 #endif
 
-
+#ifdef OF_AVAILABLE
 
 void ofxRemoteUIServer::setUiColumnWidth(int w){
 	if(fabs(uiColumnWidth - w) < 0.1) uiLines.clear();
@@ -1439,6 +1457,7 @@ void ofxRemoteUIServer::setCustomScreenWidth(int w){
 	customScreenWidth = w;
 }
 
+#endif
 
 void ofxRemoteUIServer::handleBroadcast(){
 	if(doBroadcast){

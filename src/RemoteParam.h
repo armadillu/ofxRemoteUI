@@ -62,7 +62,7 @@ struct DecodedMessage{
 
 
 #ifndef OF_AVAILABLE //if OF is not available, redefine ofColor to myColor
-#warning "Openframeworks is not available!"
+//#warning "Openframeworks is not available!"
 #define ofColor myColor
 
 struct myColor{

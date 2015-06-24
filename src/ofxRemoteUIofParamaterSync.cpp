@@ -8,6 +8,8 @@
 
 #include "ofxRemoteUIofParamaterSync.h"
 
+#ifdef OF_AVAILABLE
+
 ofxRemoteUIofParamaterSync::ofxRemoteUIofParamaterSync(){}
 
 void ofxRemoteUIofParamaterSync::setup(ofParameterGroup & _parameters){
@@ -369,3 +371,4 @@ void ofxRemoteUIofParamaterSync::forceRuiToOfParamSync(){
 	}
 }
 
+#endif

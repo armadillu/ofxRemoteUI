@@ -435,7 +435,7 @@ void ofxRemoteUI::sendUpdateForParamsInList(vector<string>list){
 			//cout << "ofxRemoteUIServer: sending updated param " + list[i]; p.print();
 			sendParam(list[i], p);
 		}else{
-			RUI_LOG_ERROR << "param not found??!";
+			RUI_LOG_ERROR << "param not found?!";
 		}
 	}
 }
