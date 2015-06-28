@@ -108,14 +108,24 @@ public:
 								(fresh > 0.1 ) ? it->second.bgColor : ofColor(it->second.bgColor, 255 * a),
 								ofColor::black
 								);
-			yy -= hh;
-
 			if (it->second.color.a != 0){
 				ofPushStyle();
 				ofSetColor(it->second.color, a * 255);
-				ofRect(x + total.length() * 8 + 4, yy - 14, 40, 20);
+				#ifdef USE_OFX_FONTSTASH
+				if(font != NULL){
+					ofRectangle r = font->getBBox(total, 15, 0, 0);
+					float diff = floor(NOTIFICATION_LINEHEIGHT - r.height);
+					ofRect(x + r.width + r.x + 4, yy + r.y - diff / 2, 40, NOTIFICATION_LINEHEIGHT);
+				}else{
+					ofRect(x + total.length() * 8 + 4, yy + 6, 40, NOTIFICATION_LINEHEIGHT);
+				}
+				#else
+				ofRect(x + total.length() * 8 + 4, yy + 6, 40, NOTIFICATION_LINEHEIGHT);
+				#endif
 				ofPopStyle();
 			}
+			yy -= hh;
+
 		}
 
 		map<int, string>::iterator it2 = paramWatchOrder.begin();
