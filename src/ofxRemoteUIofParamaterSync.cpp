@@ -14,7 +14,7 @@ ofxRemoteUIofParamaterSync::ofxRemoteUIofParamaterSync(){}
 
 void ofxRemoteUIofParamaterSync::setup(ofParameterGroup & _parameters){
 
-	ofAddListener(_parameters.parameterChangedE, this, &ofxRemoteUIofParamaterSync::parameterChanged);
+	ofAddListener(_parameters.parameterChangedE(), this, &ofxRemoteUIofParamaterSync::parameterChanged);
 	ofAddListener(RUI_GET_OF_EVENT(), this, &ofxRemoteUIofParamaterSync::remoteUIClientDidSomething);
 	recursiveSetup(_parameters);
 	syncGroup = &_parameters;
@@ -57,15 +57,9 @@ void ofxRemoteUIofParamaterSync::recursiveSetup(ofParameterGroup & _parameters){
 	for(int i = 0; i < _parameters.size() ; i++){
 
 		string type = _parameters.getType(i);
-		string fullGroupTreeName;
 		ofAbstractParameter & absP = _parameters.get(i);
-		ofParameterGroup * walker = absP.getParent();
 
-		while (walker){ //its a group!
-			fullGroupTreeName = walker->getName() + SEP + fullGroupTreeName;
-			walker = walker->getParent();
-		}
-
+		string fullGroupTreeName = getCompleteParameterPath(absP);
 		string shortedGroupName = getShortVersionForGroupPath(fullGroupTreeName);
 		string fullRUIparamName = shortedGroupName + absP.getName();
 
@@ -159,16 +153,20 @@ string ofxRemoteUIofParamaterSync::getFileName(const string & path){
 	return split[split.size() -1];
 }
 
+string ofxRemoteUIofParamaterSync::getCompleteParameterPath(ofAbstractParameter & parameter){
+
+	vector<string> paramHier = parameter.getGroupHierarchyNames();
+	string fullGroupTreeName;
+	for(int i = 0; i < paramHier.size(); i++){
+		fullGroupTreeName += SEP + paramHier[i];
+	}
+	fullGroupTreeName = fullGroupTreeName.substr(1, fullGroupTreeName.size()-1);
+	return fullGroupTreeName;
+}
 
 void ofxRemoteUIofParamaterSync::parameterChanged( ofAbstractParameter & parameter ){
 
-	string fullGroupTreeName;
-	ofParameterGroup * walker = parameter.getParent();
-	while (walker){ //its a group!
-		fullGroupTreeName = walker->getName() + SEP + fullGroupTreeName;
-		walker = walker->getParent();
-	}
-
+	string fullGroupTreeName = getCompleteParameterPath(parameter);
 	string pName = parameter.getName();
 	//string groupTree = ofFilePath::getEnclosingDirectory(fullGroupTreeName, false);
 	string groupTree = goUpOneLevel(fullGroupTreeName);

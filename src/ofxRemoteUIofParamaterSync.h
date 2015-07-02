@@ -57,6 +57,8 @@ protected:
 
 	string goUpOneLevel(const string & path);
 	string getFileName(const string & path);
+
+	string getCompleteParameterPath(ofAbstractParameter & parameter);
 };
 
 #endif
