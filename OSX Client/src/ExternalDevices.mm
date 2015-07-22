@@ -178,6 +178,12 @@ float convertHueToMidiFigtherHue(float hue){
 								//[msg setData2:(unsigned char)(17 + 30 * a)]; //value
 								[msg setData2:(unsigned char)(17 + 30 * a)]; //value
 								[device sendMsg:msg];
+							}else{ //if color param, re-set the brightness
+								msg = [VVMIDIMessage createWithType:0xB0 channel:/*midiOutConfig.channelInt*/ + 2];
+								[msg setData1:(unsigned char)(midiOutConfig.controlIDInt)]; //knob id
+								[msg setData2:(unsigned char)(17 + 30)]; //value
+								[device sendMsg:msg];
+
 							}
 						}
 					}
