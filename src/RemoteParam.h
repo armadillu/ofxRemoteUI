@@ -111,6 +111,7 @@ public:
 		stringVal = "empty";
 		r = g = b = a = 0; //bg color
 		group = OFXREMOTEUI_DEFAULT_PARAM_GROUP;
+
 	};
 
 
@@ -209,11 +210,9 @@ public:
 
 
 	void setBgColor(const ofColor & c){
-		r = c.r;
-		g = c.g;
-		b = c.b;
-		a = c.a;
+		r = c.r; g = c.g; b = c.b; a = c.a;
 	}
+	
 	RemoteUIParamType type;
 
 	float * floatValAddr;	//used in server

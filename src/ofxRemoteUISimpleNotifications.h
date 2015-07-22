@@ -117,10 +117,10 @@ public:
 					float diff = floor(NOTIFICATION_LINEHEIGHT - r.height);
 					ofRect(x + r.width + r.x + 4, yy + r.y - diff / 2, 40, NOTIFICATION_LINEHEIGHT);
 				}else{
-					ofRect(x + total.length() * 8 + 4, yy + 6, 40, NOTIFICATION_LINEHEIGHT);
+					ofRect(x + total.length() * 8 + 4, yy + 6 - NOTIFICATION_LINEHEIGHT, 40, NOTIFICATION_LINEHEIGHT);
 				}
 				#else
-				ofRect(x + total.length() * 8 + 4, yy + 6, 40, NOTIFICATION_LINEHEIGHT);
+				ofRect(x + total.length() * 8 + 4, yy + 6 - NOTIFICATION_LINEHEIGHT, 40, NOTIFICATION_LINEHEIGHT);
 				#endif
 				ofPopStyle();
 			}

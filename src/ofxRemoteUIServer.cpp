@@ -181,9 +181,8 @@ void ofxRemoteUIServer::setNewParamColorVariation(bool dontChangeVariation){
 
 void ofxRemoteUIServer::setNewParamColor(int num){
 	for(int i = 0; i < num; i++){
-		ofColor c = colorTables[colorTableIndex];
 		colorSet = true;
-		paramColor = c;
+		paramColor = colorTables[colorTableIndex];
 		colorTableIndex++;
 		if(colorTableIndex>= colorTables.size()){
 			colorTableIndex = 0;
@@ -1838,13 +1837,10 @@ vector<string>	ofxRemoteUIServer::getAvailablePresetsForGroup(string group){
 void ofxRemoteUIServer::setColorForParam(RemoteUIParam &p, ofColor c){
 
 	if (c.a > 0){ //if user supplied a color, override the setColor
-		p.r = c.r;  p.g = c.g;  p.b = c.b;  p.a = c.a;
+		p.setBgColor(c);
 	}else{
 		if (colorSet){
-			p.r = paramColorCurrentVariation.r;
-			p.g = paramColorCurrentVariation.g;
-			p.b = paramColorCurrentVariation.b;
-			p.a = paramColorCurrentVariation.a;
+			p.setBgColor(paramColorCurrentVariation);
 		}
 	}
 }
@@ -1861,7 +1857,9 @@ void ofxRemoteUIServer::watchParamOnScreen(string paramName){
 void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamName){
 
 	if(p.type != REMOTEUI_PARAM_SPACER && params.size() == 0){ //adding first param! and its not spacer!
-		setParamGroup(OFXREMOTEUI_DEFAULT_PARAM_GROUP);
+		upcomingGroup = OFXREMOTEUI_DEFAULT_PARAM_GROUP;
+		newColorInGroupCounter = 1;
+		addSpacer(OFXREMOTEUI_DEFAULT_PARAM_GROUP);
 	}
 	ofxRemoteUI::addParamToDB(p, thisParamName);
 }
