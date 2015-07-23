@@ -147,7 +147,7 @@ public:
 		return equal;
 	}
 
-	string getValueAsString(){
+	string getValueAsString() const{
 		std::ostringstream ss;
 		char aux[50];
 		switch (type) {

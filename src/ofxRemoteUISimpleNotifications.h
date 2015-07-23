@@ -20,7 +20,7 @@
 #define PARAM_WATCH_COLOR				ofColor(0, 128, 255)
 #define NOTIFICATION_LINEHEIGHT			20
 #include "ofMain.h"
-
+#include "RemoteParam.h"
 #ifdef USE_OFX_FONTSTASH
 	#include "ofxFontStash.h"
 #endif
@@ -40,6 +40,10 @@ public:
 		float time;
 		ofColor color;
 		ofColor bgColor;
+		bool range;
+		float rangeMin;
+		float rangeMax;
+		float pct;
 	};
 
 
@@ -101,13 +105,17 @@ public:
 			float a = ofClamp( NOTIFICATION_ALPHA_OVERFLOW * it->second.time, 0.0f, 1.0f);
 			float fresh = 1.0f - ofClamp((screenTime + 1) - it->second.time, 0.0f, 1.0f);
 
-			string total = it->first + ": " + it->second.value ;
+			string total = it->first + ": " + it->second.value;
+			ofColor bgColor = (fresh > 0.1 ) ? it->second.bgColor : ofColor(it->second.bgColor, 255 * a);
 			float hh = drawStringWithBox( total,
 								x,
 								yy,
-								(fresh > 0.1 ) ? it->second.bgColor : ofColor(it->second.bgColor, 255 * a),
+								bgColor,
 								ofColor::black
 								);
+
+			int xx = x + total.length() * 8 + 4;
+			int yyy = yy + 6 - NOTIFICATION_LINEHEIGHT;
 			if (it->second.color.a != 0){
 				ofPushStyle();
 				ofSetColor(it->second.color, a * 255);
@@ -117,15 +125,29 @@ public:
 					float diff = floor(NOTIFICATION_LINEHEIGHT - r.height);
 					ofRect(x + r.width + r.x + 4, yy + r.y - diff / 2, 40, NOTIFICATION_LINEHEIGHT);
 				}else{
-					ofRect(x + total.length() * 8 + 4, yy + 6 - NOTIFICATION_LINEHEIGHT, 40, NOTIFICATION_LINEHEIGHT);
+					ofRect(xx, yyy , 40, NOTIFICATION_LINEHEIGHT);
 				}
 				#else
-				ofRect(x + total.length() * 8 + 4, yy + 6 - NOTIFICATION_LINEHEIGHT, 40, NOTIFICATION_LINEHEIGHT);
+				ofRect(xx, yyy, 40, NOTIFICATION_LINEHEIGHT);
 				#endif
 				ofPopStyle();
 			}
-			yy -= hh;
+			if(it->second.range){
+				int sliderW = 80;
+				int pad = 9;
+				int knobW = 6;
+				int markH = 2;
+				int voff = (NOTIFICATION_LINEHEIGHT - knobW) / 2;
+				ofSetColor(0);
+				ofRect(xx, yyy, sliderW, NOTIFICATION_LINEHEIGHT);
+				ofSetColor(45);
+				ofRect(xx + pad, yyy + pad, sliderW - 2 * pad, NOTIFICATION_LINEHEIGHT - 2 * pad);
+				ofSetColor(bgColor);
+				ofLine(xx + sliderW/2, yyy + NOTIFICATION_LINEHEIGHT / 2 + markH, xx + sliderW/2,  yyy + NOTIFICATION_LINEHEIGHT / 2 - markH );
+				ofRect(xx + pad - knobW/2 + (sliderW - 2 * pad) * it->second.pct, yyy + voff, knobW , knobW );
 
+			}
+			yy -= hh;
 		}
 
 		map<int, string>::iterator it2 = paramWatchOrder.begin();
@@ -144,19 +166,34 @@ public:
 		}
 	};
 
-	void addNotification(string msg){
+	void addNotification(const string & msg){
 		SimpleNotification n;
 		n.msg = msg;
 		n.time = screenTime;
 		notifications.push_back(n);
 	};
 
-	void addParamUpdate(string paramName, string paramValue, ofColor bgColor, ofColor paramC = ofColor(0,0)){
+	void addParamUpdate(const string & paramName, const RemoteUIParam & p, const ofColor & bgColor, const ofColor & paramC = ofColor(0,0)){
 		ParamNotification n;
 		n.color = paramC;
 		n.bgColor = bgColor;
-		n.value = paramValue;
+		n.value = p.getValueAsString();
 		n.time = screenTime;
+		switch(p.type){
+			case REMOTEUI_PARAM_FLOAT:
+				n.rangeMin = p.minFloat; n.rangeMax = p.maxFloat;
+				n.pct = ofMap(p.floatVal, p.minFloat, p.maxFloat, 0, 1);
+				n.range = true;
+				break;
+			case REMOTEUI_PARAM_INT:
+				n.rangeMin = p.minInt; n.rangeMax = p.maxInt;
+				n.pct = ofMap(p.intVal, p.minInt, p.maxInt, 0, 1);
+				n.range = true;
+				break;
+			default:
+				n.range = false;
+				break;
+		}
 		paramNotifications[paramName] = n;
 	};
 
@@ -166,6 +203,7 @@ public:
 		n.bgColor = ofColor(0);
 		n.value = paramValue;
 		n.time = screenTime;
+		n.range = false;
 		if(paramWatch.find(paramName) == paramWatch.end()){
 			paramWatchOrder[paramWatchOrder.size()] = paramName;
 			paramWatch[paramName] = n;
@@ -187,7 +225,7 @@ public:
 private:
 
 	//return height of box
-	float drawStringWithBox(string text, int x, int y, const ofColor& background, const ofColor& foreground ){
+	float drawStringWithBox(const string & text, int x, int y, const ofColor& background, const ofColor& foreground ){
 		#ifdef USE_OFX_FONTSTASH
 		if(font == NULL){
 			ofDrawBitmapStringHighlight(text, x, y, background, foreground);

@@ -656,7 +656,7 @@ void ofxRemoteUIServer::pushParamsToClient(){
 	for(int i = 0 ; i < changedParams.size(); i++){
 		string pName = changedParams[i];
 		RemoteUIParam &p = params[pName];
-		onScreenNotifications.addParamUpdate(pName, p.getValueAsString(),
+		onScreenNotifications.addParamUpdate(pName, p,
 											 ofColor(p.r, p.g, p.b, p.a),
 			p.type == REMOTEUI_PARAM_COLOR ?
 			ofColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal) :
@@ -1050,7 +1050,7 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 						cbArg.paramName = key;
 						cbArg.param = params[key];  //copy the updated param to the callbakc arg
 						#ifdef OF_AVAILABLE
-						onScreenNotifications.addParamUpdate(key, cbArg.param.getValueAsString(), ofColor(p.r, p.g, p.b, p.a));
+						onScreenNotifications.addParamUpdate(key, cbArg.param, ofColor(p.r, p.g, p.b, p.a));
 						ofNotifyEvent(clientAction, cbArg, this);
 						#endif
 						if(callBack) callBack(cbArg);
@@ -1570,7 +1570,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				if(callBack) callBack(cbArg);
 				#ifdef OF_AVAILABLE
 				RemoteUIParam & p = params[dm.paramName];
-				onScreenNotifications.addParamUpdate(dm.paramName, p.getValueAsString(),
+				onScreenNotifications.addParamUpdate(dm.paramName, p,
 													 ofColor(p.r, p.g, p.b, p.a),
 													 p.type == REMOTEUI_PARAM_COLOR ?
 													 ofColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal):
