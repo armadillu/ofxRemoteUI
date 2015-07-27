@@ -1466,30 +1466,24 @@ void ofxRemoteUIServer::handleBroadcast(){
 #ifdef OF_AVAILABLE
 				Poco::Environment e;
 				computerName = e.nodeName();
-
 				char pathbuf[2048];
 				uint32_t  bufsize = sizeof(pathbuf);
     #ifdef TARGET_OSX
 				_NSGetExecutablePath(pathbuf, &bufsize);
-				Poco::Path p = Poco::Path(pathbuf);
-				binaryName = p[p.depth()];
     #else
         #ifdef TARGET_WIN32
 				GetModuleFileNameA( NULL, pathbuf, bufsize ); //no idea why, but GetModuleFileName() is not defined?
-				Poco::Path p = Poco::Path(pathbuf);
-				binaryName = p[p.depth()];
-
         #else
 
             char procname[1024];
             int len = readlink("/proc/self/exe", procname, 1024-1);
             if (len > 0){
                 procname[len] = '\0';
-                Poco::Path p = Poco::Path(procname);
-				binaryName = p[p.depth()];
             }
         #endif
     #endif
+				binaryName = ofFilePath::getBaseName(pathbuf);
+
 #endif
 			}
 
