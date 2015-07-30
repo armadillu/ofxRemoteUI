@@ -184,6 +184,11 @@ public:
 				n.rangeMin = p.minFloat; n.rangeMax = p.maxFloat;
 				n.pct = ofMap(p.floatVal, p.minFloat, p.maxFloat, 0, 1);
 				n.range = true;
+				if(n.value.size() < 10){
+					for(int i = 0; i < n.value.size() - 10; i++){
+						n.value += " ";
+					}
+				}
 				break;
 			case REMOTEUI_PARAM_INT:
 				n.rangeMin = p.minInt; n.rangeMax = p.maxInt;

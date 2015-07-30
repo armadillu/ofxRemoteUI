@@ -83,7 +83,7 @@ void ofxRemoteUI::addParamToDB(RemoteUIParam p, string thisParamName){
 
 	}else{
 		params[thisParamName] = p;
-		RUI_LOG_WARNING << "already have a Param with that name on the DB : " << thisParamName << "!!";
+		RUI_LOG_WARNING << "already have a Param with that name on the DB : '" << thisParamName << "'. Ignoring it!";
 	}
 }
 
