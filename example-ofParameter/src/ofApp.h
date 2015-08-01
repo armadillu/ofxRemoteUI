@@ -13,18 +13,25 @@ class ofApp : public ofBaseApp{
 		void update(){};
 		void draw();
 
-		void keyPressed(int key){}
+		void keyPressed(int key){ cout << "pressed" << endl; }
 		void keyReleased(int key){};
 
-		//your ofParams
+		ofParameterGroup parameters;
+		ofParameterGroup amount;
+		ofParameterGroup style;
+		ofParameterGroup naming;
+
 		ofParameter<float> size;
 		ofParameter<int> number;
-		ofParameter<bool> check;
-		ofParameterGroup parameters;
+		ofParameter<bool> wireframe;
+
 		ofParameter<ofColor> color;
-		ofParameter<string> name;
+		ofParameter<string> name1;
+		ofParameter<string> name2;
+
 		ofxPanel gui;
 
 		//sync ofParams to RemoteUI
 		ofxRemoteUIofParamaterSync ruiBridge;
 };
+

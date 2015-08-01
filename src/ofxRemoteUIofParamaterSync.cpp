@@ -10,15 +10,17 @@
 
 #ifdef OF_AVAILABLE
 
-ofxRemoteUIofParamaterSync::ofxRemoteUIofParamaterSync(){}
 
 void ofxRemoteUIofParamaterSync::setup(ofParameterGroup & _parameters){
 
 	ofAddListener(_parameters.parameterChangedE(), this, &ofxRemoteUIofParamaterSync::parameterChanged);
 	ofAddListener(RUI_GET_OF_EVENT(), this, &ofxRemoteUIofParamaterSync::remoteUIClientDidSomething);
+
+	RUI_NEW_GROUP(_parameters.getName());
 	recursiveSetup(_parameters);
 	syncGroup = &_parameters;
 }
+
 
 string ofxRemoteUIofParamaterSync::getShortVersionForGroupPath(const string & groupPath){
 
@@ -63,7 +65,9 @@ void ofxRemoteUIofParamaterSync::recursiveSetup(ofParameterGroup & _parameters){
 		string shortedGroupName = getShortVersionForGroupPath(fullGroupTreeName);
 		string fullRUIparamName = shortedGroupName + absP.getName();
 
-		if(fullGroupTreeName.size() && i == 0) RUI_NEW_GROUP(fullGroupTreeName.substr(0, fullGroupTreeName.size() - 1));
+		if(dynamic_cast<ofParameterGroup*>(&_parameters.get(i))){
+			RUI_NEW_GROUP(fullGroupTreeName);
+		}
 
 		if(type==typeid(ofParameter<int>).name()){ //INT
 			ofParameter<int> p = _parameters.getInt(i);
@@ -130,10 +134,11 @@ void ofxRemoteUIofParamaterSync::recursiveSetup(ofParameterGroup & _parameters){
 			ofParameterGroup p = _parameters.getGroup(i);
 			recursiveSetup(p);
 		}else{
-			ofLogError("ofxRemoteUIofParamaterSync") << "Sorry I don't support " << type << " type.";
+			ofLogError("ofxRemoteUIofParamaterSync") << "Sorry I don't support '" << type << "' type.";
 		}
 	}
 }
+
 
 string ofxRemoteUIofParamaterSync::goUpOneLevel(const string & path){
 
@@ -153,6 +158,7 @@ string ofxRemoteUIofParamaterSync::getFileName(const string & path){
 	return split[split.size() -1];
 }
 
+
 string ofxRemoteUIofParamaterSync::getCompleteParameterPath(ofAbstractParameter & parameter){
 
 	vector<string> paramHier = parameter.getGroupHierarchyNames();
@@ -163,6 +169,7 @@ string ofxRemoteUIofParamaterSync::getCompleteParameterPath(ofAbstractParameter 
 	fullGroupTreeName = fullGroupTreeName.substr(1, fullGroupTreeName.size()-1);
 	return fullGroupTreeName;
 }
+
 
 void ofxRemoteUIofParamaterSync::parameterChanged( ofAbstractParameter & parameter ){
 
@@ -340,12 +347,14 @@ void ofxRemoteUIofParamaterSync::updateOfParamFromRuiParam(string ruiParamName){
 	}
 }
 
+
 string ofxRemoteUIofParamaterSync::cleanParamName(string p){
 	if(p[p.size() - 3] == compSEP[0]){ //most likely
 		p = p.substr(0, p.size() - 3);
 	}
 	return p;
 }
+
 
 ofAbstractParameter& ofxRemoteUIofParamaterSync::findInChildren(ofParameterGroup & group,
 																vector<string>& groupTree,
@@ -361,6 +370,7 @@ ofAbstractParameter& ofxRemoteUIofParamaterSync::findInChildren(ofParameterGroup
 	ofAbstractParameter & param = g.get(paramNane);
 	return param;
 }
+
 
 void ofxRemoteUIofParamaterSync::forceRuiToOfParamSync(){
 

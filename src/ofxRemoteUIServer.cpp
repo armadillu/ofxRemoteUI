@@ -861,10 +861,10 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	}
 	//still get ui access despite being disabled
 	#ifdef OF_AVAILABLE
-	ofAddListener(ofEvents().exit, this, &ofxRemoteUIServer::_appExited); //to save to xml, disconnect, etc
-	ofAddListener(ofEvents().keyPressed, this, &ofxRemoteUIServer::_keyPressed);
-	ofAddListener(ofEvents().update, this, &ofxRemoteUIServer::_update);
-	ofAddListener(ofEvents().draw, this, &ofxRemoteUIServer::_draw, OF_EVENT_ORDER_AFTER_APP + 110);
+	ofAddListener(ofEvents().exit, this, &ofxRemoteUIServer::_appExited, OF_EVENT_ORDER_BEFORE_APP); //to save to xml, disconnect, etc
+	ofAddListener(ofEvents().keyPressed, this, &ofxRemoteUIServer::_keyPressed, OF_EVENT_ORDER_BEFORE_APP);
+	ofAddListener(ofEvents().update, this, &ofxRemoteUIServer::_update, OF_EVENT_ORDER_BEFORE_APP);
+	ofAddListener(ofEvents().draw, this, &ofxRemoteUIServer::_draw, OF_EVENT_ORDER_AFTER_APP + 110); //last thing to draw
 	#endif
 
 	setNewParamColor(1);
@@ -881,7 +881,7 @@ void ofxRemoteUIServer::_appExited(ofEventArgs &e){
 }
 
 
-void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
+bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 
 	if (showUI){
 		switch(e.key){ //you can save current config from tab screen by pressing s
@@ -1093,7 +1093,9 @@ void ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 			refreshPresetsCache();
 		}
 	}
+	return showUI;
 }
+
 
 void ofxRemoteUIServer::refreshPresetsCache(){
 

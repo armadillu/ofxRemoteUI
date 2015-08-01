@@ -17,13 +17,10 @@
 #include "ofxRemoteUIServer.h"
 #include "ofxRemoteUIVars.h"
 
-
-
 class ofxRemoteUIofParamaterSync{
 
 public:
 
-	ofxRemoteUIofParamaterSync();
 	void setup(ofParameterGroup & group);
 
 	void forceRuiToOfParamSync();
@@ -39,7 +36,6 @@ protected:
 
 	const string SEP = "."; //to separate ofParameter group hierarcy
 	const string compSEP = "_"; //for ofVec _2x, _2y, etc
-
 
 	ofAbstractParameter& findInChildren(ofParameterGroup & group,
 										vector<string>& groupPathName,

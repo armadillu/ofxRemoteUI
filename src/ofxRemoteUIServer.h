@@ -423,7 +423,7 @@ private:
 	void			_appExited(ofEventArgs &e);
 	void			_draw(ofEventArgs &d);
 	void			_update(ofEventArgs &d);
-	void			_keyPressed(ofKeyEventArgs &e);
+	bool			_keyPressed(ofKeyEventArgs &e);
 
 	int														selectedItem;
 	ofVboMesh												uiLines;
