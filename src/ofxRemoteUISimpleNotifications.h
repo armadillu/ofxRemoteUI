@@ -132,7 +132,7 @@ public:
 				#endif
 				ofPopStyle();
 			}
-			if(it->second.range){
+			if(it->second.range){ //draw slider
 				int sliderW = 80;
 				int pad = 9;
 				int knobW = 6;
@@ -144,7 +144,7 @@ public:
 				ofRect(xx + pad, yyy + pad, sliderW - 2 * pad, NOTIFICATION_LINEHEIGHT - 2 * pad);
 				ofSetColor(bgColor);
 				ofLine(xx + sliderW/2, yyy + NOTIFICATION_LINEHEIGHT / 2 + markH, xx + sliderW/2,  yyy + NOTIFICATION_LINEHEIGHT / 2 - markH );
-				ofRect(xx + pad - knobW/2 + (sliderW - 2 * pad) * it->second.pct, yyy + voff, knobW , knobW );
+				ofRect(xx + pad - knobW/2 + (sliderW - 2 * pad) * ofClamp(it->second.pct, 0, 1), yyy + voff, knobW , knobW );
 
 			}
 			yy -= hh;
