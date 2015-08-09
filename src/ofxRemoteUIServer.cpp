@@ -310,13 +310,13 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string ke
 	switch (t.type) {
 		case REMOTEUI_PARAM_FLOAT:
 			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" <<  *t.floatValAddr <<") to XML" ;
-			s.addValue("P", *t.floatValAddr);
+			s.addValue("P", t.floatValAddr ? *t.floatValAddr : t.floatVal);
 			s.setTo(path);
 			s.setAttribute("type", "float");
 			break;
 		case REMOTEUI_PARAM_INT:
 			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" <<  *t.intValAddr <<") to XML" ;
-			s.addValue("P", *t.intValAddr);
+			s.addValue("P", t.intValAddr ? *t.intValAddr : t.intVal);
 			s.setTo(path);
 			s.setAttribute("type", "int");
 			break;
@@ -325,26 +325,26 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string ke
 			s.addChild("P");
 			s.setTo(path);
 			s.setAttribute("type", "color");
-			s.setAttribute("c0.red", ofToString((int)*t.redValAddr));
-			s.setAttribute("c1.green", ofToString((int)*(t.redValAddr + 1)));
-			s.setAttribute("c2.blue", ofToString((int)*(t.redValAddr + 2)));
-			s.setAttribute("c3.alpha", ofToString((int)*(t.redValAddr + 3)));
+			s.setAttribute("c0.red", ofToString((int)(t.redValAddr ? *t.redValAddr : t.redVal)));
+			s.setAttribute("c1.green", ofToString((int)(t.redValAddr ? *(t.redValAddr + 1) : t.greenVal)));
+			s.setAttribute("c2.blue", ofToString((int)(t.redValAddr ? *(t.redValAddr + 2) : t.blueVal)));
+			s.setAttribute("c3.alpha", ofToString((int)(t.redValAddr ? *(t.redValAddr + 3) : t.alphaVal)));
 			break;
 		case REMOTEUI_PARAM_ENUM:
 			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" <<  *t.intValAddr <<") to XML" ;
-			s.addValue("P", *t.intValAddr);
+			s.addValue("P", t.intValAddr ? *t.intValAddr : t.intVal);
 			s.setTo(path);
 			s.setAttribute("type", "enum");
 			break;
 		case REMOTEUI_PARAM_BOOL:
 			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" <<  *t.boolValAddr <<") to XML" ;
-			s.addValue("P", *t.boolValAddr);
+			s.addValue("P", t.boolValAddr ? *t.boolValAddr : t.boolVal);
 			s.setTo(path);
 			s.setAttribute("type", "bool");
 			break;
 		case REMOTEUI_PARAM_STRING:
 			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" <<  *t.stringValAddr <<") to XML" ;
-			s.addValue("P", *t.stringValAddr);
+			s.addValue("P", t.stringValAddr ? *t.stringValAddr : t.stringVal);
 			s.setTo(path);
 			s.setAttribute("type", "string");
 			break;
@@ -435,20 +435,26 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 
 	//save all params
 	int numSaved = 0;
+	vector<string> savedParams;
 	for(int i = 0; i < orderedKeys.size(); i++){
 		string key = orderedKeys[i];
 		RemoteUIParam &t = params[key];
-		bool save = false;
-		if(savingGroupOnly){
-			if( t.group != OFXREMOTEUI_DEFAULT_PARAM_GROUP && t.group == groupName ){
+		if(t.type != REMOTEUI_PARAM_UNKNOWN){
+			bool save = false;
+			if(savingGroupOnly){
+				if( t.group != OFXREMOTEUI_DEFAULT_PARAM_GROUP && t.group == groupName ){
+					save = true;
+				}
+			}else{
 				save = true;
 			}
+			if(save){
+				saveParamToXmlSettings(t, key, s, numSaved, true);
+				numSaved++;
+				savedParams.push_back(key);
+			}
 		}else{
-			save = true;
-		}
-		if(save){
-			saveParamToXmlSettings(t, key, s, numSaved, true);
-			numSaved++;
+			RLOG_WARNING << "param '" << key << "' not found in DB!";
 		}
 	}
 
@@ -456,14 +462,25 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 		//add comment separating enabled params from disabled params
 		if(orderedKeys_removed.size()){
 			Poco::XML::Element *el = s.getPocoElement();
-			Poco::XML::Comment *ce = s.getPocoDocument()->createComment(Poco::XML::toXMLString("############################## DISABLED PARAMS ################################# "));
+			Poco::XML::Comment *ce = s.getPocoDocument()->createComment(Poco::XML::toXMLString("                                                                                 "));
+			el->appendChild((Poco::XML::Node*)ce);
+			ce = s.getPocoDocument()->createComment(Poco::XML::toXMLString(" ############################## DISABLED PARAMS ################################# "));
+			el->appendChild((Poco::XML::Node*)ce);
+			ce = s.getPocoDocument()->createComment(Poco::XML::toXMLString("                                                                                 "));
 			el->appendChild((Poco::XML::Node*)ce);
 		}
 		//save removed params
+		int c = 0;
 		for(int i = 0; i < orderedKeys_removed.size(); i++){
 			string key = orderedKeys_removed[i];
-			RemoteUIParam &t = params_removed[key];
-			saveParamToXmlSettings(t, key, s, i + orderedKeys.size(), false);
+			if (find(savedParams.begin(), savedParams.end(), key) == savedParams.end()){
+				RemoteUIParam &t = params_removed[key];
+				saveParamToXmlSettings(t, key, s, numSaved + c, false);
+				c++;
+			}else{
+				//param is defined as both params_removed[] and params[], most likely we loaded XML b4 we finished defining all code params...
+				//we just make sure we dont save it twice in the XML, and we save the params[] version
+			}
 		}
 	}
 
@@ -526,87 +543,133 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 		unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
 		bool isAParamWeKnowOf = it != params.end();
 
-		if(isAParamWeKnowOf){
+		if (readKeys.find(paramName) == readKeys.end()){ //lets not read keys twice, only read the first one we find in xml
 
-			if (readKeys.find(paramName) == readKeys.end()){ //lets not read keys twice, only read the first one we find in xml
+			if(type.length() >	0){
 
-				if(type.length() >	0){
+				unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
 
-					unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+				readKeys[paramName] = true;
+				loadedParams.push_back(paramName);
+				RemoteUIParam p;
 
-					if ( it != params.end() ){	// found!
+				if(isAParamWeKnowOf){
+					p = params[paramName];
+				}
 
-						readKeys[paramName] = true;
-						loadedParams.push_back(paramName);
-						RemoteUIParam &p = params[paramName];
+				switch (type[0]){
 
-						switch (type[0]){
+					case 'f':{ //float
+						if (!isAParamWeKnowOf){
+							p.type = REMOTEUI_PARAM_FLOAT;
+							p.floatVal = s.getFloatValue();
+						}else{
+							if(p.type != REMOTEUI_PARAM_FLOAT){ RLOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
+							float val = ofClamp(s.getFloatValue(), p.minFloat, p.maxFloat);
+							p.floatVal = *p.floatValAddr = val;
+							if(verbose_) RLOG_NOTICE << "loading a FLOAT '" << paramName <<"' (" << ofToString( *p.floatValAddr, 3) << ") from XML" ;
+						}
+						}break;
 
-							case 'f':{ //float
-								if(p.type != REMOTEUI_PARAM_FLOAT){ RLOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
-								float val = ofClamp(s.getFloatValue(), p.minFloat, p.maxFloat);
-								p.floatVal = *p.floatValAddr = val;
-								if(verbose_) RLOG_NOTICE << "loading a FLOAT '" << paramName <<"' (" << ofToString( *p.floatValAddr, 3) << ") from XML" ;
-								}break;
+					case 'i':{ //int
+						if (!isAParamWeKnowOf){
+							p.type = REMOTEUI_PARAM_INT;
+							p.intVal = s.getFloatValue();
+						}else{
+							if(p.type != REMOTEUI_PARAM_INT){ RLOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
+							int val = ofClamp(s.getIntValue(), p.minInt, p.maxInt);
+							p.intVal = *p.intValAddr = val;
+							if(verbose_) RLOG_NOTICE << "loading an INT '" << paramName <<"' (" << (int) *p.intValAddr << ") from XML" ;
+						}
+						}break;
 
-							case 'i':{ //int
-								if(p.type != REMOTEUI_PARAM_INT){ RLOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
-								int val = ofClamp(s.getIntValue(), p.minInt, p.maxInt);
-								p.intVal = *p.intValAddr = val;
-								if(verbose_) RLOG_NOTICE << "loading an INT '" << paramName <<"' (" << (int) *p.intValAddr << ") from XML" ;
-								}break;
+					case 's':{ //string
+						if (!isAParamWeKnowOf){
+							p.type = REMOTEUI_PARAM_STRING;
+							p.stringVal = s.getValue();
+						}else{
+							if(p.type != REMOTEUI_PARAM_STRING){ RLOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
+							string val = s.getValue();
+							p.stringVal = *p.stringValAddr = val;
+							if(verbose_) RLOG_NOTICE << "loading a STRING '" << paramName <<"' (" << (string) *p.stringValAddr << ") from XML" ;
+						}
+						}break;
 
-							case 's':{ //string
-								if(p.type != REMOTEUI_PARAM_STRING){ RLOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
-								string val = s.getValue();
-								p.stringVal = *p.stringValAddr = val;
-								if(verbose_) RLOG_NOTICE << "loading a STRING '" << paramName <<"' (" << (string) *p.stringValAddr << ") from XML" ;
-								}break;
+					case 'e':{ //enum
+						if (!isAParamWeKnowOf){
+							p.type = REMOTEUI_PARAM_ENUM;
+							p.intVal = s.getIntValue();
+						}else{
+							if(p.type != REMOTEUI_PARAM_ENUM){ RLOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
+							int val = ofClamp(s.getIntValue(), p.minInt, p.maxInt);
+							p.intVal = *p.intValAddr = val;
+							if(verbose_) RLOG_NOTICE << "loading an ENUM '" << paramName <<"' (" << (int) *p.intValAddr << ") from XML" ;
+						}
+						}break;
 
-							case 'e':{ //enum
-								if(p.type != REMOTEUI_PARAM_ENUM){ RLOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
-								int val = ofClamp(s.getIntValue(), p.minInt, p.maxInt);
-								p.intVal = *p.intValAddr = val;
-								if(verbose_) RLOG_NOTICE << "loading an ENUM '" << paramName <<"' (" << (int) *p.intValAddr << ") from XML" ;
-								}break;
+					case 'b':{ //bool
+						if (!isAParamWeKnowOf){
+							p.type = REMOTEUI_PARAM_BOOL;
+							p.boolVal = s.getIntValue();
+						}else{
+							if(p.type != REMOTEUI_PARAM_BOOL){ RLOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
+							bool val = s.getIntValue();
+							p.boolVal = *p.boolValAddr = val;
+							if(verbose_) RLOG_NOTICE << "loading a BOOL '" << paramName <<"' (" << (bool) *p.boolValAddr << ") from XML" ;
+						}
+						}break;
 
-							case 'b':{ //bool
-								if(p.type != REMOTEUI_PARAM_BOOL){ RLOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
-								bool val = s.getIntValue();
-								p.boolVal = *p.boolValAddr = val;
-								if(verbose_) RLOG_NOTICE << "loading a BOOL '" << paramName <<"' (" << (bool) *p.boolValAddr << ") from XML" ;
-								}break;
-
-							case 'g':{ //group
-								if(verbose_) RLOG_NOTICE << "skipping GROUP '" << paramName << "' from XML" ;
-							}break;
+					case 'g':{ //group
+						if (!isAParamWeKnowOf){
+							p.type = REMOTEUI_PARAM_SPACER;
+							p.group = p.stringVal = paramName;
+						}else{
+							if(verbose_) RLOG_NOTICE << "skipping GROUP '" << paramName << "' from XML" ;
+						}
+					}break;
 
 
-							case 'c':{ //color
-								if(p.type != REMOTEUI_PARAM_COLOR){ RLOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
-								unsigned char r = ofToInt(s.getAttribute("c0.red"));
-								unsigned char g = ofToInt(s.getAttribute("c1.green"));
-								unsigned char b = ofToInt(s.getAttribute("c2.blue"));
-								unsigned char a = ofToInt(s.getAttribute("c3.alpha"));
-								if(p.redValAddr != NULL){
-									*p.redValAddr = p.redVal = r;
-									*(p.redValAddr + 1) = p.greenVal = g;
-									*(p.redValAddr + 2) = p.blueVal = b;
-									*(p.redValAddr + 3) = p.alphaVal = a;
-									if(verbose_) RLOG_NOTICE << "loading a COLOR '" << paramName <<"' (" << (int)*p.redValAddr << " " << (int)*(p.redValAddr + 1) << " " << (int)*(p.redValAddr + 2) << " " << (int)*(p.redValAddr + 3)  << ") from XML" ;
-								}else{
-									RLOG_ERROR << "ERROR at loading COLOR (" << paramName << ")" ;
-								}
-								}break;
+					case 'c':{ //color
+						if (!isAParamWeKnowOf){
+							p.type = REMOTEUI_PARAM_COLOR;
+							p.redVal = ofToInt(s.getAttribute("c0.red"));
+							p.greenVal = ofToInt(s.getAttribute("c1.green"));
+							p.blueVal = ofToInt(s.getAttribute("c2.blue"));
+							p.alphaVal = ofToInt(s.getAttribute("c3.alpha"));
+						}else{
+							if(p.type != REMOTEUI_PARAM_COLOR){ RLOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
+							unsigned char r = ofToInt(s.getAttribute("c0.red"));
+							unsigned char g = ofToInt(s.getAttribute("c1.green"));
+							unsigned char b = ofToInt(s.getAttribute("c2.blue"));
+							unsigned char a = ofToInt(s.getAttribute("c3.alpha"));
+							if(p.redValAddr != NULL){
+								*p.redValAddr = p.redVal = r;
+								*(p.redValAddr + 1) = p.greenVal = g;
+								*(p.redValAddr + 2) = p.blueVal = b;
+								*(p.redValAddr + 3) = p.alphaVal = a;
+								if(verbose_) RLOG_NOTICE << "loading a COLOR '" << paramName <<"' (" << (int)*p.redValAddr << " " << (int)*(p.redValAddr + 1) << " " << (int)*(p.redValAddr + 2) << " " << (int)*(p.redValAddr + 3)  << ") from XML" ;
+							}else{
+								RLOG_ERROR << "ERROR at loading COLOR (" << paramName << ")" ;
 							}
+						}
+					}break;
+				}
 
-						//params[paramName] = p;
+				if(isAParamWeKnowOf){
+					params[paramName] = p;
+				}else{
+					RLOG_WARNING << "Param '" << paramName << "' found in XML but not defined in source code! Keeping it arround to save back to XML";
+					if (params_removed.find(paramName) == params_removed.end()){ //not added yet
+						orderedKeys_removed[orderedKeys_removed.size()] = paramName;
 					}
-					if(!loadedFromXML) paramsFromXML[paramName] = params[paramName];
+					params_removed[paramName] = p;
+				}
+
+				if(paramsLoadedFromXML.find(paramName) == paramsLoadedFromXML.end()){
+					paramsLoadedFromXML[paramName] = true;
+					paramsFromXML[paramName] = p;
 				}
 			}
-		}else{ //params not defined from code! ignore!
-			RLOG_VERBOSE << "ignoring param '" << paramName << "' defined in xml but found in DB!" ;
 		}
 		s.setToParent();
 	}
