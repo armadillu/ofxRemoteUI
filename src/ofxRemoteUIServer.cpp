@@ -2057,8 +2057,6 @@ void ofxRemoteUIServer::sendLogToClient(const char* format, ...){
 		va_start(args, format);
 		vsprintf(line, format,  args);
 		sendLogToClient(string(line));
-		RLOG_NOTICE << "RUI_LOG(" + string(line) + ")";
-		onScreenNotifications.addNotification(string(line));
 	}
 }
 
@@ -2069,6 +2067,8 @@ void ofxRemoteUIServer::sendLogToClient(string message){
 		m.addStringArg(message);
 		try{
 			oscSender.sendMessage(m);
+			RLOG_NOTICE << "RUI_LOG(" + message + ")";
+			onScreenNotifications.addNotification(message);
 		}catch(exception e){
 			RLOG_ERROR << "Exception sendLogToClient " << e.what() ;
 		}
