@@ -1263,9 +1263,10 @@ void ofxRemoteUIServer::draw(int x, int y){
 	ofPushMatrix();
 	ofScale(uiScale,uiScale);
 	ofSetDrawBitmapMode(OF_BITMAPMODE_SIMPLE);
-
+	ofEnableBlendMode(OF_BLENDMODE_ALPHA);
+	ofSetRectMode(OF_RECTMODE_CORNER);
+	
 	ofFill();
-	ofEnableAlphaBlending();
 	int screenH = customScreenHeight;
 	if (screenH < 0) screenH = ofGetHeight();
 	int screenW = customScreenWidth;
