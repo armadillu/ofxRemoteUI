@@ -211,8 +211,8 @@ public:
 		n.range = false;
 		if(paramWatch.find(paramName) == paramWatch.end()){
 			paramWatchOrder[paramWatchOrder.size()] = paramName;
-			paramWatch[paramName] = n;
 		}
+		paramWatch[paramName] = n;
 	};
 
 
