@@ -254,45 +254,60 @@ void ofxRemoteUIServer::setDirectoryPrefix(string _directoryPrefix){
 void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string key, ofxXmlSettings & s, XmlCounter & c){
 
 	switch (t.type) {
-		case REMOTEUI_PARAM_FLOAT:
-			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" <<  *t.floatValAddr <<") to XML" ;
-			s.setValue(OFXREMOTEUI_FLOAT_PARAM_XML_TAG, (double)*t.floatValAddr, c.numFloats);
+
+		case REMOTEUI_PARAM_FLOAT:{
+			float v = t.floatValAddr ? *t.floatValAddr : t.floatVal;
+			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << v <<") to XML" ;
+			s.setValue(OFXREMOTEUI_FLOAT_PARAM_XML_TAG, (double)v, c.numFloats);
 			s.setAttribute(OFXREMOTEUI_FLOAT_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, key, c.numFloats);
 			c.numFloats++;
-			break;
-		case REMOTEUI_PARAM_INT:
-			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" <<  *t.intValAddr <<") to XML" ;
-			s.setValue(OFXREMOTEUI_INT_PARAM_XML_TAG, (int)*t.intValAddr, c.numInts);
+			}break;
+		case REMOTEUI_PARAM_INT:{
+			int v = t.intValAddr ? *t.intValAddr : t.intVal;
+			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << v <<") to XML" ;
+			s.setValue(OFXREMOTEUI_INT_PARAM_XML_TAG, (int)v, c.numInts);
 			s.setAttribute(OFXREMOTEUI_INT_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, key, c.numInts);
 			c.numInts++;
-			break;
-		case REMOTEUI_PARAM_COLOR:
-			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << (int)*t.redValAddr << " " << (int)*(t.redValAddr+1) << " " << (int)*(t.redValAddr+2) << " " << (int)*(t.redValAddr+3) << ") to XML" ;
-			s.setValue(string(OFXREMOTEUI_COLOR_PARAM_XML_TAG) + ":R", (int)*t.redValAddr, c.numColors);
-			s.setValue(string(OFXREMOTEUI_COLOR_PARAM_XML_TAG) + ":G", (int)*(t.redValAddr+1), c.numColors);
-			s.setValue(string(OFXREMOTEUI_COLOR_PARAM_XML_TAG) + ":B", (int)*(t.redValAddr+2), c.numColors);
-			s.setValue(string(OFXREMOTEUI_COLOR_PARAM_XML_TAG) + ":A", (int)*(t.redValAddr+3), c.numColors);
+			}break;
+		case REMOTEUI_PARAM_COLOR:{
+			unsigned char r, g, b, a;
+			if (t.redValAddr){
+				r = *t.redValAddr;
+				g = *(t.redValAddr+1);
+				b = *(t.redValAddr+2);
+				a = *(t.redValAddr+3);
+			}else{
+				r = t.redVal; g = t.greenVal; b = t.blueVal; a = t.alphaVal;
+			}
+			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << r << " " << g << " " << b << " " << a << ") to XML" ;
+			s.setValue(string(OFXREMOTEUI_COLOR_PARAM_XML_TAG) + ":R", (int)r, c.numColors);
+			s.setValue(string(OFXREMOTEUI_COLOR_PARAM_XML_TAG) + ":G", (int)g, c.numColors);
+			s.setValue(string(OFXREMOTEUI_COLOR_PARAM_XML_TAG) + ":B", (int)b, c.numColors);
+			s.setValue(string(OFXREMOTEUI_COLOR_PARAM_XML_TAG) + ":A", (int)a, c.numColors);
 			s.setAttribute(OFXREMOTEUI_COLOR_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, key, c.numColors);
 			c.numColors++;
-			break;
-		case REMOTEUI_PARAM_ENUM:
-			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" <<  *t.intValAddr <<") to XML" ;
-			s.setValue(OFXREMOTEUI_ENUM_PARAM_XML_TAG, (int)*t.intValAddr, c.numEnums);
+			}break;
+		case REMOTEUI_PARAM_ENUM:{
+			int v = t.intValAddr ? *t.intValAddr : t.intVal;
+			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << v <<") to XML" ;
+			s.setValue(OFXREMOTEUI_ENUM_PARAM_XML_TAG, v, c.numEnums);
 			s.setAttribute(OFXREMOTEUI_ENUM_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, key, c.numEnums);
 			c.numEnums++;
-			break;
-		case REMOTEUI_PARAM_BOOL:
-			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" <<  *t.boolValAddr <<") to XML" ;
-			s.setValue(OFXREMOTEUI_BOOL_PARAM_XML_TAG, (bool)*t.boolValAddr, c.numBools);
+			}break;
+		case REMOTEUI_PARAM_BOOL:{
+			bool v = t.boolValAddr ? *t.boolValAddr : t.boolVal;
+			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << v <<") to XML" ;
+			s.setValue(OFXREMOTEUI_BOOL_PARAM_XML_TAG, (bool)v, c.numBools);
 			s.setAttribute(OFXREMOTEUI_BOOL_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, key, c.numBools);
 			c.numBools++;
-			break;
-		case REMOTEUI_PARAM_STRING:
-			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" <<  *t.stringValAddr <<") to XML" ;
-			s.setValue(OFXREMOTEUI_STRING_PARAM_XML_TAG, (string)*t.stringValAddr, c.numStrings);
+			}break;
+		case REMOTEUI_PARAM_STRING:{
+			string v = t.stringValAddr ? *t.stringValAddr : t.stringVal;
+			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << v <<") to XML" ;
+			s.setValue(OFXREMOTEUI_STRING_PARAM_XML_TAG, (string)v, c.numStrings);
 			s.setAttribute(OFXREMOTEUI_STRING_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, key, c.numStrings);
 			c.numStrings++;
-			break;
+			}break;
 
 		case REMOTEUI_PARAM_SPACER:
 			if(verbose_) RLOG_NOTICE << "skipping save of spacer '" << key << "' to XML" ;
@@ -308,46 +323,61 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string ke
 
 	string path = "P[" + ofToString(index)  + "]";
 	switch (t.type) {
-		case REMOTEUI_PARAM_FLOAT:
-			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" <<  *t.floatValAddr <<") to XML" ;
-			s.addValue("P", t.floatValAddr ? *t.floatValAddr : t.floatVal);
+
+		case REMOTEUI_PARAM_FLOAT:{
+			float v = t.floatValAddr ? *t.floatValAddr : t.floatVal;
+			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << v <<") to XML" ;
+			s.addValue("P", v);
 			s.setTo(path);
 			s.setAttribute("type", "float");
-			break;
-		case REMOTEUI_PARAM_INT:
-			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" <<  *t.intValAddr <<") to XML" ;
-			s.addValue("P", t.intValAddr ? *t.intValAddr : t.intVal);
+			}break;
+		case REMOTEUI_PARAM_INT:{
+			int v = t.intValAddr ? *t.intValAddr : t.intVal;
+			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << v <<") to XML" ;
+			s.addValue("P", v);
 			s.setTo(path);
 			s.setAttribute("type", "int");
-			break;
-		case REMOTEUI_PARAM_COLOR:
-			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << (int)*t.redValAddr << " " << (int)*(t.redValAddr+1) << " " << (int)*(t.redValAddr+2) << " " << (int)*(t.redValAddr+3) << ") to XML" ;
+			}break;
+		case REMOTEUI_PARAM_COLOR:{
+			unsigned char r, g, b, a;
+			if (t.redValAddr){
+				r = *t.redValAddr;
+				g = *(t.redValAddr+1);
+				b = *(t.redValAddr+2);
+				a = *(t.redValAddr+3);
+			}else{
+				r = t.redVal; g = t.greenVal; b = t.blueVal; a = t.alphaVal;
+			}
+			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << r << " " << g << " " << b << " " << a << ") to XML" ;
 			s.addChild("P");
 			s.setTo(path);
 			s.setAttribute("type", "color");
-			s.setAttribute("c0.red", ofToString((int)(t.redValAddr ? *t.redValAddr : t.redVal)));
-			s.setAttribute("c1.green", ofToString((int)(t.redValAddr ? *(t.redValAddr + 1) : t.greenVal)));
-			s.setAttribute("c2.blue", ofToString((int)(t.redValAddr ? *(t.redValAddr + 2) : t.blueVal)));
-			s.setAttribute("c3.alpha", ofToString((int)(t.redValAddr ? *(t.redValAddr + 3) : t.alphaVal)));
-			break;
-		case REMOTEUI_PARAM_ENUM:
-			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" <<  *t.intValAddr <<") to XML" ;
-			s.addValue("P", t.intValAddr ? *t.intValAddr : t.intVal);
+			s.setAttribute("c0.red", ofToString((int)r));
+			s.setAttribute("c1.green", ofToString((int)g));
+			s.setAttribute("c2.blue", ofToString((int)b));
+			s.setAttribute("c3.alpha", ofToString((int)a));
+			}break;
+		case REMOTEUI_PARAM_ENUM:{
+			int v = t.intValAddr ? *t.intValAddr : t.intVal;
+			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << v <<") to XML" ;
+			s.addValue("P", v);
 			s.setTo(path);
 			s.setAttribute("type", "enum");
-			break;
-		case REMOTEUI_PARAM_BOOL:
-			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" <<  *t.boolValAddr <<") to XML" ;
-			s.addValue("P", t.boolValAddr ? *t.boolValAddr : t.boolVal);
+			}break;
+		case REMOTEUI_PARAM_BOOL:{
+			bool v = t.boolValAddr ? *t.boolValAddr : t.boolVal;
+			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << v <<") to XML" ;
+			s.addValue("P", v);
 			s.setTo(path);
 			s.setAttribute("type", "bool");
-			break;
-		case REMOTEUI_PARAM_STRING:
-			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" <<  *t.stringValAddr <<") to XML" ;
-			s.addValue("P", t.stringValAddr ? *t.stringValAddr : t.stringVal);
+			}break;
+		case REMOTEUI_PARAM_STRING:{
+			string v = t.stringValAddr ? *t.stringValAddr : t.stringVal;
+			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << v <<") to XML" ;
+			s.addValue("P", v);
 			s.setTo(path);
 			s.setAttribute("type", "string");
-			break;
+			}break;
 		case REMOTEUI_PARAM_SPACER:
 			if(verbose_) RLOG_NOTICE << "save spacer '" << key << "' to XML" ;
 			s.addChild("P");
