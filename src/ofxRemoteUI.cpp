@@ -186,47 +186,47 @@ string ofxRemoteUI::getMyIP(string userChosenInteface, string & subnetMask){
 
 	status = getifaddrs(&myaddrs);
 	if (status != 0){
-		perror("getifaddrs");
-	}
+		RLOG_ERROR << "getifaddrs failed! errno: " << errno;
+	}else{
+		for (ifa = myaddrs; ifa != NULL; ifa = ifa->ifa_next){
+			if (ifa->ifa_addr == NULL) continue;
+			if ((ifa->ifa_flags & IFF_UP) == 0) continue;
 
-	for (ifa = myaddrs; ifa != NULL; ifa = ifa->ifa_next){
-		if (ifa->ifa_addr == NULL) continue;
-		if ((ifa->ifa_flags & IFF_UP) == 0) continue;
+			if (ifa->ifa_addr->sa_family == AF_INET){
+				s4 = (struct sockaddr_in *)(ifa->ifa_addr);
+				if (inet_ntop(ifa->ifa_addr->sa_family, (void *)&(s4->sin_addr), buf, sizeof(buf)) == NULL){
+					RLOG_ERROR <<ifa->ifa_name << ": inet_ntop failed!";
+				}
 
-		if (ifa->ifa_addr->sa_family == AF_INET){
-			s4 = (struct sockaddr_in *)(ifa->ifa_addr);
-			if (inet_ntop(ifa->ifa_addr->sa_family, (void *)&(s4->sin_addr), buf, sizeof(buf)) == NULL){
-				RLOG_ERROR <<ifa->ifa_name << ": inet_ntop failed!";
-			}
+				void * tmpAddrPtr = &((struct sockaddr_in *)ifa->ifa_netmask)->sin_addr;
+				char SnAddressBuffer[INET_ADDRSTRLEN];
+				if(inet_ntop(AF_INET, tmpAddrPtr, SnAddressBuffer, INET_ADDRSTRLEN) == NULL){
+					RLOG_ERROR <<ifa->ifa_name << ": inet_ntop for subnet failed!";
+				}
 
-			void * tmpAddrPtr = &((struct sockaddr_in *)ifa->ifa_netmask)->sin_addr;
-			char SnAddressBuffer[INET_ADDRSTRLEN];
-			if(inet_ntop(AF_INET, tmpAddrPtr, SnAddressBuffer, INET_ADDRSTRLEN) == NULL){
-				RLOG_ERROR <<ifa->ifa_name << ": inet_ntop for subnet failed!";
-			}
-
-			if(inet_ntop(ifa->ifa_addr->sa_family, (void *)&(s4->sin_addr), buf, sizeof(buf)) == NULL){
-				RLOG_ERROR <<ifa->ifa_name << ": inet_ntop for address failed!";
-			}else{
-				string interface = string(ifa->ifa_name);
-				if(verbose_) RLOG_VERBOSE << "found interface: " << interface ;
-				if( interface.length() > 2 || interface == userSuppliedNetInterface ){
-					if (userSuppliedNetInterface.length() > 0){
-						if (interface == userSuppliedNetInterface){
-							output = string(buf);
-							subnetMask = string(SnAddressBuffer);
-							if(verbose_) RLOG_VERBOSE << "using user chosen interface: " << interface;
-							break;
-						}
-					}else{
-                        if ((interface[0] == 'e' && interface[1] == 'n') || (interface[0] == 'e' && interface[1] == 't')){
-							if(strlen(buf) > 2){
-								bool is169 = buf[0] == '1' && buf[1] == '6' && buf[2] == '9';
-								if(!is169){ //avoid 169.x.x.x addresses
-									output = string(buf);
-									subnetMask = string(SnAddressBuffer);
-									if(verbose_) RLOG_VERBOSE << "using interface: " << interface;
-									break;
+				if(inet_ntop(ifa->ifa_addr->sa_family, (void *)&(s4->sin_addr), buf, sizeof(buf)) == NULL){
+					RLOG_ERROR <<ifa->ifa_name << ": inet_ntop for address failed!";
+				}else{
+					string interface = string(ifa->ifa_name);
+					if(verbose_) RLOG_VERBOSE << "found interface: " << interface ;
+					if( interface.length() > 2 || interface == userSuppliedNetInterface ){
+						if (userSuppliedNetInterface.length() > 0){
+							if (interface == userSuppliedNetInterface){
+								output = string(buf);
+								subnetMask = string(SnAddressBuffer);
+								if(verbose_) RLOG_VERBOSE << "using user chosen interface: " << interface;
+								break;
+							}
+						}else{
+							if ((interface[0] == 'e' && interface[1] == 'n') || (interface[0] == 'e' && interface[1] == 't')){
+								if(strlen(buf) > 2){
+									bool is169 = buf[0] == '1' && buf[1] == '6' && buf[2] == '9';
+									if(!is169){ //avoid 169.x.x.x addresses
+										output = string(buf);
+										subnetMask = string(SnAddressBuffer);
+										if(verbose_) RLOG_VERBOSE << "using interface: " << interface;
+										break;
+									}
 								}
 							}
 						}
@@ -234,14 +234,16 @@ string ofxRemoteUI::getMyIP(string userChosenInteface, string & subnetMask){
 				}
 			}
 		}
+		freeifaddrs(myaddrs);
 	}
-	freeifaddrs(myaddrs);
+
 	if (userSuppliedNetInterface.length() > 0){
 		if (output == RUI_LOCAL_IP_ADDRESS){
 			RLOG_ERROR << "could not find the user supplied net interface: " << userSuppliedNetInterface;
 			RLOG_ERROR << "automatic advertising will not work! ";
 		}
 	}
+
 #endif
 
 #ifdef TARGET_WIN32
