@@ -116,11 +116,11 @@ public:
 
 			int xx = x + total.length() * 8 + 4;
 			int yyy = yy + 6 - NOTIFICATION_LINEHEIGHT;
-			if (it->second.color.a != 0){
+			if (it->second.color.a != 0){ //this is a color type param - draw swatch
 				ofPushStyle();
 				ofSetColor(it->second.color, a * 255);
 				#ifdef USE_OFX_FONTSTASH
-				if(font != NULL){
+				if(font != NULL){ //let's find the X where to draw the color swatch - this is time wasted TODO!
 					ofRectangle r = font->getBBox(total, 15, 0, 0);
 					float diff = floor(NOTIFICATION_LINEHEIGHT - r.height);
 					ofRect(x + r.width + r.x + 4, yy + r.y - diff / 2, 40, NOTIFICATION_LINEHEIGHT);
@@ -211,8 +211,8 @@ public:
 		n.range = false;
 		if(paramWatch.find(paramName) == paramWatch.end()){
 			paramWatchOrder[paramWatchOrder.size()] = paramName;
-			paramWatch[paramName] = n;
 		}
+		paramWatch[paramName] = n;
 	};
 
 
