@@ -174,8 +174,6 @@ string ofxRemoteUI::getMyIP(string userChosenInteface, string & subnetMask){
 	//from https://github.com/jvcleave/LocalAddressGrabber/blob/master/src/LocalAddressGrabber.h
 	//and http://stackoverflow.com/questions/17288908/get-network-interface-name-from-ipv4-address
 	string output = RUI_LOCAL_IP_ADDRESS;
-	string subnetOutput = "255.255.255.0";
-	RLOG_NOTICE << "establishing local interface and IP @";
 
 #if defined(__APPLE__) || defined(__linux__)
 	struct ifaddrs *myaddrs;
@@ -214,7 +212,7 @@ string ofxRemoteUI::getMyIP(string userChosenInteface, string & subnetMask){
 							if (interface == userSuppliedNetInterface){
 								output = string(buf);
 								subnetMask = string(SnAddressBuffer);
-								if(verbose_) RLOG_VERBOSE << "using user chosen interface: " << interface;
+								RLOG_VERBOSE << "using user chosen interface: " << interface;
 								break;
 							}
 						}else{
@@ -224,7 +222,7 @@ string ofxRemoteUI::getMyIP(string userChosenInteface, string & subnetMask){
 									if(!is169){ //avoid 169.x.x.x addresses
 										output = string(buf);
 										subnetMask = string(SnAddressBuffer);
-										if(verbose_) RLOG_VERBOSE << "using interface: " << interface;
+										RLOG_NOTICE << "Using interface: " << interface << "       IP: " << output << "       SubnetMask: " << subnetMask;
 										break;
 									}
 								}

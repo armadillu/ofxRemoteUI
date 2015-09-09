@@ -912,7 +912,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 
 		if(doBroadcast){
 			broadcastSender.setup( multicastIP, OFXREMOTEUI_BROADCAST_PORT ); //multicast @
-			RLOG_NOTICE << "letting everyone know that I am at " << multicastIP << ":" << OFXREMOTEUI_BROADCAST_PORT ;
+			RLOG_NOTICE << "Broacasting my presence at this multicast @ " << multicastIP << ":" << OFXREMOTEUI_BROADCAST_PORT ;
 		}
 
 		if(port_ == -1){ //if no port specified, pick a random one, but only the very first time we get launched!
@@ -949,7 +949,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		waitingForReply = false;
 		avgTimeSinceLastReply = timeSinceLastReply = timeCounter = 0.0f;
 		port = port_;
-		RLOG_NOTICE << "listening at port " << port << " ... " ;
+		RLOG_NOTICE << "listening for commands at " << computerIP << ":" << port;
 		oscReceiver.setup(port);
 	}
 	//still get ui access despite being disabled
