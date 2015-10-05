@@ -912,7 +912,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 
 		if(doBroadcast){
 			broadcastSender.setup( multicastIP, OFXREMOTEUI_BROADCAST_PORT ); //multicast @
-			RLOG_NOTICE << "Broacasting my presence at this multicast @ " << multicastIP << ":" << OFXREMOTEUI_BROADCAST_PORT ;
+			RLOG_NOTICE << "Broacasting my presence at every " << OFXREMOTEUI_BORADCAST_INTERVAL << "sec at this multicast @ " << multicastIP << ":" << OFXREMOTEUI_BROADCAST_PORT ;
 		}
 
 		if(port_ == -1){ //if no port specified, pick a random one, but only the very first time we get launched!
