@@ -369,7 +369,6 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 			p.stringVal = m.getArgAsString(arg); arg++;
 			break;
 
-
 		case NULL_ARG: RLOG_ERROR << "updateParamFromDecodedMessage NULL type!"; break;
 		default: RLOG_ERROR << "updateParamFromDecodedMessage unknown type!"; break;
 	}
@@ -382,8 +381,10 @@ void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage 
 		p.group = m.getArgAsString(arg); arg++;
 	}
 
-	if ( !p.isEqualTo(original)  || newParam ){ // if the udpdate changed the param, keep track of it
-		paramsChangedSinceLastCheck.insert(paramName);
+	if ( !p.isEqualTo(original) || newParam ){ // if the udpdate changed the param, keep track of it
+		if(std::find(paramsChangedSinceLastCheck.begin(), paramsChangedSinceLastCheck.end(), paramName) == paramsChangedSinceLastCheck.end()){
+			paramsChangedSinceLastCheck.push_back(paramName);
+		}
 	}
 
 	//here we update our param db
@@ -679,7 +680,9 @@ void ofxRemoteUI::setValuesFromString( string values ){
 
 			if ( !param.isEqualTo(original) ){ // if the udpdate changed the param, keep track of it
 				params[name] = param;
-				paramsChangedSinceLastCheck.insert(name);
+				if(std::find(paramsChangedSinceLastCheck.begin(), paramsChangedSinceLastCheck.end(), name) == paramsChangedSinceLastCheck.end()){
+					paramsChangedSinceLastCheck.push_back(name);
+				}
 			}
 		}
 	}

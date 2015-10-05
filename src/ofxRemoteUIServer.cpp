@@ -695,7 +695,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 					params_removed[paramName] = p;
 				}
 
-				if(paramsLoadedFromXML.find(paramName) == paramsLoadedFromXML.end()){
+				if(isAParamWeKnowOf && paramsLoadedFromXML.find(paramName) == paramsLoadedFromXML.end()){
 					paramsLoadedFromXML[paramName] = true;
 					paramsFromXML[paramName] = p;
 				}
