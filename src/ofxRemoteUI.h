@@ -26,7 +26,7 @@
 
 #define OFXREMOTEUI_PORT									10000
 #define OFXREMOTEUI_BROADCAST_PORT							25748
-#define OFXREMOTEUI_BORADCAST_INTERVAL						0.25 /*secs*/
+#define OFXREMOTEUI_BORADCAST_INTERVAL						1 /*secs*/
 #define OFXREMOTEUI_NEIGHBOR_DEATH_BY_TIME					1.1 /*sec*/
 
 #define OFXREMOTEUI_LATENCY_TEST_RATE						0.3333
@@ -287,7 +287,7 @@ protected:
 	map<int, string>							orderedKeys; // used to keep the order in which the params were added
 	vector<string>								presetNames;
 
-	set<string>									paramsChangedSinceLastCheck;
+	vector<string>								paramsChangedSinceLastCheck;
 
 	unordered_map<string, RemoteUIParam>		paramsFromCode; //this will hold a copy of all the params as they where when shared first
 	unordered_map<string, RemoteUIParam>		paramsFromXML; //this will hold a copy of all the params as they where when first loaded from XML

@@ -262,15 +262,15 @@ struct RemoteUIServerCallBackArg{
 
 
 #ifdef OF_AVAILABLE
-	#define RUI_LOG_NOTICE		(ofLogNotice("ofxRemoteUI"))
-	#define RUI_LOG_ERROR		(ofLogError("ofxRemoteUI"))
-	#define RUI_LOG_WARNING		(ofLogWarning("ofxRemoteUI"))
-	#define RUI_LOG_VERBOSE		(ofLogVerbose("ofxRemoteUI"))
+	#define RLOG_NOTICE		(ofLogNotice("ofxRemoteUI"))
+	#define RLOG_ERROR		(ofLogError("ofxRemoteUI"))
+	#define RLOG_WARNING		(ofLogWarning("ofxRemoteUI"))
+	#define RLOG_VERBOSE		(ofLogVerbose("ofxRemoteUI"))
 #else
-	#define RUI_LOG_NOTICE		(cout << endl) //TODO!
-	#define RUI_LOG_ERROR		(cout << endl)
-	#define RUI_LOG_WARNING		(cout << endl)
-	#define RUI_LOG_VERBOSE		(cout << endl)
+	#define RLOG_NOTICE		(cout << endl) //TODO!
+	#define RLOG_ERROR		(cout << endl)
+	#define RLOG_WARNING		(cout << endl)
+	#define RLOG_VERBOSE		(cout << endl)
 #endif
 
 #endif //emptyExample_RemoteParam_h

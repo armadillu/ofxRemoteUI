@@ -116,11 +116,11 @@ public:
 
 			int xx = x + total.length() * 8 + 4;
 			int yyy = yy + 6 - NOTIFICATION_LINEHEIGHT;
-			if (it->second.color.a != 0){
+			if (it->second.color.a != 0){ //this is a color type param - draw swatch
 				ofPushStyle();
 				ofSetColor(it->second.color, a * 255);
 				#ifdef USE_OFX_FONTSTASH
-				if(font != NULL){
+				if(font != NULL){ //let's find the X where to draw the color swatch - this is time wasted TODO!
 					ofRectangle r = font->getBBox(total, 15, 0, 0);
 					float diff = floor(NOTIFICATION_LINEHEIGHT - r.height);
 					ofRect(x + r.width + r.x + 4, yy + r.y - diff / 2, 40, NOTIFICATION_LINEHEIGHT);
@@ -132,7 +132,7 @@ public:
 				#endif
 				ofPopStyle();
 			}
-			if(it->second.range){
+			if(it->second.range){ //draw slider
 				int sliderW = 80;
 				int pad = 9;
 				int knobW = 6;
@@ -144,7 +144,7 @@ public:
 				ofRect(xx + pad, yyy + pad, sliderW - 2 * pad, NOTIFICATION_LINEHEIGHT - 2 * pad);
 				ofSetColor(bgColor);
 				ofLine(xx + sliderW/2, yyy + NOTIFICATION_LINEHEIGHT / 2 + markH, xx + sliderW/2,  yyy + NOTIFICATION_LINEHEIGHT / 2 - markH );
-				ofRect(xx + pad - knobW/2 + (sliderW - 2 * pad) * it->second.pct, yyy + voff, knobW , knobW );
+				ofRect(xx + pad - knobW/2 + (sliderW - 2 * pad) * ofClamp(it->second.pct, 0, 1), yyy + voff, knobW , knobW );
 
 			}
 			yy -= hh;
@@ -184,6 +184,11 @@ public:
 				n.rangeMin = p.minFloat; n.rangeMax = p.maxFloat;
 				n.pct = ofMap(p.floatVal, p.minFloat, p.maxFloat, 0, 1);
 				n.range = true;
+				if(n.value.size() < 10){
+					for(int i = 0; i < n.value.size() - 10; i++){
+						n.value += " ";
+					}
+				}
 				break;
 			case REMOTEUI_PARAM_INT:
 				n.rangeMin = p.minInt; n.rangeMax = p.maxInt;
@@ -206,8 +211,8 @@ public:
 		n.range = false;
 		if(paramWatch.find(paramName) == paramWatch.end()){
 			paramWatchOrder[paramWatchOrder.size()] = paramName;
-			paramWatch[paramName] = n;
 		}
+		paramWatch[paramName] = n;
 	};
 
 
