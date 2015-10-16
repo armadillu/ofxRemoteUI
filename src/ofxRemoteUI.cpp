@@ -22,6 +22,7 @@
 #include <arpa/inet.h>
 #include <net/if.h>
 #include <ifaddrs.h>
+#include <errno.h>
 #endif
 
 #ifdef TARGET_WIN32
