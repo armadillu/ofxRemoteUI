@@ -12,23 +12,21 @@
 
 #if !IPHONE
 	#import "VVCURLDL.h"
-	#import "VVView.h"
-	#import "VVSprite.h"
-	#import "VVSpriteManager.h"
-	#import "VVSpriteView.h"
-	#import "VVSpriteControl.h"
-	#import "VVSpriteControlCell.h"
-	#import "VVSpriteGLView.h"
 	#import "VVCrashReporter.h"
 	//#import "NSHostAdditions.h"
+	#import "VVSysVersion.h"
 #endif
 
 /*
 	the following stuff is for doxygen
 */
 
+/**
+\defgroup VVBasics VVBasics framework
+*/
 /*!
-\mainpage
+\page VVBasics
+\ingroup VVBasics
 
 \htmlonly
 

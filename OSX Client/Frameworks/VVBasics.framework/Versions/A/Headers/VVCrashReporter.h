@@ -20,6 +20,7 @@
 
 @protocol VVCrashReporterDelegate
 - (void) crashReporterCheckDone:(BOOL)foundLogs;	//	"new"- 'f' designates whether crash reports were found or not
+- (void) crashReporterWillSendLog:(NSString *)crashString;
 @end
 
 
@@ -72,6 +73,8 @@ HOW TO USE THIS CLASS:
 
 ///	This is the main method- when you call 'check', the crash reporter looks for crash logs, gets a basic system profile, and collects anything your applications has dumped to the console log.
 - (void) check;
+- (void) checkLogs;
+- (void) checkServerAndLogs;
 - (void) openCrashReporter;
 - (IBAction) replyButtonClicked:(id)sender;
 - (IBAction) doneClicked:(id)sender;
