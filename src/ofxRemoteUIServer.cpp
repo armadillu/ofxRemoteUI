@@ -1186,7 +1186,7 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 			refreshPresetsCache();
 		}
 	}
-	return showUI;
+	return showUI && e.key != OF_KEY_ESC;
 }
 
 
