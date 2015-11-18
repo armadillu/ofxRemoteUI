@@ -900,14 +900,12 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		}
 
 		#ifdef OF_AVAILABLE
-		ofTargetPlatform platform = ofGetTargetPlatform();
-		if ( (platform == OF_TARGET_WINVS || platform == OF_TARGET_WINGCC)
-			&&
-			multicastIP == "255.255.255.255"
-			){
+		#ifdef TARGET_WIN32
+		if (multicastIP == "255.255.255.255"){
 			doBroadcast = false; //windows crashes on bradcast if no devices are up!
 			RLOG_WARNING << "no network interface found, we will not broadcast ourselves";
 		}
+		#endif
 		#endif
 
 		if(doBroadcast){
