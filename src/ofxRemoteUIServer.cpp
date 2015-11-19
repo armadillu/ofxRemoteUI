@@ -35,6 +35,8 @@
 using Poco::Util::Application;
 #endif
 
+
+
 ofxRemoteUIServer* ofxRemoteUIServer::singleton = NULL;
 
 ofxRemoteUIServer* ofxRemoteUIServer::instance(){
@@ -1255,12 +1257,9 @@ void ofxRemoteUIServer::threadedFunction(){
 
 void ofxRemoteUIServer::_draw(ofEventArgs &e){
 	if(autoDraw){
-		ofSetupScreen(); //mmm this is a bit scary //TODO!
 		int h = customScreenHeight;
-		int w = customScreenWidth;
 		if(h < 0) h = ofGetHeight();
-		if(w < 0) w = ofGetWidth();
-		draw( 20 / uiScale, (h - 20)/ uiScale );
+		draw( 9 / uiScale, (h - 5)/ uiScale );
 	}
 }
 
@@ -1287,18 +1286,25 @@ void ofxRemoteUIServer::drawString(const string & text, const float & x, const f
 //x and y of where the notifications will get draw
 void ofxRemoteUIServer::draw(int x, int y){
 
-	ofPushStyle();
-	ofPushMatrix();
-	ofScale(uiScale,uiScale);
-	ofSetDrawBitmapMode(OF_BITMAPMODE_SIMPLE);
-	ofEnableBlendMode(OF_BLENDMODE_ALPHA);
-	ofSetRectMode(OF_RECTMODE_CORNER);
-	
-	ofFill();
-	int screenH = customScreenHeight;
-	if (screenH < 0) screenH = ofGetHeight();
-	int screenW = customScreenWidth;
-	if (screenW < 0) screenW = ofGetWidth();
+	bool needsToDrawNotification = !showUI || uiAlpha < 1.0;
+	int screenH, screenW;
+
+	if(needsToDrawNotification | showUI){
+		ofSetupScreen(); //mmm this is a bit scary //TODO!
+
+		ofPushStyle();
+		ofPushMatrix();
+		ofScale(uiScale,uiScale);
+		ofSetDrawBitmapMode(OF_BITMAPMODE_SIMPLE);
+		ofEnableBlendMode(OF_BLENDMODE_ALPHA);
+		ofSetRectMode(OF_RECTMODE_CORNER);
+		
+		ofFill();
+		screenH = customScreenHeight;
+		if (screenH < 0) screenH = ofGetHeight();
+		screenW = customScreenWidth;
+		if (screenW < 0) screenW = ofGetWidth();
+	}
 
 	if(showUI){
 
@@ -1510,8 +1516,13 @@ void ofxRemoteUIServer::draw(int x, int y){
 		}
 	}
 
-	if (!showUI || uiAlpha < 1.0){
+	if (needsToDrawNotification){
 		if (drawNotifications){
+			#ifdef OFX_TIME_MEASUREMENTS_EXISTS
+			if(TIME_SAMPLE_GET_INSTANCE()->getDrawLocation() == TIME_MEASUREMENTS_BOTTOM_LEFT){
+				ofTranslate(0, -TIME_SAMPLE_GET_INSTANCE()->getHeight() - 10);
+			}
+			#endif
 			for(int i = 0; i < paramsToWatch.size(); i++){
 				RemoteUIParam & p = params[paramsToWatch[i]];
 				string v = p.getValueAsStringFromPointer();
@@ -1521,8 +1532,10 @@ void ofxRemoteUIServer::draw(int x, int y){
 			onScreenNotifications.draw(x, y);
 		}
 	}
-	ofPopMatrix();
-	ofPopStyle();
+	if(needsToDrawNotification | showUI){
+		ofPopMatrix();
+		ofPopStyle();
+	}
 }
 #endif
 

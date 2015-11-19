@@ -24,6 +24,13 @@
 
 #include "ofxRemoteUIServerMacros.h"
 
+#if defined(__has_include)
+	#if __has_include("ofxTimeMeasurements.h")
+		#define OFX_TIME_MEASUREMENTS_EXISTS
+		#include "ofxTimeMeasurements.h"
+	#endif
+#endif
+
 #define BG_COLOR_ALPHA			55
 
 class ofxRemoteUIServer: public ofxRemoteUI
