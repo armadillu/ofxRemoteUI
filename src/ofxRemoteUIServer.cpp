@@ -185,6 +185,9 @@ void ofxRemoteUIServer::setNewParamColor(int num){
 	for(int i = 0; i < num; i++){
 		colorSet = true;
 		paramColor = colorTables[colorTableIndex];
+		paramColorCurrentVariation = paramColor;
+		int offset = newColorInGroupCounter%2;
+		paramColorCurrentVariation.a = BG_COLOR_ALPHA + offset * BG_COLOR_ALPHA * 0.75;
 		colorTableIndex++;
 		if(colorTableIndex>= colorTables.size()){
 			colorTableIndex = 0;
