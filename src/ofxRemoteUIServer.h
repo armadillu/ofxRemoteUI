@@ -26,9 +26,12 @@
 
 #if defined(__has_include)
 	#if __has_include("ofxTimeMeasurements.h")
-		#define OFX_TIME_MEASUREMENTS_EXISTS
-		#include "ofxTimeMeasurements.h"
+		#define USE_OFX_TIME_MEASUREMENTS
 	#endif
+#endif
+
+#ifdef USE_OFX_TIME_MEASUREMENTS
+	#include "ofxTimeMeasurements.h"
 #endif
 
 #define BG_COLOR_ALPHA			55
