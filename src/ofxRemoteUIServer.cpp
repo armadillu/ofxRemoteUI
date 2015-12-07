@@ -1090,7 +1090,7 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 						if(selectedColorComp > 3) selectedColorComp = 0;
 					}else{
 						if(p.type == REMOTEUI_PARAM_STRING){
-							p.stringVal = ofSystemTextBoxDialog("Edit Value for ", p.stringVal );
+							p.stringVal = ofSystemTextBoxDialog("Edit Value for '" + key + "' parameter:", p.stringVal );
 							syncPointerToParam(key);
 							pushParamsToClient();
 							RemoteUIServerCallBackArg cbArg;
