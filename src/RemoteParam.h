@@ -153,8 +153,8 @@ public:
 		switch (type) {
 			case REMOTEUI_PARAM_FLOAT: ss << floatVal; return ss.str();
 			case REMOTEUI_PARAM_ENUM:
-				if (intVal >= 0 && intVal < enumList.size())
-					ss << enumList[intVal];
+				if (intVal >= minInt && intVal <= maxInt && (intVal - minInt) < enumList.size())
+					ss << enumList[intVal - minInt];
 				else
 					ss << "Invalid Enum!";
 				return ss.str();
@@ -177,8 +177,8 @@ public:
 			case REMOTEUI_PARAM_FLOAT: ss << *floatValAddr; return ss.str();
 			case REMOTEUI_PARAM_ENUM:{
 				int v = *intValAddr;
-				if (v >= 0 && v < enumList.size())
-					ss << enumList[v];
+				if (v >= minInt && v <= maxInt && (v - minInt) < enumList.size())
+					ss << enumList[v - minInt];
 				else
 					ss << "Invalid Enum!";
 				return ss.str();

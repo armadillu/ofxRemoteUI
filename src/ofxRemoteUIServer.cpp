@@ -2037,6 +2037,9 @@ void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int ma
 }
 
 void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int max, vector<string> names, ofColor c ){
+	if (names.size() != max - min + 1){
+		RLOG_ERROR << "Error sharing enum param '" << paramName << "': Number of supplied strings doesnt match enum range!";
+	}
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_ENUM;
 	p.intValAddr = param;
