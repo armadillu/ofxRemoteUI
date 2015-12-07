@@ -1064,6 +1064,13 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				if (selectedItem >= 0){ //selection on params list
 					string key = orderedKeys[selectedItem];
 					RemoteUIParam & p = params[key];
+
+					RemoteUIServerCallBackArg cbArg;
+					cbArg.action = CLIENT_DID_RESET_TO_XML;
+					cbArg.host = "localhost";
+					cbArg.action =  CLIENT_UPDATED_PARAM;
+					cbArg.paramName = key;
+
 					if(p.type == REMOTEUI_PARAM_SPACER && groupPresetsCached[p.group].size() > 0){
 						string presetName = p.group + "/" + groupPresetsCached[p.group][selectedGroupPreset];
 						loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
@@ -1081,6 +1088,22 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 					}else if(p.type == REMOTEUI_PARAM_COLOR){
 						selectedColorComp++;
 						if(selectedColorComp > 3) selectedColorComp = 0;
+					}else{
+						if(p.type == REMOTEUI_PARAM_STRING){
+							p.stringVal = ofSystemTextBoxDialog("Edit Value for ", p.stringVal );
+							syncPointerToParam(key);
+							pushParamsToClient();
+							RemoteUIServerCallBackArg cbArg;
+							cbArg.host = "localhost";
+							cbArg.action =  CLIENT_UPDATED_PARAM;
+							cbArg.paramName = key;
+							cbArg.param = p;  //copy the updated param to the callback arg
+							#ifdef OF_AVAILABLE
+							onScreenNotifications.addParamUpdate(key, cbArg.param, ofColor(p.r, p.g, p.b, p.a));
+							ofNotifyEvent(clientAction, cbArg, this);
+							#endif
+							if(callBack) callBack(cbArg);
+						}
 					}
 				}
 				break;
@@ -1136,15 +1159,13 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 							default:
 								break;
 						}
-						params[key] = p;
 						syncPointerToParam(key);
 						pushParamsToClient();
 						RemoteUIServerCallBackArg cbArg;
-						cbArg.action = CLIENT_DID_RESET_TO_XML;
 						cbArg.host = "localhost";
 						cbArg.action =  CLIENT_UPDATED_PARAM;
 						cbArg.paramName = key;
-						cbArg.param = params[key];  //copy the updated param to the callbakc arg
+						cbArg.param = p;  //copy the updated param to the callback arg
 						#ifdef OF_AVAILABLE
 						onScreenNotifications.addParamUpdate(key, cbArg.param, ofColor(p.r, p.g, p.b, p.a));
 						ofNotifyEvent(clientAction, cbArg, this);
