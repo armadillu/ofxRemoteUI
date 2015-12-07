@@ -1065,12 +1065,6 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 					string key = orderedKeys[selectedItem];
 					RemoteUIParam & p = params[key];
 
-					RemoteUIServerCallBackArg cbArg;
-					cbArg.action = CLIENT_DID_RESET_TO_XML;
-					cbArg.host = "localhost";
-					cbArg.action =  CLIENT_UPDATED_PARAM;
-					cbArg.paramName = key;
-
 					if(p.type == REMOTEUI_PARAM_SPACER && groupPresetsCached[p.group].size() > 0){
 						string presetName = p.group + "/" + groupPresetsCached[p.group][selectedGroupPreset];
 						loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
