@@ -1546,8 +1546,9 @@ void ofxRemoteUIServer::draw(int x, int y){
 	if (needsToDrawNotification){
 		if (drawNotifications){
 			#if( defined(USE_OFX_TIME_MEASUREMENTS) && !defined(TIME_MEASUREMENTS_DISABLED))
-			if(TIME_SAMPLE_GET_INSTANCE()->getDrawLocation() == TIME_MEASUREMENTS_BOTTOM_LEFT){
-				ofTranslate(0, -TIME_SAMPLE_GET_INSTANCE()->getHeight() - 10);
+			ofxTimeMeasurements * tm = TIME_SAMPLE_GET_INSTANCE();
+			if(tm->getDrawLocation() == TIME_MEASUREMENTS_BOTTOM_LEFT){
+				ofTranslate(0, -tm->getHeight() - 10 - tm->getPlotsHeight());
 			}
 			#endif
 			for(int i = 0; i < paramsToWatch.size(); i++){
