@@ -1336,6 +1336,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 		int valSpaceW = realColW - valOffset;
 		int spacing = 20;
 		int bottomBarHeight = padding + spacing + 36;
+		int frameNum = ofGetFrameNum();
 
 		//bottom bar
 		if (uiAlpha > 0.99 || showUIduringEdits){
@@ -1358,7 +1359,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 		ofSetColor(64);
 		ofRect(0 , 0, screenW / uiScale, 22);
 		ofColor textBlinkC ;
-		if(ofGetFrameNum()%6 < 4) textBlinkC = ofColor(0,0);
+		if(frameNum%6 < 4) textBlinkC = ofColor(0,0);
 		else textBlinkC = ofColor(255,0,0);
 
 		if(presetsCached.size() > 0 && selectedPreset >= 0 && selectedPreset < presetsCached.size()){
@@ -1419,7 +1420,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 				if (selectedItem != i){
 					ofSetColor(p.r, p.g, p.b);
 				}else{
-					if(ofGetFrameNum()%5 < 1) ofSetColor(255);
+					if(frameNum%5 < 1) ofSetColor(255);
 					else ofSetColor(255,0,0);
 				}
 
@@ -1532,6 +1533,14 @@ void ofxRemoteUIServer::draw(int x, int y){
 			ofSetColor(128);
 			m.draw();
 		}
+
+		//clearly draw the corners - helpful when in multi monitor setups to see if we are cropping
+		float ts = 7 * uiScale;
+		ofSetColor((frameNum * 20)%255);
+		ofDrawTriangle(0, 0, ts, 0, 0, ts);
+		ofDrawTriangle(screenW, 0, screenW - ts, 0, screenW, ts);
+		ofDrawTriangle(0, screenH, ts, screenH, 0, screenH - ts);
+		ofDrawTriangle(screenW, screenH, screenW - ts, screenH, screenW, screenH - ts);
 	}
 
 	if (needsToDrawNotification){
