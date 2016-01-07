@@ -1548,7 +1548,8 @@ void ofxRemoteUIServer::draw(int x, int y){
 			#if( defined(USE_OFX_TIME_MEASUREMENTS) && !defined(TIME_MEASUREMENTS_DISABLED))
 			ofxTimeMeasurements * tm = TIME_SAMPLE_GET_INSTANCE();
 			if(tm->getDrawLocation() == TIME_MEASUREMENTS_BOTTOM_LEFT){
-				ofTranslate(0, -tm->getHeight() - 10 - tm->getPlotsHeight());
+				float scale = tm->getUiScale();
+				ofTranslate(0, scale * (-tm->getHeight() - 10 - tm->getPlotsHeight()));
 			}
 			#endif
 			for(int i = 0; i < paramsToWatch.size(); i++){
