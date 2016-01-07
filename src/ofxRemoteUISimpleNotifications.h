@@ -153,7 +153,7 @@ public:
 		map<int, string>::iterator it2 = paramWatchOrder.begin();
 		while(it2 != paramWatchOrder.end()){
 
-			int order = it2->first;
+			//int order = it2->first;
 			string name = it2->second;
 
 			float hh = drawStringWithBox( "[" + it2->second + "] " + paramWatch[name].value,
