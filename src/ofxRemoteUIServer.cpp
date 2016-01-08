@@ -1341,9 +1341,9 @@ void ofxRemoteUIServer::draw(int x, int y){
 		//bottom bar
 		if (uiAlpha > 0.99 || showUIduringEdits){
 			ofSetColor(11, 245);
-			ofRect(0,0, screenW / uiScale, screenH / uiScale);
+			ofDrawRectangle(0,0, screenW / uiScale, screenH / uiScale);
 			ofSetColor(44, 245);
-			ofRect(0,screenH / uiScale - bottomBarHeight, screenW / uiScale, bottomBarHeight );
+			ofDrawRectangle(0,screenH / uiScale - bottomBarHeight, screenW / uiScale, bottomBarHeight );
 
 			ofSetColor(255);
 			drawString("ofxRemoteUI built in client. " +
@@ -1357,7 +1357,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 
 		//preset selection / top bar
 		ofSetColor(64);
-		ofRect(0 , 0, screenW / uiScale, 22);
+		ofDrawRectangle(0 , 0, screenW / uiScale, 22);
 		ofColor textBlinkC ;
 		if(frameNum%6 < 4) textBlinkC = ofColor(0,0);
 		else textBlinkC = ofColor(255,0,0);
@@ -1415,7 +1415,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 				if(p.type == REMOTEUI_PARAM_SPACER){
 					ofColor c = ofColor(p.r, p.g, p.b);
 					ofSetColor(c * 0.3);
-					ofRect(x , -spacing + y + spacing * 0.33, realColW, spacing);
+					ofDrawRectangle(x , -spacing + y + spacing * 0.33, realColW, spacing);
 				}
 				if (selectedItem != i){
 					ofSetColor(p.r, p.g, p.b);
@@ -1458,7 +1458,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 					case REMOTEUI_PARAM_COLOR:{
 						ofPushStyle();
 						ofSetColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal);
-						ofRect(x + valOffset, y - spacing * 0.6, valSpaceW, spacing * 0.85);
+						ofDrawRectangle(x + valOffset, y - spacing * 0.6, valSpaceW, spacing * 0.85);
 						char aux[200];
 						//sprintf(aux, "[%02x%02x%02x%02x]", p.redVal, p.greenVal, p.blueVal, p.alphaVal);
 						sprintf(aux, "[%0*d,%0*d,%0*d,%0*d]", 3, p.redVal, 3, p.greenVal, 3, p.blueVal, 3, p.alphaVal);

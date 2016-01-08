@@ -123,12 +123,12 @@ public:
 				if(font != NULL){ //let's find the X where to draw the color swatch - this is time wasted TODO!
 					ofRectangle r = font->getBBox(total, 15, 0, 0);
 					float diff = floor(NOTIFICATION_LINEHEIGHT - r.height);
-					ofRect(x + r.width + r.x + 4, yy + r.y - diff / 2, 40, NOTIFICATION_LINEHEIGHT);
+					ofDrawRectangle(x + r.width + r.x + 4, yy + r.y - diff / 2, 40, NOTIFICATION_LINEHEIGHT);
 				}else{
-					ofRect(xx, yyy , 40, NOTIFICATION_LINEHEIGHT);
+					ofDrawRectangle(xx, yyy , 40, NOTIFICATION_LINEHEIGHT);
 				}
 				#else
-				ofRect(xx, yyy, 40, NOTIFICATION_LINEHEIGHT);
+				ofDrawRectangle(xx, yyy, 40, NOTIFICATION_LINEHEIGHT);
 				#endif
 				ofPopStyle();
 			}
@@ -139,12 +139,12 @@ public:
 				int markH = 2;
 				int voff = (NOTIFICATION_LINEHEIGHT - knobW) / 2;
 				ofSetColor(0);
-				ofRect(xx, yyy, sliderW, NOTIFICATION_LINEHEIGHT);
+				ofDrawRectangle(xx, yyy, sliderW, NOTIFICATION_LINEHEIGHT);
 				ofSetColor(45);
-				ofRect(xx + pad, yyy + pad, sliderW - 2 * pad, NOTIFICATION_LINEHEIGHT - 2 * pad);
+				ofDrawRectangle(xx + pad, yyy + pad, sliderW - 2 * pad, NOTIFICATION_LINEHEIGHT - 2 * pad);
 				ofSetColor(bgColor);
 				ofLine(xx + sliderW/2, yyy + NOTIFICATION_LINEHEIGHT / 2 + markH, xx + sliderW/2,  yyy + NOTIFICATION_LINEHEIGHT / 2 - markH );
-				ofRect(xx + pad - knobW/2 + (sliderW - 2 * pad) * ofClamp(it->second.pct, 0, 1), yyy + voff, knobW , knobW );
+				ofDrawRectangle(xx + pad - knobW/2 + (sliderW - 2 * pad) * ofClamp(it->second.pct, 0, 1), yyy + voff, knobW , knobW );
 
 			}
 			yy -= hh;
@@ -244,7 +244,7 @@ private:
 			r.height = ceil(r.height);
 			ofPushStyle();
 			ofSetColor(background);
-			ofRect(r);
+			ofDrawRectangle(r);
 			ofSetColor(foreground);
 			font->draw(text, 15, x, y);
 			ofPopStyle();
