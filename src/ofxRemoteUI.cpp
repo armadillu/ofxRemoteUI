@@ -33,7 +33,7 @@
 #endif
 
 void split(vector<string> &tokens, const string &text, char separator) {
-	unsigned long start = 0, end = 0;
+	std::size_t start = 0, end = 0;
 	while ((end = text.find(separator, start)) != string::npos) {
 		tokens.push_back(text.substr(start, end - start));
 		start = end + 1;
