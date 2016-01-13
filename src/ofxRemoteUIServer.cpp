@@ -18,8 +18,6 @@
 #ifdef __APPLE__
 	#include "dirent.h"
 	#include <mach-o/dyld.h>	/* _NSGetExecutablePath */
-#elif _WIN32 || _WIN64
-	#include "dirent_vs.h"
 #endif
 
 #include <sys/stat.h>
