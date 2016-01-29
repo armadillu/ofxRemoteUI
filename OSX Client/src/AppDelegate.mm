@@ -52,14 +52,9 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		}break;
 
 		case SERVER_SENT_FULL_PARAMS_UPDATE:
-			//NSLog(@"## Callback: PARAMS_UPDATED");
-			if(me->needFullParamsUpdate){ //a bit ugly here...
-				[me fullParamsUpdate];
-				me->needFullParamsUpdate = NO;
-			}else{
-				[[me getExternalDevices] updateDevicesWithClientValues:FALSE resetToZero: FALSE paramName:""]; //udpate midi motors to match values
-			}
-			[me partialParamsUpdate];
+			//NSLog(@"## Callback: SERVER_SENT_FULL_PARAMS_UPDATE");
+			[me fullParamsUpdate];
+			//[me partialParamsUpdate];
 			[me updateGroupPopup];
 			break;
 
@@ -399,7 +394,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		//NSLog(@"NO CONFIG");
 	}
 
-	for( map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
+	for( unordered_map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
 		string key = (*ii).first;
 		ParamUI* t = widgets[key];
 		[t remapSlider];
@@ -430,12 +425,14 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 -(void)fullParamsUpdate{
 
+	#if MEASURE_PERFORMANCE
+	NSDate * date = [NSDate date];
+	#endif
 	[self cleanUpGUIParams];
 
 	vector<string> paramList = client->getAllParamNamesList();
 	//vector<string> updatedParamsList = client->getChangedParamsList();
-
-	//NSLog(@"Client holds %d params so far", (int) paramList.size());
+	//NSLog(@"fullParamsUpdate : Client holds %d params so far", (int) paramList.size());
 	//NSLog(@"Client reports %d params changed since last check", (int)updatedParamsList.size());
 
 	if(paramList.size() > 0 /*&& updatedParamsList.size() > 0*/){
@@ -444,10 +441,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 		for(int i = 0; i < paramList.size(); i++){
 
-			string paramName = paramList[i];
-			RemoteUIParam p = client->getParamForName(paramName);
+			string & paramName = paramList[i];
+			RemoteUIParam & p = client->getParamRefForName(paramName);
 
-			map<string,ParamUI*>::iterator it = widgets.find(paramName);
+			unordered_map<string,ParamUI*>::iterator it = widgets.find(paramName);
 			if ( it == widgets.end() ){	//not found, this is a new param... lets make an UI item for it
 				ParamUI * row = [[ParamUI alloc] initWithParam: p paramName: paramName ID: c];
 				c++;
@@ -458,6 +455,11 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		[self layoutWidgetsWithConfig: [self calcLayoutParams]];
 	}
 	[externalDevices updateDevicesWithClientValues:FALSE resetToZero: FALSE paramName:""]; //udpate midi motors to match values
+	#if MEASURE_PERFORMANCE
+	NSDate * date2 = [NSDate date];
+	float seconds = [date2 timeIntervalSinceDate:date];
+	NSLog(@"UI update took %f sec", seconds);
+	#endif
 }
 
 
@@ -469,12 +471,12 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 		string paramName = paramList[i];
 
-		map<string,ParamUI*>::iterator it = widgets.find(paramName);
+		unordered_map<string,ParamUI*>::iterator it = widgets.find(paramName);
 		if ( it == widgets.end() ){	//not found, this is a new param... lets make an UI item for it
 			NSLog(@"uh?");
 		}else{
-			ParamUI * item = widgets[paramName];
-			RemoteUIParam p = client->getParamForName(paramName);
+			ParamUI * item = it->second;
+			RemoteUIParam & p = client->getParamRefForName(paramName);
 			[item updateParam:p];
 			[item updateUI];
 		}
@@ -664,7 +666,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 
 -(void)disableAllWidgets{
-	for( map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
+	for( unordered_map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
 		string key = (*ii).first;
 		ParamUI* t = widgets[key];
 		[t disableChanges];
@@ -673,7 +675,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 
 -(void)enableAllWidgets{
-	for( map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
+	for( unordered_map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
 		string key = (*ii).first;
 		ParamUI* t = widgets[key];
 		[t enableChanges];
@@ -856,8 +858,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 }
 
 
--(map<string, ParamUI*>)getAllGroupSpacerParams{
-	map<string, ParamUI*> groups;
+-(unordered_map<string, ParamUI*>)getAllGroupSpacerParams{
+	unordered_map<string, ParamUI*> groups;
 	for(int i = 0; i < orderedKeys.size(); i++){
 		ParamUI* t = widgets[ orderedKeys[i] ];
 		if(t->param.type == REMOTEUI_PARAM_SPACER){
@@ -873,7 +875,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	spacerGroups = [self getAllGroupSpacerParams];
 
 	//walk all group spacer ParamUIs, empty and add dirty option to its menu
-	for( map<string,ParamUI*>::iterator ii = spacerGroups.begin(); ii != spacerGroups.end(); ++ii ){
+	for( unordered_map<string,ParamUI*>::iterator ii = spacerGroups.begin(); ii != spacerGroups.end(); ++ii ){
 		string key = (*ii).first;
 		ParamUI* t = spacerGroups[key];
 		[[t getPresetsMenu] removeAllItems];
@@ -900,7 +902,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 
 -(void)hideAllWarnings{
-	for( map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
+	for( unordered_map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
 		string key = (*ii).first;
 		ParamUI* t = widgets[key];
 		[t hideWarning];
@@ -910,7 +912,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 -(IBAction)filterType:(id)sender{
 	NSString * filter = [sender stringValue];
 
-	for( map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
+	for( unordered_map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
 		string key = (*ii).first;
 		ParamUI* t = widgets[key];
 		NSString * paramName = [NSString stringWithFormat:@"%s", t->paramName.c_str()];
@@ -991,12 +993,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		[updateFromServerButton setEnabled: true];
 		[updateContinuouslyCheckbox setEnabled: true];
 		[statusImage setImage:nil];
-		//first load of vars
-		[self pressedSync:nil];
-		[self performSelector:@selector(pressedSync:) withObject:nil afterDelay:REFRESH_RATE];
 		[progress startAnimation:self];
 		connecting = TRUE;
-		needFullParamsUpdate = YES;
 		client->connect();
 		[logs appendToServerLog:[NSString stringWithFormat:@"%@ >> ## CLIENT CONNECTED ###################\n", date]];
 
@@ -1029,7 +1027,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 
 -(void)cleanUpGUIParams{
-	for( map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
+	for( unordered_map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
 		string key = (*ii).first;
 		ParamUI* t = widgets[key];
 		[t release];

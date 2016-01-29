@@ -19,6 +19,8 @@
 
 #include "constants.h"
 
+#define MEASURE_PERFORMANCE false
+
 enum RowHeightSize{ SMALL_26 = 0, LARGE_34 = 1, TINY_20 = 2};
 
 struct LayoutConfig{
@@ -68,10 +70,10 @@ void clientCallback(RemoteUIClientCallBackArg a);
 
 	NSMutableArray*					currentNeighbors;
 
-	map<string, ParamUI*>			widgets;
+	unordered_map<string, ParamUI*>			widgets;
 	vector<string>					orderedKeys; // used to keep the order in which the items were added
 
-	map<string, ParamUI*>			spacerGroups; // a subset of the params, only the spacer params
+	unordered_map<string, ParamUI*>			spacerGroups; // a subset of the params, only the spacer params
 	ofxRemoteUIClient *				client;
 
 	NSTimer *						timer;
@@ -87,8 +89,6 @@ void clientCallback(RemoteUIClientCallBackArg a);
 																	//otherwise, it is true for as long as its pressed
 	BOOL							autoConnectToggle;
 	BOOL							onlyAutoConnectToLocalHost;
-
-	bool							needFullParamsUpdate;
 
 	bool							connecting;
 
@@ -153,7 +153,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 
 -(vector<string>)getParamsInGroup:(string)group;
 -(vector<string>)getAllGroupsInParams;
--(map<string, ParamUI*>)getAllGroupSpacerParams;
+-(unordered_map<string, ParamUI*>)getAllGroupSpacerParams;
 
 
 //growl

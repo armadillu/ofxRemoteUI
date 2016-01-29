@@ -23,7 +23,7 @@
 	ParamUI							*upcomingDeviceParam;
 	map<string, string>				bindingsMap; //table of bindings for midi and joystick
 
-	map<string, ParamUI*> *			widgets;
+	unordered_map<string, ParamUI*> *			widgets;
 	ofxRemoteUIClient *				client;
 	BOOL							externalButtonsBehaveAsToggle;	//if true, one press on midi or joystick toggles a bool;
 
@@ -42,7 +42,7 @@
 -(void)updateDevicesWithClientValues:(BOOL)onlyColor resetToZero:(BOOL)reset paramName:(string)pName;
 -(IBAction)flashBoundControllers:(id)sender; //for n seconds
 
--(void)initWithWidgets:(map<string, ParamUI*>*) widgets andClient:(ofxRemoteUIClient*) client;
+-(void)initWithWidgets:(unordered_map<string, ParamUI*>*) widgets andClient:(ofxRemoteUIClient*) client;
 -(void)savePrefs:(id)sender;
 -(IBAction)applyPrefs:(id)sender;
 -(void)loadPrefs;

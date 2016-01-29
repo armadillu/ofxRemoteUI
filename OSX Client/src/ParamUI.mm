@@ -14,7 +14,7 @@
 	[super dealloc];
 }
 
--(id)initWithParam: (RemoteUIParam)p paramName:(string)name ID:(int)n{
+-(id)initWithParam: (const RemoteUIParam&)p paramName:(string)name ID:(int)n{
 	waitingForMidiTimer = nil;
 	midiHighlightAnim = false;
 	self = [super init];
@@ -32,9 +32,6 @@
 		case SMALL_26: didLoad = [NSBundle loadNibNamed:@"View26" owner:self];
 			break;
 		case TINY_20: didLoad = [NSBundle loadNibNamed:@"View20" owner:self];
-			break;
-
-		default:
 			break;
 	}
 	if(!didLoad){
@@ -445,7 +442,7 @@
 }
 
 
--(void)updateParam:(RemoteUIParam)p;{
+-(void)updateParam:(const RemoteUIParam &)p;{
 	param = p;
 }
 

@@ -29,7 +29,7 @@ float convertHueToMidiFigtherHue(float hue){
 @implementation ExternalDevices
 
 
--(void)initWithWidgets:(map<string, ParamUI*> *) widgets_ andClient:(ofxRemoteUIClient*) client_{
+-(void)initWithWidgets:(unordered_map<string, ParamUI*> *) widgets_ andClient:(ofxRemoteUIClient*) client_{
 
 	widgets = widgets_;
 	client = client_;
@@ -295,7 +295,7 @@ float convertHueToMidiFigtherHue(float hue){
 				map<string,string>::iterator ii = bindingsMap.find(controllerUniqueAddress);
 				if ( ii != bindingsMap.end() ){ //found a param linked to that controller
 					string paramName = bindingsMap[controllerUniqueAddress];
-					map<string,ParamUI*>::iterator it = widgets->find(paramName);
+					unordered_map<string,ParamUI*>::iterator it = widgets->find(paramName);
 					if ( it == widgets->end() ){	//not found! wtf?
 						NSLog(@"uh? midi binding pointing to an unexisting param!");
 					}else{
@@ -487,7 +487,7 @@ float convertHueToMidiFigtherHue(float hue){
 		map<string,string>::iterator ii = bindingsMap.begin();
 		std::advance(ii, row);
 		string paramName = [p UTF8String];
-		map<string,ParamUI*>::iterator it = widgets->find(paramName);
+		unordered_map<string,ParamUI*>::iterator it = widgets->find(paramName);
 		if(it != widgets->end()){
 			bindingsMap[(*ii).first] = paramName;
 		}
@@ -521,7 +521,7 @@ float convertHueToMidiFigtherHue(float hue){
 
 			float value = [joystick getRelativeValueOfAxesIndex:axisIndex];
 			string paramName = bindingsMap[controllerAddress];
-			map<string,ParamUI*>::iterator it = widgets->find(paramName);
+			unordered_map<string,ParamUI*>::iterator it = widgets->find(paramName);
 			if ( it == widgets->end() ){	//not found! wtf?
 				NSLog(@"uh? joystick binding pointing to an unexisting param!");
 			}else{
@@ -588,7 +588,7 @@ float convertHueToMidiFigtherHue(float hue){
 		if ( ii != bindingsMap.end() ){ //found a param linked to that controller
 
 			string paramName = bindingsMap[controllerAddress];
-			map<string,ParamUI*>::iterator it = widgets->find(paramName);
+			unordered_map<string,ParamUI*>::iterator it = widgets->find(paramName);
 			if ( it == widgets->end() ){	//not found! wtf?
 				NSLog(@"uh? joystick binding pointing to an unexisting param!");
 			}else{

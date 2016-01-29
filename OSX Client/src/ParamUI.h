@@ -45,8 +45,8 @@
 
 -(void)dealloc;
 
--(id)initWithParam: (RemoteUIParam)p paramName:(string)name ID:(int)n;
--(void)updateParam:(RemoteUIParam)p;
+-(id)initWithParam: (const RemoteUIParam&)p paramName:(string)name ID:(int)n;
+-(void)updateParam:(const RemoteUIParam &)p;
 -(void)updateUI;
 
 -(NSPopUpButton*)getPresetsMenu;
