@@ -1027,21 +1027,24 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 
 -(void)cleanUpGUIParams{
-	for( unordered_map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
-		string key = (*ii).first;
-		ParamUI* t = widgets[key];
-		[t release];
-	}
-	widgets.clear();
-	orderedKeys.clear(); 
 
 	//also remove the spacer bars. Dont ask me why, but dynamic array walking crashes! :?
 	//that why this ghetto walk is here
 	NSArray * subviews = [listContainer subviews];
 	for( int i = (int)[subviews count]-1 ; i >= 0 ; i-- ){
-		[[subviews objectAtIndex:i] removeFromSuperview];
-		//[[subviews objectAtIndex:i] release];
+		if( [[subviews objectAtIndex:i] isKindOfClass:[NSBox class]]){
+			[[subviews objectAtIndex:i] release]; // release NSBox we allocated before
+		}
+		[[subviews objectAtIndex:i] removeFromSuperviewWithoutNeedingDisplay];
 	}
+
+	for( unordered_map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
+		//string key = (*ii).first;
+		[(*ii).second release];
+	}
+	widgets.clear();
+	orderedKeys.clear(); 
+
 }
 
 

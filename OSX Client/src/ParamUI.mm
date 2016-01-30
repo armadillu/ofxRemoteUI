@@ -4,6 +4,8 @@
 #include "AppDelegate.h"
 #import <QuartzCore/QuartzCore.h>
 
+//int numParamUIs = 0;
+
 @implementation ParamUI
 
 -(void)dealloc{
@@ -12,9 +14,13 @@
 	[ui removeFromSuperviewWithoutNeedingDisplay];
 	[ui release];
 	[super dealloc];
+	//numParamUIs--;
+	//NSLog(@"dealloc: there are %d paramUI objs", numParamUIs);
 }
 
 -(id)initWithParam: (const RemoteUIParam&)p paramName:(string)name ID:(int)n{
+	//numParamUIs++;
+	//NSLog(@"init: there are %d paramUI objs", numParamUIs);
 	waitingForMidiTimer = nil;
 	midiHighlightAnim = false;
 	self = [super init];

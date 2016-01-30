@@ -765,7 +765,7 @@ void ofxRemoteUI::sendSAVE(bool confirm){
 
 
 void ofxRemoteUI::sendTEST(){
-	if(verbose_) RLOG_VERBOSE << "sendTEST()";
+	if(verboqse_) RLOG_VERBOSE << "sendTEST()";
 	waitingForReply = true;
 	timeSinceLastReply = 0.0f;
 	ofxOscMessage m;
@@ -776,7 +776,7 @@ void ofxRemoteUI::sendTEST(){
 //on client call, presetNames should be empty vector (request ing the list)
 //on server call, presetNames should have all the presetNames
 void ofxRemoteUI::sendPREL( vector<string> presetNames_ ){
-	if(verbose_) RLOG_VERBOSE << "sendPRES()";
+	if(verbose_) RLOG_VERBOSE << "sendPREL()";
 	ofxOscMessage m;
 	m.setAddress("PREL");
 	if (presetNames_.size() == 0){ // if we are the client requesting a preset list, delete our current list
