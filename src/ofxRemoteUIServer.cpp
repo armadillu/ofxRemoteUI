@@ -763,11 +763,16 @@ void ofxRemoteUIServer::pushParamsToClient(){
 	#endif
 	
 	if(readyToSend){
-
 		vector<string>paramsList = getAllParamNamesList();
 		syncAllParamsToPointers();
 		sendUpdateForParamsInList(paramsList);
 		sendREQU(true); //once all send, confirm to close the REQU
+		//also send the presets list
+		presetNames = getAvailablePresets();
+		if (presetNames.size() == 0){
+			presetNames.push_back(OFXREMOTEUI_NO_PRESETS);
+		}
+		sendPREL(presetNames);
 	}
 }
 
