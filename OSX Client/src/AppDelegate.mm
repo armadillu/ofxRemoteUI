@@ -51,12 +51,28 @@ void clientCallback(RemoteUIClientCallBackArg a){
 			[me showNotificationWithTitle:@"Server Deleted Group Preset OK" description:[NSString stringWithFormat:@"%@ deleted group preset named '%s'", remoteIP, a.msg.c_str()] ID:@"ServerDeletedPreset" priority:1];
 		}break;
 
-		case SERVER_SENT_FULL_PARAMS_UPDATE:
+		case SERVER_SENT_FULL_PARAMS_UPDATE:{
 			//NSLog(@"## Callback: SERVER_SENT_FULL_PARAMS_UPDATE");
-			[me fullParamsUpdate];
-			//[me partialParamsUpdate];
+			
+			vector<string> paramList = me->client->getAllParamNamesList();
+			int numMatches = 0;
+			for (auto & pname : paramList){
+				if(me->widgets.find(pname) != me->widgets.end()){
+					numMatches++;
+				}
+			}
+			bool allMatch = numMatches == paramList.size();
+			if(paramList.size() == 0){ allMatch = false; }
+			
+			if( !allMatch || me->widgets.size() != paramList.size() ){
+				[me fullParamsUpdate];
+			}else{
+				[me partialParamsUpdate];
+				[[me getExternalDevices] updateDevicesWithClientValues:FALSE resetToZero: FALSE paramName:""]; //udpate
+			}
 			[me updateGroupPopup];
-			break;
+			
+			}break;
 
 		case SERVER_PRESETS_LIST_UPDATED:{
 			//NSLog(@"## Callback: PRESETS_UPDATED");
@@ -466,6 +482,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 -(void) partialParamsUpdate{
 
 	vector<string> paramList = client->getAllParamNamesList();
+	//NSLog(@"partialParamsUpdate %d", paramList.size());
 
 	for(int i = 0; i < paramList.size(); i++){
 
