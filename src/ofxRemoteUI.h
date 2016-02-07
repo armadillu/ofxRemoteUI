@@ -228,21 +228,21 @@ public:
 protected:
 
 	virtual void update(float dt) = 0;
-	void sendParam(string paramName, RemoteUIParam p);
-	DecodedMessage decode(ofxOscMessage m);
+	void sendParam(string paramName, const RemoteUIParam & p);
+	DecodedMessage decode(const ofxOscMessage & m);
 
 	vector<string> scanForUpdatedParamsAndSync();	//goes through all params, comparing * to real valie
 													//reports those that are out of syn
 
 	void sendUpdateForParamsInList(vector<string>paramsPendingUpdate);
-	bool hasParamChanged(RemoteUIParam p);
+	bool hasParamChanged(const RemoteUIParam & p);
 
-	void updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage dm);
+	void updateParamFromDecodedMessage(const ofxOscMessage & m, DecodedMessage dm);
 	void syncAllParamsToPointers();
 	void syncAllPointersToParams();
 	void syncParamToPointer(string paramName); //copies the param0s pointer value over the value
 	void syncPointerToParam(string paramName); //the other way around
-	void addParamToDB(RemoteUIParam p, string paramName);
+	void addParamToDB(const RemoteUIParam & p, string paramName);
 
 	void clearOscReceiverMsgQueue();
 

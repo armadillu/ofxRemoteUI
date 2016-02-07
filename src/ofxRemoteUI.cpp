@@ -72,7 +72,7 @@ void ofxRemoteUI::printAllParamsDebug(){
 	cout << "####################################################" << endl;
 }
 
-void ofxRemoteUI::addParamToDB(RemoteUIParam p, string thisParamName){
+void ofxRemoteUI::addParamToDB(const RemoteUIParam & p, string thisParamName){
 
 	//see if we already had it, if we didnt, set its add order #
 	unordered_map<string, RemoteUIParam>::iterator it = params.find(thisParamName);
@@ -107,7 +107,7 @@ vector<string> ofxRemoteUI::getChangedParamsList(){
 }
 
 
-DecodedMessage ofxRemoteUI::decode(ofxOscMessage m){
+DecodedMessage ofxRemoteUI::decode(const ofxOscMessage & m){
 
 	string msgAddress = m.getAddress();
 	if(msgAddress.size() > 0){
@@ -286,7 +286,7 @@ void GetHostName(std::string& host_name){
 }
 #endif
 
-void ofxRemoteUI::updateParamFromDecodedMessage(ofxOscMessage m, DecodedMessage dm){
+void ofxRemoteUI::updateParamFromDecodedMessage(const ofxOscMessage & m, DecodedMessage dm){
 
 	string paramName = dm.paramName;
 	RemoteUIParam original;
@@ -536,7 +536,7 @@ void ofxRemoteUI::syncParamToPointer(string paramName){
 }
 
 
-bool ofxRemoteUI::hasParamChanged(RemoteUIParam p){
+bool ofxRemoteUI::hasParamChanged(const RemoteUIParam & p){
 
 	switch (p.type) {
 		case REMOTEUI_PARAM_FLOAT:
@@ -700,7 +700,7 @@ void ofxRemoteUI::setValuesFromString( string values ){
 }
 
 
-void ofxRemoteUI::sendParam(string paramName, RemoteUIParam p){
+void ofxRemoteUI::sendParam(string paramName, const RemoteUIParam & p){
 	ofxOscMessage m;
 	//if(verbose_){ ofLogVerbose("sending >> %s ", paramName.c_str()); p.print(); }
 	m.setAddress("SEND " + stringForParamType(p.type) + " " + paramName);
