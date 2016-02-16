@@ -83,8 +83,8 @@ void ofxRemoteUI::addParamToDB(const RemoteUIParam & p, string thisParamName){
 		paramsFromCode[thisParamName] = p; //cos this didnt exist before, we store it as "from code"
 
 	}else{
-		params[thisParamName] = p;
-		RLOG_WARNING << "already have a Param with that name on the DB : '" << thisParamName << "'. Ignoring it!";
+		RLOG_ERROR << "already have a Param with that name on the DB : '" << thisParamName << "'. Ignoring it!";
+		//params[thisParamName] = p;
 	}
 }
 
