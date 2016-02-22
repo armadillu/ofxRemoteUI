@@ -2017,6 +2017,7 @@ void ofxRemoteUIServer::shareParam(string paramName, float* param, float min, fl
 	p.floatValAddr = param;
 	p.maxFloat = max;
 	p.minFloat = min;
+	if (std::isnan(*param)) *param = 0.0f;
 	p.floatVal = *param = ofClamp(*param, min, max);
 	p.group = upcomingGroup;
 	setColorForParam(p, c);
