@@ -265,6 +265,8 @@ private:
 	float													fontSize;
 	#endif
 
+	bool													headlessMode;
+
 	void			refreshPresetsCache();
 	void			drawString(const string & text, const float & x, const float & y);
 	void			drawString(const string & text, const ofVec2f & pos);

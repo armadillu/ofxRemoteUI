@@ -31,6 +31,8 @@
 #include <Poco/Process.h>
 #include <Poco/Util/Application.h>
 using Poco::Util::Application;
+#include "ofAppNoWindow.h"
+
 #endif
 
 
@@ -101,6 +103,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	selectedPreset = selectedGroupPreset = 0;
 	selectedItem = -1;
 	ofSeedRandom(1979);
+	headlessMode = false;
 
 	int numHues = 9;
 	for(int i = 0; i < numHues; i++){
@@ -837,6 +840,12 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		if(!d.exists()){
 			d.create(true);
 		}
+
+		const ofAppNoWindow * win = dynamic_cast<const ofAppNoWindow*>(ofGetWindowPtr());
+		if(win){
+			RLOG_NOTICE << "Running Headless mode!";
+			headlessMode = true;
+		}
 	#else
 	#if defined(_WIN32)
 		_mkdir(getFinalPath(OFXREMOTEUI_PRESET_DIR));
@@ -844,7 +853,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		mkdir(getFinalPath(OFXREMOTEUI_PRESET_DIR).c_str(), (mode_t)0777);
 	#endif
 	#endif
-	
+
 	//check for enabled
 	string configFile;
 	bool exists = true;
@@ -1306,6 +1315,8 @@ void ofxRemoteUIServer::drawString(const string & text, const float & x, const f
 
 //x and y of where the notifications will get draw
 void ofxRemoteUIServer::draw(int x, int y){
+
+	if(headlessMode) return;
 
 	bool needsToDrawNotification = !showUI || uiAlpha < 1.0;
 	int screenH, screenW;
