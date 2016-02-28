@@ -892,9 +892,9 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		
 		if (computerIP != RUI_LOCAL_IP_ADDRESS) { // if addr is not 127.0.0.1
 			
+			#ifdef __APPLE__
 			struct in_addr host, mask, broadcast;
 			char broadcast_address[INET_ADDRSTRLEN];
-			
 			// get broadcast
 			if (inet_pton(AF_INET, computerIP.c_str(), &host) == 1 && inet_pton(AF_INET, subnetMask.c_str(), &mask) == 1) {
 				broadcast.s_addr = host.s_addr | ~mask.s_addr;
@@ -907,6 +907,23 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 			} else {
 				// Failed converting ip to string
 			}
+			#endif
+			#ifdef TARGET_WIN32			//TODO proper windows subnet mask!
+			vector<string>addComps;
+			// Failed converting ip to string
+			split(addComps, computerIP, '.');
+			vector<string>subnetComps;
+			split(subnetComps, subnetMask, '.');
+			for(int i = 0; i < 4; i++){
+				if(subnetComps[i] == "255"){
+					multicastIP += addComps[i];
+				}else{
+					multicastIP += "255";
+				}
+				if (i < 3) multicastIP += ".";
+			}
+			#endif
+			
 		} else {
 			// Go with default guess
 			multicastIP = "255.255.255.255";
