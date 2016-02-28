@@ -115,6 +115,7 @@ public:
 	void setShowInterfaceKey(char k);
 	void setAutomaticBackupsEnabled(bool enabled);
 	void setAutoDraw(bool d){autoDraw = d;};
+	bool getAutoDraw(){return autoDraw;}
 	#ifdef USE_OFX_FONTSTASH
 	void drawUiWithFontStash(string fontPath, float fontSize = 15 /*good with veraMono*/ );
 	void drawUiWithBitmapFont();
