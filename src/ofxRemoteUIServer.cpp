@@ -1421,6 +1421,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 		drawString("+ PRESET SELECTION: " , 30,  16);
 
 		int linesInited = uiLines.getNumVertices() > 0 ;
+		ofPushMatrix();
 
 		if(uiAlpha > 0.99 || showUIduringEdits){
 
@@ -1539,7 +1540,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 			ofSetLineWidth(1);
 			uiLines.draw();
 		}
-
+		
 		//tiny clock top left
 		if (uiAlpha < 1.0 && !showUIduringEdits){
 			ofMesh m;
@@ -1560,7 +1561,9 @@ void ofxRemoteUIServer::draw(int x, int y){
 			ofSetColor(128);
 			m.draw();
 		}
-
+		
+		ofPopMatrix();
+		
 		//clearly draw the corners - helpful when in multi monitor setups to see if we are cropping
 		float ts = 7 * uiScale;
 		ofSetColor((frameNum * 20)%255);
@@ -1568,6 +1571,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 		ofDrawTriangle(screenW, 0, screenW - ts, 0, screenW, ts);
 		ofDrawTriangle(0, screenH, ts, screenH, 0, screenH - ts);
 		ofDrawTriangle(screenW, screenH, screenW - ts, screenH, screenW, screenH - ts);
+
 	}
 
 	if (needsToDrawNotification){
@@ -1649,8 +1653,6 @@ void ofxRemoteUIServer::handleBroadcast(){
 
 #endif
 			}
-
-
 
 			ofxOscMessage m;
 			m.addIntArg(port); //0
