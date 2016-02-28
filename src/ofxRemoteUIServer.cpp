@@ -1568,9 +1568,9 @@ void ofxRemoteUIServer::draw(int x, int y){
 		float ts = 7 * uiScale;
 		ofSetColor((frameNum * 20)%255);
 		ofDrawTriangle(0, 0, ts, 0, 0, ts);
-		ofDrawTriangle(screenW, 0, screenW - ts, 0, screenW, ts);
-		ofDrawTriangle(0, screenH, ts, screenH, 0, screenH - ts);
-		ofDrawTriangle(screenW, screenH, screenW - ts, screenH, screenW, screenH - ts);
+		ofDrawTriangle(screenW / uiScale, 0, screenW / uiScale - ts, 0, screenW / uiScale, ts);
+		ofDrawTriangle(0, screenH / uiScale, ts, screenH / uiScale, 0, screenH / uiScale - ts);
+		ofDrawTriangle(screenW / uiScale, screenH / uiScale, screenW / uiScale - ts, screenH / uiScale, screenW / uiScale, screenH / uiScale - ts);
 
 	}
 
@@ -1589,7 +1589,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 				ofColor c = ofColor(p.r, p.g, p.b, 255);
 				onScreenNotifications.addParamWatch(paramsToWatch[i], v, c);
 			}
-			onScreenNotifications.draw(x, y);
+			onScreenNotifications.draw(x / uiScale, y / uiScale);
 		}
 	}
 	if(needsToDrawNotification | showUI){
