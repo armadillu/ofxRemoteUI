@@ -43,7 +43,7 @@ Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 ## Compatibility
 
 Works in OpenFrameworks, but also in plain C++ projects.
-There a Cinder Block I created of as "proof of concept" but it's not even published. Ask me if you are interested.
+[@kitschpatrol](http://github.com/kitschpatrol) is actively working on a Cinder Block that works on top of a fork [here](https://github.com/kitschpatrol/Cinder-RemoteUI). He's added some awesome feature like getter/setter support for your params, and maybe one day we'll be able to merge back. 
 
 There's also a feature limited version of the server for Processing, made by [@kritzikratzi](http://github.com/kirtzikratzi)! See <a href="http://superduper.org/processing/remoteUI">here</a>.
 
