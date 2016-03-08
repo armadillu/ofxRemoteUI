@@ -116,7 +116,7 @@ void ofxRemoteUIClient::updateAutoDiscovery(float dt){
 	while( broadcastReceiver.hasWaitingMessages() ){// check for waiting messages from client
 		ofxOscMessage m;
 		broadcastReceiver.getNextMessage(&m);
-		neigbhorChange |= closebyServers.gotPing( m.getRemoteIp(), m.getArgAsInt32(0)/*port*/, m.getArgAsString(1), m.getArgAsString(2));
+		neigbhorChange |= closebyServers.gotPing( m.getRemoteIp(), m.getArgAsInt32(0)/*port*/, m.getArgAsString(1)/*computerName*/, m.getArgAsString(2)/*binaryName*/);
 		//read the broadcast sequence number
 		int broadcastSequenceNumber = m.getArgAsInt32(3);
 		neighborJustLaunched = (broadcastSequenceNumber == 0); //keep track of just launched apps

@@ -10,6 +10,7 @@
 #ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <WinBase.h>
 #endif
 
 #include <iostream>
@@ -1613,28 +1614,36 @@ void ofxRemoteUIServer::handleBroadcast(){
 		if(broadcastTime > OFXREMOTEUI_BORADCAST_INTERVAL){
 			broadcastTime = 0.0f;
 			if (computerName.size() == 0){
-#ifdef OF_AVAILABLE
-				Poco::Environment e;
-				computerName = e.nodeName();
-				char pathbuf[2048];
-				uint32_t  bufsize = sizeof(pathbuf);
-    #ifdef TARGET_OSX
-				_NSGetExecutablePath(pathbuf, &bufsize);
-    #else
-        #ifdef _WIN32
-				GetModuleFileNameA( NULL, pathbuf, bufsize ); //no idea why, but GetModuleFileName() is not defined?
-        #else
+				#ifdef OF_AVAILABLE
+					#ifdef _WIN32
+						char buffer[MAX_COMPUTERNAME_LENGTH + 1];
+						DWORD length = sizeof(buffer);
+						GetComputerNameExA((COMPUTER_NAME_FORMAT)0, buffer, &length);
+						computerName = buffer;
+					#else					
+						Poco::Environment e;
+						computerName = e.nodeName();
+					#endif
+					char pathbuf[2048];
+					uint32_t  bufsize = sizeof(pathbuf);
+					#ifdef TARGET_OSX
+						_NSGetExecutablePath(pathbuf, &bufsize);
+					#else
+						#ifdef _WIN32
+							GetModuleFileNameA( NULL, pathbuf, bufsize ); //no idea why, but GetModuleFileName() is not defined?
+						#else
 
-            char procname[1024];
-            int len = readlink("/proc/self/exe", procname, 1024-1);
-            if (len > 0){
-                procname[len] = '\0';
-            }
-        #endif
-    #endif
-				binaryName = ofFilePath::getBaseName(pathbuf);
-
-#endif
+							char procname[1024];
+							int len = readlink("/proc/self/exe", procname, 1024-1);
+							if (len > 0){
+								procname[len] = '\0';
+							}
+						#endif
+					#endif
+					binaryName = ofFilePath::getBaseName(pathbuf);
+				#else			
+					binaryName = "Unknown";
+				#endif
 			}
 
 			ofxOscMessage m;
