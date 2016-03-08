@@ -7,8 +7,9 @@
 //
 
 
-#ifdef TARGET_WIN32
+#ifdef _WIN32
 #include <winsock2.h>
+#include <ws2tcpip.h>
 #endif
 
 #include <iostream>
@@ -892,7 +893,6 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		
 		if (computerIP != RUI_LOCAL_IP_ADDRESS) { // if addr is not 127.0.0.1
 			
-			#ifdef __APPLE__
 			struct in_addr host, mask, broadcast;
 			char broadcast_address[INET_ADDRSTRLEN];
 			// get broadcast
@@ -907,30 +907,13 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 			} else {
 				// Failed converting ip to string
 			}
-			#endif
-			#ifdef TARGET_WIN32			//TODO proper windows subnet mask!
-			vector<string>addComps;
-			// Failed converting ip to string
-			split(addComps, computerIP, '.');
-			vector<string>subnetComps;
-			split(subnetComps, subnetMask, '.');
-			for(int i = 0; i < 4; i++){
-				if(subnetComps[i] == "255"){
-					multicastIP += addComps[i];
-				}else{
-					multicastIP += "255";
-				}
-				if (i < 3) multicastIP += ".";
-			}
-			#endif
-			
 		} else {
 			// Go with default guess
 			multicastIP = "255.255.255.255";
 		}
 
 		#ifdef OF_AVAILABLE
-		#ifdef TARGET_WIN32
+		#ifdef _WIN32
 		if (multicastIP == "255.255.255.255"){
 			doBroadcast = false; //windows crashes on bradcast if no devices are up!
 			RLOG_WARNING << "no network interface found, we will not broadcast ourselves";
@@ -1638,7 +1621,7 @@ void ofxRemoteUIServer::handleBroadcast(){
     #ifdef TARGET_OSX
 				_NSGetExecutablePath(pathbuf, &bufsize);
     #else
-        #ifdef TARGET_WIN32
+        #ifdef _WIN32
 				GetModuleFileNameA( NULL, pathbuf, bufsize ); //no idea why, but GetModuleFileName() is not defined?
         #else
 
