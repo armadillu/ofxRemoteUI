@@ -1447,17 +1447,18 @@ void ofxRemoteUIServer::draw(int x, int y){
 					case REMOTEUI_PARAM_FLOAT:
 						drawString(ofToString(p.floatVal), x + valOffset, y);
 						break;
-					case REMOTEUI_PARAM_ENUM:
-						if (p.intVal >= 0 && p.intVal < p.enumList.size() && p.enumList.size() > 0){
-							string val = p.enumList[p.intVal];
-							if (val.length() > column2MaxLen){
+					case REMOTEUI_PARAM_ENUM: {
+						int index = p.intVal - p.minInt;
+						if (index >= 0 && index < p.enumList.size()) {
+							string val = p.enumList[index];
+							if (val.length() > column2MaxLen) {
 								val = val.substr(0, column2MaxLen);
 							}
 							drawString(val, x + valOffset, y);
-						}else{
+						}else {
 							drawString(ofToString(p.intVal), x + valOffset, y);
 						}
-						break;
+					}break;
 					case REMOTEUI_PARAM_INT:
 						drawString(ofToString(p.intVal), x + valOffset, y);
 						break;
