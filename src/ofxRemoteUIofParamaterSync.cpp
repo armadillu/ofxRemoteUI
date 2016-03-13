@@ -121,11 +121,11 @@ void ofxRemoteUIofParamaterSync::recursiveSetup(ofParameterGroup & _parameters){
 			float * x = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "4x", p->x);
 			float * y = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "4y", p->y);
 			float * z = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "4z", p->z);
-			float * w = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "4w", p->z);
+			float * w = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "4w", p->w);
 			server->shareParam(fullRUIparamName + compSEP + "4x", x, p.getMin().x, p.getMax().x);
 			server->shareParam(fullRUIparamName + compSEP + "4y", y, p.getMin().y, p.getMax().y);
-			server->shareParam(fullRUIparamName + compSEP + "4z", x, p.getMin().z, p.getMax().z);
-			server->shareParam(fullRUIparamName + compSEP + "4w", x, p.getMin().w, p.getMax().w);
+			server->shareParam(fullRUIparamName + compSEP + "4z", z, p.getMin().z, p.getMax().z);
+			server->shareParam(fullRUIparamName + compSEP + "4w", w, p.getMin().w, p.getMax().w);
 			ofParamRuiList.push_back(fullRUIparamName + compSEP + "4x");
 			ofParamRuiList.push_back(fullRUIparamName + compSEP + "4y");
 			ofParamRuiList.push_back(fullRUIparamName + compSEP + "4z");
