@@ -18,6 +18,13 @@
 #include <set>
 #include <vector>
 #include "ofxRemoteUISimpleNotifications.h"
+
+#if defined(__has_include) /*llvm only - query about header files being available or not*/
+	#if __has_include("ofxFontStash.h")
+		#define USE_OFX_FONTSTASH
+	#endif
+#endif
+
 #ifdef USE_OFX_FONTSTASH
 	#include "ofxFontStash.h"
 #endif
