@@ -17,6 +17,8 @@
 
 	IBOutlet NSTableView			*midiBindingsTable;
 	IBOutlet NSButton *				externalButtonsBehaveAsToggleCheckbox;
+	IBOutlet NSButton *				knobOnColorAffectsAlpha; //or hue
+
 
 	//MIDI
 	VVMIDIManager					*midiManager;
@@ -26,6 +28,7 @@
 	unordered_map<string, ParamUI*> *			widgets;
 	ofxRemoteUIClient *				client;
 	BOOL							externalButtonsBehaveAsToggle;	//if true, one press on midi or joystick toggles a bool;
+	BOOL 							knobColorAffectsAlpha;
 
 	struct MidiOutCache{
 		string deviceName;

@@ -89,7 +89,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 																	//otherwise, it is true for as long as its pressed
 	BOOL							autoConnectToggle;
 	BOOL							onlyAutoConnectToLocalHost;
-
+	
 	bool							connecting;
 
 	RowHeightSize					rowHeight;

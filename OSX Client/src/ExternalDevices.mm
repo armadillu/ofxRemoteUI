@@ -47,6 +47,7 @@ float convertHueToMidiFigtherHue(float hue){
 -(void)savePrefs:(id)sender{
 	NSUserDefaults * d = [NSUserDefaults standardUserDefaults];
 	[d setInteger: externalButtonsBehaveAsToggle  forKey:@"externalButtonsBehaveAsToggle"];
+	[d setInteger: knobColorAffectsAlpha  forKey:@"knobColorAffectsAlpha"];
 }
 
 
@@ -59,11 +60,16 @@ float convertHueToMidiFigtherHue(float hue){
 	NSUserDefaults * d = [NSUserDefaults standardUserDefaults];
 	externalButtonsBehaveAsToggle = (int)[d integerForKey:@"externalButtonsBehaveAsToggle"];
 	[externalButtonsBehaveAsToggleCheckbox setState:externalButtonsBehaveAsToggle];
+
+	knobColorAffectsAlpha = (int)[d integerForKey:@"knobColorAffectsAlpha"];
+	[knobOnColorAffectsAlpha setState:knobColorAffectsAlpha];
+
 }
 
 
 -(IBAction)applyPrefs:(id)sender{
 	externalButtonsBehaveAsToggle = (int)[externalButtonsBehaveAsToggleCheckbox state];
+	knobColorAffectsAlpha = (int)[knobOnColorAffectsAlpha state];
 }
 
 
@@ -316,15 +322,20 @@ float convertHueToMidiFigtherHue(float hue){
 									p.intVal = round(p.minInt + (p.maxInt - p.minInt) * val);
 									}break;
 								case REMOTEUI_PARAM_COLOR:{
-									NSColor * c = [NSColor colorWithDeviceRed:p.redVal/255.0f green:p.greenVal/255.0f blue:p.blueVal/255.0f alpha:p.alphaVal/255.0f];
-									float sat = [c saturationComponent];
-									float bri = [c brightnessComponent];
-									float a = [c alphaComponent];
-									NSColor * c2 = [NSColor colorWithDeviceHue:val saturation:sat brightness:bri alpha:a];
-									p.redVal = [c2 redComponent] * 255.0f;
-									p.greenVal = [c2 greenComponent] * 255.0f;
-									p.blueVal = [c2 blueComponent] * 255.0f;
-									p.alphaVal = [c2 alphaComponent] * 255.0f;
+									if(knobColorAffectsAlpha){
+										p.alphaVal = val * 255;
+
+									}else{
+										NSColor * c = [NSColor colorWithDeviceRed:p.redVal/255.0f green:p.greenVal/255.0f blue:p.blueVal/255.0f alpha:p.alphaVal/255.0f];
+										float sat = [c saturationComponent];
+										float bri = [c brightnessComponent];
+										float a = [c alphaComponent];
+										NSColor * c2 = [NSColor colorWithDeviceHue:val saturation:sat brightness:bri alpha:a];
+										p.redVal = [c2 redComponent] * 255.0f;
+										p.greenVal = [c2 greenComponent] * 255.0f;
+										p.blueVal = [c2 blueComponent] * 255.0f;
+										p.alphaVal = [c2 alphaComponent] * 255.0f;
+									}
 								}break;
 								default:
 									break;//ignore other types
