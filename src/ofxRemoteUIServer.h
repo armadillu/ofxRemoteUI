@@ -20,7 +20,7 @@
 #include "ofxRemoteUISimpleNotifications.h"
 
 #if defined(__has_include) /*llvm only - query about header files being available or not*/
-	#if __has_include("ofxFontStash.h")
+	#if __has_include("ofxFontStash.h") && !defined(DISABLE_AUTO_FIND_FONSTASH_HEADERS)
 		#define USE_OFX_FONTSTASH
 	#endif
 #endif
