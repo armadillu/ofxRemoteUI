@@ -1574,7 +1574,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 				ofColor c = ofColor(p.r, p.g, p.b, 255);
 				onScreenNotifications.addParamWatch(paramsToWatch[i], v, c);
 			}
-			onScreenNotifications.draw(x / uiScale, y / uiScale);
+			onScreenNotifications.draw(x, y);
 		}
 	}
 	if(needsToDrawNotification | showUI){
