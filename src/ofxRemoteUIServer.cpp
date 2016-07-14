@@ -35,7 +35,9 @@
 #include <Poco/Process.h>
 #include <Poco/Util/Application.h>
 using Poco::Util::Application;
-#include "ofAppNoWindow.h"
+#ifndef TARGET_OF_IOS
+	#include "ofAppNoWindow.h"
+#endif
 
 #endif
 
@@ -845,11 +847,13 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 			d.create(true);
 		}
 
+		#ifndef TARGET_OF_IOS
 		const ofAppNoWindow * win = dynamic_cast<const ofAppNoWindow*>(ofGetWindowPtr());
 		if(win){
 			RLOG_NOTICE << "Running Headless mode!";
 			headlessMode = true;
 		}
+		#endif
 	#else
 	#if defined(_WIN32)
 		_mkdir(getFinalPath(OFXREMOTEUI_PRESET_DIR));
@@ -1199,21 +1203,26 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 	}
 
 	if(e.key == showInterfaceKey){
-		if (uiAlpha < 1.0 && showUI){
-			uiAlpha = 1.0;
-			showUI = false;
-		}else{
-			showUI = !showUI;
-		}
-
-		if (showUI){
-			uiAlpha = 1;
-			uiLines.clear();
-			syncAllPointersToParams();
-			refreshPresetsCache();
-		}
+		toggleBuiltInClientUI();
 	}
 	return showUI && e.key != OF_KEY_ESC;
+}
+
+
+void ofxRemoteUIServer::toggleBuiltInClientUI(){
+	if (uiAlpha < 1.0 && showUI){
+		uiAlpha = 1.0;
+		showUI = false;
+	}else{
+		showUI = !showUI;
+	}
+
+	if (showUI){
+		uiAlpha = 1;
+		uiLines.clear();
+		syncAllPointersToParams();
+		refreshPresetsCache();
+	}
 }
 
 
@@ -1625,24 +1634,13 @@ void ofxRemoteUIServer::handleBroadcast(){
 						Poco::Environment e;
 						computerName = e.nodeName();
 					#endif
-					char pathbuf[2048];
-					uint32_t  bufsize = sizeof(pathbuf);
-					#ifdef TARGET_OSX
-						_NSGetExecutablePath(pathbuf, &bufsize);
-					#else
-						#ifdef _WIN32
-							GetModuleFileNameA( NULL, pathbuf, bufsize ); //no idea why, but GetModuleFileName() is not defined?
-						#else
 
-							char procname[1024];
-							int len = readlink("/proc/self/exe", procname, 1024-1);
-							if (len > 0){
-								procname[len] = '\0';
-							}
-						#endif
+					binaryName = ofFilePath::getBaseName(ofFilePath::getCurrentExePath());
+
+					#ifdef TARGET_OF_IOS
+					binaryName = "iOS App";
 					#endif
-					binaryName = ofFilePath::getBaseName(pathbuf);
-				#else			
+				#else
 					binaryName = "Unknown";
 				#endif
 			}

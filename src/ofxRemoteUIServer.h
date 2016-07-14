@@ -132,6 +132,8 @@ public:
 
 #ifdef OF_AVAILABLE
 
+
+	void toggleBuiltInClientUI(); //show hide the "built in client" GUI screen
 	void setUiColumnWidth(int w);
 	void setBuiltInUiScale(float s);
 	void setCustomScreenHeight(int h);
