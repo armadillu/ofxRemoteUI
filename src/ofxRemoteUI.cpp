@@ -12,18 +12,6 @@
 #include "uriencode.h"
 #include <sstream>
 
-#if !defined(__APPLE__) && !defined(_WIN32)
-    #ifndef __linux__
-        #define __linux__
-    #endif
-#endif
-
-#if defined(__APPLE__) || defined(__linux__)
-#include <arpa/inet.h>
-#include <net/if.h>
-#include <ifaddrs.h>
-#include <errno.h>
-#endif
 
 #ifdef _WIN32
 #include <windows.h>
