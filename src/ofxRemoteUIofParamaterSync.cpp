@@ -96,7 +96,7 @@ void ofxRemoteUIofParamaterSync::recursiveSetup(ofParameterGroup & _parameters){
 			ofParamRuiList.push_back(fullRUIparamName);
 
 		}else if(type==typeid(ofParameter<ofVec2f>).name()){ //ofVec2f
-			ofParameter<ofVec2f> p = _parameters.getVec2f(i);
+			auto p = _parameters.getVec2f(i);
 			float * x = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "2x", p->x);
 			float * y = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "2y", p->y);
 			server->shareParam(fullRUIparamName + compSEP + "2x", x, p.getMin().x, p.getMax().x);
@@ -105,7 +105,7 @@ void ofxRemoteUIofParamaterSync::recursiveSetup(ofParameterGroup & _parameters){
 			ofParamRuiList.push_back(fullRUIparamName + compSEP + "2y");
 
 		}else if(type==typeid(ofParameter<ofVec3f>).name()){ //ofVec3f
-			ofParameter<ofVec3f> p = _parameters.getVec3f(i);
+			auto p = _parameters.getVec3f(i);
 			float * x = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "3x", p->x);
 			float * y = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "3y", p->y);
 			float * z = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "3z", p->z);
@@ -117,7 +117,7 @@ void ofxRemoteUIofParamaterSync::recursiveSetup(ofParameterGroup & _parameters){
 			ofParamRuiList.push_back(fullRUIparamName + compSEP + "3z");
 
 		}else if(type==typeid(ofParameter<ofVec4f>).name()){ //ofVec4f
-			ofParameter<ofVec4f> p = _parameters.getVec4f(i);
+			auto p = _parameters.getVec4f(i);
 			float * x = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "4x", p->x);
 			float * y = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "4y", p->y);
 			float * z = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "4z", p->z);

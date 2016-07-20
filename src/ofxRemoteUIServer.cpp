@@ -1521,8 +1521,8 @@ void ofxRemoteUIServer::draw(int x, int y){
 					default: printf("weird RemoteUIParam at draw()!\n"); break;
 				}
 				if(!linesInited){
-					uiLines.addVertex(ofVec2f(x, y + spacing * 0.33));
-					uiLines.addVertex(ofVec2f(x + realColW, y + spacing * 0.33));
+					uiLines.addVertex(ofVec3f(x, y + spacing * 0.33));
+					uiLines.addVertex(ofVec3f(x + realColW, y + spacing * 0.33));
 				}
 				y += spacing;
 				if (y > screenH / uiScale - padding * 0.5 - bottomBarHeight){
@@ -1540,17 +1540,17 @@ void ofxRemoteUIServer::draw(int x, int y){
 			ofMesh m;
 			int step = 30;
 			m.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
-			ofVec2f origin = ofVec2f(15,11); //rect is 22
+			ofVec3f origin = ofVec3f(15,11); //rect is 22
 			m.addVertex(origin);
 			float r = 8.0f;
 			float ang;
 			float lim = 360.0f * (1.0f - uiAlpha);
 			for(ang = 0; ang < lim; ang += step){
-				m.addVertex( origin + ofVec2f( r * cosf((-90.0f + ang) * DEG_TO_RAD),
+				m.addVertex( origin + ofVec3f( r * cosf((-90.0f + ang) * DEG_TO_RAD),
 											  r * sinf((-90.0f + ang) * DEG_TO_RAD)));
 			}
 			float lastBit = lim - ang;
-			m.addVertex( origin + ofVec2f( r * cosf((-90.0f + ang + lastBit) * DEG_TO_RAD),
+			m.addVertex( origin + ofVec3f( r * cosf((-90.0f + ang + lastBit) * DEG_TO_RAD),
 										  r * sinf((-90.0f + ang + lastBit) * DEG_TO_RAD)));
 			ofSetColor(128);
 			m.draw();
