@@ -692,7 +692,7 @@ void ofxRemoteUI::setValuesFromString( string values ){
 void ofxRemoteUI::sendParam(string paramName, const RemoteUIParam & p){
 	ofxOscMessage m;
 	//if(verbose_){ ofLogVerbose("sending >> %s ", paramName.c_str()); p.print(); }
-	m.setAddress("SEND " + stringForParamType(p.type) + " " + paramName);
+	m.setAddress("/SEND " + stringForParamType(p.type) + " " + paramName);
 	switch (p.type) {
 		case REMOTEUI_PARAM_FLOAT: m.addFloatArg(p.floatVal); m.addFloatArg(p.minFloat); m.addFloatArg(p.maxFloat); break;
 		case REMOTEUI_PARAM_INT: m.addIntArg(p.intVal); m.addIntArg(p.minInt); m.addIntArg(p.maxInt); break;
@@ -722,7 +722,7 @@ void ofxRemoteUI::sendParam(string paramName, const RemoteUIParam & p){
 void ofxRemoteUI::sendREQU(bool confirmation){
 	if(verbose_) RLOG_VERBOSE << "sendREQU()";
 	ofxOscMessage m;
-	m.setAddress("REQU");
+	m.setAddress("/REQU");
 	if (confirmation) m.addStringArg("OK");
 	oscSender.sendMessage(m);
 }
@@ -731,7 +731,7 @@ void ofxRemoteUI::sendREQU(bool confirmation){
 void ofxRemoteUI::sendRESX(bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendRESX()";
 	ofxOscMessage m;
-	m.setAddress("RESX");
+	m.setAddress("/RESX");
 	if (confirm) m.addStringArg("OK");
 	oscSender.sendMessage(m);
 }
@@ -739,7 +739,7 @@ void ofxRemoteUI::sendRESX(bool confirm){
 void ofxRemoteUI::sendRESD(bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendRESD()";
 	ofxOscMessage m;
-	m.setAddress("RESD");
+	m.setAddress("/RESD");
 	if (confirm) m.addStringArg("OK");
 	oscSender.sendMessage(m);
 }
@@ -747,7 +747,7 @@ void ofxRemoteUI::sendRESD(bool confirm){
 void ofxRemoteUI::sendSAVE(bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendSAVE()";
 	ofxOscMessage m;
-	m.setAddress("SAVE");
+	m.setAddress("/SAVE");
 	if (confirm) m.addStringArg("OK");
 	oscSender.sendMessage(m);
 }
@@ -758,7 +758,7 @@ void ofxRemoteUI::sendTEST(){
 	waitingForReply = true;
 	timeSinceLastReply = 0.0f;
 	ofxOscMessage m;
-	m.setAddress("TEST");
+	m.setAddress("/TEST");
 	oscSender.sendMessage(m);
 }
 
@@ -767,7 +767,7 @@ void ofxRemoteUI::sendTEST(){
 void ofxRemoteUI::sendPREL( vector<string> presetNames_ ){
 	if(verbose_) RLOG_VERBOSE << "sendPREL()";
 	ofxOscMessage m;
-	m.setAddress("PREL");
+	m.setAddress("/PREL");
 	if (presetNames_.size() == 0){ // if we are the client requesting a preset list, delete our current list
 		presetNames.clear();
 		m.addStringArg("OK");
@@ -783,7 +783,7 @@ void ofxRemoteUI::sendPREL( vector<string> presetNames_ ){
 void ofxRemoteUI::sendSAVP(string presetName, bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendSAVP()";
 	ofxOscMessage m;
-	m.setAddress("SAVP");
+	m.setAddress("/SAVP");
 	m.addStringArg(presetName);
 	if (confirm){
 		m.addStringArg("OK");
@@ -796,7 +796,7 @@ void ofxRemoteUI::sendSAVP(string presetName, bool confirm){
 void ofxRemoteUI::sendSETP(string presetName, bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendSETP()";
 	ofxOscMessage m;
-	m.setAddress("SETP");
+	m.setAddress("/SETP");
 	m.addStringArg(presetName);
 	if (confirm){
 		m.addStringArg("OK");
@@ -808,7 +808,7 @@ void ofxRemoteUI::sendMISP(vector<string> missingParamsInPreset){
 	if (missingParamsInPreset.size() == 0) return; //do nothing if no params are missing
 	if(verbose_) RLOG_VERBOSE << "sendMISP()";
 	ofxOscMessage m;
-	m.setAddress("MISP");
+	m.setAddress("/MISP");
 	for(int i = 0; i < missingParamsInPreset.size(); i++){
 		m.addStringArg(missingParamsInPreset[i]);
 	}
@@ -818,7 +818,7 @@ void ofxRemoteUI::sendMISP(vector<string> missingParamsInPreset){
 void ofxRemoteUI::sendDELP(string presetName, bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendDELP()";
 	ofxOscMessage m;
-	m.setAddress("DELP");
+	m.setAddress("/DELP");
 	m.addStringArg(presetName);
 	if (confirm){
 		m.addStringArg("OK");
@@ -828,13 +828,13 @@ void ofxRemoteUI::sendDELP(string presetName, bool confirm){
 
 void ofxRemoteUI::sendHELLO(){
 	ofxOscMessage m;
-	m.setAddress("HELO");
+	m.setAddress("/HELO");
 	oscSender.sendMessage(m);
 }
 
 void ofxRemoteUI::sendCIAO(){
 	ofxOscMessage m;
-	m.setAddress("CIAO");
+	m.setAddress("/CIAO");
 	oscSender.sendMessage(m);
 }
 
@@ -843,7 +843,7 @@ void ofxRemoteUI::sendCIAO(){
 void ofxRemoteUI::sendSETp(string presetName, string group, bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendSETp()";
 	ofxOscMessage m;
-	m.setAddress("SETp");
+	m.setAddress("/SETp");
 	m.addStringArg(presetName);
 	m.addStringArg(group);
 	if (confirm){
@@ -857,7 +857,7 @@ void ofxRemoteUI::sendSETp(string presetName, string group, bool confirm){
 void ofxRemoteUI::sendSAVp(string presetName, string group, bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendSAVp()";
 	ofxOscMessage m;
-	m.setAddress("SAVp");
+	m.setAddress("/SAVp");
 	m.addStringArg(presetName);
 	m.addStringArg(group);
 	if (confirm){
@@ -871,7 +871,7 @@ void ofxRemoteUI::sendSAVp(string presetName, string group, bool confirm){
 void ofxRemoteUI::sendDELp(string presetName, string group, bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendDELp()";
 	ofxOscMessage m;
-	m.setAddress("DELp");
+	m.setAddress("/DELp");
 	m.addStringArg(presetName);
 	m.addStringArg(group);
 	if (confirm){

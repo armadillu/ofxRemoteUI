@@ -2158,7 +2158,7 @@ void ofxRemoteUIServer::sendLogToClient(const char* format, ...){
 void ofxRemoteUIServer::sendLogToClient(string message){
 	if(readyToSend){
 		ofxOscMessage m;
-		m.setAddress("LOG_");
+		m.setAddress("/LOG_");
 		m.addStringArg(message);
 		try{
 			oscSender.sendMessage(m);
