@@ -1646,6 +1646,7 @@ void ofxRemoteUIServer::handleBroadcast(){
 			}
 
 			ofxOscMessage m;
+			m.setAddress("/ServerBroadcast");
 			m.addIntArg(port); //0
 			m.addStringArg(computerName); //1
 			m.addStringArg(binaryName);	//2
