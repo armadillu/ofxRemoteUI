@@ -1646,6 +1646,7 @@ void ofxRemoteUIServer::handleBroadcast(){
 			}
 
 			ofxOscMessage m;
+			m.setAddress("/ServerBroadcast");
 			m.addIntArg(port); //0
 			m.addStringArg(computerName); //1
 			m.addStringArg(binaryName);	//2
@@ -2158,7 +2159,7 @@ void ofxRemoteUIServer::sendLogToClient(const char* format, ...){
 void ofxRemoteUIServer::sendLogToClient(string message){
 	if(readyToSend){
 		ofxOscMessage m;
-		m.setAddress("LOG_");
+		m.setAddress("/LOG_");
 		m.addStringArg(message);
 		try{
 			oscSender.sendMessage(m);
