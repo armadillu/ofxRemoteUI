@@ -79,9 +79,6 @@ public:
 	//		}
 	//	}
 
-	float getMinThresholdForParam(string paramMame); //only applies to int and float
-	float getMaxThresholdForParam(string paramMame); //only applies to int and float
-
 	vector<Neighbor> getNeighbors();
 	bool isReadyToSend();
 	bool isSetup();

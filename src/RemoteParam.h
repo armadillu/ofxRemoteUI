@@ -115,7 +115,7 @@ public:
 	};
 
 
-	bool isEqualTo(RemoteUIParam &p){
+	bool isEqualTo(const RemoteUIParam &p) const{
 
 		bool equal = true;
 		switch (type) {
@@ -258,8 +258,6 @@ struct RemoteUIServerCallBackArg{
 	string host;
 	string group;
 };
-
-
 
 #ifdef OF_AVAILABLE
 	#define RLOG_NOTICE		(ofLogNotice("ofxRemoteUI"))

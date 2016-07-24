@@ -6,8 +6,7 @@
 //
 //
 
-#ifndef emptyExample_ofxRemoteUISimpleNotifications_h
-#define emptyExample_ofxRemoteUISimpleNotifications_h
+#pragma once
 
 #if defined OF_VERSION_MINOR /*if OF exists*/
 
@@ -44,7 +43,6 @@ public:
 		float time;
 		int repeatCount;
 	};
-
 
 	struct ParamNotification{
 		string value;
@@ -106,8 +104,6 @@ public:
 		for(int i = toDeleteIndexes.size() - 1; i >= 0; i--){
 			logLines.erase( logLines.begin() + toDeleteIndexes[i] );
 		}
-
-
 	};
 
 	void draw(float x, float y){
@@ -138,7 +134,6 @@ public:
 										 );
 			yy -= hh;
 		}
-
 
 		typedef std::map<string, ParamNotification>::iterator it_type;
 		for(it_type it = paramNotifications.begin(); it != paramNotifications.end(); it++){
@@ -335,5 +330,4 @@ private:
 	float logScreenTime = 10;
 };
 
-#endif
 #endif
