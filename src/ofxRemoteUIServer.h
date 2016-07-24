@@ -106,18 +106,18 @@ public:
 	void setSaveToXMLOnExit(bool save);
 	void setDrawsNotificationsAutomaticallly(bool draw);
 	void setShowUIDuringEdits(bool s){showUIduringEdits = s;} 
-	void setNetworkInterface(string iface);
+	void setNetworkInterface(const string & iface);
 	void pushParamsToClient(); //pushes all param values to client, updating its UI
 	void sendLogToClient(const char* format, ...);
-	void sendLogToClient(string message);
+	void sendLogToClient(const string & message);
 	void setClearXMLonSave(bool clear){clearXmlOnSaving = clear;}
-	void setDirectoryPrefix(string _directoryPrefix); // set the optional directory prefix
+	void setDirectoryPrefix(const string & _directoryPrefix); // set the optional directory prefix
 
-	void removeParamFromDB(string paramName);	//useful for params its value is kinda set and will not change,
+	void removeParamFromDB(const string & paramName);	//useful for params its value is kinda set and will not change,
 												//to load from xml and then remove from the list to
 												//avoid crowding the UI too much
 
-	void watchParamOnScreen(string paramName);
+	void watchParamOnScreen(const string& paramName);
 
 	void setShowInterfaceKey(char k);
 	void setAutomaticBackupsEnabled(bool enabled);
@@ -132,7 +132,6 @@ public:
 
 #ifdef OF_AVAILABLE
 
-
 	void toggleBuiltInClientUI(); //show hide the "built in client" GUI screen
 	void setUiColumnWidth(int w);
 	void setBuiltInUiScale(float s);
@@ -140,6 +139,7 @@ public:
 	void setCustomScreenWidth(int w);
 
 	void setNotificationScreenTime(float t){onScreenNotifications.setNotificationScreenTime(t);}
+	void setLogNotificationScreenTime(float t){onScreenNotifications.setLogNotificationScreenTime(t);}
 
 	//of style event/callback
 	ofEvent<RemoteUIServerCallBackArg> clientAction;
@@ -147,11 +147,11 @@ public:
 	void startInBackgroundThread();
 	/*	Calling this will run the server in a background thread.
 	 all param changes will run in a separate thread, this might cause issues with your app
-	 as parameters can be changed at any time! so be aware, especially with strings. You might get crashes.
+	 as parameters can be changed at any time! so be aware; especially with strings, you might get crashes.
 	 This can be useful in situation where your main thread is blocked for seconds, or your app runs
 	 at a very low framerate. In those situations, the server doesnt get updated often enough,
 	 and you might get disconnected. Using a background thread means you can still control your params
-	 as the main thread is blocked, but it also means the changes may happen at any time. Also, the
+	 as the main thread is blocked, but it also means the changes are not synced with the main thread. Also, the
 	 callback method will be called from a background thread, so keep it in mind. (no GL calls in there!)
 	 */
 
@@ -201,7 +201,7 @@ private:
 
 	void addParamToDB(const RemoteUIParam & p, string thisParamName);
 
-	string 			getFinalPath(string);
+	string 			getFinalPath(const string &);
 
 	vector<ofColor> colorTables;
 	int				colorTableIndex;

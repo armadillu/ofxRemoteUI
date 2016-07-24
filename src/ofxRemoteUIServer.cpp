@@ -203,7 +203,7 @@ void ofxRemoteUIServer::setNewParamColor(int num){
 }
 
 
-void ofxRemoteUIServer::removeParamFromDB(string paramName){
+void ofxRemoteUIServer::removeParamFromDB(const string & paramName){
 
 	unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
 
@@ -250,7 +250,7 @@ void ofxRemoteUIServer::removeParamFromDB(string paramName){
 }
 
 
-void ofxRemoteUIServer::setDirectoryPrefix(string _directoryPrefix){
+void ofxRemoteUIServer::setDirectoryPrefix(const string & _directoryPrefix){
 	directoryPrefix = _directoryPrefix;
 	RLOG_NOTICE << "directoryPrefix set to '" << directoryPrefix << "'";
 	#ifdef OF_AVAILABLE
@@ -786,16 +786,16 @@ void ofxRemoteUIServer::pushParamsToClient(){
 }
 
 
-void ofxRemoteUIServer::setNetworkInterface(string iface){
+void ofxRemoteUIServer::setNetworkInterface(const string& iface){
 	userSuppliedNetInterface = iface;
 }
 
-string ofxRemoteUIServer::getFinalPath(string p){
+string ofxRemoteUIServer::getFinalPath(const string & p){
 
 	if(directoryPrefix.size()){
 		stringstream ss;
 		ss << directoryPrefix << "/" << p;
-		p = ss.str();
+		return ss.str();
 	}
 	return p;
 }
@@ -1372,7 +1372,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 					   "\nPress 's' to save current config, 'S' to make a new preset. ('E' to save in old format)\n" +
 					   "Press 'r' to restore all params's launch state.\n" +
 					   "Press Arrow Keys to edit values. SPACEBAR + Arrow Keys for bigger increments. ',' and '.' Keys to scroll.\n" +
-					   "Press 'TAB' to hide. Press 'RETURN' when editing a Color param to cycle through RGBA components.", padding, screenH / uiScale - bottomBarHeight + 20);
+					   "Press 'TAB' to hide. Press 'RETURN' when editing a Color Param to cycle through RGBA components.", padding, screenH / uiScale - bottomBarHeight + 20);
 		}
 
 		//preset selection / top bar
@@ -1996,7 +1996,7 @@ void ofxRemoteUIServer::setColorForParam(RemoteUIParam &p, ofColor c){
 	}
 }
 
-void ofxRemoteUIServer::watchParamOnScreen(string paramName){
+void ofxRemoteUIServer::watchParamOnScreen(const string & paramName){
 	if (params.find(paramName) != params.end()){
 		paramsToWatch.push_back(paramName);
 	}else{
@@ -2141,22 +2141,19 @@ void ofxRemoteUIServer::connect(string ipAddress, int port){
 }
 
 void ofxRemoteUIServer::sendLogToClient(const char* format, ...){
-	if(readyToSend){
-		// protect from crashes or memory issues
-		if (strlen(format) >= 1024) {
-			RLOG_ERROR << "log string must be under 1024 chars" << endl;
-		    return;
-		}
 
-		char line[1024];
-		va_list args;
-		va_start(args, format);
-		vsprintf(line, format,  args);
-		sendLogToClient(string(line));
+	if (strlen(format) >= 1024) {
+		RLOG_ERROR << "log string must be under 1024 chars" << endl;
+		return;
 	}
+	char line[1024];
+	va_list args;
+	va_start(args, format);
+	vsprintf(line, format,  args);
+	sendLogToClient(string(line));
 }
 
-void ofxRemoteUIServer::sendLogToClient(string message){
+void ofxRemoteUIServer::sendLogToClient(const string & message){
 	if(readyToSend){
 		ofxOscMessage m;
 		m.setAddress("/LOG_");
@@ -2164,11 +2161,11 @@ void ofxRemoteUIServer::sendLogToClient(string message){
 		try{
 			oscSender.sendMessage(m);
 			RLOG_NOTICE << "RUI_LOG(" + message + ")";
-			onScreenNotifications.addNotification(message);
 		}catch(exception e){
 			RLOG_ERROR << "Exception sendLogToClient " << e.what() ;
 		}
 	}
+	onScreenNotifications.addLogLine(message, true);
 }
 
 

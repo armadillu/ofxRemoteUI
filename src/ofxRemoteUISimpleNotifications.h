@@ -9,16 +9,13 @@
 #ifndef emptyExample_ofxRemoteUISimpleNotifications_h
 #define emptyExample_ofxRemoteUISimpleNotifications_h
 
-
 #if defined OF_VERSION_MINOR /*if OF exists*/
 
-#define NOTIFICATION_ALPHA_OVERFLOW		3.0
-#define NOTIFICATION_COLOR				ofColor(200,16,16, 255 * a)
+#define RUI_NOTIFICATION_ALPHA_OVERFLOW		3.0
+#define RUI_NOTIFICATION_COLOR				ofColor(200,16,16, 255 * a)
+#define RUI_LOG_COLOR						ofColor(28,214,40, 255 * a)
+#define RUI_NOTIFICATION_LINEHEIGHT			20
 
-#define PARAM_UPDATE_COLOR				ofColor(0, 200, 0, 255 * a)
-#define FRESH_COLOR						ofColor(0)
-#define PARAM_WATCH_COLOR				ofColor(0, 128, 255)
-#define NOTIFICATION_LINEHEIGHT			20
 #include "ofMain.h"
 #include "RemoteParam.h"
 
@@ -42,6 +39,13 @@ public:
 		float time;
 	};
 
+	struct LogLineNotification{
+		string logLine;
+		float time;
+		int repeatCount;
+	};
+
+
 	struct ParamNotification{
 		string value;
 		float time;
@@ -53,7 +57,6 @@ public:
 		float pct;
 	};
 
-
 	ofxRemoteUISimpleNotifications(){
 		#ifdef USE_OFX_FONTSTASH
 		font = NULL;
@@ -61,6 +64,7 @@ public:
 	};
 
 	void update(float dt){
+
 		vector<int> toDeleteIndexes;
 		//walk all notif, write down expired ones's indexes
 		for(int i = 0; i < notifications.size(); i++){
@@ -88,28 +92,58 @@ public:
 		for(int i = 0; i < toDeleteParams.size(); i++){
 			paramNotifications.erase( toDeleteParams[i] );
 		}
+
+		//delete expired log lines
+		toDeleteIndexes.clear();
+		for(int i = 0; i < logLines.size(); i++){
+			logLines[i].time -= dt;
+			if( logLines[i].time < 0.0f ){
+				toDeleteIndexes.push_back(i);
+			}
+		}
+
+		//delete expired logLines
+		for(int i = toDeleteIndexes.size() - 1; i >= 0; i--){
+			logLines.erase( logLines.begin() + toDeleteIndexes[i] );
+		}
+
+
 	};
 
 	void draw(float x, float y){
 
-		float spacing = NOTIFICATION_LINEHEIGHT;
+		float spacing = RUI_NOTIFICATION_LINEHEIGHT;
 		float yy = y;
 
 		for(int i = 0; i < notifications.size(); i++){
-			float a = ofClamp( NOTIFICATION_ALPHA_OVERFLOW * notifications[i].time, 0.0f, 1.0f);
+			float a = ofClamp( RUI_NOTIFICATION_ALPHA_OVERFLOW * notifications[i].time, 0.0f, 1.0f);
 			float hh = drawStringWithBox("ofxRemoteUIServer: " + notifications[i].msg,
 										x,
 										yy,
 										ofColor(0, 255 * a),
-										NOTIFICATION_COLOR
+										RUI_NOTIFICATION_COLOR
 										);
 			yy -= hh;
 		}
 
+		for(int i = 0; i < logLines.size(); i++){
+			float a = ofClamp( RUI_NOTIFICATION_ALPHA_OVERFLOW * logLines[i].time, 0.0f, 1.0f);
+			string repeatCount;
+			if (logLines[i].repeatCount > 1) repeatCount = " (x" + ofToString(logLines[i].repeatCount) + ")";
+			float hh = drawStringWithBox("Log: " + logLines[i].logLine + repeatCount,
+										 x,
+										 yy,
+										 ofColor(0, 255 * a),
+										 RUI_LOG_COLOR
+										 );
+			yy -= hh;
+		}
+
+
 		typedef std::map<string, ParamNotification>::iterator it_type;
 		for(it_type it = paramNotifications.begin(); it != paramNotifications.end(); it++){
 
-			float a = ofClamp( NOTIFICATION_ALPHA_OVERFLOW * it->second.time, 0.0f, 1.0f);
+			float a = ofClamp( RUI_NOTIFICATION_ALPHA_OVERFLOW * it->second.time, 0.0f, 1.0f);
 			float fresh = 1.0f - ofClamp((screenTime + 1) - it->second.time, 0.0f, 1.0f);
 
 			string total = it->first + ": " + it->second.value;
@@ -122,20 +156,20 @@ public:
 								);
 
 			int xx = x + total.length() * 8 + 4;
-			int yyy = yy + 6 - NOTIFICATION_LINEHEIGHT;
+			int yyy = yy + 6 - RUI_NOTIFICATION_LINEHEIGHT;
 			if (it->second.color.a != 0){ //this is a color type param - draw swatch
 				ofPushStyle();
 				ofSetColor(it->second.color, a * 255);
 				#ifdef USE_OFX_FONTSTASH
 				if(font != NULL){ //let's find the X where to draw the color swatch - this is time wasted TODO!
 					ofRectangle r = font->getBBox(total, 15, 0, 0);
-					float diff = floor(NOTIFICATION_LINEHEIGHT - r.height);
-					ofDrawRectangle(x + r.width + r.x + 4, yy + r.y - diff / 2, 40, NOTIFICATION_LINEHEIGHT);
+					float diff = floor(RUI_NOTIFICATION_LINEHEIGHT - r.height);
+					ofDrawRectangle(x + r.width + r.x + 4, yy + r.y - diff / 2, 40, RUI_NOTIFICATION_LINEHEIGHT);
 				}else{
-					ofDrawRectangle(xx, yyy , 40, NOTIFICATION_LINEHEIGHT);
+					ofDrawRectangle(xx, yyy , 40, RUI_NOTIFICATION_LINEHEIGHT);
 				}
 				#else
-				ofDrawRectangle(xx, yyy, 40, NOTIFICATION_LINEHEIGHT);
+				ofDrawRectangle(xx, yyy, 40, RUI_NOTIFICATION_LINEHEIGHT);
 				#endif
 				ofPopStyle();
 			}
@@ -144,13 +178,13 @@ public:
 				int pad = 9;
 				int knobW = 6;
 				int markH = 2;
-				int voff = (NOTIFICATION_LINEHEIGHT - knobW) / 2;
+				int voff = (RUI_NOTIFICATION_LINEHEIGHT - knobW) / 2;
 				ofSetColor(0);
-				ofDrawRectangle(xx, yyy, sliderW, NOTIFICATION_LINEHEIGHT);
+				ofDrawRectangle(xx, yyy, sliderW, RUI_NOTIFICATION_LINEHEIGHT);
 				ofSetColor(45);
-				ofDrawRectangle(xx + pad, yyy + pad, sliderW - 2 * pad, NOTIFICATION_LINEHEIGHT - 2 * pad);
+				ofDrawRectangle(xx + pad, yyy + pad, sliderW - 2 * pad, RUI_NOTIFICATION_LINEHEIGHT - 2 * pad);
 				ofSetColor(bgColor);
-				ofLine(xx + sliderW/2, yyy + NOTIFICATION_LINEHEIGHT / 2 + markH, xx + sliderW/2,  yyy + NOTIFICATION_LINEHEIGHT / 2 - markH );
+				ofLine(xx + sliderW/2, yyy + RUI_NOTIFICATION_LINEHEIGHT / 2 + markH, xx + sliderW/2,  yyy + RUI_NOTIFICATION_LINEHEIGHT / 2 - markH );
 				ofDrawRectangle(xx + pad - knobW/2 + (sliderW - 2 * pad) * ofClamp(it->second.pct, 0, 1), yyy + voff, knobW , knobW );
 
 			}
@@ -179,6 +213,29 @@ public:
 		n.time = screenTime;
 		notifications.push_back(n);
 	};
+
+	void addLogLine(const string & msg, bool merge){ //if merge==true, will look for existing log lines and increase their counter
+
+		bool found = false;
+		if(merge){
+			for(int i = 0; i < logLines.size(); i++){
+				if(logLines[i].logLine == msg){
+					logLines[i].repeatCount++;
+					logLines[i].time = screenTime; //update
+					found = true;
+					break;
+				}
+			}
+		}
+		if(!found || !merge){
+			LogLineNotification n;
+			n.logLine = msg;
+			n.time = screenTime;
+			n.repeatCount = 1;
+			logLines.push_back(n);
+		}
+	};
+
 
 	void addParamUpdate(const string & paramName, const RemoteUIParam & p, const ofColor & bgColor, const ofColor & paramC = ofColor(0,0)){
 		ParamNotification n;
@@ -233,6 +290,8 @@ public:
 	#endif
 
 	void setNotificationScreenTime(float t){screenTime = t;}
+	void setLogNotificationScreenTime(float t){logScreenTime = t;}
+
 
 private:
 
@@ -243,7 +302,7 @@ private:
 			ofDrawBitmapStringHighlight(text, x, y, background, foreground);
 		}else{
 			ofRectangle r = font->getBBox(text, 15, x, y);
-			float diff = floor(NOTIFICATION_LINEHEIGHT - r.height);
+			float diff = floor(RUI_NOTIFICATION_LINEHEIGHT - r.height);
 			r.x = x - 4;
 			r.y -= diff * 0.5f;
 			r.width += diff + 2;
@@ -260,7 +319,7 @@ private:
 		#else
 		ofDrawBitmapStringHighlight(text, x, y, background, foreground);
 		#endif
-		return NOTIFICATION_LINEHEIGHT;
+		return RUI_NOTIFICATION_LINEHEIGHT;
 	}
 
 	#ifdef USE_OFX_FONTSTASH
@@ -268,10 +327,12 @@ private:
 	#endif
 
 	vector<SimpleNotification> notifications;
+	vector<LogLineNotification> logLines;
 	map<string, ParamNotification> paramNotifications;
 	map<string, ParamNotification> paramWatch;
 	map<int, string> paramWatchOrder;
 	float screenTime = 5.0;
+	float logScreenTime = 10;
 };
 
 #endif
