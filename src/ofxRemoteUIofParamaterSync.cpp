@@ -94,8 +94,11 @@ void ofxRemoteUIofParamaterSync::recursiveSetup(ofParameterGroup & _parameters){
 			ofColor * c = ofxRemoteUIVars<ofColor>::one().defineParam(fullRUIparamName, p);
 			server->shareParam(fullRUIparamName, &(*c)[0] );
 			ofParamRuiList.push_back(fullRUIparamName);
-
-		}else if(type==typeid(ofParameter<ofVec2f>).name()){ //ofVec2f
+		#ifdef GLM_SWIZZLE
+		}else if(type==typeid(ofParameter<ofDefaultVec2>).name()){ //ofVec2f
+		#else
+		}else if (type == typeid(ofParameter<ofVec2f>).name()) { //ofVec2f
+		#endif
 			auto p = _parameters.getVec2f(i);
 			float * x = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "2x", p->x);
 			float * y = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "2y", p->y);
@@ -103,8 +106,11 @@ void ofxRemoteUIofParamaterSync::recursiveSetup(ofParameterGroup & _parameters){
 			server->shareParam(fullRUIparamName + compSEP + "2y", y, p.getMin().y, p.getMax().y);
 			ofParamRuiList.push_back(fullRUIparamName + compSEP + "2x");
 			ofParamRuiList.push_back(fullRUIparamName + compSEP + "2y");
-
-		}else if(type==typeid(ofParameter<ofVec3f>).name()){ //ofVec3f
+		#ifdef GLM_SWIZZLE
+		}else if (type == typeid(ofParameter<ofDefaultVec3>).name()) { //ofVec3f
+		#else
+		}else if (type == typeid(ofParameter<ofVec3f>).name()) { //ofVec3f
+		#endif
 			auto p = _parameters.getVec3f(i);
 			float * x = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "3x", p->x);
 			float * y = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "3y", p->y);
@@ -115,8 +121,12 @@ void ofxRemoteUIofParamaterSync::recursiveSetup(ofParameterGroup & _parameters){
 			ofParamRuiList.push_back(fullRUIparamName + compSEP + "3x");
 			ofParamRuiList.push_back(fullRUIparamName + compSEP + "3y");
 			ofParamRuiList.push_back(fullRUIparamName + compSEP + "3z");
+		#ifdef GLM_SWIZZLE
+		}else if (type == typeid(ofParameter<ofDefaultVec2>).name()) { //ofVec2f
+		#else
+		}else if (type == typeid(ofParameter<ofVec2f>).name()) { //ofVec2f
+		#endif
 
-		}else if(type==typeid(ofParameter<ofVec4f>).name()){ //ofVec4f
 			auto p = _parameters.getVec4f(i);
 			float * x = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "4x", p->x);
 			float * y = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "4y", p->y);
