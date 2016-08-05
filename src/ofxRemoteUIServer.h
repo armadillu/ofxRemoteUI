@@ -110,7 +110,7 @@ public:
 	void pushParamsToClient(); //pushes all param values to client, updating its UI
 	void sendLogToClient(const char* format, ...);
 	void sendLogToClient(const string & message);
-	void setClearXMLonSave(bool clear){clearXmlOnSaving = clear;}
+	void setClearXMLonSave(bool clear){clearXmlOnSaving = clear;} //this only affects xml v1 - not relevant nowadays
 	void setDirectoryPrefix(const string & _directoryPrefix); // set the optional directory prefix
 
 	void removeParamFromDB(const string & paramName);	//useful for params its value is kinda set and will not change,
