@@ -179,7 +179,7 @@ public:
 				ofSetColor(45);
 				ofDrawRectangle(xx + pad, yyy + pad, sliderW - 2 * pad, RUI_NOTIFICATION_LINEHEIGHT - 2 * pad);
 				ofSetColor(bgColor);
-				ofLine(xx + sliderW/2, yyy + RUI_NOTIFICATION_LINEHEIGHT / 2 + markH, xx + sliderW/2,  yyy + RUI_NOTIFICATION_LINEHEIGHT / 2 - markH );
+				ofDrawLine(xx + sliderW/2, yyy + RUI_NOTIFICATION_LINEHEIGHT / 2 + markH, xx + sliderW/2,  yyy + RUI_NOTIFICATION_LINEHEIGHT / 2 - markH );
 				ofDrawRectangle(xx + pad - knobW/2 + (sliderW - 2 * pad) * ofClamp(it->second.pct, 0, 1), yyy + voff, knobW , knobW );
 
 			}

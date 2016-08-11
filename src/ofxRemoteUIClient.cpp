@@ -115,7 +115,7 @@ void ofxRemoteUIClient::updateAutoDiscovery(float dt){
 	//listen for broadcast from all servers in the broadcast channel OFXREMOTEUI_BROADCAST_PORT
 	while( broadcastReceiver.hasWaitingMessages() ){// check for waiting messages from client
 		ofxOscMessage m;
-		broadcastReceiver.getNextMessage(&m);
+		broadcastReceiver.getNextMessage(m);
 		neigbhorChange |= closebyServers.gotPing( m.getRemoteIp(), m.getArgAsInt32(0)/*port*/, m.getArgAsString(1)/*computerName*/, m.getArgAsString(2)/*binaryName*/);
 		//read the broadcast sequence number
 		int broadcastSequenceNumber = m.getArgAsInt32(3);
@@ -182,7 +182,7 @@ void ofxRemoteUIClient::update(float dt){
 		while( oscReceiver.hasWaitingMessages() ){// check for waiting messages from server
 
 			ofxOscMessage m;
-			oscReceiver.getNextMessage(&m);
+			oscReceiver.getNextMessage(m);
 
 			DecodedMessage dm = decode(m);
 			RemoteUIClientCallBackArg cbArg; // to notify our "delegate"

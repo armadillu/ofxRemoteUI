@@ -343,6 +343,7 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string ke
 			s.setTo(path);
 			s.setAttribute("type", "float");
 			}break;
+			
 		case REMOTEUI_PARAM_INT:{
 			int v = t.intValAddr ? *t.intValAddr : t.intVal;
 			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << v <<") to XML" ;
@@ -350,6 +351,7 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string ke
 			s.setTo(path);
 			s.setAttribute("type", "int");
 			}break;
+
 		case REMOTEUI_PARAM_COLOR:{
 			unsigned char r, g, b, a;
 			if (t.redValAddr){
@@ -369,6 +371,7 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string ke
 			s.setAttribute("c2.blue", ofToString((int)b));
 			s.setAttribute("c3.alpha", ofToString((int)a));
 			}break;
+
 		case REMOTEUI_PARAM_ENUM:{
 			int v = t.intValAddr ? *t.intValAddr : t.intVal;
 			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << v <<") to XML" ;
@@ -376,6 +379,7 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string ke
 			s.setTo(path);
 			s.setAttribute("type", "enum");
 			}break;
+
 		case REMOTEUI_PARAM_BOOL:{
 			bool v = t.boolValAddr ? *t.boolValAddr : t.boolVal;
 			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << v <<") to XML" ;
@@ -383,6 +387,7 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string ke
 			s.setTo(path);
 			s.setAttribute("type", "bool");
 			}break;
+
 		case REMOTEUI_PARAM_STRING:{
 			string v = t.stringValAddr ? *t.stringValAddr : t.stringVal;
 			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << v <<") to XML" ;
@@ -390,7 +395,8 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string ke
 			s.setTo(path);
 			s.setAttribute("type", "string");
 			}break;
-		case REMOTEUI_PARAM_SPACER:
+
+		case REMOTEUI_PARAM_SPACER:{
 			if(verbose_) RLOG_NOTICE << "save spacer '" << key << "' to XML" ;
 			s.addChild("P");
 			s.setTo(path);
@@ -398,6 +404,10 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string ke
 			Poco::XML::Element *el = s.getPocoElement();
 			Poco::XML::Comment *ce = s.getPocoDocument()->createComment(Poco::XML::toXMLString(" # " + ofToString(key) + " ############################ "));
 			el->parentNode()->appendChild((Poco::XML::Node*)ce);
+			}break;
+
+		case REMOTEUI_PARAM_UNKNOWN:
+			RLOG_ERROR << "unknown param type at saveParamToXmlSettings()";
 			break;
 	}
 
@@ -1684,7 +1694,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 	while( oscReceiver.hasWaitingMessages() ){// check for waiting messages from client
 
 		ofxOscMessage m;
-		oscReceiver.getNextMessage(&m);
+		oscReceiver.getNextMessage(m);
 		if (!readyToSend){ // if not connected, connect to our friend so we can talk back
 			connect(m.getRemoteIp(), port + 1);
 		}

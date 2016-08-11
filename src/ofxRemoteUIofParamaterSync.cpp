@@ -14,7 +14,7 @@
 void ofxRemoteUIofParamaterSync::setup(ofParameterGroup & _parameters){
 
 	ofAddListener(_parameters.parameterChangedE(), this, &ofxRemoteUIofParamaterSync::parameterChanged);
-	ofAddListener(RUI_GET_OF_EVENT(), this, &ofxRemoteUIofParamaterSync::remoteUIClientDidSomething);
+	ofAddListener(RUI_GET_OF_EVENT(), this, &ofxRemoteUIofParamaterSync::onRemoteUINotification);
 
 	RUI_NEW_GROUP(_parameters.getName());
 	recursiveSetup(_parameters);
@@ -240,7 +240,7 @@ void ofxRemoteUIofParamaterSync::parameterChanged( ofAbstractParameter & paramet
 }
 
 
-void ofxRemoteUIofParamaterSync::remoteUIClientDidSomething(RemoteUIServerCallBackArg &arg){
+void ofxRemoteUIofParamaterSync::onRemoteUINotification(RemoteUIServerCallBackArg &arg){
 
 	if (arg.action == CLIENT_UPDATED_PARAM){
 		updateOfParamFromRuiParam(arg.paramName);

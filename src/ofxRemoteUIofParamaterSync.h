@@ -29,7 +29,7 @@ protected:
 
 	ofParameterGroup * syncGroup;
 
-	void remoteUIClientDidSomething(RemoteUIServerCallBackArg & arg);
+	void onRemoteUINotification(RemoteUIServerCallBackArg & arg);
 	void parameterChanged( ofAbstractParameter & parameter );
 
 	void recursiveSetup(ofParameterGroup & group);

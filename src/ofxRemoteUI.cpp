@@ -81,7 +81,7 @@ void ofxRemoteUI::clearOscReceiverMsgQueue(){
 	ofxOscMessage tempM;
 	//int c = 0;
 	//delete all pending messages
-	while (oscReceiver.getNextMessage(&tempM)) {
+	while (oscReceiver.getNextMessage(tempM)) {
 		//cout << "clearOscReceiverMsgQueue " << c << endl;
 		//c++;
 	}
