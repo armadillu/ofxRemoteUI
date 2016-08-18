@@ -710,7 +710,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 				if(isAParamWeKnowOf){
 					params[paramName] = p;
 				}else{
-					RLOG_WARNING << "Param '" << paramName << "' found in XML but not defined in source code! Keeping it arround to save back to XML";
+					RLOG_VERBOSE << "Param '" << paramName << "' found in XML but not defined in source code! Keeping it arround to save back to XML";
 					if (params_removed.find(paramName) == params_removed.end()){ //not added yet
 						orderedKeys_removed[orderedKeys_removed.size()] = paramName;
 					}

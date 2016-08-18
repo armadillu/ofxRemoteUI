@@ -208,6 +208,11 @@ public:
 		}
 	};
 
+#ifdef OF_AVAILABLE
+	ofColor getColor(){
+		return ofColor(redVal, greenVal, blueVal, alphaVal);
+	}
+#endif
 
 	void setBgColor(const ofColor & c){
 		r = c.r; g = c.g; b = c.b; a = c.a;
