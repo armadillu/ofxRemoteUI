@@ -281,6 +281,8 @@ private:
 	void			drawString(const string & text, const float & x, const float & y);
 	void			drawString(const string & text, const ofVec2f & pos);
 
+	string 			cleanCharsForFileSystem(const string & s);
+
 #endif
 
 	//keep track of params we added and then removed

@@ -165,6 +165,7 @@ void ofxRemoteUIServer::close(){
 
 
 void ofxRemoteUIServer::setParamGroup(string g){
+	g = cleanCharsForFileSystem(g);
 	upcomingGroup = g;
 	newColorInGroupCounter = 1;
 	setNewParamColor(1);
@@ -1029,6 +1030,8 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 														  :
 														  "Create a New Global Preset" ,
 														  "");
+
+				presetName = cleanCharsForFileSystem(presetName); //remove weird chars
 				if(presetName.size()){
 					RemoteUIServerCallBackArg cbArg;
 					if (groupIsSelected){
@@ -1769,7 +1772,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				break;
 
 			case SET_PRESET_ACTION:{ // client wants to set a preset
-				string presetName = m.getArgAsString(0);
+				string presetName = cleanCharsForFileSystem(m.getArgAsString(0));
 				vector<string> missingParams = loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
 				sendSETP(presetName);
 				sendMISP(missingParams);
@@ -1784,7 +1787,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			}break;
 
 			case SAVE_PRESET_ACTION:{ //client wants to save current xml as a new preset
-				string presetName = m.getArgAsString(0);
+				string presetName = cleanCharsForFileSystem(m.getArgAsString(0));
 				saveToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
 				sendSAVP(presetName);
 				cbArg.action = CLIENT_SAVED_PRESET;
@@ -1798,7 +1801,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			}break;
 
 			case DELETE_PRESET_ACTION:{
-				string presetName = m.getArgAsString(0);
+				string presetName = cleanCharsForFileSystem(m.getArgAsString(0));
 				deletePreset(presetName);
 				sendDELP(presetName);
 				cbArg.action = CLIENT_DELETED_PRESET;
@@ -1848,8 +1851,8 @@ void ofxRemoteUIServer::updateServer(float dt){
 			}break;
 
 			case SET_GROUP_PRESET_ACTION:{ // client wants to set a preset for a group
-				string presetName = m.getArgAsString(0);
-				string groupName = m.getArgAsString(1);
+				string presetName = cleanCharsForFileSystem(m.getArgAsString(0));
+				string groupName = cleanCharsForFileSystem(m.getArgAsString(1));
 				vector<string> missingParams = loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName + "/" + presetName + ".xml");
 				vector<string> filtered;
 				for(int i = 0; i < missingParams.size(); i++){
@@ -1871,8 +1874,8 @@ void ofxRemoteUIServer::updateServer(float dt){
 			}break;
 
 			case SAVE_GROUP_PRESET_ACTION:{ //client wants to save current xml as a new preset
-				string presetName = m.getArgAsString(0);
-				string groupName = m.getArgAsString(1);
+				string presetName = cleanCharsForFileSystem(m.getArgAsString(0));
+				string groupName = cleanCharsForFileSystem(m.getArgAsString(1));
 				saveGroupToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName + "/" + presetName + ".xml", groupName);
 				sendSAVp(presetName, groupName);
 				cbArg.action = CLIENT_SAVED_GROUP_PRESET;
@@ -1887,8 +1890,8 @@ void ofxRemoteUIServer::updateServer(float dt){
 			}break;
 
 			case DELETE_GROUP_PRESET_ACTION:{
-				string presetName = m.getArgAsString(0);
-				string groupName = m.getArgAsString(1);
+				string presetName = cleanCharsForFileSystem(m.getArgAsString(0));
+				string groupName = cleanCharsForFileSystem(m.getArgAsString(1));
 				deletePreset(presetName, groupName);
 				sendDELp(presetName, groupName);
 				cbArg.action = CLIENT_DELETED_GROUP_PRESET;
@@ -1908,13 +1911,14 @@ void ofxRemoteUIServer::updateServer(float dt){
 
 void ofxRemoteUIServer::deletePreset(string name, string group){
 	#ifdef OF_AVAILABLE
-	ofDirectory dir;
-	if (group == "")
-		dir.open(getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + name + ".xml");
-	else
-		dir.open(getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + group + "/" + name + ".xml");
-	dir.remove(true);
-	#else
+	if (group == ""){ //global preset
+		string path = getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + name + ".xml";
+		ofFile::removeFile(path);
+	}else{
+		string path = getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + group + "/" + name + ".xml";
+		ofFile::removeFile(path);
+	}
+	#else //TODO this wont work, relative path
 	string file = getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + name + ".xml";
 	if (group != "") file = getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + group + "/" + name + ".xml";
 	remove( file.c_str() );
@@ -2431,7 +2435,18 @@ vector<string> ofxRemoteUIServer::loadFromXMLv1(string fileName){
 	return paramsNotInXML;
 }
 
+string ofxRemoteUIServer::cleanCharsForFileSystem(const string & s){
 
+	string r = s;
+	//remove some chars that will confuse the fileSystem
+	std::replace( r.begin(), r.end(), ':', '_');
+	std::replace( r.begin(), r.end(), '/', '_');
+	std::replace( r.begin(), r.end(), '\\', '_');
+	std::replace( r.begin(), r.end(), '<', '_');
+	std::replace( r.begin(), r.end(), '>', '_');
+	std::replace( r.begin(), r.end(), '|', '_');
+	return r;
+}
 
 void ofxRemoteUIServer::saveGroupToXMLv1(string filePath, string groupName){
 
