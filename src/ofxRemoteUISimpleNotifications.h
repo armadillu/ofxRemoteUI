@@ -186,19 +186,22 @@ public:
 			yy -= hh;
 		}
 
-		map<int, string>::iterator it2 = paramWatchOrder.begin();
+		auto it2 = paramWatchOrder.begin();
 		while(it2 != paramWatchOrder.end()){
-
-			//int order = it2->first;
-			string name = it2->second;
-
-			float hh = drawStringWithBox( "[" + it2->second + "] " + paramWatch[name].value,
-								x,
-								yy,
-								ofColor::black, paramWatch[name].color
-								);
+			string & name = it2->second;
+			float hh = drawStringWithBox( "[" + name + "] " + paramWatch[name].value,
+								x, yy, ofColor::black, paramWatch[name].color );
 			yy -= hh;
 			++it2;
+		}
+
+		auto it3 = variableWatchOrder.begin();
+		while(it3 != variableWatchOrder.end()){
+			string & name = it3->second;
+			float hh = drawStringWithBox( "*(" + name + ") = " + variableWatch[name].value,
+										 x, yy, ofColor::black, variableWatch[name].color );
+			yy -= hh;
+			++it3;
 		}
 	};
 
@@ -274,6 +277,19 @@ public:
 		paramWatch[paramName] = n;
 	};
 
+	void addVariableWatch(const string &paramName, const string& paramValue, const ofColor & paramC){
+		ParamNotification n;
+		n.color = paramC;
+		n.bgColor = ofColor(0);
+		n.value = paramValue;
+		n.time = screenTime;
+		n.range = false;
+		if(variableWatch.find(paramName) == variableWatch.end()){
+			variableWatchOrder[variableWatchOrder.size()] = paramName;
+		}
+		variableWatch[paramName] = n;
+	};
+
 
 	#ifdef USE_OFX_FONTSTASH
 	void drawUiWithFontStash(ofxFontStash * font_){
@@ -325,7 +341,9 @@ private:
 	vector<LogLineNotification> logLines;
 	map<string, ParamNotification> paramNotifications;
 	map<string, ParamNotification> paramWatch;
+	map<string, ParamNotification> variableWatch;
 	map<int, string> paramWatchOrder;
+	map<int, string> variableWatchOrder;
 	float screenTime = 5.0;
 	float logScreenTime = 10;
 };

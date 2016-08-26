@@ -1596,6 +1596,10 @@ void ofxRemoteUIServer::draw(int x, int y){
 				ofColor c = ofColor(p.r, p.g, p.b, 255);
 				onScreenNotifications.addParamWatch(paramsToWatch[i], v, c);
 			}
+
+			for(auto & w : varWatches){ // add watches
+				onScreenNotifications.addVariableWatch(w.first, w.second.getValueAsString(), ofColor::limeGreen);
+			}
 			onScreenNotifications.draw(x, y);
 		}
 	}
@@ -2467,3 +2471,46 @@ void ofxRemoteUIServer::saveGroupToXMLv1(string filePath, string groupName){
 	}
 	s.saveFile(filePath);
 }
+
+
+void ofxRemoteUIServer::addVariableWatch(const string & varName, float* varPtr){
+	RemoteUIServerValueWatch w;
+	w.type = REMOTEUI_PARAM_FLOAT;
+	w.floatAddress = varPtr;
+	varWatches[varName] = w;
+	RLOG_NOTICE << "addVariableWatch() - added a watch for var named '" << varName << "'";
+}
+
+
+void ofxRemoteUIServer::addVariableWatch(const string & varName, int* varPtr){
+	RemoteUIServerValueWatch w;
+	w.type = REMOTEUI_PARAM_INT;
+	w.intAddress = varPtr;
+	varWatches[varName] = w;
+	RLOG_NOTICE << "addVariableWatch() - added a watch for var named '" << varName << "'";
+}
+
+
+void ofxRemoteUIServer::addVariableWatch(const string & varName, bool* varPtr){
+	RemoteUIServerValueWatch w;
+	w.type = REMOTEUI_PARAM_BOOL;
+	w.boolAddress = varPtr;
+	varWatches[varName] = w;
+	RLOG_NOTICE << "addVariableWatch() - added a watch for var named '" << varName << "'";
+}
+
+/*
+void ofxRemoteUIServer::removeVariableWatch(const string &varName){
+
+	auto find = varWatches.find(varName);
+	if(find == varWatches.end()){
+		RLOG_ERROR << "Can't removeVariableWatch() - var not found! : " << varName;
+	}else{
+		RLOG_NOTICE << "removeVariableWatch() - removed var '" << varName << "' from the watch list!";
+		varWatches.erase(varName);
+	}
+}
+*/
+
+
+

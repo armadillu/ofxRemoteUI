@@ -6,8 +6,7 @@
 //
 //
 
-#ifndef emptyExample_RemoteParam_h
-#define emptyExample_RemoteParam_h
+#pragma once
 
 #include <stdio.h>
 #include <sstream>
@@ -264,6 +263,22 @@ struct RemoteUIServerCallBackArg{
 	string group;
 };
 
+struct RemoteUIServerValueWatch{
+	RemoteUIParamType type;
+	float * floatAddress;
+	int * intAddress;
+	bool * boolAddress;
+	RemoteUIServerValueWatch(){ floatAddress = nullptr; intAddress = nullptr; boolAddress = nullptr;}
+	string getValueAsString(){
+		switch(type){
+			case REMOTEUI_PARAM_FLOAT: return ofToString(*floatAddress, 4);
+			case REMOTEUI_PARAM_INT: return ofToString(*intAddress);
+			case REMOTEUI_PARAM_BOOL: return (*boolAddress) ? "true" : "false";
+		}
+		return "unknown var type?";
+	}
+};
+
 #ifdef OF_AVAILABLE
 	#define RLOG_NOTICE		(ofLogNotice("ofxRemoteUI"))
 	#define RLOG_ERROR		(ofLogError("ofxRemoteUI"))
@@ -276,4 +291,3 @@ struct RemoteUIServerCallBackArg{
 	#define RLOG_VERBOSE		(cout << endl)
 #endif
 
-#endif //emptyExample_RemoteParam_h

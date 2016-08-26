@@ -157,6 +157,14 @@ public:
 
 #endif
 
+	//These are used to monitor on screen any value you need; similar to watchParam
+	//WARNING - make sure the pointer you provide is VALID during the whole program duration
+	//or you will crash!
+	void addVariableWatch(const string & varName, float* varPtr);
+	void addVariableWatch(const string & varName, int* varPtr);
+	void addVariableWatch(const string & varName, bool* varPtr);
+	//void removeVariableWatch(const string &varName);
+
 private:
 
 	ofxRemoteUIServer(); // use ofxRemoteUIServer::instance() instead! Use the MACROS defined above!
@@ -283,12 +291,14 @@ private:
 
 	string 			cleanCharsForFileSystem(const string & s);
 
+
 #endif
 
 	//keep track of params we added and then removed
-	unordered_map<string, RemoteUIParam>		params_removed;
-	unordered_map<int, string>					orderedKeys_removed; // used to keep the order in which the params were added
+	unordered_map<string, RemoteUIParam>				params_removed;
+	unordered_map<int, string>							orderedKeys_removed; // used to keep the order in which the params were added
 
+	unordered_map<string, RemoteUIServerValueWatch> 	varWatches;
 
 	static ofxRemoteUIServer* 							singleton;
 };
