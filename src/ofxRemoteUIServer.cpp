@@ -1604,7 +1604,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 			}
 
 			for(auto & w : varWatches){ // add watches
-				onScreenNotifications.addVariableWatch(w.first, w.second.getValueAsString(), ofColor::limeGreen);
+				onScreenNotifications.addVariableWatch(w.first, w.second.getValueAsString(), ofColor::darkorange);
 			}
 			onScreenNotifications.draw(x, y);
 		}

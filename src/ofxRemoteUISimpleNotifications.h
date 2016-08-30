@@ -190,7 +190,7 @@ public:
 		while(it2 != paramWatchOrder.end()){
 			string & name = it2->second;
 			float hh = drawStringWithBox( "[" + name + "] " + paramWatch[name].value,
-								x, yy, ofColor::black, paramWatch[name].color );
+								x, yy, paramWatch[name].bgColor, paramWatch[name].color );
 			yy -= hh;
 			++it2;
 		}
@@ -199,7 +199,7 @@ public:
 		while(it3 != variableWatchOrder.rend()){
 			string & name = it3->second;
 			float hh = drawStringWithBox( "*(" + name + ") = " + variableWatch[name].value,
-										 x, yy, ofColor::black, variableWatch[name].color );
+										 x, yy, variableWatch[name].bgColor, variableWatch[name].color );
 			yy -= hh;
 			++it3;
 		}
@@ -279,8 +279,8 @@ public:
 
 	void addVariableWatch(const string &paramName, const string& paramValue, const ofColor & paramC){
 		ParamNotification n;
-		n.color = paramC;
-		n.bgColor = ofColor(0);
+		n.color = ofColor(0);
+		n.bgColor = paramC;
 		n.value = paramValue;
 		n.time = screenTime;
 		n.range = false;
