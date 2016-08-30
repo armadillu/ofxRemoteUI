@@ -298,7 +298,7 @@ private:
 	unordered_map<string, RemoteUIParam>				params_removed;
 	unordered_map<int, string>							orderedKeys_removed; // used to keep the order in which the params were added
 
-	unordered_map<string, RemoteUIServerValueWatch> 	varWatches;
+	map<string, RemoteUIServerValueWatch> 				varWatches;
 
 	static ofxRemoteUIServer* 							singleton;
 };

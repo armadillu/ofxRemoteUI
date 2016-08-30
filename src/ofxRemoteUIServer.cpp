@@ -1589,6 +1589,11 @@ void ofxRemoteUIServer::draw(int x, int y){
 				float scale = tm->getUiScale();
 				ofTranslate(0, scale * (-tm->getHeight() - 10 - tm->getPlotsHeight()));
 			}
+			if(tm->getDrawLocation() == TIME_MEASUREMENTS_BOTTOM_RIGHT){
+				float scale = tm->getUiScale();
+				ofTranslate(0, scale * (-10 - tm->getPlotsHeight()));
+			}
+
 			#endif
 			for(int i = 0; i < paramsToWatch.size(); i++){
 				RemoteUIParam & p = params[paramsToWatch[i]];

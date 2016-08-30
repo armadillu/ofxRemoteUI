@@ -195,8 +195,8 @@ public:
 			++it2;
 		}
 
-		auto it3 = variableWatchOrder.begin();
-		while(it3 != variableWatchOrder.end()){
+		auto it3 = variableWatchOrder.rbegin();
+		while(it3 != variableWatchOrder.rend()){
 			string & name = it3->second;
 			float hh = drawStringWithBox( "*(" + name + ") = " + variableWatch[name].value,
 										 x, yy, ofColor::black, variableWatch[name].color );
