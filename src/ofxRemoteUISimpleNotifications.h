@@ -199,7 +199,7 @@ public:
 		while(it3 != variableWatchOrder.rend()){
 			string & name = it3->second;
 			float hh = drawStringWithBox( "*(" + name + ") = " + variableWatch[name].value,
-										 x, yy, variableWatch[name].bgColor, variableWatch[name].color );
+										 x, yy, variableWatch[name].bgColor, variableWatch[name].color, 11, 12 );
 			yy -= hh;
 			++it3;
 		}
@@ -279,8 +279,8 @@ public:
 
 	void addVariableWatch(const string &paramName, const string& paramValue, const ofColor & paramC){
 		ParamNotification n;
-		n.color = ofColor(0);
-		n.bgColor = paramC;
+		n.color = paramC;
+		n.bgColor = ofColor(0,190);
 		n.value = paramValue;
 		n.time = screenTime;
 		n.range = false;
@@ -307,13 +307,13 @@ public:
 private:
 
 	//return height of box
-	float drawStringWithBox(const string & text, int x, int y, const ofColor& background, const ofColor& foreground ){
+	float drawStringWithBox(const string & text, int x, int y, const ofColor& background, const ofColor& foreground, float fontSize = 15, float lineH = RUI_NOTIFICATION_LINEHEIGHT ){
 		#ifdef USE_OFX_FONTSTASH
 		if(font == NULL){
 			ofDrawBitmapStringHighlight(text, x, y, background, foreground);
 		}else{
-			ofRectangle r = font->getBBox(text, 15, x, y);
-			float diff = floor(RUI_NOTIFICATION_LINEHEIGHT - r.height);
+			ofRectangle r = font->getBBox(text, fontSize, x, y);
+			float diff = floor(lineH - r.height);
 			r.x = x - 4;
 			r.y -= diff * 0.5f;
 			r.width += diff + 2;
@@ -323,7 +323,7 @@ private:
 			ofSetColor(background);
 			ofDrawRectangle(r);
 			ofSetColor(foreground);
-			font->draw(text, 15, x, y);
+			font->draw(text, fontSize, x, y);
 			ofPopStyle();
 			return floor(r.height);
 		}

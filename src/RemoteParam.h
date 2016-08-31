@@ -268,6 +268,7 @@ struct RemoteUIServerValueWatch{
 	float * floatAddress;
 	int * intAddress;
 	bool * boolAddress;
+	ofColor color;
 	RemoteUIServerValueWatch(){ floatAddress = nullptr; intAddress = nullptr; boolAddress = nullptr;}
 	string getValueAsString(){
 		switch(type){

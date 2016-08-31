@@ -55,7 +55,7 @@ public:
 
 	void setup(int port = -1, float updateInterval = 0.1/*sec*/);
 
-	//You shouldnt need to call any of these directly. Use the Macros supplied above instead.
+	//You shouldnt need to call any of these directly. Use the Macros supplied in a separate header file instead.
 	void update(float dt);
 	#ifdef OF_AVAILABLE
 	void draw(int x = 20, int y = ofGetHeight() - 20); //x and y of where the notifications will get draw
@@ -101,12 +101,12 @@ public:
 	//		}
 	//	}
 
-	void setEnabled(bool enabled);
+	void setEnabled(bool enabled_){enabled = enabled_;};
 	bool getSaveToXMLOnExit(){ return saveToXmlOnExit; }
-	void setSaveToXMLOnExit(bool save);
-	void setDrawsNotificationsAutomaticallly(bool draw);
+	void setSaveToXMLOnExit(bool save){saveToXmlOnExit = save;};
+	void setDrawsNotificationsAutomaticallly(bool draw){drawNotifications = draw;}
 	void setShowUIDuringEdits(bool s){showUIduringEdits = s;} 
-	void setNetworkInterface(const string & iface);
+	void setNetworkInterface(const string & iface){userSuppliedNetInterface = iface;}
 	void pushParamsToClient(); //pushes all param values to client, updating its UI
 	void sendLogToClient(const char* format, ...);
 	void sendLogToClient(const string & message);
@@ -119,8 +119,8 @@ public:
 
 	void watchParamOnScreen(const string& paramName);
 
-	void setShowInterfaceKey(char k);
-	void setAutomaticBackupsEnabled(bool enabled);
+	void setShowInterfaceKey(char key){showInterfaceKey = key;};
+	void setAutomaticBackupsEnabled(bool enabled){autoBackups = enabled;}
 	void setAutoDraw(bool d){autoDraw = d;};
 	bool getAutoDraw(){return autoDraw;}
 	#ifdef USE_OFX_FONTSTASH
@@ -160,9 +160,9 @@ public:
 	//These are used to monitor on screen any value you need; similar to watchParam
 	//WARNING - make sure the pointer you provide is VALID during the whole program duration
 	//or you will crash!
-	void addVariableWatch(const string & varName, float* varPtr);
-	void addVariableWatch(const string & varName, int* varPtr);
-	void addVariableWatch(const string & varName, bool* varPtr);
+	void addVariableWatch(const string & varName, float* varPtr, ofColor c = ofColor(0,0,0,0));
+	void addVariableWatch(const string & varName, int* varPtr, ofColor c = ofColor(0,0,0,0));
+	void addVariableWatch(const string & varName, bool* varPtr, ofColor c = ofColor(0,0,0,0));
 	//void removeVariableWatch(const string &varName);
 
 private:
@@ -207,7 +207,7 @@ private:
 	#endif
 	void			saveSettingsBackup();
 
-	void addParamToDB(const RemoteUIParam & p, string thisParamName);
+	void 			addParamToDB(const RemoteUIParam & p, string thisParamName);
 
 	string 			getFinalPath(const string &);
 

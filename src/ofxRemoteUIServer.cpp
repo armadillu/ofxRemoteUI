@@ -52,21 +52,6 @@ ofxRemoteUIServer* ofxRemoteUIServer::instance(){
 	return singleton;
 }
 
-void ofxRemoteUIServer::setEnabled(bool enabled_){
-	enabled = enabled_;
-}
-
-void ofxRemoteUIServer::setAutomaticBackupsEnabled(bool enabled){
-	autoBackups = enabled;
-}
-
-void ofxRemoteUIServer::setDrawsNotificationsAutomaticallly(bool draw){
-	drawNotifications = draw;
-}
-
-void ofxRemoteUIServer::setShowInterfaceKey(char k){
-	showInterfaceKey = k;
-}
 
 ofxRemoteUIServer::ofxRemoteUIServer(){
 
@@ -138,11 +123,6 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 
 ofxRemoteUIServer::~ofxRemoteUIServer(){
 	RLOG_NOTICE << "~ofxRemoteUIServer()" ;
-}
-
-
-void ofxRemoteUIServer::setSaveToXMLOnExit(bool save){
-	saveToXmlOnExit = save;
 }
 
 
@@ -796,10 +776,6 @@ void ofxRemoteUIServer::pushParamsToClient(){
 	}
 }
 
-
-void ofxRemoteUIServer::setNetworkInterface(const string& iface){
-	userSuppliedNetInterface = iface;
-}
 
 string ofxRemoteUIServer::getFinalPath(const string & p){
 
@@ -1603,8 +1579,9 @@ void ofxRemoteUIServer::draw(int x, int y){
 				onScreenNotifications.addParamWatch(paramsToWatch[i], v, c);
 			}
 
+			ofColor transp = ofColor(0,0,0,0);
 			for(auto & w : varWatches){ // add watches
-				onScreenNotifications.addVariableWatch(w.first, w.second.getValueAsString(), ofColor::darkorange);
+				onScreenNotifications.addVariableWatch(w.first, w.second.getValueAsString(), (w.second.color == transp) ? ofColor(0, 190) : w.second.color );
 			}
 			onScreenNotifications.draw(x, y);
 		}
@@ -2479,28 +2456,31 @@ void ofxRemoteUIServer::saveGroupToXMLv1(string filePath, string groupName){
 }
 
 
-void ofxRemoteUIServer::addVariableWatch(const string & varName, float* varPtr){
+void ofxRemoteUIServer::addVariableWatch(const string & varName, float* varPtr, ofColor c){
 	RemoteUIServerValueWatch w;
 	w.type = REMOTEUI_PARAM_FLOAT;
 	w.floatAddress = varPtr;
+	w.color = c;
 	varWatches[varName] = w;
 	RLOG_NOTICE << "addVariableWatch() - added a watch for var named '" << varName << "'";
 }
 
 
-void ofxRemoteUIServer::addVariableWatch(const string & varName, int* varPtr){
+void ofxRemoteUIServer::addVariableWatch(const string & varName, int* varPtr, ofColor c){
 	RemoteUIServerValueWatch w;
 	w.type = REMOTEUI_PARAM_INT;
 	w.intAddress = varPtr;
+	w.color = c;
 	varWatches[varName] = w;
 	RLOG_NOTICE << "addVariableWatch() - added a watch for var named '" << varName << "'";
 }
 
 
-void ofxRemoteUIServer::addVariableWatch(const string & varName, bool* varPtr){
+void ofxRemoteUIServer::addVariableWatch(const string & varName, bool* varPtr, ofColor c){
 	RemoteUIServerValueWatch w;
 	w.type = REMOTEUI_PARAM_BOOL;
 	w.boolAddress = varPtr;
+	w.color = c;
 	varWatches[varName] = w;
 	RLOG_NOTICE << "addVariableWatch() - added a watch for var named '" << varName << "'";
 }
