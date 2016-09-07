@@ -2460,6 +2460,9 @@ void ofxRemoteUIServer::addVariableWatch(const string & varName, float* varPtr, 
 	RemoteUIServerValueWatch w;
 	w.type = REMOTEUI_PARAM_FLOAT;
 	w.floatAddress = varPtr;
+	if(c.r == 0 && c.g == 0 && c.b == 0 && c.a == 0){
+		c = ofColor::magenta;
+	}
 	w.color = c;
 	varWatches[varName] = w;
 	RLOG_NOTICE << "addVariableWatch() - added a watch for var named '" << varName << "'";
@@ -2470,6 +2473,9 @@ void ofxRemoteUIServer::addVariableWatch(const string & varName, int* varPtr, of
 	RemoteUIServerValueWatch w;
 	w.type = REMOTEUI_PARAM_INT;
 	w.intAddress = varPtr;
+	if(c.r == 0 && c.g == 0 && c.b == 0 && c.a == 0){
+		c = ofColor::magenta;
+	}
 	w.color = c;
 	varWatches[varName] = w;
 	RLOG_NOTICE << "addVariableWatch() - added a watch for var named '" << varName << "'";
@@ -2480,6 +2486,9 @@ void ofxRemoteUIServer::addVariableWatch(const string & varName, bool* varPtr, o
 	RemoteUIServerValueWatch w;
 	w.type = REMOTEUI_PARAM_BOOL;
 	w.boolAddress = varPtr;
+	if(c.r == 0 && c.g == 0 && c.b == 0 && c.a == 0){
+		c = ofColor::magenta;
+	}
 	w.color = c;
 	varWatches[varName] = w;
 	RLOG_NOTICE << "addVariableWatch() - added a watch for var named '" << varName << "'";
