@@ -455,7 +455,7 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 		fileName = getFinalPath(fileName);
 	}
 
-	RLOG_NOTICE << "saving to xml (using the V2 format) '" << fileName << "'" ;
+	RLOG_NOTICE << "saving to XML (using the V2 format) '" << fileName << "'" ;
 	ofXml s;
 
 	s.addChild(OFXREMOTEUI_XML_ROOT_TAG);
@@ -523,6 +523,8 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 	}
 	s.addValue(OFXREMOTEUI_XML_ENABLED_TAG, enabled);
 	s.save(fileName );
+
+	RLOG_NOTICE << "done saving! (using the V2 format) '" << fileName << "'" ;
 }
 #endif
 
@@ -536,6 +538,8 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 	ofxXmlSettings s;
 	bool exists = s.loadFile(fileName);
 	bool newVersion = s.getNumTags(string(OFXREMOTEUI_XML_ROOT_TAG) + ":" + string(OFXREMOTEUI_XML_V_TAG)) > 0;
+
+	RLOG_NOTICE << "Loading from XML! \"" << fileName << "\"";
 
 	if (exists){
 		#ifdef OF_AVAILABLE
@@ -965,14 +969,19 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 
 	setNewParamColor(1);
 	setNewParamColorVariation(true);
+	RUI_LOAD_FROM_XML(); //we load at setup time - all values are store even b4 they are defined in src!
 }
 
 #ifdef OF_AVAILABLE
 void ofxRemoteUIServer::_appExited(ofEventArgs &e){
 	if(!enabled) return;
+	RLOG_NOTICE << "closing ofxRemoteUIServer...";
 	OFX_REMOTEUI_SERVER_CLOSE();		//stop the server
-	if(saveToXmlOnExit){
+	if(saveToXmlOnExit && loadedFromXML){
+		RLOG_NOTICE << "saving to XML on exit...";
 		OFX_REMOTEUI_SERVER_SAVE_TO_XML();	//save values to XML
+	}else{
+		RLOG_NOTICE << "We were supposed to Save to XML on exit, but we haven't loaded an XML yet... So not saving!";
 	}
 }
 
@@ -1554,7 +1563,6 @@ void ofxRemoteUIServer::draw(int x, int y){
 		ofDrawTriangle(screenW / uiScale, 0, screenW / uiScale - ts, 0, screenW / uiScale, ts);
 		ofDrawTriangle(0, screenH / uiScale, ts, screenH / uiScale, 0, screenH / uiScale - ts);
 		ofDrawTriangle(screenW / uiScale, screenH / uiScale, screenW / uiScale - ts, screenH / uiScale, screenW / uiScale, screenH / uiScale - ts);
-
 	}
 
 	if (needsToDrawNotification){
@@ -2014,6 +2022,48 @@ void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamNa
 		addSpacer(OFXREMOTEUI_DEFAULT_PARAM_GROUP);
 	}
 	ofxRemoteUI::addParamToDB(p, thisParamName);
+
+	if(loadedFromXML){ //lets see if we had loaded this param from xml - will upate its values if so
+		auto it = params_removed.find(thisParamName);
+		if(it != params_removed.end()){
+			RemoteUIParam & xmlP = params_removed[thisParamName];
+			RemoteUIParam & srcP = params[thisParamName];
+			if(xmlP.type == srcP.type){
+				switch (xmlP.type) {
+					case REMOTEUI_PARAM_FLOAT:
+						if (srcP.floatValAddr){
+							*(srcP.floatValAddr) = srcP.floatVal = xmlP.floatVal;
+						}break;
+					case REMOTEUI_PARAM_ENUM:
+					case REMOTEUI_PARAM_INT:
+						if (srcP.intValAddr){
+							*(srcP.intValAddr) = srcP.intVal = xmlP.intVal;
+						}break;
+
+					case REMOTEUI_PARAM_COLOR:
+						if (srcP.redValAddr){
+							*srcP.redValAddr = srcP.redVal = xmlP.redVal;
+							*(srcP.redValAddr+1) = srcP.greenVal = xmlP.greenVal;
+							*(srcP.redValAddr+2) = srcP.blueVal = xmlP.blueVal;
+							*(srcP.redValAddr+3) = srcP.alphaVal = xmlP.alphaVal;
+						}break;
+
+					case REMOTEUI_PARAM_BOOL:
+						if (srcP.boolValAddr){
+							*srcP.boolValAddr = srcP.boolVal = xmlP.boolVal;
+						}break;
+
+					case REMOTEUI_PARAM_SPACER:
+					case REMOTEUI_PARAM_STRING:
+						if (srcP.stringValAddr){
+							*srcP.stringValAddr = srcP.stringVal = xmlP.stringVal;
+						}break;
+					default: break;
+				}
+				RLOG_NOTICE << "updating value of param \"" << thisParamName << "\" according to the previously loaded XML!";
+			}
+		}
+	}
 }
 
 void ofxRemoteUIServer::addSpacer(string title){
@@ -2179,7 +2229,7 @@ void ofxRemoteUIServer::saveToXMLv1(string fileName){
 	fileName = getFinalPath(fileName);
 #endif
 
-	RLOG_NOTICE << "saving to xml (using the OLD FORMAT) '" << fileName << "'" ;
+	RLOG_NOTICE << "saving to XML (using the OLD FORMAT) '" << fileName << "'" ;
 	ofxXmlSettings s;
 	s.loadFile(fileName);
 	if(clearXmlOnSaving){
@@ -2465,7 +2515,7 @@ void ofxRemoteUIServer::addVariableWatch(const string & varName, float* varPtr, 
 	}
 	w.color = c;
 	varWatches[varName] = w;
-	RLOG_NOTICE << "addVariableWatch() - added a watch for var named '" << varName << "'";
+	RLOG_NOTICE << "addVariableWatch() - added a watch for var named \"" << varName << "\"";
 }
 
 
@@ -2478,7 +2528,7 @@ void ofxRemoteUIServer::addVariableWatch(const string & varName, int* varPtr, of
 	}
 	w.color = c;
 	varWatches[varName] = w;
-	RLOG_NOTICE << "addVariableWatch() - added a watch for var named '" << varName << "'";
+	RLOG_NOTICE << "addVariableWatch() - added a watch for var named \"" << varName << "\"";
 }
 
 
@@ -2491,7 +2541,7 @@ void ofxRemoteUIServer::addVariableWatch(const string & varName, bool* varPtr, o
 	}
 	w.color = c;
 	varWatches[varName] = w;
-	RLOG_NOTICE << "addVariableWatch() - added a watch for var named '" << varName << "'";
+	RLOG_NOTICE << "addVariableWatch() - added a watch for var named \"" << varName << "\"";
 }
 
 /*
