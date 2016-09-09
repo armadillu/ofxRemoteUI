@@ -702,8 +702,10 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 					params_removed[paramName] = p;
 				}
 
-				if(isAParamWeKnowOf && paramsLoadedFromXML.find(paramName) == paramsLoadedFromXML.end()){
+				if(paramsLoadedFromXML.find(paramName) == paramsLoadedFromXML.end()){
+					//if(isAParamWeKnowOf){ //defined in src by calling rui_share_param()
 					paramsLoadedFromXML[paramName] = true;
+					//}
 					paramsFromXML[paramName] = p;
 				}
 			}
@@ -734,7 +736,10 @@ void ofxRemoteUIServer::restoreAllParamsToInitialXML(){
 		string key = (*ii).first;
 		if (params[key].type != REMOTEUI_PARAM_SPACER){
 			if (paramsFromXML.find(key) != paramsFromXML.end()){
-				params[key] = paramsFromXML[key];
+				auto & xmlP = paramsFromXML[key];
+				auto & p = params[key];
+				//params[key] = paramsFromXML[key];
+				p = xmlP;
 				syncPointerToParam(key);
 			}
 		}
@@ -2026,40 +2031,58 @@ void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamNa
 	if(loadedFromXML){ //lets see if we had loaded this param from xml - will upate its values if so
 		auto it = params_removed.find(thisParamName);
 		if(it != params_removed.end()){
-			RemoteUIParam & xmlP = params_removed[thisParamName];
+			RemoteUIParam & pRem = params_removed[thisParamName];
+			RemoteUIParam & xmlP = paramsFromXML[thisParamName];
 			RemoteUIParam & srcP = params[thisParamName];
-			if(xmlP.type == srcP.type){
-				switch (xmlP.type) {
+			if(pRem.type == srcP.type){
+				switch (pRem.type) {
 					case REMOTEUI_PARAM_FLOAT:
 						if (srcP.floatValAddr){
-							*(srcP.floatValAddr) = srcP.floatVal = xmlP.floatVal;
-						}break;
+							*(srcP.floatValAddr) = srcP.floatVal = pRem.floatVal;
+						}
+						pRem.floatValAddr = srcP.floatValAddr;
+						xmlP.minFloat = srcP.minFloat; //the xml doesnt store ranges, but the param we are adding does! so we copy the other way in this case
+						xmlP.maxFloat = srcP.maxFloat;
+						break;
 					case REMOTEUI_PARAM_ENUM:
 					case REMOTEUI_PARAM_INT:
 						if (srcP.intValAddr){
-							*(srcP.intValAddr) = srcP.intVal = xmlP.intVal;
-						}break;
+							*(srcP.intValAddr) = srcP.intVal = pRem.intVal;
+							pRem.intValAddr = srcP.intValAddr;
+						}
+						xmlP.maxInt = srcP.maxInt;
+						xmlP.minInt = srcP.minInt;
+						xmlP.enumList = srcP.enumList;
+						break;
 
 					case REMOTEUI_PARAM_COLOR:
 						if (srcP.redValAddr){
-							*srcP.redValAddr = srcP.redVal = xmlP.redVal;
-							*(srcP.redValAddr+1) = srcP.greenVal = xmlP.greenVal;
-							*(srcP.redValAddr+2) = srcP.blueVal = xmlP.blueVal;
-							*(srcP.redValAddr+3) = srcP.alphaVal = xmlP.alphaVal;
+							*srcP.redValAddr = srcP.redVal = pRem.redVal;
+							*(srcP.redValAddr+1) = srcP.greenVal = pRem.greenVal;
+							*(srcP.redValAddr+2) = srcP.blueVal = pRem.blueVal;
+							*(srcP.redValAddr+3) = srcP.alphaVal = pRem.alphaVal;
+							pRem.redValAddr = srcP.redValAddr;
 						}break;
 
 					case REMOTEUI_PARAM_BOOL:
 						if (srcP.boolValAddr){
-							*srcP.boolValAddr = srcP.boolVal = xmlP.boolVal;
+							pRem.boolValAddr = srcP.boolValAddr;
+							*srcP.boolValAddr = srcP.boolVal = pRem.boolVal;
 						}break;
 
 					case REMOTEUI_PARAM_SPACER:
 					case REMOTEUI_PARAM_STRING:
 						if (srcP.stringValAddr){
-							*srcP.stringValAddr = srcP.stringVal = xmlP.stringVal;
+							*srcP.stringValAddr = srcP.stringVal = pRem.stringVal;
+							pRem.stringValAddr = srcP.stringValAddr;
 						}break;
 					default: break;
 				}
+				xmlP.r = srcP.r;
+				xmlP.g = srcP.g;
+				xmlP.b = srcP.b;
+				xmlP.a = srcP.a;
+				pRem.group = srcP.group;
 				RLOG_NOTICE << "updating value of param \"" << thisParamName << "\" according to the previously loaded XML!";
 			}
 		}
