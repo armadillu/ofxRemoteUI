@@ -195,7 +195,7 @@ bool ofxOscReceiver::hasWaitingMessages()
 	return queue_length > 0;
 }
 
-bool ofxOscReceiver::getNextMessage( ofxOscMessage* message )
+bool ofxOscReceiver::getNextMessage( ofxOscMessage& message )
 {
 	// grab a lock on the queue
 	grabMutex();
@@ -210,7 +210,7 @@ bool ofxOscReceiver::getNextMessage( ofxOscMessage* message )
 
 	// copy the message from the queue to message
 	ofxOscMessage* src_message = messages.front();
-	message->copy( *src_message );
+	message.copy( *src_message );
 
 	// now delete the src message
 	delete src_message;

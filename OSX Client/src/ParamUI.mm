@@ -48,6 +48,7 @@
 	[ui setWantsLayer:YES];
 	CALayer *viewLayer = [CALayer layer];
 	[ui setLayer:viewLayer];
+	//[viewLayer setOpaque:YES];
 
 	[paramLabel setButtonType:NSMomentaryChangeButton];
 
@@ -204,11 +205,14 @@
 		[bg setBackgroundColor:[NSColor colorWithDeviceRed:0.950 green:0.950 blue:1 alpha:1.000]];
 
 	if (param.a > 0 ){
-		[bg setBackgroundColor: [NSColor colorWithDeviceRed: param.r/255.
-														  green: param.g/255.
-														   blue: param.b/255.
-														  alpha: param.a/255.]
+		float a = (param.a/255.); //lets simulate alpha blending without using alpha blending
+									//the goal is to speed up rendering
+		[bg setBackgroundColor: [NSColor colorWithDeviceRed: (a * param.r/255.) + (1 - a)
+													  green: (a * param.g/255.) + (1 - a)
+													   blue: (a * param.b/255.) + (1 - a)
+													  alpha: 1]
 		 ];
+
 	}
 	[self setupUI];
 }

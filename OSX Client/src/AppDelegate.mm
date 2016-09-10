@@ -619,6 +619,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 -(void)layoutWidgetsWithConfig:(LayoutConfig) p{
 
+	//NSDisableScreenUpdates();
 	//remove all views, start over
 	NSArray * subviews = [listContainer subviews];
 	for( int i = (int)[subviews count] - 1 ; i >= 0 ; i-- ){
@@ -628,7 +629,6 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		[[subviews objectAtIndex:i] removeFromSuperview];
 	}
 	[self adjustScrollView];
-
 
 	vector<string> paramsInGroup = [self getParamsInGroup:currentGroup];
 	int numParams = (int)paramsInGroup.size();
@@ -657,6 +657,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		[item remapSlider];
 		if(howManyThisCol > maxInACol) maxInACol = howManyThisCol;
 	}
+
+
 	int off = ((int)[scroll.contentView frame].size.height + 1) % ((int)(ROW_HEIGHT));
 
 	// draw grid ///////////////////////////////////////////
@@ -679,6 +681,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	//NSLog(@"colIndex %d", colIndex);
 	//NSLog(@"totalCols %d", totalCols);
 	[listContainer setFrameSize: NSMakeSize( listContainer.frame.size.width, totalCols * ROW_HEIGHT + off - 1) ];
+	//NSEnableScreenUpdates();
 }
 
 
