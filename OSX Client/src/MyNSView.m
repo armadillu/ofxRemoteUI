@@ -14,4 +14,8 @@
 	return YES;
 }
 
+- (BOOL)wantsDefaultClipping {
+	return NO;
+}
+
 @end
