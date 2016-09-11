@@ -22,6 +22,10 @@
 
 
 -(BOOL)isOpaque{
+	return YES;
+}
+
+- (BOOL)wantsDefaultClipping {
 	return NO;
 }
 
@@ -36,7 +40,7 @@
 
 - (void)drawRect:(NSRect)dirtyRect{
 	[background set];
-    NSRectFillUsingOperation(dirtyRect, NSCompositeSourceOver);
+    NSRectFill(dirtyRect);
 }
 
 @end

@@ -10,6 +10,10 @@
 
 #include <stdio.h>
 #include <sstream>
+#ifndef OF_AVAILABLE
+	#include "ofStolenUtils.h"
+#endif
+
 
 enum RemoteUICallClientAction{
 	SERVER_CONNECTED, SERVER_DISCONNECTED, SERVER_SENT_FULL_PARAMS_UPDATE, SERVER_PRESETS_LIST_UPDATED,

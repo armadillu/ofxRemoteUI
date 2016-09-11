@@ -83,6 +83,36 @@ NSMutableArray * coloredWindows = nil;
 			path = [NSBezierPath bezierPathWithRect:rect];
 		}
 		[path fill];
+		int w = 83;
+		int h = 13;
+		int x = 2 + (self.frame.size.width - w) / 2.0;
+		int y = self.frame.size.height - h - 6;
+
+		NSArray * objs = [NSArray  arrayWithObjects:
+						  	[NSFont titleBarFontOfSize:13],
+						  	[NSColor colorWithDeviceWhite:66.0/255.0 alpha:1.0],
+						  	nil
+						  ];
+
+
+		NSArray * keys = [NSArray  arrayWithObjects:
+						  	(id)NSFontAttributeName,
+						  	(id)NSForegroundColorAttributeName,
+						  nil ];
+
+		NSDictionary* textAttributes = [NSDictionary dictionaryWithObjects:objs forKeys: keys ];
+
+		[[NSGraphicsContext currentContext] setShouldAntialias:YES];
+		CGContextSetShouldAntialias((CGContextRef)context, YES);
+		CGContextSetShouldSmoothFonts((CGContextRef)context, YES);
+		CGContextSetAllowsFontSmoothing(context, NO);
+		CGContextSetShouldSubpixelPositionFonts(context, YES);
+		CGContextSetAllowsFontSubpixelPositioning(context, YES);
+		CGContextSetShouldSubpixelQuantizeFonts(context, YES);
+		CGContextSetAllowsFontSubpixelQuantization(context, YES);
+
+		CGContextSetBlendMode(context, kCGBlendModeMultiply);
+		[@"ofxRemoteUI" drawAtPoint:NSMakePoint(x, y) withAttributes:textAttributes];
 	}
 }
 @end

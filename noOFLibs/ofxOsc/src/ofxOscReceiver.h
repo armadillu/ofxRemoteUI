@@ -63,7 +63,7 @@ public:
 	/// take the next message on the queue of received messages, copy its details into message, and
 	/// remove it from the queue. return false if there are no more messages to be got, otherwise
 	/// return true
-	bool getNextMessage( ofxOscMessage* );
+	bool getNextMessage( ofxOscMessage& );
 
 protected:
 	/// process an incoming osc message and add it to the queue
