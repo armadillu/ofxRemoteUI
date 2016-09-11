@@ -14,6 +14,7 @@
 #define RUI_NOTIFICATION_COLOR				ofColor(200,16,16, 255 * a)
 #define RUI_LOG_COLOR						ofColor(28,214,40, 255 * a)
 #define RUI_NOTIFICATION_LINEHEIGHT			20
+#define RUI_NOTIFICATION_FONTSIZE			15
 
 #include "ofMain.h"
 #include "RemoteParam.h"
@@ -41,6 +42,7 @@ public:
 	struct LogLineNotification{
 		string logLine;
 		float time;
+		float highlight; //a decay-based timer - when a repeat notif is new, will be highlighted shortly
 		int repeatCount;
 	};
 
@@ -95,6 +97,7 @@ public:
 		toDeleteIndexes.clear();
 		for(int i = 0; i < logLines.size(); i++){
 			logLines[i].time -= dt;
+			if (logLines[i].highlight > 0.0f) logLines[i].highlight -= dt * 0.75;
 			if( logLines[i].time < 0.0f ){
 				toDeleteIndexes.push_back(i);
 			}
@@ -126,11 +129,20 @@ public:
 			float a = ofClamp( RUI_NOTIFICATION_ALPHA_OVERFLOW * logLines[i].time, 0.0f, 1.0f);
 			string repeatCount;
 			if (logLines[i].repeatCount > 1) repeatCount = " (x" + ofToString(logLines[i].repeatCount) + ")";
+			float highlight = ofClamp(logLines[i].highlight, 0, 1); //will decrease from 1 to 0 over time
+			float blink = powf(highlight, 0.5) * fabs(sin(3 * M_PI * highlight));
+			//float fontBump = RUI_NOTIFICATION_FONTSIZE + 4 * highlight;
+			//float lineHeightBump = RUI_NOTIFICATION_LINEHEIGHT + 4 * highlight;
+			ofColor fontColor = RUI_LOG_COLOR; fontColor.a = 255;
+			ofColor rainbow;
+			if(blink > 0.01){
+				rainbow.setHsb((30 * ofGetFrameNum())%255, 255, 255);
+			}
 			float hh = drawStringWithBox("Log: " + logLines[i].logLine + repeatCount,
-										 x,
+										 x + 20 * blink,
 										 yy,
 										 ofColor(0, 255 * a),
-										 RUI_LOG_COLOR
+										 blink * rainbow + (1.0 - blink) * fontColor
 										 );
 			yy -= hh;
 		}
@@ -157,7 +169,7 @@ public:
 				ofSetColor(it->second.color, a * 255);
 				#ifdef USE_OFX_FONTSTASH
 				if(font != NULL){ //let's find the X where to draw the color swatch - this is time wasted TODO!
-					ofRectangle r = font->getBBox(total, 15, 0, 0);
+					ofRectangle r = font->getBBox(total, RUI_NOTIFICATION_FONTSIZE, 0, 0);
 					float diff = floor(RUI_NOTIFICATION_LINEHEIGHT - r.height);
 					ofDrawRectangle(x + r.width + r.x + 4, yy + r.y - diff / 2, 40, RUI_NOTIFICATION_LINEHEIGHT);
 				}else{
@@ -219,7 +231,8 @@ public:
 			for(int i = 0; i < logLines.size(); i++){
 				if(logLines[i].logLine == msg){
 					logLines[i].repeatCount++;
-					logLines[i].time = screenTime; //update
+					logLines[i].time = logScreenTime; //update
+					logLines[i].highlight = 1.0;
 					found = true;
 					break;
 				}
@@ -228,9 +241,12 @@ public:
 		if(!found || !merge){
 			LogLineNotification n;
 			n.logLine = msg;
-			n.time = screenTime;
+			n.time = logScreenTime;
 			n.repeatCount = 1;
-			logLines.push_back(n);
+			n.highlight = 1.0;
+			//logLines.push_back(n);
+			logLines.insert(logLines.begin(), n);
+
 		}
 	};
 
@@ -307,7 +323,7 @@ public:
 private:
 
 	//return height of box
-	float drawStringWithBox(const string & text, int x, int y, const ofColor& background, const ofColor& foreground, float fontSize = 15, float lineH = RUI_NOTIFICATION_LINEHEIGHT ){
+	float drawStringWithBox(const string & text, int x, int y, const ofColor& background, const ofColor& foreground, float fontSize = RUI_NOTIFICATION_FONTSIZE, float lineH = RUI_NOTIFICATION_LINEHEIGHT ){
 		#ifdef USE_OFX_FONTSTASH
 		if(font == NULL){
 			ofDrawBitmapStringHighlight(text, x, y, background, foreground);

@@ -1298,7 +1298,7 @@ void ofxRemoteUIServer::_draw(ofEventArgs &e){
 	if(autoDraw){
 		int h = customScreenHeight;
 		if(h < 0) h = ofGetHeight();
-		draw( 9 / uiScale, (h - 5)/ uiScale );
+		draw( 8 / uiScale, (h - 9)/ uiScale );
 	}
 }
 
