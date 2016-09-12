@@ -16,6 +16,9 @@
 #define RUI_NOTIFICATION_LINEHEIGHT			20
 #define RUI_NOTIFICATION_FONTSIZE			15
 
+#define _USE_MATH_DEFINES // visual studio M_PI
+#include <math.h>
+
 #include "ofMain.h"
 #include "RemoteParam.h"
 
