@@ -552,6 +552,8 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 		loadFromXMLv1(fileName);
 		newVersion = false;
 		#endif
+	}else{
+		RLOG_ERROR << "can't load XML from \"" << fileName << "\"";
 	}
 	return empty;
 }
@@ -982,7 +984,7 @@ void ofxRemoteUIServer::_appExited(ofEventArgs &e){
 	if(!enabled) return;
 	RLOG_NOTICE << "closing ofxRemoteUIServer...";
 	OFX_REMOTEUI_SERVER_CLOSE();		//stop the server
-	if(saveToXmlOnExit && loadedFromXML){
+	if(saveToXmlOnExit){
 		RLOG_NOTICE << "saving to XML on exit...";
 		OFX_REMOTEUI_SERVER_SAVE_TO_XML();	//save values to XML
 	}else{
