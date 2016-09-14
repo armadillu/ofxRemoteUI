@@ -446,7 +446,7 @@ void ofxRemoteUI::syncAllPointersToParams(){
 
 void ofxRemoteUI::syncPointerToParam(string paramName){
 
-	RemoteUIParam p = params[paramName];
+	RemoteUIParam &p = params[paramName];
 
 	switch (p.type) {
 		case REMOTEUI_PARAM_FLOAT:
@@ -480,14 +480,12 @@ void ofxRemoteUI::syncPointerToParam(string paramName){
 			}break;
 		default: break;
 	}
-
-	params[paramName] = p;
 }
 
 
 void ofxRemoteUI::syncParamToPointer(string paramName){
 
-	RemoteUIParam p = params[paramName];
+	RemoteUIParam & p = params[paramName];
 
 	switch (p.type) {
 		case REMOTEUI_PARAM_FLOAT:
@@ -521,8 +519,6 @@ void ofxRemoteUI::syncParamToPointer(string paramName){
 			}break;
 		default: break;
 	}
-
-	params[paramName] = p;
 }
 
 

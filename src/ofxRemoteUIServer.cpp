@@ -741,7 +741,32 @@ void ofxRemoteUIServer::restoreAllParamsToInitialXML(){
 				auto & xmlP = paramsFromXML[key];
 				auto & p = params[key];
 				//params[key] = paramsFromXML[key];
-				p = xmlP;
+				switch (p.type) {
+					case REMOTEUI_PARAM_FLOAT:
+						p.floatVal = xmlP.floatVal;
+						break;
+					case REMOTEUI_PARAM_ENUM:
+					case REMOTEUI_PARAM_INT:
+						p.intVal = xmlP.intVal;
+						break;
+
+					case REMOTEUI_PARAM_COLOR:
+						p.redVal = xmlP.redVal;
+						p.greenVal = xmlP.greenVal;
+						p.blueVal = xmlP.blueVal;
+						p.alphaVal = xmlP.alphaVal;
+						break;
+
+					case REMOTEUI_PARAM_BOOL:
+						p.boolVal = xmlP.boolVal;
+						break;
+
+					case REMOTEUI_PARAM_STRING:
+					case REMOTEUI_PARAM_SPACER:
+						p.stringVal = xmlP.stringVal;
+						break;
+					default: break;
+				}
 				syncPointerToParam(key);
 			}
 		}
@@ -2028,10 +2053,10 @@ void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamNa
 		newColorInGroupCounter = 1;
 		addSpacer(OFXREMOTEUI_DEFAULT_PARAM_GROUP);
 	}
-	ofxRemoteUI::addParamToDB(p, thisParamName);
 
 	if(loadedFromXML){ //lets see if we had loaded this param from xml - will upate its values if so
 		auto it = params_removed.find(thisParamName);
+		ofxRemoteUI::addParamToDB(p, thisParamName);
 		if(it != params_removed.end()){
 			RemoteUIParam & pRem = params_removed[thisParamName];
 			RemoteUIParam & xmlP = paramsFromXML[thisParamName];
@@ -2041,8 +2066,8 @@ void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamNa
 					case REMOTEUI_PARAM_FLOAT:
 						if (srcP.floatValAddr){
 							*(srcP.floatValAddr) = srcP.floatVal = pRem.floatVal;
+							xmlP.floatValAddr = pRem.floatValAddr = srcP.floatValAddr;
 						}
-						pRem.floatValAddr = srcP.floatValAddr;
 						xmlP.minFloat = srcP.minFloat; //the xml doesnt store ranges, but the param we are adding does! so we copy the other way in this case
 						xmlP.maxFloat = srcP.maxFloat;
 						break;
@@ -2050,7 +2075,7 @@ void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamNa
 					case REMOTEUI_PARAM_INT:
 						if (srcP.intValAddr){
 							*(srcP.intValAddr) = srcP.intVal = pRem.intVal;
-							pRem.intValAddr = srcP.intValAddr;
+							xmlP.intValAddr = pRem.intValAddr = srcP.intValAddr;
 						}
 						xmlP.maxInt = srcP.maxInt;
 						xmlP.minInt = srcP.minInt;
@@ -2084,7 +2109,7 @@ void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamNa
 				xmlP.g = srcP.g;
 				xmlP.b = srcP.b;
 				xmlP.a = srcP.a;
-				pRem.group = srcP.group;
+				pRem.group = xmlP.group = srcP.group;
 				RLOG_NOTICE << "updating value of param \"" << thisParamName << "\" according to the previously loaded XML!";
 			}
 		}
