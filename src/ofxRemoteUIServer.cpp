@@ -1352,7 +1352,7 @@ void ofxRemoteUIServer::drawString(const string & text, const float & x, const f
 //x and y of where the notifications will get draw
 void ofxRemoteUIServer::draw(int x, int y){
 
-	if(headlessMode) return;
+	if(headlessMode || !enabled) return;
 
 	bool needsToDrawNotification = !showUI || uiAlpha < 1.0;
 	int screenH, screenW;
