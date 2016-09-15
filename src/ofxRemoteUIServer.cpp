@@ -2261,11 +2261,11 @@ void ofxRemoteUIServer::sendLogToClient(const string & message){
 		m.addStringArg(message);
 		try{
 			oscSender.sendMessage(m);
-			RLOG_NOTICE << "RUI_LOG(" + message + ")";
 		}catch(exception e){
 			RLOG_ERROR << "Exception sendLogToClient " << e.what() ;
 		}
 	}
+	RLOG_WARNING << "RUI_LOG(" + message + ")";
 	onScreenNotifications.addLogLine(message, true);
 }
 
