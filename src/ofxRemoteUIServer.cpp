@@ -2110,7 +2110,7 @@ void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamNa
 				xmlP.b = srcP.b;
 				xmlP.a = srcP.a;
 				pRem.group = xmlP.group = srcP.group;
-				RLOG_NOTICE << "updating value of param \"" << thisParamName << "\" according to the previously loaded XML!";
+				if (verbose_) RLOG_NOTICE << "updating value of param \"" << thisParamName << "\" according to the previously loaded XML!";
 			}
 		}
 	}
