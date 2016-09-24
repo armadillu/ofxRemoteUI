@@ -1512,7 +1512,6 @@ void ofxRemoteUIServer::draw(int x, int y){
 						ofSetColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal);
 						ofDrawRectangle(x + valOffset, y - spacing * 0.6, valSpaceW, spacing * 0.85);
 						char aux[200];
-						//sprintf(aux, "[%02x%02x%02x%02x]", p.redVal, p.greenVal, p.blueVal, p.alphaVal);
 						sprintf(aux, "[%0*d,%0*d,%0*d,%0*d]", 3, p.redVal, 3, p.greenVal, 3, p.blueVal, 3, p.alphaVal);
 						ofSetColor(0); //shadow
 						drawString(aux, x + valOffset + 1, y + 1);
