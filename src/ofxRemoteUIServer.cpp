@@ -1158,6 +1158,8 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				selectedGroupPreset = 0;
 				}break;
 
+			case '+': setBuiltInUiScale(uiScale + 0.1); break;
+			case '-': setBuiltInUiScale(MAX(uiScale - 0.1, 0.5)); break;
 			case ',': xOffsetTarget += (uiColumnWidth); xOffsetTarget = ofClamp(xOffsetTarget, -FLT_MAX, 2 * uiColumnWidth); break;
 			case '.': xOffsetTarget -= (uiColumnWidth); xOffsetTarget = ofClamp(xOffsetTarget, -FLT_MAX, 2 * uiColumnWidth); break;
 			case OF_KEY_LEFT:
@@ -1300,8 +1302,8 @@ void ofxRemoteUIServer::drawUiWithFontStash(string fontPath, float fontSize_){
 	useFontStash = true;
 	fontFile = ofToDataPath(fontPath, true);
 	fontSize = fontSize_;
-	font.setup(fontFile, 1.0, 512, (uiScale > 1.0), 4, uiScale);
-	if(uiScale > 1.0) font.setLodBias(-0.5);
+	font = ofxFontStash();
+	font.setup(fontFile, 1.0, 512, false, 0, uiScale);
 	onScreenNotifications.drawUiWithFontStash(&font);
 }
 
@@ -1400,7 +1402,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 							   string(enabled ? ("Server reachable at " + computerIP + ":" + ofToString(port)) + "." :
 									  "Sever Disabled." ) +
 					   "\nPress 's' to save current config, 'S' to make a new preset. ('E' to save in old format)\n" +
-					   "Press 'r' to restore all params's launch state.\n" +
+					   "Press 'r' to restore all params's launch state. '+' / '-' to set UI Scale.\n" +
 					   "Press Arrow Keys to edit values. SPACEBAR + Arrow Keys for bigger increments. ',' and '.' Keys to scroll.\n" +
 					   "Press 'TAB' to hide. Press 'RETURN' when editing a Color Param to cycle through RGBA components.", padding, screenH / uiScale - bottomBarHeight + 20);
 		}
@@ -1642,6 +1644,9 @@ void ofxRemoteUIServer::setUiColumnWidth(int w){
 void ofxRemoteUIServer::setBuiltInUiScale(float s){
 	if(fabs(uiScale - s) < 0.1) uiLines.clear();
 	uiScale = s;
+	if(fontFile.size()){ //re-create font with higher uiscale
+		drawUiWithFontStash(fontFile, fontSize);
+	}
 }
 
 
