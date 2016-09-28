@@ -1642,11 +1642,11 @@ void ofxRemoteUIServer::setUiColumnWidth(int w){
 }
 
 void ofxRemoteUIServer::setBuiltInUiScale(float s){
-	if(fabs(uiScale - s) < 0.01) uiLines.clear();
 	uiScale = s;
 	if(fontFile.size()){ //re-create font with higher uiscale
 		drawUiWithFontStash(fontFile, fontSize);
 	}
+	if (fabs(uiScale - s) < 0.01) uiLines.clear();
 }
 
 
