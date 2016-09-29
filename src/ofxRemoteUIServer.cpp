@@ -1088,6 +1088,28 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				loadFromXML(ofToDataPath(p));
 				}break;
 
+			case ' ': { //press spacebar to edit string fields! return didnt work well on windows
+				if (selectedItem >= 0) { //selection on params list
+					string key = orderedKeys[selectedItem];
+					RemoteUIParam & p = params[key];
+					if (p.type == REMOTEUI_PARAM_STRING) {
+						p.stringVal = ofSystemTextBoxDialog("Edit Value for '" + key + "' parameter:", p.stringVal);
+						syncPointerToParam(key);
+						pushParamsToClient();
+						RemoteUIServerCallBackArg cbArg;
+						cbArg.host = "localhost";
+						cbArg.action = CLIENT_UPDATED_PARAM;
+						cbArg.paramName = key;
+						cbArg.param = p;  //copy the updated param to the callback arg
+						#ifdef OF_AVAILABLE
+						onScreenNotifications.addParamUpdate(key, cbArg.param, ofColor(p.r, p.g, p.b, p.a));
+						ofNotifyEvent(clientAction, cbArg, this);
+						#endif
+						if (callBack) callBack(cbArg);
+					}
+				}
+			}break;
+
 			case OF_KEY_RETURN:
 				if(selectedItem == -1 && selectedPreset >= 0 && presetsCached.size()){ //global presets
 					lastChosenPreset = presetsCached[selectedPreset];
@@ -1122,25 +1144,9 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 						ofNotifyEvent(clientAction, cbArg, this);
 						onScreenNotifications.addNotification("SET '" + p.group  + "' GROUP TO '" + presetName + ".xml' PRESET");
 						#endif
-					}else if(p.type == REMOTEUI_PARAM_COLOR){
+					} else if (p.type == REMOTEUI_PARAM_COLOR) {
 						selectedColorComp++;
-						if(selectedColorComp > 3) selectedColorComp = 0;
-					}else{
-						if(p.type == REMOTEUI_PARAM_STRING){
-							p.stringVal = ofSystemTextBoxDialog("Edit Value for '" + key + "' parameter:", p.stringVal );
-							syncPointerToParam(key);
-							pushParamsToClient();
-							RemoteUIServerCallBackArg cbArg;
-							cbArg.host = "localhost";
-							cbArg.action =  CLIENT_UPDATED_PARAM;
-							cbArg.paramName = key;
-							cbArg.param = p;  //copy the updated param to the callback arg
-							#ifdef OF_AVAILABLE
-							onScreenNotifications.addParamUpdate(key, cbArg.param, ofColor(p.r, p.g, p.b, p.a));
-							ofNotifyEvent(clientAction, cbArg, this);
-							#endif
-							if(callBack) callBack(cbArg);
-						}
+						if (selectedColorComp > 3) selectedColorComp = 0;
 					}
 				}
 				break;
