@@ -1061,7 +1061,6 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 						ofNotifyEvent(clientAction, cbArg, this);
 						onScreenNotifications.addNotification("SAVED PRESET '" + presetName + formatExt + ".xml' FOR GROUP '" + groupName + "'");
 						#endif
-
 					}else{
 						if(verbose_) RLOG_NOTICE << "saving NEW preset: " << presetName ;
 						saveToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + formatExt + ".xml", saveInV1);
@@ -1088,6 +1087,7 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				loadFromXML(ofToDataPath(p));
 				}break;
 
+			case 'N': drawNotifications ^= true; break;
 			case ' ': { //press spacebar to edit string fields! return didnt work well on windows
 				if (selectedItem >= 0) { //selection on params list
 					string key = orderedKeys[selectedItem];
@@ -1408,7 +1408,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 							   string(enabled ? ("Server reachable at " + computerIP + ":" + ofToString(port)) + "." :
 									  "Sever Disabled." ) +
 					   "\nPress 's' to save current config, 'S' to make a new preset. ('E' to save in old format)\n" +
-					   "Press 'r' to restore all params's launch state. '+' / '-' to set UI Scale.\n" +
+					   "Press 'r' to restore all params's launch state. '+'/'-' to set UI Scale. 'N' to toggle screen notif.\n" +
 					   "Press Arrow Keys to edit values. SPACEBAR + Arrow Keys for bigger increments. ',' and '.' Keys to scroll.\n" +
 					   "Press 'TAB' to hide. Press 'RETURN' when editing a Color Param to cycle through RGBA components.", padding, screenH / uiScale - bottomBarHeight + 20);
 		}
