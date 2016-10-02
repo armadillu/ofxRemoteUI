@@ -455,7 +455,7 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 		fileName = getFinalPath(fileName);
 	}
 
-	RLOG_NOTICE << "saving to XML (using the V2 format) '" << fileName << "'" ;
+	RLOG_NOTICE << "Saving to XML (using the V2 format) '" << fileName << "'" ;
 	ofXml s;
 
 	s.addChild(OFXREMOTEUI_XML_ROOT_TAG);
@@ -524,7 +524,7 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 	s.addValue(OFXREMOTEUI_XML_ENABLED_TAG, enabled);
 	s.save(fileName );
 
-	RLOG_NOTICE << "done saving! (using the V2 format) '" << fileName << "'" ;
+	RLOG_NOTICE << "Done saving! (using the V2 format) '" << fileName << "'" ;
 }
 #endif
 
@@ -988,7 +988,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		waitingForReply = false;
 		avgTimeSinceLastReply = timeSinceLastReply = timeCounter = 0.0f;
 		port = port_;
-		RLOG_NOTICE << "listening for commands at " << computerIP << ":" << port;
+		RLOG_NOTICE << "Listening for commands at " << computerIP << ":" << port;
 		oscReceiver.setup(port);
 	}
 	//still get ui access despite being disabled
@@ -1007,10 +1007,10 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 #ifdef OF_AVAILABLE
 void ofxRemoteUIServer::_appExited(ofEventArgs &e){
 	if(!enabled) return;
-	RLOG_NOTICE << "closing ofxRemoteUIServer...";
+	RLOG_NOTICE << "Closing ofxRemoteUIServer...";
 	OFX_REMOTEUI_SERVER_CLOSE();		//stop the server
 	if(saveToXmlOnExit){
-		RLOG_NOTICE << "saving to XML on exit...";
+		RLOG_NOTICE << "Saving to XML on exit...";
 		OFX_REMOTEUI_SERVER_SAVE_TO_XML();	//save values to XML
 	}else{
 		RLOG_NOTICE << "We were supposed to Save to XML on exit, but we haven't loaded an XML yet... So not saving!";
@@ -2289,7 +2289,7 @@ void ofxRemoteUIServer::saveToXMLv1(string fileName){
 	fileName = getFinalPath(fileName);
 #endif
 
-	RLOG_NOTICE << "saving to XML (using the OLD FORMAT) '" << fileName << "'" ;
+	RLOG_NOTICE << "Saving to XML (using the OLD FORMAT) '" << fileName << "'" ;
 	ofxXmlSettings s;
 	s.loadFile(fileName);
 	if(clearXmlOnSaving){
