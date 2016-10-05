@@ -1649,9 +1649,11 @@ void ofxRemoteUIServer::setUiColumnWidth(int w){
 
 void ofxRemoteUIServer::setBuiltInUiScale(float s){
 	uiScale = s;
+	#ifdef USE_OFX_FONTSTASH
 	if(fontFile.size()){ //re-create font with higher uiscale
 		drawUiWithFontStash(fontFile, fontSize);
 	}
+	#endif
 	if (fabs(uiScale - s) < 0.01) uiLines.clear();
 }
 

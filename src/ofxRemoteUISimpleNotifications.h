@@ -145,7 +145,7 @@ public:
 										 x + 20 * blink,
 										 yy,
 										 ofColor(0, 255 * a),
-										 blink * rainbow + (1.0 - blink) * fontColor
+										 rainbow * blink + fontColor * (1.0 - blink)
 										 );
 			yy -= hh;
 		}
