@@ -1166,8 +1166,8 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 
 			case '+': setBuiltInUiScale(uiScale + 0.1); break;
 			case '-': setBuiltInUiScale(MAX(uiScale - 0.1, 0.5)); break;
-			case ',': xOffsetTarget += (uiColumnWidth); xOffsetTarget = ofClamp(xOffsetTarget, -FLT_MAX, 2 * uiColumnWidth); break;
-			case '.': xOffsetTarget -= (uiColumnWidth); xOffsetTarget = ofClamp(xOffsetTarget, -FLT_MAX, 2 * uiColumnWidth); break;
+			case ',': xOffsetTarget += (uiColumnWidth); xOffsetTarget = ofClamp(xOffsetTarget, -FLT_MAX, 4 * uiColumnWidth); break;
+			case '.': xOffsetTarget -= (uiColumnWidth); xOffsetTarget = ofClamp(xOffsetTarget, -FLT_MAX, 4 * uiColumnWidth); break;
 			case OF_KEY_LEFT:
 			case OF_KEY_RIGHT:{
 
