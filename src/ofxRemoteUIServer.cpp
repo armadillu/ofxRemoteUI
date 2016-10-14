@@ -102,6 +102,17 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 		ofColor c = ofColor::fromHsb(hue, 255.0f, 230.0f, BG_COLOR_ALPHA);
 		colorTables.push_back( c );
 	}
+//	colorTables.push_back(ofColor(254,19,41,BG_COLOR_ALPHA) );
+//	colorTables.push_back(ofColor(255,82,0,BG_COLOR_ALPHA) );
+//	colorTables.push_back(ofColor(255,234,0,BG_COLOR_ALPHA) );
+//	colorTables.push_back(ofColor(86,203,0,BG_COLOR_ALPHA) );
+//	colorTables.push_back(ofColor(0,136,58,BG_COLOR_ALPHA) );
+//	colorTables.push_back(ofColor(23,234,237,BG_COLOR_ALPHA) );
+//	colorTables.push_back(ofColor(0,150,255,BG_COLOR_ALPHA) );
+//	colorTables.push_back(ofColor(11,51,255,BG_COLOR_ALPHA) );
+//	colorTables.push_back(ofColor(139,2,190,BG_COLOR_ALPHA) );
+//	colorTables.push_back(ofColor(255,20,214,BG_COLOR_ALPHA) );
+
 	uiLines.setMode(OF_PRIMITIVE_LINES);
 #else
 	int a = 44;
