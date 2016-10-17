@@ -960,9 +960,33 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		#endif
 		#endif
 
+		//find out some info about the host
+		if (computerName.size() == 0){
+			#ifdef OF_AVAILABLE
+				#ifdef _WIN32
+					char buffer[MAX_COMPUTERNAME_LENGTH + 1];
+					DWORD length = sizeof(buffer);
+					GetComputerNameExA((COMPUTER_NAME_FORMAT)0, buffer, &length);
+					computerName = buffer;
+				#else					
+					Poco::Environment e;
+					computerName = e.nodeName();
+				#endif
+
+				binaryName = ofFilePath::getBaseName(ofFilePath::getCurrentExePath());
+
+				#ifdef TARGET_OF_IOS
+				binaryName = "iOS App";
+				#endif
+			#else
+				binaryName = "Unknown";
+			#endif
+		}
+
+		
 		if(doBroadcast){
 			broadcastSender.setup( multicastIP, OFXREMOTEUI_BROADCAST_PORT ); //multicast @
-			RLOG_NOTICE << "Broacasting my presence every " << OFXREMOTEUI_BORADCAST_INTERVAL << "sec at this multicast @ " << multicastIP << ":" << OFXREMOTEUI_BROADCAST_PORT ;
+			RLOG_NOTICE << "Broacasting my presence every " << OFXREMOTEUI_BORADCAST_INTERVAL << "sec at this multicast @ " << multicastIP << ":" << OFXREMOTEUI_BROADCAST_PORT ;
 		}
 
 		if(port_ == -1){ //if no port specified, pick a random one, but only the very first time we get launched!
@@ -1686,27 +1710,6 @@ void ofxRemoteUIServer::handleBroadcast(){
 	if(doBroadcast){
 		if(broadcastTime > OFXREMOTEUI_BORADCAST_INTERVAL){
 			broadcastTime = 0.0f;
-			if (computerName.size() == 0){
-				#ifdef OF_AVAILABLE
-					#ifdef _WIN32
-						char buffer[MAX_COMPUTERNAME_LENGTH + 1];
-						DWORD length = sizeof(buffer);
-						GetComputerNameExA((COMPUTER_NAME_FORMAT)0, buffer, &length);
-						computerName = buffer;
-					#else					
-						Poco::Environment e;
-						computerName = e.nodeName();
-					#endif
-
-					binaryName = ofFilePath::getBaseName(ofFilePath::getCurrentExePath());
-
-					#ifdef TARGET_OF_IOS
-					binaryName = "iOS App";
-					#endif
-				#else
-					binaryName = "Unknown";
-				#endif
-			}
 
 			ofxOscMessage m;
 			m.setAddress("/ServerBroadcast");

@@ -129,6 +129,11 @@ public:
 	#endif
 
 	bool builtInClientIsVisible(){return showUI;}
+	
+	//get host info
+	string getComputerIP(){return computerIP;}
+	string getComputerName(){return computerName;}
+	string getBinaryName(){return binaryName;}
 
 #ifdef OF_AVAILABLE
 
