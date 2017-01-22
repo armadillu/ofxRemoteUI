@@ -1260,6 +1260,7 @@ bool resizeWindowUpDown = false; //if you keep changing paramUI size, with this 
 	[alert layout];
 	[alert setAlertStyle:NSInformationalAlertStyle];
 	[alert setAccessoryView:input];
+	[[alert window] setInitialFirstResponder: input];
 	[alert setIcon:nil];
 	//	NSRect fr = [[alert accessoryView] frame];
 	//	fr.origin.y += 10;
