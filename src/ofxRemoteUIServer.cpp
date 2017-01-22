@@ -1340,12 +1340,17 @@ void ofxRemoteUIServer::update(float dt){
 
 #ifdef USE_OFX_FONTSTASH
 void ofxRemoteUIServer::drawUiWithFontStash(string fontPath, float fontSize_){
-	useFontStash = true;
-	fontFile = ofToDataPath(fontPath, true);
-	fontSize = fontSize_;
-	font = ofxFontStash();
-	font.setup(fontFile, 1.0, 512, false, 0, uiScale);
-	onScreenNotifications.drawUiWithFontStash(&font);
+
+	if(!ofIsGLProgrammableRenderer()){
+		useFontStash = true;
+		fontFile = ofToDataPath(fontPath, true);
+		fontSize = fontSize_;
+		font = ofxFontStash();
+		font.setup(fontFile, 1.0, 512, false, 0, uiScale);
+		onScreenNotifications.drawUiWithFontStash(&font);
+	}else{
+		ofLogError("ofxRemoteUIServer") << "Can't use ofxFontStash with the Programmable Renderer!";
+	}
 }
 
 void ofxRemoteUIServer::drawUiWithBitmapFont(){
