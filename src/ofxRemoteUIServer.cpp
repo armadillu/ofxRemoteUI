@@ -30,11 +30,6 @@
 #include "ofxRemoteUIServer.h"
 
 #ifdef OF_AVAILABLE
-#include <Poco/Path.h>
-#include <Poco/Environment.h>
-#include <Poco/Process.h>
-#include <Poco/Util/Application.h>
-using Poco::Util::Application;
 #ifndef TARGET_OF_IOS
 	#include "ofAppNoWindow.h"
 #endif
@@ -323,7 +318,7 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string ke
 }
 
 #ifdef OF_AVAILABLE
-void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string key, ofXml & s, int index, bool active){
+void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string key, ofxXmlPoco & s, int index, bool active){
 
 	string path = "P[" + ofToString(index)  + "]";
 	switch (t.type) {
@@ -467,7 +462,7 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 	}
 
 	RLOG_NOTICE << "Saving to XML (using the V2 format) '" << fileName << "'" ;
-	ofXml s;
+	ofxXmlPoco s;
 
 	s.addChild(OFXREMOTEUI_XML_ROOT_TAG);
 	s.setTo(OFXREMOTEUI_XML_ROOT_TAG); //get into root
@@ -575,7 +570,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 	vector<string> loadedParams;
 	unordered_map<string, bool> readKeys; //to keep track of duplicated keys;
 
-	ofXml s;
+	ofxXmlPoco s;
 	s.load(fileName);
 	s.setTo(OFXREMOTEUI_XML_ROOT_TAG);
 	s.setTo(OFXREMOTEUI_XML_TAG);
@@ -968,9 +963,10 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 					DWORD length = sizeof(buffer);
 					GetComputerNameExA((COMPUTER_NAME_FORMAT)0, buffer, &length);
 					computerName = buffer;
-				#else					
-					Poco::Environment e;
-					computerName = e.nodeName();
+				#else
+					computerName = ofSystem("hostname");
+					ofStringReplace(computerName, "\n", "");
+					ofStringReplace(computerName, ".local", "");
 				#endif
 
 				binaryName = ofFilePath::getBaseName(ofFilePath::getCurrentExePath());

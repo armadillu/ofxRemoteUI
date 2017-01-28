@@ -1,13 +1,23 @@
 # ofxRemoteUI
 
 
+
+Also, it now depends on ofxPoco.
+
+
 OpenFrameworks addon that allows you to serve c++ variables/parameters (bool, float, int, enum, string, ofColor) on the network, so that you can modify them remotely. It uses server client architecture, where your app is the server. It communicates both ways; you can modify your project's variables from the client, but you can also pull your app's variable values from the client; this way you can track values that evolve programatically. It runs on OSC.
 
 You can save and then load "presets", which allow you to quickly change values for a lot of your parameters quickly. You can also make "group presets" to change only the values of a subset of your parameters.
 
+___Compile against OF master branch. If you are trying to use this 
+against an older version (0.9.8 or lower) you should use the commit tagged 
+with "OF_0.9.8". ___
+
+
 Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 
 ![MultiPlatform Client](https://farm4.staticflickr.com/3926/14983323502_4019a37a8f_o_d.png "List of Clients") In Order of appearance, OSX Client, Built In Client, iOS Client (wip), multiplatform client (based on ofxUI)
+
 
 
 ---
