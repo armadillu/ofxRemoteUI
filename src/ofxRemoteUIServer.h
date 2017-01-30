@@ -45,7 +45,7 @@
 
 //handle poco being a separate addon after 0.9.8 - and ofXML went from a pocoXML based implementation
 //to a pugiXML based implementation
-#if OF_VERSION_MAJOR>=0 || (OF_VERSION_MAJOR==0 && OF_VERSION_MINOR>=10)
+#if OF_VERSION_MAJOR>0 || (OF_VERSION_MAJOR==0 && OF_VERSION_MINOR>=10)
 	#include "ofxXmlPoco.h"
 	#define ofXmlObject ofxXmlPoco
 #else

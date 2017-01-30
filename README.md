@@ -9,9 +9,9 @@ OpenFrameworks addon that allows you to serve c++ variables/parameters (bool, fl
 
 You can save and then load "presets", which allow you to quickly change values for a lot of your parameters quickly. You can also make "group presets" to change only the values of a subset of your parameters.
 
-___Compile against OF master branch. If you are trying to use this 
+__Compile against OF master branch. If you are trying to use this 
 against an older version (0.9.8 or lower) you should use the commit tagged 
-with "OF_0.9.8". ___
+with "OF_0.9.8". It requires ofxPoco in OF versions >0.9.8__ 
 
 
 Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
@@ -41,6 +41,12 @@ Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 * ofxRemoteUI can be used outside OF in any C++ project, and in Processing thx to [@kritzikratzi](http://github.com/kirtzikratzi)
 * Easy to use C++ Macros hide complexity away, very easy to plug into any existing project.
 * Support for native ofParameters of compatible types (int, float, bool, string ofColor, ofVec). Allows you to edit native OF ofParamater types from RemoteUI. See "example-ofParameter".
+
+##Dependencies
+
+* ofxXmlSettings
+* ofxOsc
+* ofxPoco in OF v > 0.9.8
 
 ##Available Clients
 
