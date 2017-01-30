@@ -19,8 +19,6 @@
 #include <vector>
 #include "ofxRemoteUISimpleNotifications.h"
 
-#include "ofxXmlPoco.h"
-
 #if defined(__has_include) /*llvm only - query about header files being available or not*/
 	#if __has_include("ofxFontStash.h") && !defined(DISABLE_AUTO_FIND_FONSTASH_HEADERS)
 		#define USE_OFX_FONTSTASH
@@ -44,6 +42,16 @@
 #endif
 
 #define BG_COLOR_ALPHA			55
+
+//handle poco being a separate addon after 0.9.8 - and ofXML went from a pocoXML based implementation
+//to a pugiXML based implementation
+#if OF_VERSION_MAJOR>=0 || (OF_VERSION_MAJOR==0 && OF_VERSION_MINOR>=10)
+	#include "ofxXmlPoco.h"
+	#define ofXmlObject ofxXmlPoco
+#else
+	#define ofXmlObject ofXml
+#endif
+
 
 class ofxRemoteUIServer: public ofxRemoteUI
 #ifdef OF_AVAILABLE
@@ -210,7 +218,7 @@ private:
 
 	void			saveParamToXmlSettings(const RemoteUIParam & p, string key, ofxXmlSettings & s, XmlCounter & counter);
 	#ifdef OF_AVAILABLE
-	void			saveParamToXmlSettings(const RemoteUIParam & p, string key, ofxXmlPoco & s, int index, bool active);
+	void			saveParamToXmlSettings(const RemoteUIParam & p, string key, ofXmlObject & s, int index, bool active);
 	#endif
 	void			saveSettingsBackup();
 

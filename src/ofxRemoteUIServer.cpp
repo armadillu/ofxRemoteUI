@@ -318,7 +318,7 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string ke
 }
 
 #ifdef OF_AVAILABLE
-void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string key, ofxXmlPoco & s, int index, bool active){
+void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string key, ofXmlObject & s, int index, bool active){
 
 	string path = "P[" + ofToString(index)  + "]";
 	switch (t.type) {
@@ -462,7 +462,7 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 	}
 
 	RLOG_NOTICE << "Saving to XML (using the V2 format) '" << fileName << "'" ;
-	ofxXmlPoco s;
+	ofXmlObject s;
 
 	s.addChild(OFXREMOTEUI_XML_ROOT_TAG);
 	s.setTo(OFXREMOTEUI_XML_ROOT_TAG); //get into root
@@ -570,7 +570,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 	vector<string> loadedParams;
 	unordered_map<string, bool> readKeys; //to keep track of duplicated keys;
 
-	ofxXmlPoco s;
+	ofXmlObject s;
 	s.load(fileName);
 	s.setTo(OFXREMOTEUI_XML_ROOT_TAG);
 	s.setTo(OFXREMOTEUI_XML_TAG);
