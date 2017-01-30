@@ -279,6 +279,7 @@ struct RemoteUIServerValueWatch{
 			case REMOTEUI_PARAM_FLOAT: return ofToString(*floatAddress, 4);
 			case REMOTEUI_PARAM_INT: return ofToString(*intAddress);
 			case REMOTEUI_PARAM_BOOL: return (*boolAddress) ? "true" : "false";
+			default: break;
 		}
 		return "unknown var type?";
 	}

@@ -305,7 +305,9 @@ private:
 	void			drawString(const string & text, const ofVec2f & pos);
 
 	string 			cleanCharsForFileSystem(const string & s);
-
+	const float 											ruiLineH = 20;
+	float 													lineH = ruiLineH;
+	float													charW = 8;
 
 #endif
 
@@ -316,6 +318,8 @@ private:
 	map<string, RemoteUIServerValueWatch> 				varWatches;
 
 	static ofxRemoteUIServer* 							singleton;
+
+
 };
 
 #endif

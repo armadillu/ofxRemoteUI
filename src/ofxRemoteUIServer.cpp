@@ -1344,6 +1344,9 @@ void ofxRemoteUIServer::drawUiWithFontStash(string fontPath, float fontSize_){
 		font = ofxFontStash();
 		font.setup(fontFile, 1.0, 512, false, 0, uiScale);
 		onScreenNotifications.drawUiWithFontStash(&font);
+		ofRectangle r = font.getBBox("M", fontSize, 0, 0);
+		lineH = ceil(r.height * 1.75);
+		charW = r.width;
 	}else{
 		ofLogError("ofxRemoteUIServer") << "Can't use ofxFontStash with the Programmable Renderer!";
 	}
@@ -1351,6 +1354,8 @@ void ofxRemoteUIServer::drawUiWithFontStash(string fontPath, float fontSize_){
 
 void ofxRemoteUIServer::drawUiWithBitmapFont(){
 	useFontStash = false;
+	lineH = ruiLineH;
+	charW = 8;
 }
 #endif
 
@@ -1384,12 +1389,12 @@ void ofxRemoteUIServer::drawString(const string & text, const ofVec2f & pos){
 void ofxRemoteUIServer::drawString(const string & text, const float & x, const float & y){
 	#ifdef USE_OFX_FONTSTASH
 	if(useFontStash){
-		font.drawMultiLine(text, fontSize, x, y + 1);
+		font.drawMultiLine(text, fontSize, x, y + lineH * 0.135);
 	}else{
-		ofDrawBitmapString(text, x, y);
+		ofDrawBitmapString(text, x, y + 2);
 	}
 	#else
-	ofDrawBitmapString(text, x, y);
+	ofDrawBitmapString(text, x, y + 2 );
 	#endif
 }
 
@@ -1420,16 +1425,16 @@ void ofxRemoteUIServer::draw(int x, int y){
 
 	if(showUI){
 
-		int padding = 30;
+		int padding = lineH * 1.5;
 		int x = padding;
-		int initialY = padding * 1.5;
+		int initialY = lineH * 2;
 		int y = initialY;
 		int colw = uiColumnWidth;
 		int realColW = colw * 0.9;
 		int valOffset = realColW * 0.7;
 		int valSpaceW = realColW - valOffset;
-		int spacing = 20;
-		int bottomBarHeight = padding + spacing + 36;
+		int spacing = lineH;
+		int bottomBarHeight = lineH * 4.25;
 		int frameNum = ofGetFrameNum();
 
 		//bottom bar
@@ -1446,19 +1451,21 @@ void ofxRemoteUIServer::draw(int x, int y){
 					   "\nPress 's' to save current config, 'S' to make a new preset. ('E' to save in old format)\n" +
 					   "Press 'r' to restore all params's launch state. '+'/'-' to set UI Scale. 'N' to toggle screen notif.\n" +
 					   "Press Arrow Keys to edit values. SPACEBAR + Arrow Keys for bigger increments. ',' and '.' Keys to scroll.\n" +
-					   "Press 'TAB' to hide. Press 'RETURN' when editing a Color Param to cycle through RGBA components.", padding, screenH / uiScale - bottomBarHeight + 20);
+					   "Press 'TAB' to hide. Press 'RETURN' when editing a Color Param to cycle through RGBA components.",
+					   charW * 1.5,
+					   screenH / uiScale - bottomBarHeight + lineH * 0.65);
 		}
 
 		//preset selection / top bar
 		ofSetColor(64);
-		ofDrawRectangle(0 , 0, screenW / uiScale, 22);
+		ofDrawRectangle(0 , 0, screenW / uiScale, lineH);
 		ofColor textBlinkC ;
 		if(frameNum%6 < 4) textBlinkC = ofColor(0,0);
 		else textBlinkC = ofColor(255,0,0);
 
+		ofVec2f dpos = ofVec2f(charW * 23, lineH * 0.65);
 		if(presetsCached.size() > 0 && selectedPreset >= 0 && selectedPreset < presetsCached.size()){
 
-			ofVec2f dpos = ofVec2f(192, 16);
 			ofSetColor(180);
 			if (selectedItem < 0){
 				drawString("Press RETURN to load GLOBAL PRESET: \"" + presetsCached[selectedPreset] + "\"", dpos);
@@ -1485,7 +1492,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 		}
 		if (selectedItem != -1) ofSetColor(255);
 		else ofSetColor(textBlinkC);
-		drawString("+ PRESET SELECTION: " , 30,  16);
+		drawString("+ PRESET SELECTION: ", charW * 3,  dpos.y);
 
 		int linesInited = uiLines.getNumVertices() > 0 ;
 		ofPushMatrix();
@@ -1611,11 +1618,11 @@ void ofxRemoteUIServer::draw(int x, int y){
 		//tiny clock top left
 		if (uiAlpha < 1.0 && !showUIduringEdits){
 			ofMesh m;
-			int step = 30;
+			int step = 20;
 			m.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
-			ofVec3f origin = ofVec3f(15,11); //rect is 22
+			ofVec3f origin = ofVec3f(charW * 1.5, lineH * 0.5); //rect is 22
 			m.addVertex(origin);
-			float r = 8.0f;
+			float r = lineH * 0.4;
 			float ang;
 			float lim = 360.0f * (1.0f - uiAlpha);
 			for(ang = 0; ang < lim; ang += step){
