@@ -9,7 +9,7 @@ common:
 
 	# dependencies with other addons, a list of them separated by spaces 
 	# or use += in several lines
-	  ADDON_DEPENDENCIES = ofxXmlSettings ofxOsc
+	  ADDON_DEPENDENCIES = ofxXmlSettings ofxOsc ofxPoco
 	
 	# include search paths, this will be usually parsed from the file system
 	# but if the addon or addon libraries need special search paths they can be
