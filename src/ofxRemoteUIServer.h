@@ -136,6 +136,7 @@ public:
 	#ifdef USE_OFX_FONTSTASH
 	void drawUiWithFontStash(string fontPath, float fontSize = 15 /*good with veraMono*/ );
 	void drawUiWithBitmapFont();
+	ofxFontStash & getFont(){return font;}
 	#endif
 
 	bool builtInClientIsVisible(){return showUI;}
@@ -146,7 +147,6 @@ public:
 	string getBinaryName(){return binaryName;}
 
 #ifdef OF_AVAILABLE
-
 	void toggleBuiltInClientUI(); //show hide the "built in client" GUI screen
 	void setUiColumnWidth(int w);
 	void setBuiltInUiScale(float s);
@@ -169,7 +169,6 @@ public:
 	 as the main thread is blocked, but it also means the changes are not synced with the main thread. Also, the
 	 callback method will be called from a background thread, so keep it in mind. (no GL calls in there!)
 	 */
-
 #endif
 
 	//These are used to monitor on screen any value you need; similar to watchParam
