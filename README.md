@@ -40,13 +40,13 @@ Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 * Easy to use C++ Macros hide complexity away, very easy to plug into any existing project.
 * Support for native ofParameters of compatible types (int, float, bool, string ofColor, ofVec). Allows you to edit native OF ofParamater types from RemoteUI. See "example-ofParameter".
 
-##Dependencies
+## Dependencies
 
 * ofxXmlSettings
 * ofxOsc
 * ofxPoco in OF v > 0.9.8
 
-##Available Clients
+## Available Clients
 
 * Native OSX client, feature complete (this should be your first choice)
 * Alternative mutliplatform (iOS/win) client built on top of ofxUI (less features & less robust, stale)
@@ -151,7 +151,7 @@ You can set the built-in UI to be drawn using [ofxFontStash](https://github.com/
 RUI_GET_INSTANCE()->drawUiWithFontStash("myFont.ttf");
 ```
 
-##XML FILE FORMAT
+## XML FILE FORMAT
 
 Commits before the Git Tag "LastCommitWithXMLv1" use the original file format for XML files. Commits after that tag, will automatically save in the new format (v2), but will also parse files with the old format. You can also save files in the old format by pressing "E" (for export) from the built in client, either globally or on a per-group basis.
 
