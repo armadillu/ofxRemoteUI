@@ -29,6 +29,10 @@
 
 #include "ofxRemoteUIServer.h"
 
+#ifdef TARGET_IOS
+#include "ofxiOS.h"
+#endif
+
 #ifdef OF_AVAILABLE
 #ifndef TARGET_OF_IOS
 	#include "ofAppNoWindow.h"
@@ -62,6 +66,9 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	colorSet = false;
 	computerName = binaryName = "";
 	directoryPrefix = "";
+	#ifdef TARGET_IOS
+	directoryPrefix = ofxiOSGetDocumentsDirectory();
+	#endif
 	callBack = NULL;
 	upcomingGroup = OFXREMOTEUI_DEFAULT_PARAM_GROUP;
 	verbose_ = false;
@@ -571,7 +578,10 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 	unordered_map<string, bool> readKeys; //to keep track of duplicated keys;
 
 	ofXmlObject s;
-	s.load(fileName);
+	bool loaded = s.load(fileName);
+	if(!loaded){
+		RLOG_ERROR << "can't load XML file at " << fileName;
+	}
 	s.setTo(OFXREMOTEUI_XML_ROOT_TAG);
 	s.setTo(OFXREMOTEUI_XML_TAG);
 
@@ -2147,6 +2157,8 @@ void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamNa
 				if (verbose_) RLOG_NOTICE << "updating value of param \"" << thisParamName << "\" according to the previously loaded XML!";
 			}
 		}
+	}else{
+		ofxRemoteUI::addParamToDB(p, thisParamName);
 	}
 }
 
