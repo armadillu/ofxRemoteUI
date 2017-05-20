@@ -116,6 +116,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 //	colorTables.push_back(ofColor(255,20,214,BG_COLOR_ALPHA) );
 
 	uiLines.setMode(OF_PRIMITIVE_LINES);
+	ofAddListener(eventShowParamUpdateNotification, this, &ofxRemoteUIServer::onShowParamUpdateNotification);
 #else
 	int a = 44;
 	colorTables.push_back(ofColor(194,144,221,a) );
@@ -799,7 +800,7 @@ void ofxRemoteUIServer::restoreAllParamsToDefaultValues(){
 
 void ofxRemoteUIServer::pushParamsToClient(){
 
-	vector<string>changedParams =  scanForUpdatedParamsAndSync();
+	vector<string>changedParams = scanForUpdatedParamsAndSync();
 	#ifdef OF_AVAILABLE
 	for(int i = 0 ; i < changedParams.size(); i++){
 		string pName = changedParams[i];
@@ -2654,4 +2655,13 @@ void ofxRemoteUIServer::removeVariableWatch(const string &varName){
 */
 
 
+void ofxRemoteUIServer::onShowParamUpdateNotification(ScreenNotifArg& a){
 
+	onScreenNotifications.addParamUpdate(a.paramName, a.p,
+										 ofColor(a.p.r, a.p.g, a.p.b, a.p.a),
+										 a.p.type == REMOTEUI_PARAM_COLOR ?
+										 ofColor(a.p.redVal, a.p.greenVal, a.p.blueVal, a.p.alphaVal) :
+										 ofColor(0,0,0,0)
+										 );
+
+}

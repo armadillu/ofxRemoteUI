@@ -179,7 +179,7 @@ public:
 	void addVariableWatch(const string & varName, bool* varPtr, ofColor c = ofColor(0,0,0,0));
 	//void removeVariableWatch(const string &varName);
 
-private:
+protected:
 
 	ofxRemoteUIServer(); // use ofxRemoteUIServer::instance() instead! Use the MACROS defined above!
 	~ofxRemoteUIServer();
@@ -201,6 +201,7 @@ private:
 
 	void			saveGroupToXMLv1(string fileName, string groupName); //save only a subset of params into xml
 
+	void			onShowParamUpdateNotification(ScreenNotifArg& a);
 
 	void			restoreAllParamsToInitialXML();
 	void			restoreAllParamsToDefaultValues();

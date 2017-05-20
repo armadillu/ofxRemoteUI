@@ -12,7 +12,6 @@
 #include "uriencode.h"
 #include <sstream>
 
-
 #ifdef _WIN32
 #include <windows.h>
 #include <iphlpapi.h>
@@ -408,7 +407,6 @@ vector<string> ofxRemoteUI::scanForUpdatedParamsAndSync(){
 
 		RemoteUIParam p = (*ii).second;
 		if ( hasParamChanged(p) ){
-			//cout << "scanForUpdatedParamsAndSync: found '" << (*ii).first << + "'" << endl;
 			paramsPendingUpdate.push_back( (*ii).first );
 			syncParamToPointer((*ii).first);
 		}
@@ -607,23 +605,26 @@ RemoteUIParam& ofxRemoteUI::getParamRefForName(string paramName){
 	return nullParam;
 }
 
-string ofxRemoteUI::getValuesAsString(){
+string ofxRemoteUI::getValuesAsString(vector<string>paramList){
 	stringstream out;
 	map<int,string>::iterator it = orderedKeys.begin();
 	while( it != orderedKeys.end() ){
-		RemoteUIParam param = params[it->second];
-		if(param.type != REMOTEUI_PARAM_SPACER){
-			out << UriEncode(it->second) << "=";
-		}
-		switch (param.type) {
-			case REMOTEUI_PARAM_FLOAT: out << param.floatVal << endl; break;
-			case REMOTEUI_PARAM_INT: out << param.intVal << endl; break;
-			case REMOTEUI_PARAM_COLOR: out << (int)param.redVal << " " << (int)param.greenVal << " " << (int)param.blueVal << " " << (int)param.alphaVal << " " << endl; break;
-			case REMOTEUI_PARAM_ENUM: out << param.intVal << endl; break;
-			case REMOTEUI_PARAM_BOOL: out << (param.boolVal?"1":"0") << endl; break;
-			case REMOTEUI_PARAM_STRING: out << UriEncode(param.stringVal) << endl; break;
-			case REMOTEUI_PARAM_SPACER: break;
-			default: break;
+		string pname = it->second;
+		if(paramList.size() == 0 || find(paramList.begin(), paramList.end(), pname) != paramList.end()){
+			RemoteUIParam param = params[it->second];
+			if(param.type != REMOTEUI_PARAM_SPACER){
+				out << UriEncode(it->second) << "=";
+			}
+			switch (param.type) {
+				case REMOTEUI_PARAM_FLOAT: out << param.floatVal << endl; break;
+				case REMOTEUI_PARAM_INT: out << param.intVal << endl; break;
+				case REMOTEUI_PARAM_COLOR: out << (int)param.redVal << " " << (int)param.greenVal << " " << (int)param.blueVal << " " << (int)param.alphaVal << " " << endl; break;
+				case REMOTEUI_PARAM_ENUM: out << param.intVal << endl; break;
+				case REMOTEUI_PARAM_BOOL: out << (param.boolVal?"1":"0") << endl; break;
+				case REMOTEUI_PARAM_STRING: out << UriEncode(param.stringVal) << endl; break;
+				case REMOTEUI_PARAM_SPACER: break;
+				default: break;
+			}
 		}
 		++it;
 	}
@@ -671,6 +672,8 @@ void ofxRemoteUI::setValuesFromString( string values ){
 					paramsChangedSinceLastCheck.push_back(name);
 				}
 			}
+		}else{
+			RLOG_NOTICE << "unknown param name; ignoring (" << name << ")";
 		}
 	}
 
@@ -680,6 +683,11 @@ void ofxRemoteUI::setValuesFromString( string values ){
 			RemoteUIParam param = params[*it];
 			sendUntrackedParamUpdate(param, *it);
 			RLOG_VERBOSE << "sending update for " << *it ;
+			ScreenNotifArg arg;
+			arg.paramName = *it;
+			arg.p = param;
+			arg.bgColor = (param.type == REMOTEUI_PARAM_COLOR) ? param.getColor() : ofColor(0,0,0,0);
+			ofNotifyEvent(eventShowParamUpdateNotification, arg, this);
 		}
 		it++;
 	}

@@ -38,6 +38,7 @@
 	using std::tr1::unordered_map;
 #endif
 
+
 #define OFXREMOTEUI_PORT									10000
 #define OFXREMOTEUI_BROADCAST_PORT							25748
 #define OFXREMOTEUI_BORADCAST_INTERVAL						1 /*secs*/
@@ -77,6 +78,7 @@
 #endif
 
 #include "RemoteParam.h"
+
 
 #define RUI_LOCAL_IP_ADDRESS "127.0.0.1"
 using namespace std;
@@ -225,7 +227,7 @@ public:
 	bool paramExistsForName(string paramName);
 	vector<string> getPresetsList();
 
-	string getValuesAsString();
+	string getValuesAsString(vector<string>paramList = vector<string>()); //supply param list to get only those, supply empty list to get all params
 	void setValuesFromString( string values );
 
 	virtual void restoreAllParamsToInitialXML() = 0;	//call this on client to request server to do so
@@ -245,8 +247,8 @@ protected:
 	void sendParam(string paramName, const RemoteUIParam & p);
 	DecodedMessage decode(const ofxOscMessage & m);
 
-	vector<string> scanForUpdatedParamsAndSync();	//goes through all params, comparing * to real valie
-													//reports those that are out of syn
+	vector<string> scanForUpdatedParamsAndSync();	//goes through all params, comparing * to real value
+													//reports those that are out of sync
 
 	void sendUpdateForParamsInList(vector<string>paramsPendingUpdate);
 	bool hasParamChanged(const RemoteUIParam & p);
@@ -307,6 +309,14 @@ protected:
 	unordered_map<string, RemoteUIParam>		paramsFromXML; //this will hold a copy of all the params as they where when first loaded from XML
 	unordered_map<string, bool>					paramsLoadedFromXML;
 
+	struct ScreenNotifArg{
+		string paramName;
+		RemoteUIParam p;
+		ofColor bgColor;
+	};
+
+	ofFastEvent<ScreenNotifArg> eventShowParamUpdateNotification; //this is a horrible hack to be able to show
+															//screen notifications on the server triggered from the supper class
 private:
 
 	string stringForParamType(RemoteUIParamType t);
