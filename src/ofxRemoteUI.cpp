@@ -666,8 +666,10 @@ void ofxRemoteUI::setValuesFromString( string values ){
 				default: break;
 			}
 
+
 			if ( !param.isEqualTo(original) ){ // if the udpdate changed the param, keep track of it
 				params[name] = param;
+				syncPointerToParam(name);
 				if(std::find(paramsChangedSinceLastCheck.begin(), paramsChangedSinceLastCheck.end(), name) == paramsChangedSinceLastCheck.end()){
 					paramsChangedSinceLastCheck.push_back(name);
 				}
