@@ -675,7 +675,9 @@ void ofxRemoteUI::setValuesFromString( string values ){
 				}
 			}
 		}else{
-			RLOG_NOTICE << "unknown param name; ignoring (" << name << ")";
+			if(name.size()){
+				RLOG_NOTICE << "unknown param name; ignoring (" << name << ")";
+			}
 		}
 	}
 
