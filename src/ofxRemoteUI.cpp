@@ -691,7 +691,9 @@ void ofxRemoteUI::setValuesFromString( string values ){
 			arg.paramName = *it;
 			arg.p = param;
 			arg.bgColor = (param.type == REMOTEUI_PARAM_COLOR) ? param.getColor() : ofColor(0,0,0,0);
+			#ifdef OF_AVAILABLE
 			ofNotifyEvent(eventShowParamUpdateNotification, arg, this);
+			#endif
 		}
 		it++;
 	}

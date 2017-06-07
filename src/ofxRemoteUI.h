@@ -315,7 +315,9 @@ protected:
 		ofColor bgColor;
 	};
 
+	#ifdef OF_AVAILABLE
 	ofFastEvent<ScreenNotifArg> eventShowParamUpdateNotification; //this is a horrible hack to be able to show
+	#endif
 															//screen notifications on the server triggered from the supper class
 private:
 
