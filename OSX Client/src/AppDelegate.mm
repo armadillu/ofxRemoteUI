@@ -1116,7 +1116,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	NSString * winColor = [d stringForKey:@"windowColor"];
 	NSColor * col;
 	if (winColor == nil) {
-		col = [NSColor colorWithDeviceRed:0.0f green:78.0f/255.0f blue:0.0f alpha:1.0f];
+		col = [NSColor colorWithSRGBRed:1.0f green:78.0f/255.0f blue:0.0f alpha:1.0f];
 	}else{
 		col = [NSColor colorFromString:winColor forColorSpace:[NSColorSpace deviceRGBColorSpace]];
 	}

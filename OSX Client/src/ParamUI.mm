@@ -150,10 +150,10 @@
 	if([times intValue] == NUM_BOUND_FLASH) shouldBeFlashing = true; //this is the 1st call, force flash
 	else{	//not first call, we've been flashing for a while!
 		if (shouldBeFlashing == false){
-			[bg setBackgroundColor:[NSColor colorWithDeviceRed: param.r/255.
-														 green: param.g/255.
-														  blue: param.b/255.
-														 alpha: param.a/255.]];
+			[bg setBackgroundColor:[NSColor colorWithSRGBRed: param.r/255.0f
+														 green: param.g/255.0f
+														  blue: param.b/255.0f
+														 alpha: param.a/255.0f]];
 			return;
 		}
 	}
@@ -173,23 +173,23 @@
 			}else{ //last fadeout is really long
 				[CATransaction begin];
 				[CATransaction setAnimationDuration: duration];
-				[bg setBackgroundColor:[NSColor colorWithDeviceRed: param.r/255.
-															 green: param.g/255.
-															  blue: param.b/255.
-															 alpha: param.a/255.]];
+				[bg setBackgroundColor:[NSColor colorWithSRGBRed: param.r/255.0f
+															 green: param.g/255.0f
+															  blue: param.b/255.0f
+															 alpha: param.a/255.0f]];
 				[CATransaction commit];
 			}
 		}];
 		if(localTimes%2 == 1){
-			[bg setBackgroundColor:[NSColor colorWithDeviceRed: param.r/255.
-														 green: param.g/255.
-														  blue: param.b/255.
+			[bg setBackgroundColor:[NSColor colorWithSRGBRed: param.r/255.0f
+														 green: param.g/255.0f
+														  blue: param.b/255.0f
 														 alpha: 0.7]];
 		}else{
-			[bg setBackgroundColor:[NSColor colorWithDeviceRed: param.r/255.
-														 green: param.g/255.
-														  blue: param.b/255.
-														 alpha: param.a/255.]];
+			[bg setBackgroundColor:[NSColor colorWithSRGBRed: param.r/255.0f
+														 green: param.g/255.0f
+														  blue: param.b/255.0f
+														 alpha: param.a/255.0f]];
 		}
 		[CATransaction commit];
 	}];
@@ -202,14 +202,14 @@
 	if (numberID%2 == 1)
 		[bg setBackgroundColor:[NSColor whiteColor]];
 	else
-		[bg setBackgroundColor:[NSColor colorWithDeviceRed:0.950 green:0.950 blue:1 alpha:1.000]];
+		[bg setBackgroundColor:[NSColor colorWithSRGBRed:0.950 green:0.950 blue:1 alpha:1.000]];
 
 	if (param.a > 0 ){
 		float a = (param.a/255.); //lets simulate alpha blending without using alpha blending
 									//the goal is to speed up rendering
-		[bg setBackgroundColor: [NSColor colorWithDeviceRed: (a * param.r/255.) + (1 - a)
-													  green: (a * param.g/255.) + (1 - a)
-													   blue: (a * param.b/255.) + (1 - a)
+		[bg setBackgroundColor: [NSColor colorWithSRGBRed: (a * param.r/255.0f) + (1 - a)
+													  green: (a * param.g/255.0f) + (1 - a)
+													   blue: (a * param.b/255.0f) + (1 - a)
 													  alpha: 1]
 		 ];
 
@@ -532,11 +532,11 @@
 			break;
 
 		case REMOTEUI_PARAM_COLOR:{
-			NSColor * col = [NSColor colorWithSRGBRed:param.redVal/255. green:param.greenVal/255. blue:param.blueVal/255. alpha:param.alphaVal/255.];
+			NSColor * col = [NSColor colorWithSRGBRed:param.redVal/255.0f green:param.greenVal/255.0f blue:param.blueVal/255.0f alpha:param.alphaVal/255.0f];
 			//col = [col colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
 			//CGFloat comp[] = {param.redVal/255., param.greenVal/255., param.blueVal/255., param.alphaVal/255. };
 			//NSColor * col = [NSColor colorWithColorSpace:[NSColorSpace sRGBColorSpace] components:comp count:4];
-			col = [col colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
+			col = [col colorUsingColorSpaceName:NSDeviceRGBColorSpace device:[[NSApp mainWindow] deviceDescription]];
 			[colorWell setColor:col];
 			}break;
 
@@ -567,7 +567,7 @@
 	//NSLog(@"colorSP: %@", [col colorSpaceName]);
 	//col = [col colorUsingColorSpaceName:NSCalibratedRGBColorSpace device:[[NSApp mainWindow] deviceDescription]];
 	//NSString*	myColorSpace = [col colorSpaceName];
-	col = [col colorUsingColorSpaceName: NSCalibratedRGBColorSpace device:[[NSApp mainWindow] deviceDescription]];
+	col = [col colorUsingColorSpaceName: NSDeviceRGBColorSpace device:[[NSApp mainWindow] deviceDescription]];
 	//[sender setColor:col];
 	//NSColor * col2 = [col colorUsingColorSpace:[NSColorSpace sRGBColorSpace] ];
 	//[sender performSelector:@selector(setColor:) withObject:col2 afterDelay:1];

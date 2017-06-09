@@ -146,7 +146,7 @@ float convertHueToMidiFigtherHue(float hue){
 										value = valMap(p.intVal, p.minInt, p.maxInt, 0, 127);
 										break;
 									case REMOTEUI_PARAM_COLOR:{
-										NSColor * c = [NSColor colorWithDeviceRed:p.redVal/255.0f green:p.greenVal/255.0f blue:p.blueVal/255.0f alpha:p.alphaVal/255.0f];
+										NSColor * c = [NSColor colorWithSRGBRed:p.redVal/255.0f green:p.greenVal/255.0f blue:p.blueVal/255.0f alpha:p.alphaVal/255.0f];
 										float hue = [c hueComponent];
 										//the midifigter has a weird color mapping, 0 is blue, 1 is blue;
 										//usually hue is 0 is red, 1 is red. so we apply offset to the hue we get
@@ -167,7 +167,7 @@ float convertHueToMidiFigtherHue(float hue){
 
 							//set param highlight color to match midiFigtherTwister color //TODO make UI to toggle this behavior!
 							if(p.type != REMOTEUI_PARAM_COLOR){
-								NSColor * paramColor = [NSColor colorWithDeviceRed:p.r/255.0f green:p.g/255.0f blue:p.b/255.0f alpha:1.0];
+								NSColor * paramColor = [NSColor colorWithSRGBRed:p.r/255.0f green:p.g/255.0f blue:p.b/255.0f alpha:1.0];
 								float hue = convertHueToMidiFigtherHue([paramColor hueComponent]);
 								//param hue
 								msg = [VVMIDIMessage createWithType:0xB0 channel:/*midiOutConfig.channelInt*/ + 1];
@@ -326,11 +326,11 @@ float convertHueToMidiFigtherHue(float hue){
 										p.alphaVal = val * 255;
 
 									}else{
-										NSColor * c = [NSColor colorWithDeviceRed:p.redVal/255.0f green:p.greenVal/255.0f blue:p.blueVal/255.0f alpha:p.alphaVal/255.0f];
+										NSColor * c = [NSColor colorWithSRGBRed:p.redVal/255.0f green:p.greenVal/255.0f blue:p.blueVal/255.0f alpha:p.alphaVal/255.0f];
 										float sat = [c saturationComponent];
 										float bri = [c brightnessComponent];
 										float a = [c alphaComponent];
-										NSColor * c2 = [NSColor colorWithDeviceHue:val saturation:sat brightness:bri alpha:a];
+										NSColor * c2 = [NSColor colorWithSRGBRed:val saturation:sat brightness:bri alpha:a];
 										p.redVal = [c2 redComponent] * 255.0f;
 										p.greenVal = [c2 greenComponent] * 255.0f;
 										p.blueVal = [c2 blueComponent] * 255.0f;
@@ -547,7 +547,7 @@ float convertHueToMidiFigtherHue(float hue){
 						p.intVal = p.minInt + (p.maxInt - p.minInt) * value;
 						break;
 					case REMOTEUI_PARAM_COLOR:{
-						NSColor * c = [NSColor colorWithDeviceRed:p.redVal/255.0f green:p.greenVal/255.0f blue:p.blueVal/255.0f alpha:p.alphaVal/255.0f];
+						NSColor * c = [NSColor colorWithSRGBRed:p.redVal/255.0f green:p.greenVal/255.0f blue:p.blueVal/255.0f alpha:p.alphaVal/255.0f];
 						float sat = [c saturationComponent];
 						float bri = [c brightnessComponent];
 						float a = [c alphaComponent];
