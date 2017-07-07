@@ -70,7 +70,7 @@ public:
 
 		vector<int> toDeleteIndexes;
 		//walk all notif, write down expired ones's indexes
-		for(int i = 0; i < notifications.size(); i++){
+		for(size_t i = 0; i < notifications.size(); i++){
 			notifications[i].time -= dt;
 			if( notifications[i].time < 0.0f ){
 				toDeleteIndexes.push_back(i);
@@ -92,13 +92,13 @@ public:
 		}
 
 		//delete expired paramUpdates
-		for(int i = 0; i < toDeleteParams.size(); i++){
+		for(size_t i = 0; i < toDeleteParams.size(); i++){
 			paramNotifications.erase( toDeleteParams[i] );
 		}
 
 		//delete expired log lines
 		toDeleteIndexes.clear();
-		for(int i = 0; i < logLines.size(); i++){
+		for(size_t i = 0; i < logLines.size(); i++){
 			logLines[i].time -= dt;
 			if (logLines[i].highlight > 0.0f) logLines[i].highlight -= dt * 0.75;
 			if( logLines[i].time < 0.0f ){
@@ -117,7 +117,7 @@ public:
 		float spacing = RUI_NOTIFICATION_LINEHEIGHT;
 		float yy = y;
 
-		for(int i = 0; i < notifications.size(); i++){
+		for(size_t i = 0; i < notifications.size(); i++){
 			float a = ofClamp( RUI_NOTIFICATION_ALPHA_OVERFLOW * notifications[i].time, 0.0f, 1.0f);
 			float hh = drawStringWithBox("ofxRemoteUIServer: " + notifications[i].msg,
 										x,
@@ -128,7 +128,7 @@ public:
 			yy -= hh;
 		}
 
-		for(int i = 0; i < logLines.size(); i++){
+		for(size_t i = 0; i < logLines.size(); i++){
 			float a = ofClamp( RUI_NOTIFICATION_ALPHA_OVERFLOW * logLines[i].time, 0.0f, 1.0f);
 			string repeatCount;
 			if (logLines[i].repeatCount > 1) repeatCount = " (x" + ofToString(logLines[i].repeatCount) + ")";
@@ -231,7 +231,7 @@ public:
 
 		bool found = false;
 		if(merge){
-			for(int i = 0; i < logLines.size(); i++){
+			for(size_t i = 0; i < logLines.size(); i++){
 				if(logLines[i].logLine == msg){
 					logLines[i].repeatCount++;
 					logLines[i].time = logScreenTime; //update
@@ -266,7 +266,7 @@ public:
 				n.pct = ofMap(p.floatVal, p.minFloat, p.maxFloat, 0, 1);
 				n.range = true;
 				if(n.value.size() < 10){
-					for(int i = 0; i < n.value.size() - 10; i++){
+					for(size_t i = 0; i < n.value.size() - 10; i++){
 						n.value += " ";
 					}
 				}

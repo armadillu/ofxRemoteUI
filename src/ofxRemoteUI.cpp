@@ -51,7 +51,7 @@ vector<string> ofxRemoteUI::getPresetsList(){
 void ofxRemoteUI::printAllParamsDebug(){
 	if(orderedKeys.size() == 0) return;
 	cout << "#### FULL PARAM LIST ################################" << endl;
-	for(int i = 0; i < orderedKeys.size(); i++){
+	for(size_t i = 0; i < orderedKeys.size(); i++){
 		string key = orderedKeys[i];
 		RemoteUIParam thisP = params[key];
 		cout << "   index: " << i << "  list: " << key << " > "; thisP.print();
@@ -417,7 +417,7 @@ vector<string> ofxRemoteUI::scanForUpdatedParamsAndSync(){
 
 void ofxRemoteUI::sendUpdateForParamsInList(vector<string>list){
 
-	for(int i = 0; i < list.size(); i++){
+	for(size_t i = 0; i < list.size(); i++){
 		string name = list[i];
 		unordered_map<string, RemoteUIParam>::const_iterator it = params.find(name);
 		if(it!=params.end()){
@@ -712,7 +712,7 @@ void ofxRemoteUI::sendParam(string paramName, const RemoteUIParam & p){
 		case REMOTEUI_PARAM_STRING: m.addStringArg(p.stringVal); break;
 		case REMOTEUI_PARAM_ENUM:{
 			m.addIntArg(p.intVal); m.addIntArg(p.minInt); m.addIntArg(p.maxInt);
-			for (int i = 0; i < p.enumList.size(); i++) {
+			for (size_t i = 0; i < p.enumList.size(); i++) {
 				m.addStringArg(p.enumList[i]);
 			}
 		}break;
@@ -783,7 +783,7 @@ void ofxRemoteUI::sendPREL( vector<string> presetNames_ ){
 		presetNames.clear();
 		m.addStringArg("OK");
 	}
-	for(int i = 0; i < presetNames_.size(); i++){
+	for(size_t i = 0; i < presetNames_.size(); i++){
 		m.addStringArg(presetNames_[i]);
 	}
 	oscSender.sendMessage(m);
@@ -820,7 +820,7 @@ void ofxRemoteUI::sendMISP(vector<string> missingParamsInPreset){
 	if(verbose_) RLOG_VERBOSE << "sendMISP()";
 	ofxOscMessage m;
 	m.setAddress("/MISP");
-	for(int i = 0; i < missingParamsInPreset.size(); i++){
+	for(size_t i = 0; i < missingParamsInPreset.size(); i++){
 		m.addStringArg(missingParamsInPreset[i]);
 	}
 	oscSender.sendMessage(m);
