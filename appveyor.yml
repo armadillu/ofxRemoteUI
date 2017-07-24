@@ -6,13 +6,13 @@ environment:
     APPVEYOR_OS_NAME: windows
   matrix:
   #MSYS2 Building
-    - platform: x86
-      BUILDER: MSYS2
+#    - platform: x86
+#      BUILDER: MSYS2
 
   #VisualStudio Building
-    - platform: x86
-      BUILDER : VS
-      BITS: 32
+#    - platform: x86
+#      BUILDER : VS
+#      BITS: 32
     - platform: x64
       BUILDER : VS
       BITS: 64
