@@ -2,6 +2,7 @@
 
 
 [![Build Status](https://travis-ci.org/armadillu/ofxRemoteUI.svg?branch=master)](https://travis-ci.org/armadillu/ofxRemoteUI)
+[![Build status](https://ci.appveyor.com/api/projects/status/0cne779u0mdp8mvp/branch/master?svg=true)](https://ci.appveyor.com/project/armadillu/ofxremoteui/branch/master)
 
 OpenFrameworks addon that allows you to serve c++ variables/parameters (bool, float, int, enum, string, ofColor) on the network, so that you can modify them remotely. It uses server client architecture, where your app is the server. It communicates both ways; you can modify your project's variables from the client, but you can also pull your app's variable values from the client; this way you can track values that evolve programatically. It runs on OSC.
 
