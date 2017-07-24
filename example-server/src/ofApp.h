@@ -4,7 +4,7 @@
 #include "ofMain.h"
 #include "ofxRemoteUIServer.h"
 
-class testApp : public ofBaseApp{
+class ofApp : public ofBaseApp{
 
 enum MenuItems{
 	MENU_OPTION_0, MENU_OPTION_1, MENU_OPTION_2, MENU_OPTION_3

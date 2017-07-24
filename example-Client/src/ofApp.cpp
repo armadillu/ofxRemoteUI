@@ -1,4 +1,4 @@
-#include "testApp.h"
+#include "ofAppApp.h"
 
 //get notified when server tells us something
 void clientCallback(RemoteUIClientCallBackArg a){
@@ -20,7 +20,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 }
 
 
-void testApp::setup(){
+void ofApp::setup(){
 
 	ofBackground(22);
 	ofSetFrameRate(60);
@@ -41,7 +41,7 @@ void testApp::setup(){
 }
 
 
-void testApp::update(){
+void ofAppApp::update(){
 
 	float dt = 0.016666;
 	time += dt;
@@ -62,7 +62,7 @@ void testApp::update(){
 }
 
 
-void testApp::draw(){
+void ofAppApp::draw(){
 
 	ofDrawBitmapStringHighlight(
 								string("CLIENT\n") +
@@ -78,12 +78,12 @@ void testApp::draw(){
 }
 
 
-void testApp::mousePressed( int x, int y, int button ){
+void ofAppApp::mousePressed( int x, int y, int button ){
 	drawOutlines = !drawOutlines;
 }
 
 
-void testApp::keyPressed(int key){
+void ofAppApp::keyPressed(int key){
 
 	if(key=='1'){
 		client.savePresetWithName("a");

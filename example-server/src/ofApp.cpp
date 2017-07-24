@@ -1,7 +1,7 @@
-#include "testApp.h"
+#include "ofApp.h"
 
 
-void testApp::setup(){
+void ofApp::setup(){
 
 	ofBackground(22);
 	ofSetFrameRate(60);
@@ -23,7 +23,7 @@ void testApp::setup(){
 					//the first time you launch it, and will use it forever
 
 	// SETUP A CALLBACK ///////////////////////////////////////////
-	ofAddListener(RUI_GET_OF_EVENT(), this, &testApp::clientDidSomething);
+	ofAddListener(RUI_GET_OF_EVENT(), this, &ofApp::clientDidSomething);
 
 	RUI_GET_INSTANCE()->setVerbose(true);
 
@@ -100,14 +100,14 @@ void testApp::setup(){
 }
 
 
-void testApp::update(){
+void ofApp::update(){
 
 	float dt = 0.016666;
 	currentMouseX = ofGetMouseX();
 }
 
 
-void testApp::draw(){
+void ofApp::draw(){
 
 	if (drawOutlines == 1) ofNoFill();
 	else ofFill();
@@ -140,7 +140,7 @@ void testApp::draw(){
 }
 
 
-void testApp::keyPressed( int key ){
+void ofApp::keyPressed( int key ){
 	//force an update in the client side (same as pressing sync button on osx client)
 	RUI_PUSH_TO_CLIENT();
 
@@ -150,7 +150,7 @@ void testApp::keyPressed( int key ){
 
 
 //define a callback method to get notifications of client actions
-void testApp::clientDidSomething(RemoteUIServerCallBackArg &arg){
+void ofApp::clientDidSomething(RemoteUIServerCallBackArg &arg){
 
 	switch (arg.action) {
 		case CLIENT_CONNECTED: cout << "CLIENT_CONNECTED" << endl; break;
