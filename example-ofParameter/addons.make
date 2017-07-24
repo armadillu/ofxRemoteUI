@@ -1,0 +1,4 @@
+ofxRemoteUI
+ofxOsc
+ofxXmlSettings
+ofxPoco
