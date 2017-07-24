@@ -2,3 +2,4 @@ ofxRemoteUI
 ofxOsc
 ofxXmlSettings
 ofxPoco
+ofxGui
