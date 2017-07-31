@@ -52,6 +52,8 @@
 	#define ofXmlObject ofXml
 #endif
 
+#include "ofxLibwebsockets.h"
+
 
 class ofxRemoteUIServer: public ofxRemoteUI
 #ifdef OF_AVAILABLE
@@ -120,6 +122,7 @@ public:
 	void pushParamsToClient(); //pushes all param values to client, updating its UI
 	void sendLogToClient(const char* format, ...);
 	void sendLogToClient(const string & message);
+    void sendMessage(ofxOscMessage m);
 	void setClearXMLonSave(bool clear){clearXmlOnSaving = clear;} //this only affects xml v1 - not relevant nowadays
 	void setDirectoryPrefix(const string & _directoryPrefix); // set the optional directory prefix
 
@@ -145,6 +148,15 @@ public:
 	string getComputerIP(){return computerIP;}
 	string getComputerName(){return computerName;}
 	string getBinaryName(){return binaryName;}
+    
+    
+    //---WebSockets---
+    void    onConnect( ofxLibwebsockets::Event& args );
+    void    onOpen( ofxLibwebsockets::Event& args );
+    void    onClose( ofxLibwebsockets::Event& args );
+    void    onIdle( ofxLibwebsockets::Event& args );
+    void    onMessage( ofxLibwebsockets::Event& args );
+    void    onBroadcast( ofxLibwebsockets::Event& args );
 
 #ifdef OF_AVAILABLE
 	void toggleBuiltInClientUI(); //show hide the "built in client" GUI screen
@@ -310,6 +322,15 @@ protected:
 	float													charW = 8;
 
 #endif
+
+    //---WebSockets---
+    void    listenWebSocket(int port);
+    int     wsPort;
+    bool    useWebSockets;
+    deque<ofxOscMessage>    wsMessages;
+    ofxOscMessage           jsonToOsc(Json::Value json);
+    string                  oscToJson(ofxOscMessage m);
+    ofxLibwebsockets::Server wsServer;
 
 	//keep track of params we added and then removed
 	unordered_map<string, RemoteUIParam>				params_removed;

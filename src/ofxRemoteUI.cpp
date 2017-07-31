@@ -722,7 +722,7 @@ void ofxRemoteUI::sendParam(string paramName, const RemoteUIParam & p){
 	m.addIntArg(p.r); m.addIntArg(p.g); m.addIntArg(p.b); m.addIntArg(p.a); // set bg color!
 	m.addStringArg(p.group);
 	try{
-		oscSender.sendMessage(m);
+		sendMessage(m);
 	}catch(exception e){
 		RLOG_ERROR << "exception sendParam " << paramName;
 	}
@@ -735,7 +735,7 @@ void ofxRemoteUI::sendREQU(bool confirmation){
 	ofxOscMessage m;
 	m.setAddress("/REQU");
 	if (confirmation) m.addStringArg("OK");
-	oscSender.sendMessage(m);
+	sendMessage(m);
 }
 
 
@@ -744,7 +744,7 @@ void ofxRemoteUI::sendRESX(bool confirm){
 	ofxOscMessage m;
 	m.setAddress("/RESX");
 	if (confirm) m.addStringArg("OK");
-	oscSender.sendMessage(m);
+	sendMessage(m);
 }
 
 void ofxRemoteUI::sendRESD(bool confirm){
@@ -752,7 +752,7 @@ void ofxRemoteUI::sendRESD(bool confirm){
 	ofxOscMessage m;
 	m.setAddress("/RESD");
 	if (confirm) m.addStringArg("OK");
-	oscSender.sendMessage(m);
+	sendMessage(m);
 }
 
 void ofxRemoteUI::sendSAVE(bool confirm){
@@ -760,7 +760,7 @@ void ofxRemoteUI::sendSAVE(bool confirm){
 	ofxOscMessage m;
 	m.setAddress("/SAVE");
 	if (confirm) m.addStringArg("OK");
-	oscSender.sendMessage(m);
+	sendMessage(m);
 }
 
 
@@ -770,7 +770,7 @@ void ofxRemoteUI::sendTEST(){
 	timeSinceLastReply = 0.0f;
 	ofxOscMessage m;
 	m.setAddress("/TEST");
-	oscSender.sendMessage(m);
+	sendMessage(m);
 }
 
 //on client call, presetNames should be empty vector (request ing the list)
@@ -786,7 +786,7 @@ void ofxRemoteUI::sendPREL( vector<string> presetNames_ ){
 	for(size_t i = 0; i < presetNames_.size(); i++){
 		m.addStringArg(presetNames_[i]);
 	}
-	oscSender.sendMessage(m);
+	sendMessage(m);
 }
 
 //on client call, presetName should be the new preset name
@@ -799,7 +799,7 @@ void ofxRemoteUI::sendSAVP(string presetName, bool confirm){
 	if (confirm){
 		m.addStringArg("OK");
 	}
-	oscSender.sendMessage(m);
+	sendMessage(m);
 }
 
 //on client call, presetName should be the new preset name
@@ -812,7 +812,7 @@ void ofxRemoteUI::sendSETP(string presetName, bool confirm){
 	if (confirm){
 		m.addStringArg("OK");
 	}
-	oscSender.sendMessage(m);
+	sendMessage(m);
 }
 
 void ofxRemoteUI::sendMISP(vector<string> missingParamsInPreset){
@@ -823,7 +823,7 @@ void ofxRemoteUI::sendMISP(vector<string> missingParamsInPreset){
 	for(size_t i = 0; i < missingParamsInPreset.size(); i++){
 		m.addStringArg(missingParamsInPreset[i]);
 	}
-	oscSender.sendMessage(m);
+	sendMessage(m);
 }
 
 void ofxRemoteUI::sendDELP(string presetName, bool confirm){
@@ -834,19 +834,19 @@ void ofxRemoteUI::sendDELP(string presetName, bool confirm){
 	if (confirm){
 		m.addStringArg("OK");
 	}
-	oscSender.sendMessage(m);
+	sendMessage(m);
 }
 
 void ofxRemoteUI::sendHELLO(){
 	ofxOscMessage m;
 	m.setAddress("/HELO");
-	oscSender.sendMessage(m);
+	sendMessage(m);
 }
 
 void ofxRemoteUI::sendCIAO(){
 	ofxOscMessage m;
 	m.setAddress("/CIAO");
-	oscSender.sendMessage(m);
+	sendMessage(m);
 }
 
 //on client call, presetName should be the new preset name
@@ -860,7 +860,7 @@ void ofxRemoteUI::sendSETp(string presetName, string group, bool confirm){
 	if (confirm){
 		m.addStringArg("OK");
 	}
-	oscSender.sendMessage(m);
+	sendMessage(m);
 }
 
 //on client call, presetName should be the new preset name
@@ -874,7 +874,7 @@ void ofxRemoteUI::sendSAVp(string presetName, string group, bool confirm){
 	if (confirm){
 		m.addStringArg("OK");
 	}
-	oscSender.sendMessage(m);
+	sendMessage(m);
 }
 
 //on client call, presetName should be the new preset name
@@ -888,7 +888,7 @@ void ofxRemoteUI::sendDELp(string presetName, string group, bool confirm){
 	if (confirm){
 		m.addStringArg("OK");
 	}
-	oscSender.sendMessage(m);
+	sendMessage(m);
 }
 
 
