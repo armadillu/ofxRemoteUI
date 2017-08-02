@@ -2702,37 +2702,34 @@ string ofxRemoteUIServer::oscToJson(ofxOscMessage m) {
     
     int argc = m.getNumArgs();
     for (int i = 0; i < argc; i++) {
-        json += "\"";
         switch(m.getArgType(i)) {
             case OFXOSC_TYPE_INT32:
             case OFXOSC_TYPE_INT64:
                 json += to_string(m.getArgAsInt(i));
                 break;
             case OFXOSC_TYPE_FLOAT:
-                json += to_string(m.getArgAsInt(i));
+                json += to_string(m.getArgAsFloat(i));
                 break;
             case OFXOSC_TYPE_DOUBLE:
-                json += to_string(m.getArgAsInt(i));
+                json += to_string(m.getArgAsDouble(i));
                 break;
             case OFXOSC_TYPE_STRING:
-                json += to_string(m.getArgAsInt(i));
+                json += "\"" + m.getArgAsString(i) + "\"";
                 break;
             case OFXOSC_TYPE_CHAR:
-                json += to_string(m.getArgAsInt(i));
+                json += "\"" + to_string(m.getArgAsChar(i)) + "\"";
                 break;
             case OFXOSC_TYPE_TRUE:
             case OFXOSC_TYPE_FALSE:
-                json += to_string(m.getArgAsInt(i));
+                json += to_string(m.getArgAsBool(i));
                 break;
             case OFXOSC_TYPE_RGBA_COLOR:
-                json += to_string(m.getArgAsInt(i));
+                json += to_string(m.getArgAsRgbaColor(i));
                 break;
             default: break;
         }
-        json += "\"";
         if ( i < (argc - 1))
             json += ",";
-        json += " ";
     }
     json += "] }";
 
@@ -2791,6 +2788,7 @@ void ofxRemoteUIServer::onOpen( ofxLibwebsockets::Event& args ){
 }
 void ofxRemoteUIServer::onClose( ofxLibwebsockets::Event& args ){
     useWebSockets = false;
+    readyToSend = false;
 }
 void ofxRemoteUIServer::onIdle( ofxLibwebsockets::Event& args ){}
 void ofxRemoteUIServer::onMessage( ofxLibwebsockets::Event& args ){
