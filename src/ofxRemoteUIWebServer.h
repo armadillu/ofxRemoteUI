@@ -1,13 +1,13 @@
 //
-//  SimplePocoServer.h
+//  ofxRemoteUIWebServer.h
 //  projector-vis
 //
 //  Created by Jack O'Shea on 8/3/17.
 //
 //
 
-#ifndef SimplePocoServer_h
-#define SimplePocoServer_h
+#ifndef ofxRemoteUIWebServer_h
+#define ofxRemoteUIWebServer_h
 
 #include <ofMain.h>
 #include <Poco/Net/ServerSocket.h>
@@ -19,7 +19,7 @@
 #include <Poco/Net/HTTPServerResponse.h>
 #include <Poco/Util/ServerApplication.h>
 
-class SimplePocoServer : Poco::Util::ServerApplication {
+class ofxRemoteUIWebServer : Poco::Util::ServerApplication {
 private:
     class RUIRequestHandler : public Poco::Net::HTTPRequestHandler {
         virtual void handleRequest(Poco::Net::HTTPServerRequest &req,
@@ -45,10 +45,10 @@ public:
     void start();
     void stop();
     
-    ~SimplePocoServer();
+    ~ofxRemoteUIWebServer();
 };
 
 
 
 
-#endif /* SimplePocoServer_h */
+#endif /* ofxRemoteUIWebServer_h */

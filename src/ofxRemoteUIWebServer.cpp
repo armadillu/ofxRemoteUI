@@ -1,22 +1,22 @@
 //
-//  SimplePocoServer.cpp
+//  ofxRemoteUIWebServer.cpp
 //  projector-vis
 //
 //  Created by Jack O'Shea on 8/3/17.
 //
 //
 
-#include "SimplePocoServer.h"
+#include "ofxRemoteUIWebServer.h"
 
 
-void SimplePocoServer::setup(int port) {
-    server = make_shared<Poco::Net::HTTPServer>(new SimplePocoServer::RUIRequestHandlerFactory,
+void ofxRemoteUIWebServer::setup(int port) {
+    server = make_shared<Poco::Net::HTTPServer>(new ofxRemoteUIWebServer::RUIRequestHandlerFactory,
                             Poco::Net::ServerSocket(port),
                             new Poco::Net::HTTPServerParams);
     state = kSetup;
 }
 
-void SimplePocoServer::start() {
+void ofxRemoteUIWebServer::start() {
     switch (state) {
         case kNotSetup:
             ofLogError("PocoServer") << "Trying to start before setup";
@@ -33,7 +33,7 @@ void SimplePocoServer::start() {
     }
 }
 
-void SimplePocoServer::stop() {
+void ofxRemoteUIWebServer::stop() {
     switch (state) {
         case kNotSetup:
         case kSetup:
@@ -46,19 +46,19 @@ void SimplePocoServer::stop() {
     }
 }
 
-SimplePocoServer::~SimplePocoServer() {
+ofxRemoteUIWebServer::~ofxRemoteUIWebServer() {
     if (state == kStarted){
         server->stop();
     }
 }
 
 
-extern unsigned POCO_CONTENT_SIZE;
-extern unsigned char GEN_POCO_CONTENT[];
+extern unsigned RUI_WEB_BINARY_SIZE;
+extern unsigned char RUI_WEB_BINARY_CONTENT[];
 
-void SimplePocoServer::RUIRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &req, Poco::Net::HTTPServerResponse &resp) {
+void ofxRemoteUIWebServer::RUIRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &req, Poco::Net::HTTPServerResponse &resp) {
     resp.set("Content-Encoding", "gzip");
-    resp.sendBuffer(GEN_POCO_CONTENT, POCO_CONTENT_SIZE);
+    resp.sendBuffer(RUI_WEB_BINARY_CONTENT, RUI_WEB_BINARY_SIZE);
 }
 
 

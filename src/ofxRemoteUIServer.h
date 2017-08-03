@@ -52,7 +52,14 @@
 	#define ofXmlObject ofXml
 #endif
 
+
+#define USE_WEBSOCKETS
+#ifdef USE_WEBSOCKETS
+
 #include "ofxLibwebsockets.h"
+#include "ofxRemoteUIWebServer.h"
+
+#endif
 
 
 class ofxRemoteUIServer: public ofxRemoteUI
@@ -323,7 +330,7 @@ protected:
 
 #endif
 
-    //---WebSockets---
+    //---Web Sockets (OSC Port + 1)---
     void    listenWebSocket(int port);
     int     wsPort;
     bool    useWebSockets;
@@ -331,6 +338,13 @@ protected:
     ofxOscMessage           jsonToOsc(Json::Value json);
     string                  oscToJson(ofxOscMessage m);
     ofxLibwebsockets::Server wsServer;
+    
+    //---Web Server (OSC Port + 2)---
+    ofxRemoteUIWebServer webServer;
+    int  webPort;
+    void startWebServer(int port);
+    
+    
 
 	//keep track of params we added and then removed
 	unordered_map<string, RemoteUIParam>				params_removed;
