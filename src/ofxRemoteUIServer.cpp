@@ -1033,6 +1033,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		RLOG_NOTICE << "Listening for commands at " << computerIP << ":" << port;
 		oscReceiver.setup(port);
         listenWebSocket(port + 1);
+        startWebServer(port + 2);
 	}
 	//still get ui access despite being disabled
 	#ifdef OF_AVAILABLE
@@ -2684,6 +2685,12 @@ void ofxRemoteUIServer::listenWebSocket(int port) {
     else
         RLOG_NOTICE << "WebSocket server setup failed.";
     
+}
+
+void ofxRemoteUIServer::startWebServer(int port) {
+    webPort = port;
+    webServer.setup(port);
+    webServer.start();
 }
 
 
