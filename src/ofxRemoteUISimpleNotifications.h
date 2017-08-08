@@ -22,14 +22,32 @@
 #include "ofMain.h"
 #include "RemoteParam.h"
 
+// ofxFontStash ///////////////////////////////////////////////////////////////////////////////////
+
 #if defined(__has_include) /*llvm only - query about header files being available or not*/
-	#if __has_include("ofxFontStash.h")
+#if __has_include("ofxFontStash.h") && !defined(DISABLE_AUTO_FIND_FONSTASH_HEADERS)
+	#ifndef USE_OFX_FONTSTASH
 		#define USE_OFX_FONTSTASH
 	#endif
+#endif
 #endif
 
 #ifdef USE_OFX_FONTSTASH
 	#include "ofxFontStash.h"
+#endif
+
+// ofxFontStash2 //////////////////////////////////////////////////////////////////////////////////
+
+#if defined(__has_include) /*llvm only - query about header files being available or not*/
+#if __has_include("ofxFontStash2.h") && !defined(DISABLE_AUTO_FIND_FONSTASH_HEADERS)
+	#ifndef USE_OFX_FONTSTASH2
+		#define USE_OFX_FONTSTASH2
+	#endif
+#endif
+#endif
+
+#ifdef USE_OFX_FONTSTASH2
+#include "ofxFontStash2.h"
 #endif
 
 
@@ -58,12 +76,6 @@ public:
 		float rangeMin;
 		float rangeMax;
 		float pct;
-	};
-
-	ofxRemoteUISimpleNotifications(){
-		#ifdef USE_OFX_FONTSTASH
-		font = NULL;
-		#endif
 	};
 
 	void update(float dt){
@@ -170,17 +182,29 @@ public:
 			if (it->second.color.a != 0){ //this is a color type param - draw swatch
 				ofPushStyle();
 				ofSetColor(it->second.color, a * 255);
-				#ifdef USE_OFX_FONTSTASH
-				if(font != NULL){ //let's find the X where to draw the color swatch - this is time wasted TODO!
-					ofRectangle r = font->getBBox(total, RUI_NOTIFICATION_FONTSIZE, 0, 0);
-					float diff = floor(RUI_NOTIFICATION_LINEHEIGHT - r.height);
-					ofDrawRectangle(x + r.width + r.x + 4, yy + r.y - diff / 2, 40, RUI_NOTIFICATION_LINEHEIGHT);
-				}else{
-					ofDrawRectangle(xx, yyy , 40, RUI_NOTIFICATION_LINEHEIGHT);
+
+				switch (fontRenderer) {
+
+					case RENDER_WITH_OF_BITMAP_FONT:
+						ofDrawRectangle(xx, yyy , 40, RUI_NOTIFICATION_LINEHEIGHT); break;
+
+					#ifdef USE_OFX_FONTSTASH
+					case RENDER_WITH_OFXFONTSTASH:{
+						ofRectangle r = font->getBBox(total, RUI_NOTIFICATION_FONTSIZE, 0, 0);
+						float diff = floor(RUI_NOTIFICATION_LINEHEIGHT - r.height);
+						ofDrawRectangle(x + r.width + r.x + 4, yy + r.y - diff / 2, 40, RUI_NOTIFICATION_LINEHEIGHT);
+						}break;
+					#endif
+
+					#ifdef USE_OFX_FONTSTASH2
+					case RENDER_WITH_OFXFONTSTASH2:{
+						ofRectangle r = font2->getTextBounds(total, ofxFontStash2::Style("mono", RUI_NOTIFICATION_FONTSIZE, ofGetStyle().color), 0, 0);
+						float diff = floor(RUI_NOTIFICATION_LINEHEIGHT - r.height);
+						ofDrawRectangle(x + r.width + r.x + 4, yy + r.y - diff / 2, 40, RUI_NOTIFICATION_LINEHEIGHT);
+					}break;
+					#endif
+					default:break;
 				}
-				#else
-				ofDrawRectangle(xx, yyy, 40, RUI_NOTIFICATION_LINEHEIGHT);
-				#endif
 				ofPopStyle();
 			}
 			if(it->second.range){ //draw slider
@@ -312,12 +336,21 @@ public:
 
 	#ifdef USE_OFX_FONTSTASH
 	void drawUiWithFontStash(ofxFontStash * font_){
+		fontRenderer = RENDER_WITH_OFXFONTSTASH;
 		font = font_;
 	}
+	#endif
+
+	#ifdef USE_OFX_FONTSTASH
+	void drawUiWithFontStash2(ofxFontStash2::Fonts * font2_){
+		fontRenderer = RENDER_WITH_OFXFONTSTASH2;
+		font2 = font2_;
+	}
+	#endif
+
 	void drawUiWithBitmapFont(){
 		font = NULL;
 	}
-	#endif
 
 	void setNotificationScreenTime(float t){screenTime = t;}
 	void setLogNotificationScreenTime(float t){logScreenTime = t;}
@@ -327,34 +360,69 @@ private:
 
 	//return height of box
 	float drawStringWithBox(const string & text, int x, int y, const ofColor& background, const ofColor& foreground, float fontSize = RUI_NOTIFICATION_FONTSIZE, float lineH = RUI_NOTIFICATION_LINEHEIGHT ){
-		#ifdef USE_OFX_FONTSTASH
-		if(font == NULL){
-			ofDrawBitmapStringHighlight(text, x, y, background, foreground);
-		}else{
-			ofRectangle r = font->getBBox(text, fontSize, x, y);
-			float diff = floor(lineH - r.height);
-			r.x = x - 4;
-			r.y -= diff * 0.5f;
-			r.width += diff + 2;
-			r.height += diff;
-			r.height = ceil(r.height);
-			ofPushStyle();
-			ofSetColor(background);
-			ofDrawRectangle(r);
-			ofSetColor(foreground);
-			font->draw(text, fontSize, x, y);
-			ofPopStyle();
-			return floor(r.height);
+
+		switch (fontRenderer) {
+			case RENDER_WITH_OF_BITMAP_FONT:{
+				ofDrawBitmapStringHighlight(text, x, y, background, foreground);
+			}break;
+
+			#ifdef USE_OFX_FONTSTASH
+			case RENDER_WITH_OFXFONTSTASH:{
+				ofRectangle r = font->getBBox(text, fontSize, x, y);
+				float diff = floor(lineH - r.height);
+				r.x = x - 4;
+				r.y -= diff * 0.5f;
+				r.width += diff + 2;
+				r.height += diff;
+				r.height = ceil(r.height);
+				ofPushStyle();
+				ofSetColor(background);
+				ofDrawRectangle(r);
+				ofSetColor(foreground);
+				font->draw(text, fontSize, x, y);
+				ofPopStyle();
+				return floor(r.height);
+			}break;
+			#endif
+
+			#ifdef USE_OFX_FONTSTASH2
+			case RENDER_WITH_OFXFONTSTASH2:{
+				ofxFontStash2::Style s = ofxFontStash2::Style("mono", fontSize, foreground);
+				ofRectangle r = font2->getTextBounds(text, s, x, y);
+				float diff = floor(lineH - r.height);
+				r.x = x - 4;
+				r.y -= diff * 0.5f;
+				r.width += diff + 2;
+				r.height += diff;
+				r.height = ceil(r.height);
+				ofPushStyle();
+				ofSetColor(background);
+				ofDrawRectangle(r);
+				font2->draw(text, s, x, y);
+				ofPopStyle();
+				return floor(r.height);
+			}break;
+			#endif
+			default:break;
 		}
-		#else
-		ofDrawBitmapStringHighlight(text, x, y, background, foreground);
-		#endif
 		return RUI_NOTIFICATION_LINEHEIGHT;
 	}
 
 	#ifdef USE_OFX_FONTSTASH
-	ofxFontStash * font;
+	ofxFontStash * font = nullptr;
 	#endif
+	#ifdef USE_OFX_FONTSTASH2
+	ofxFontStash2::Fonts * font2 = nullptr;
+	#endif
+
+	enum FontRenderer{
+		RENDER_WITH_OF_BITMAP_FONT,
+		RENDER_WITH_OFXFONTSTASH,
+		RENDER_WITH_OFXFONTSTASH2
+	};
+
+	FontRenderer fontRenderer = RENDER_WITH_OF_BITMAP_FONT;
+
 
 	vector<SimpleNotification> notifications;
 	vector<LogLineNotification> logLines;

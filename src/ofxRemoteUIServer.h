@@ -18,6 +18,9 @@
 #include <set>
 #include <vector>
 #include "ofxRemoteUISimpleNotifications.h"
+#include "ofxRemoteUIServerMacros.h"
+
+// ofxFontStash ///////////////////////////////////////////////////////////////////////////////////
 
 #if defined(__has_include) /*llvm only - query about header files being available or not*/
 	#if __has_include("ofxFontStash.h") && !defined(DISABLE_AUTO_FIND_FONSTASH_HEADERS)
@@ -29,7 +32,19 @@
 	#include "ofxFontStash.h"
 #endif
 
-#include "ofxRemoteUIServerMacros.h"
+// ofxFontStash2 //////////////////////////////////////////////////////////////////////////////////
+
+#if defined(__has_include) /*llvm only - query about header files being available or not*/
+#if __has_include("ofxFontStash2.h") && !defined(DISABLE_AUTO_FIND_FONSTASH_HEADERS)
+#define USE_OFX_FONTSTASH2
+#endif
+#endif
+
+#ifdef USE_OFX_FONTSTASH2
+#include "ofxFontStash2.h"
+#endif
+
+// ofxTimeMeasurements /////////////////////////////////////////////////////////////////////////////
 
 #if defined(__has_include)
 	#if __has_include("ofxTimeMeasurements.h")
@@ -40,6 +55,8 @@
 #ifdef USE_OFX_TIME_MEASUREMENTS
 	#include "ofxTimeMeasurements.h"
 #endif
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define BG_COLOR_ALPHA			55
 
@@ -133,10 +150,18 @@ public:
 	void setAutomaticBackupsEnabled(bool enabled){autoBackups = enabled;}
 	void setAutoDraw(bool d){autoDraw = d;};
 	bool getAutoDraw(){return autoDraw;}
+
+	// Font render configs ///////
+
+	void drawUiWithBitmapFont();
 	#ifdef USE_OFX_FONTSTASH
 	void drawUiWithFontStash(string fontPath, float fontSize = 15 /*good with veraMono*/ );
-	void drawUiWithBitmapFont();
 	ofxFontStash & getFont(){return font;}
+	#endif
+
+	#if defined(USE_OFX_FONTSTASH2)
+	void drawUiWithFontStash2(string fontPath, float fontSize = 15.0f /*good with VeraMonoBold*/);
+	ofxFontStash2::Fonts & getFont2(){return font2;}
 	#endif
 
 	bool builtInClientIsVisible(){return showUI;}
@@ -291,11 +316,24 @@ protected:
 	int														customScreenHeight;
 	int														customScreenWidth;
 	int														selectedColorComp; //[0..4]
+
+	enum FontRenderer{
+		RENDER_WITH_OF_BITMAP_FONT,
+		RENDER_WITH_OFXFONTSTASH,
+		RENDER_WITH_OFXFONTSTASH2
+	};
+	FontRenderer											fontRenderer = RENDER_WITH_OF_BITMAP_FONT;
+
 	#ifdef USE_OFX_FONTSTASH
-	bool													useFontStash;
 	ofxFontStash											font;
 	string													fontFile;
 	float													fontSize;
+	#endif
+
+	#ifdef USE_OFX_FONTSTASH2
+	string 													fontStashFile2;
+	ofxFontStash2::Fonts									font2;
+	float													fontSize2;
 	#endif
 
 	bool													headlessMode;

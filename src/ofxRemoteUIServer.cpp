@@ -86,9 +86,6 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	uiScale = 1;
 	customScreenWidth = customScreenHeight = -1;
 
-	#ifdef USE_OFX_FONTSTASH
-	useFontStash = false;
-	#endif
 	xOffset = xOffsetTarget = 0.0f;
 	selectedColorComp = 0;
 	uiColumnWidth = 320;
@@ -1349,7 +1346,7 @@ void ofxRemoteUIServer::update(float dt){
 void ofxRemoteUIServer::drawUiWithFontStash(string fontPath, float fontSize_){
 
 	if(!ofIsGLProgrammableRenderer()){
-		useFontStash = true;
+		fontRenderer = RENDER_WITH_OFXFONTSTASH;
 		fontFile = ofToDataPath(fontPath, true);
 		fontSize = fontSize_;
 		font = ofxFontStash();
@@ -1363,12 +1360,28 @@ void ofxRemoteUIServer::drawUiWithFontStash(string fontPath, float fontSize_){
 	}
 }
 
-void ofxRemoteUIServer::drawUiWithBitmapFont(){
-	useFontStash = false;
-	lineH = ruiLineH;
-	charW = 8;
+#endif
+
+#ifdef USE_OFX_FONTSTASH2
+void ofxRemoteUIServer::drawUiWithFontStash2(string fontPath, float fontSize_){
+	fontRenderer = RENDER_WITH_OFXFONTSTASH2; fontSize2 = fontSize_; fontStashFile2 = fontPath;
+	font2 = ofxFontStash2::Fonts();
+	font2.setup();
+	font2.addFont("mono", ofToDataPath(fontStashFile2, true));
+	onScreenNotifications.drawUiWithFontStash2(&font2);
+	ofxFontStash2::Style style = ofxFontStash2::Style("mono", fontSize2);
+	ofRectangle r = font2.getTextBounds("Mp", style, 0, 0);
+	charW = r.width;
+	lineH = ceil(r.height * 1.25);
 }
 #endif
+
+void ofxRemoteUIServer::drawUiWithBitmapFont(){
+	fontRenderer = RENDER_WITH_OF_BITMAP_FONT;
+	onScreenNotifications.drawUiWithBitmapFont();
+	charW = 8;
+	lineH = ruiLineH;
+}
 
 
 void ofxRemoteUIServer::threadedFunction(){
@@ -1398,15 +1411,24 @@ void ofxRemoteUIServer::drawString(const string & text, const ofVec2f & pos){
 }
 
 void ofxRemoteUIServer::drawString(const string & text, const float & x, const float & y){
-	#ifdef USE_OFX_FONTSTASH
-	if(useFontStash){
-		font.drawMultiLine(text, fontSize, x, y + lineH * 0.135);
-	}else{
-		ofDrawBitmapString(text, x, y + 2);
+
+	switch (fontRenderer) {
+
+		case RENDER_WITH_OF_BITMAP_FONT: ofDrawBitmapString(text, x, y + 1);
+			break;
+
+		#ifdef USE_OFX_FONTSTASH
+		case RENDER_WITH_OFXFONTSTASH: font.drawMultiLine(text, fontSize, x, y + lineH * 0.135); break;
+		#endif
+
+		#ifdef USE_OFX_FONTSTASH2
+		case RENDER_WITH_OFXFONTSTASH2:{
+			ofxFontStash2::Style style = ofxFontStash2::Style("mono", fontSize2, ofGetStyle().color);
+			font2.drawColumnNVG(text, style, x, y + lineH * 0.125, ofGetWidth());
+		}break;
+		#endif
+		default:break;
 	}
-	#else
-	ofDrawBitmapString(text, x, y + 2 );
-	#endif
 }
 
 //x and y of where the notifications will get draw
@@ -1706,6 +1728,11 @@ void ofxRemoteUIServer::setBuiltInUiScale(float s){
 	#ifdef USE_OFX_FONTSTASH
 	if(fontFile.size()){ //re-create font with higher uiscale
 		drawUiWithFontStash(fontFile, fontSize);
+	}
+	#endif
+	#ifdef USE_OFX_FONTSTASH2
+	if(fontStashFile2.size()){ //re-create font with higher uiscale
+		drawUiWithFontStash2(fontStashFile2, fontSize2);
 	}
 	#endif
 	if (fabs(uiScale - s) < 0.01) uiLines.clear();
