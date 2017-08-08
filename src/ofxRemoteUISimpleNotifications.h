@@ -341,7 +341,7 @@ public:
 	}
 	#endif
 
-	#ifdef USE_OFX_FONTSTASH
+	#ifdef USE_OFX_FONTSTASH2
 	void drawUiWithFontStash2(ofxFontStash2::Fonts * font2_){
 		fontRenderer = RENDER_WITH_OFXFONTSTASH2;
 		font2 = font2_;
