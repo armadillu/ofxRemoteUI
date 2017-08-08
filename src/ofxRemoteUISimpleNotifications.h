@@ -349,7 +349,7 @@ public:
 	#endif
 
 	void drawUiWithBitmapFont(){
-		font = NULL;
+		fontRenderer = RENDER_WITH_OF_BITMAP_FONT;
 	}
 
 	void setNotificationScreenTime(float t){screenTime = t;}
