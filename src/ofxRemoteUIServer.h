@@ -9,6 +9,7 @@
 #ifndef _ofxRemoteUIServer__
 #define _ofxRemoteUIServer__
 
+
 // you will need to add this to your "Header Search Path" for ofxOsc to compile
 // ../../../addons/ofxOsc/libs ../../../addons/ofxOsc/libs/oscpack ../../../addons/ofxOsc/libs/oscpack/src ../../../addons/ofxOsc/libs/oscpack/src/ip ../../../addons/ofxOsc/libs/oscpack/src/ip/posix ../../../addons/ofxOsc/libs/oscpack/src/ip/win32 ../../../addons/ofxOsc/libs/oscpack/src/osc ../../../addons/ofxOsc/src
 #include "ofxOsc.h"
@@ -53,12 +54,16 @@
 #endif
 
 
+// Remove to turn off websockets/webserver
 #define USE_WEBSOCKETS
+#define USE_WEBSERVER
+
 #ifdef USE_WEBSOCKETS
+    #include "ofxLibwebsockets.h"
+#endif
 
-#include "ofxLibwebsockets.h"
-#include "ofxRemoteUIWebServer.h"
-
+#ifdef USE_WEBSERVER
+    #include "ofxRemoteUIWebServer.h"
 #endif
 
 
@@ -157,14 +162,6 @@ public:
 	string getBinaryName(){return binaryName;}
     
     
-    //---WebSockets---
-    void    onConnect( ofxLibwebsockets::Event& args );
-    void    onOpen( ofxLibwebsockets::Event& args );
-    void    onClose( ofxLibwebsockets::Event& args );
-    void    onIdle( ofxLibwebsockets::Event& args );
-    void    onMessage( ofxLibwebsockets::Event& args );
-    void    onBroadcast( ofxLibwebsockets::Event& args );
-
 #ifdef OF_AVAILABLE
 	void toggleBuiltInClientUI(); //show hide the "built in client" GUI screen
 	void setUiColumnWidth(int w);
@@ -198,6 +195,16 @@ public:
 	void addVariableWatch(const string & varName, bool* varPtr, ofColor c = ofColor(0,0,0,0));
 	//void removeVariableWatch(const string &varName);
 
+#ifdef USE_WEBSOCKETS
+    // WebSocket Events
+    void    onConnect( ofxLibwebsockets::Event& args );
+    void    onOpen( ofxLibwebsockets::Event& args );
+    void    onClose( ofxLibwebsockets::Event& args );
+    void    onIdle( ofxLibwebsockets::Event& args );
+    void    onMessage( ofxLibwebsockets::Event& args );
+    void    onBroadcast( ofxLibwebsockets::Event& args );
+#endif
+    
 protected:
 
 	ofxRemoteUIServer(); // use ofxRemoteUIServer::instance() instead! Use the MACROS defined above!
@@ -330,20 +337,27 @@ protected:
 
 #endif
 
-    //---Web Sockets (OSC Port + 1)---
+    //---WebSockets---
+    bool useWebSockets = false;
+    deque<ofxOscMessage> wsMessages;
+
+#ifdef USE_WEBSOCKETS
     void    listenWebSocket(int port);
     int     wsPort;
-    bool    useWebSockets;
-    deque<ofxOscMessage>    wsMessages;
-    ofxOscMessage           jsonToOsc(Json::Value json);
-    string                  oscToJson(ofxOscMessage m);
+    class mutex    wsDequeMut;
+    ofxOscMessage  jsonToOsc(Json::Value json);
+    string         oscToJson(ofxOscMessage m);
     ofxLibwebsockets::Server wsServer;
+#endif
+    
+    
     
     //---Web Server (OSC Port + 2)---
+#ifdef USE_WEBSERVER
     ofxRemoteUIWebServer webServer;
     int  webPort;
     void startWebServer(int port);
-    
+#endif
     
 
 	//keep track of params we added and then removed
