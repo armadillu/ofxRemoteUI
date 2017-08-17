@@ -342,6 +342,7 @@ protected:
     deque<ofxOscMessage> wsMessages;
 
 #ifdef USE_WEBSOCKETS
+    //---Web Sockets (OSC Port + 1)---
     void    listenWebSocket(int port);
     int     wsPort;
     class mutex    wsDequeMut;
@@ -349,7 +350,6 @@ protected:
     string         oscToJson(ofxOscMessage m);
     ofxLibwebsockets::Server wsServer;
 #endif
-    
     
     
     //---Web Server (OSC Port + 2)---

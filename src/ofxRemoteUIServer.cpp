@@ -1042,7 +1042,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
         #endif
         
     }
-    
+
 	//still get ui access despite being disabled
 	#ifdef OF_AVAILABLE
 	ofAddListener(ofEvents().exit, this, &ofxRemoteUIServer::_appExited, OF_EVENT_ORDER_BEFORE_APP); //to save to xml, disconnect, etc
@@ -2718,7 +2718,6 @@ void ofxRemoteUIServer::startWebServer(int _port) {
     webServer.start();
 }
 #endif
-
 
 void ofxRemoteUIServer::sendMessage(ofxOscMessage m) {
         if (useWebSockets){
