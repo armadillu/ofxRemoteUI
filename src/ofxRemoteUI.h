@@ -279,6 +279,8 @@ protected:
 	void sendSAVp(string presetName, string group, bool confirm = false);
 	void sendSETp(string presetName, string group, bool confirm = false);
 	void sendDELp(string presetName, string group, bool confirm = false);
+    
+    virtual void sendMessage(ofxOscMessage m) = 0; // b/c native Client only uses an OSC sender, but server might use WS
 
 	void printAllParamsDebug();
 
