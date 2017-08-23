@@ -2826,6 +2826,10 @@ ofxOscMessage ofxRemoteUIServer::jsonToOsc(Json::Value json){
     return m;
     
 }
+//-----------------------------------------------
+//              WebSocket Events
+//-----------------------------------------------
+
 
 void ofxRemoteUIServer::onConnect( ofxLibwebsockets::Event& args ) {
     readyToSend = true;
@@ -2843,7 +2847,7 @@ void ofxRemoteUIServer::onClose( ofxLibwebsockets::Event& args ){
 }
 
 void ofxRemoteUIServer::onMessage( ofxLibwebsockets::Event& args ){
-    RLOG_NOTICE << "Got WS message " << args.json;
+//    ofLogNotice() << "Got WS message " << args.json;
     ofxOscMessage m = jsonToOsc(args.json);
     m.setRemoteEndpoint(args.conn.getClientName(), wsPort);
     wsDequeMut.lock();
