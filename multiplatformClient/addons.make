@@ -1,3 +1,0 @@
-ofxOsc
-ofxXmlSettings
-ofxRemoteUI
