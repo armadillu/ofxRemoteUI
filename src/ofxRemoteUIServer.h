@@ -54,15 +54,14 @@
 #endif
 
 
-// Remove to turn off websockets/webserver
-#define USE_WEBSOCKETS
-#define USE_WEBSERVER
+// Define NO_RUI_WEBSOCKETS and/or NO_RUI_WEBSERVER
+// to turn off websockets/webserver
 
-#ifdef USE_WEBSOCKETS
+#ifndef NO_RUI_WEBSOCKETS
     #include "ofxLibwebsockets.h"
 #endif
 
-#ifdef USE_WEBSERVER
+#ifndef NO_RUI_WEBSERVER
     #include "ofxRemoteUIWebServer.h"
 #endif
 
@@ -195,7 +194,7 @@ public:
 	void addVariableWatch(const string & varName, bool* varPtr, ofColor c = ofColor(0,0,0,0));
 	//void removeVariableWatch(const string &varName);
 
-#ifdef USE_WEBSOCKETS
+#ifndef NO_RUI_WEBSOCKETS
     // WebSocket Events
     void    onConnect( ofxLibwebsockets::Event& args );
     void    onOpen( ofxLibwebsockets::Event& args );
@@ -341,7 +340,7 @@ protected:
     bool useWebSockets = false;
     deque<ofxOscMessage> wsMessages;
 
-#ifdef USE_WEBSOCKETS
+#ifndef NO_RUI_WEBSOCKETS
     //---Web Sockets (OSC Port + 1)---
     void    listenWebSocket(int port);
     int     wsPort;
@@ -353,7 +352,7 @@ protected:
     
     
     //---Web Server (OSC Port + 2)---
-#ifdef USE_WEBSERVER
+#ifndef NO_RUI_WEBSERVER
     ofxRemoteUIWebServer webServer;
     int  webPort;
     void startWebServer(int port);

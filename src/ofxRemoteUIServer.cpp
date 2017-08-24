@@ -1033,11 +1033,11 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		RLOG_NOTICE << "Listening for commands at " << computerIP << ":" << port;
 		oscReceiver.setup(port);
         
-        #ifdef USE_WEBSOCKETS
+        #ifndef NO_RUI_WEBSOCKETS
             listenWebSocket(port + 1);
         #endif
         
-        #ifdef USE_WEBSERVER
+        #ifndef NO_RUI_WEBSERVER
             startWebServer(port + 2);
         #endif
         
@@ -1469,21 +1469,21 @@ void ofxRemoteUIServer::draw(int x, int y){
             if (enabled) {
                 reachableAt = "Server reachable at " + computerIP + ":";
                 
-                #if defined(USE_WEBSOCKETS) || defined(USE_WEBSERVER)
+                #if !defined(NO_RUI_WEBSOCKETS) || !defined(NO_RUI_WEBSERVER)
                      reachableAt += " ";
                 #endif
                 
                 reachableAt += ofToString(port);
                 
-                #if defined(USE_WEBSOCKETS) || defined(USE_WEBSERVER)
+                #if !defined(NO_RUI_WEBSOCKETS) || !defined(NO_RUI_WEBSERVER)
                     reachableAt += "(OSC)";
                 #endif
                 
-                #ifdef USE_WEBSOCKETS
+                #ifndef NO_RUI_WEBSOCKETS
                     reachableAt += " " + ofToString(wsPort) + "(WS)";
                 #endif
                 
-                #ifdef USE_WEBSERVER
+                #ifndef NO_RUI_WEBSERVER
                      reachableAt += " " + ofToString(webPort) + "(Web)";
                 #endif
             }
@@ -1800,7 +1800,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 	//let everyone know I exist and which is my port, every now and then
 	handleBroadcast();
 
-#ifdef USE_WEBSOCKETS
+#ifndef NO_RUI_WEBSOCKETS
     lock_guard<std::mutex> guard(wsDequeMut);
 #endif
     
@@ -2711,7 +2711,7 @@ void ofxRemoteUIServer::onShowParamUpdateNotification(ScreenNotifArg& a){
 }
 
 
-#ifdef USE_WEBSERVER
+#ifndef NO_RUI_WEBSERVER
 void ofxRemoteUIServer::startWebServer(int _port) {
     webPort = _port;
     webServer.setup(_port);
@@ -2721,7 +2721,7 @@ void ofxRemoteUIServer::startWebServer(int _port) {
 
 void ofxRemoteUIServer::sendMessage(ofxOscMessage m) {
         if (useWebSockets){
-            #ifdef USE_WEBSOCKETS
+            #ifndef NO_RUI_WEBSOCKETS
             string json = oscToJson(m);
             wsServer.send(json);
             #endif
@@ -2732,7 +2732,7 @@ void ofxRemoteUIServer::sendMessage(ofxOscMessage m) {
 }
 
 
-#ifdef USE_WEBSOCKETS
+#ifndef NO_RUI_WEBSOCKETS
 
 void ofxRemoteUIServer::listenWebSocket(int port) {
     ofxLibwebsockets::ServerOptions options = ofxLibwebsockets::defaultServerOptions();
