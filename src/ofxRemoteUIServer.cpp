@@ -1125,6 +1125,13 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				}
 			}break;
 
+			#ifndef NO_RUI_WEBSOCKETS
+			case 'c':{
+				string url = ofToString(computerIP) + ":" + ofToString(webPort);
+				ofLaunchBrowser("http://" + url + "?connect=" + url);
+				}break;
+			#endif
+
 			case 'r':
 				restoreAllParamsToInitialXML();
 				onScreenNotifications.addNotification("RESET CONFIG TO SERVER-LAUNCH XML values");
@@ -1514,11 +1521,16 @@ void ofxRemoteUIServer::draw(int x, int y){
             }
             
 			ofSetColor(255);
-			drawString("ofxRemoteUI built in client. " + reachableAt +
-					   "\nPress 's' to save current config, 'S' to make a new preset. ('E' to save in old format)\n" +
-					   "Press 'r' to restore all params's launch state. '+'/'-' to set UI Scale. 'N' to toggle screen notif.\n" +
-					   "Press Arrow Keys to edit values. SPACEBAR + Arrow Keys for bigger increments. ',' and '.' Keys to scroll.\n" +
-					   "Press 'TAB' to hide. Press 'RETURN' when editing a Color Param to cycle through RGBA components.",
+			string instructions = "ofxRemoteUI built in client. " + reachableAt +
+			"\nPress 's' to save current config, 'S' to make a new preset. ('E' to save in old format)\n" +
+			"Press 'r' to restore all params's launch state. '+'/'-' to set UI Scale. 'N' to toggle screen notif.\n" +
+			"Press Arrow Keys to edit values. SPACEBAR + Arrow Keys for bigger increments. ',' and '.' Keys to scroll.\n" +
+			"Press 'TAB' to hide. Press 'RETURN' to cycle through RGBA components.";
+			#ifndef NO_RUI_WEBSOCKETS
+			instructions += " Press 'c' to launch a web client.";
+			#endif
+
+			drawString(instructions,
 					   charW * 1.5,
 					   screenH / uiScale - bottomBarHeight + lineH * 0.65);
 		}
