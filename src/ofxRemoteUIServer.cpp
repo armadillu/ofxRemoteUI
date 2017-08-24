@@ -1902,7 +1902,11 @@ void ofxRemoteUIServer::updateServer(float dt){
 				break;
 
 			case CIAO_ACTION:{
-				sendCIAO();
+                if (!useWebSockets){
+                    sendCIAO();
+                } else {
+                    useWebSockets = false;
+                }
 				cbArg.action = CLIENT_DISCONNECTED;
 				if(callBack) callBack(cbArg);
 				#ifdef OF_AVAILABLE
@@ -1911,7 +1915,6 @@ void ofxRemoteUIServer::updateServer(float dt){
 				#endif
 				clearOscReceiverMsgQueue();
 				readyToSend = false;
-                useWebSockets = false;
 				if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " says CIAO!" ;
 			}break;
 
