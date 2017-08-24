@@ -1128,7 +1128,8 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 			#ifndef NO_RUI_WEBSOCKETS
 			case 'c':{
 				string url = ofToString(computerIP) + ":" + ofToString(webPort);
-				ofLaunchBrowser("http://" + url + "?connect=" + url);
+				string wsUrl = ofToString(computerIP) + ":" + ofToString(wsPort);
+				ofLaunchBrowser("http://" + url + "?connect=" + wsUrl);
 				}break;
 			#endif
 
