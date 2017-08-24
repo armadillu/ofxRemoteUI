@@ -1910,6 +1910,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				#endif
 				clearOscReceiverMsgQueue();
 				readyToSend = false;
+                useWebSockets = false;
 				if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " says CIAO!" ;
 			}break;
 
@@ -2880,9 +2881,12 @@ void ofxRemoteUIServer::onOpen( ofxLibwebsockets::Event& args ){
     useWebSockets = true;
 }
 void ofxRemoteUIServer::onClose( ofxLibwebsockets::Event& args ){
-    useWebSockets = false;
-    readyToSend = false;
-    
+    ofxOscMessage m;
+    m.setAddress("/CIAO");
+    m.setRemoteEndpoint(args.conn.getClientName(), wsPort);
+    wsDequeMut.lock();
+    wsMessages.push_back(m);
+    wsDequeMut.unlock();
 }
 
 void ofxRemoteUIServer::onMessage( ofxLibwebsockets::Event& args ){
