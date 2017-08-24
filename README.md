@@ -14,7 +14,7 @@ with "OF_0.9.8". It requires ofxPoco in OF versions >0.9.8__
 
 Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 
-![Clients](screenshots/clientList.png "List of Clients")
+![Clients](screenshots/clientList.png "List of Clients")  
 In order of appearance in the screenshot above, Mac OS X native Client, Built In Client (inside your OpenFrameworks app), Web Client (served from your OpenFrameworks app), iOS Client (not quite flushed out).
 
 
