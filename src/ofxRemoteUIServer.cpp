@@ -1029,7 +1029,17 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		port = port_;
 		RLOG_NOTICE << "Listening for commands at " << computerIP << ":" << port;
 		oscReceiver.setup(port);
-	}
+        
+        #ifndef NO_RUI_WEBSOCKETS
+            listenWebSocket(port + 1);
+        #endif
+        
+        #ifndef NO_RUI_WEBSERVER
+            startWebServer(port + 2);
+        #endif
+        
+    }
+
 	//still get ui access despite being disabled
 	#ifdef OF_AVAILABLE
 	ofAddListener(ofEvents().exit, this, &ofxRemoteUIServer::_appExited, OF_EVENT_ORDER_BEFORE_APP); //to save to xml, disconnect, etc
@@ -1477,10 +1487,34 @@ void ofxRemoteUIServer::draw(int x, int y){
 			ofSetColor(44, 245);
 			ofDrawRectangle(0,screenH / uiScale - bottomBarHeight, screenW / uiScale, bottomBarHeight );
 
+            string reachableAt;
+            if (enabled) {
+                reachableAt = "Server reachable at " + computerIP + ":";
+                
+                #if !defined(NO_RUI_WEBSOCKETS) || !defined(NO_RUI_WEBSERVER)
+                     reachableAt += " ";
+                #endif
+                
+                reachableAt += ofToString(port);
+                
+                #if !defined(NO_RUI_WEBSOCKETS) || !defined(NO_RUI_WEBSERVER)
+                    reachableAt += "(OSC)";
+                #endif
+                
+                #ifndef NO_RUI_WEBSOCKETS
+                    reachableAt += " " + ofToString(wsPort) + "(WS)";
+                #endif
+                
+                #ifndef NO_RUI_WEBSERVER
+                     reachableAt += " " + ofToString(webPort) + "(Web)";
+                #endif
+            }
+            else {
+                reachableAt = "Server disabled";
+            }
+            
 			ofSetColor(255);
-			drawString("ofxRemoteUI built in client. " +
-							   string(enabled ? ("Server reachable at " + computerIP + ":" + ofToString(port)) + "." :
-									  "Sever Disabled." ) +
+			drawString("ofxRemoteUI built in client. " + reachableAt +
 					   "\nPress 's' to save current config, 'S' to make a new preset. ('E' to save in old format)\n" +
 					   "Press 'r' to restore all params's launch state. '+'/'-' to set UI Scale. 'N' to toggle screen notif.\n" +
 					   "Press Arrow Keys to edit values. SPACEBAR + Arrow Keys for bigger increments. ',' and '.' Keys to scroll.\n" +
@@ -1793,13 +1827,23 @@ void ofxRemoteUIServer::updateServer(float dt){
 	//let everyone know I exist and which is my port, every now and then
 	handleBroadcast();
 
-	while( oscReceiver.hasWaitingMessages() ){// check for waiting messages from client
+#ifndef NO_RUI_WEBSOCKETS
+    lock_guard<std::mutex> guard(wsDequeMut);
+#endif
+    
+	while( oscReceiver.hasWaitingMessages() or wsMessages.size()){// check for waiting messages from client
 
 		ofxOscMessage m;
-		oscReceiver.getNextMessage(m);
-		if (!readyToSend){ // if not connected, connect to our friend so we can talk back
-			connect(m.getRemoteIp(), port + 1);
-		}
+        if (useWebSockets && wsMessages.size()) {
+            m = ofxOscMessage(wsMessages.front());
+            wsMessages.pop_front();
+        }
+        else {
+            oscReceiver.getNextMessage(m);
+            if (!readyToSend ){ // if not connected, connect to our friend so we can talk back
+                connect(m.getRemoteIp(), port + 1);
+            }
+        }
 
 		DecodedMessage dm = decode(m);
 		RemoteUIServerCallBackArg cbArg; // to notify our "delegate"
@@ -2334,7 +2378,7 @@ void ofxRemoteUIServer::sendLogToClient(const string & message){
 		m.setAddress("/LOG_");
 		m.addStringArg(message);
 		try{
-			oscSender.sendMessage(m);
+			sendMessage(m);
 		}catch(exception e){
 			RLOG_ERROR << "Exception sendLogToClient " << e.what() ;
 		}
@@ -2692,3 +2736,153 @@ void ofxRemoteUIServer::onShowParamUpdateNotification(ScreenNotifArg& a){
 										 );
 
 }
+
+
+#ifndef NO_RUI_WEBSERVER
+void ofxRemoteUIServer::startWebServer(int _port) {
+    webPort = _port;
+    webServer.setup(_port);
+    webServer.start();
+}
+#endif
+
+void ofxRemoteUIServer::sendMessage(ofxOscMessage m) {
+        if (useWebSockets){
+            #ifndef NO_RUI_WEBSOCKETS
+            string json = oscToJson(m);
+            wsServer.send(json);
+            #endif
+        }
+        else {
+            oscSender.sendMessage(m);
+        }
+}
+
+
+#ifndef NO_RUI_WEBSOCKETS
+
+void ofxRemoteUIServer::listenWebSocket(int port) {
+    ofxLibwebsockets::ServerOptions options = ofxLibwebsockets::defaultServerOptions();
+    options.port = port;
+    wsPort = port;
+    wsServer.addListener(this);
+    bool success = wsServer.setup( options );
+    if (success)
+        RLOG_NOTICE << "WebSocket server running on port " << port;
+    else
+        RLOG_NOTICE << "WebSocket server setup failed.";
+    
+}
+
+string ofxRemoteUIServer::oscToJson(ofxOscMessage m) {
+    std::string json = " { \"addr\": \"" + m.getAddress() + "\", \"args\" : [ ";
+    
+    int argc = m.getNumArgs();
+    for (int i = 0; i < argc; i++) {
+        switch(m.getArgType(i)) {
+            case OFXOSC_TYPE_INT32:
+            case OFXOSC_TYPE_INT64:
+                json += to_string(m.getArgAsInt(i));
+                break;
+            case OFXOSC_TYPE_FLOAT:
+                json += to_string(m.getArgAsFloat(i));
+                break;
+            case OFXOSC_TYPE_DOUBLE:
+                json += to_string(m.getArgAsDouble(i));
+                break;
+            case OFXOSC_TYPE_STRING:
+                json += "\"" + m.getArgAsString(i) + "\"";
+                break;
+            case OFXOSC_TYPE_CHAR:
+                json += "\"" + to_string(m.getArgAsChar(i)) + "\"";
+                break;
+            case OFXOSC_TYPE_TRUE:
+            case OFXOSC_TYPE_FALSE:
+                json += to_string(m.getArgAsBool(i));
+                break;
+            case OFXOSC_TYPE_RGBA_COLOR:
+                json += to_string(m.getArgAsRgbaColor(i));
+                break;
+            default: break;
+        }
+        if ( i < (argc - 1))
+            json += ",";
+    }
+    json += "] }";
+
+    return json;
+    
+}
+
+ofxOscMessage ofxRemoteUIServer::jsonToOsc(Json::Value json){
+    ofxOscMessage m;
+    m.setAddress(json.get("addr", "NONE").asString());
+    
+    Json::Value argv = json.get("args", Json::nullValue);
+    int argc = argv.size();
+    
+    for (int i = 0; i < argc; i++) {
+        
+        Json::Value arg = argv.get(i, Json::nullValue);
+        
+        switch (arg.type()) {
+                
+            case Json::intValue:
+            case Json::uintValue:
+                m.addIntArg(arg.asInt());
+                break;
+                
+            case Json::realValue:
+                m.addFloatArg(arg.asFloat());
+                break;
+                
+            case Json::stringValue:
+                m.addStringArg(arg.asString());
+                break;
+                
+            case Json::booleanValue:
+                m.addBoolArg(arg.asBool());
+                break;
+                
+            default:
+                RLOG_NOTICE << "Possibly malformed JSON message";
+                break;
+        }
+    }
+    
+    return m;
+    
+}
+//-----------------------------------------------
+//              WebSocket Events
+//-----------------------------------------------
+
+
+void ofxRemoteUIServer::onConnect( ofxLibwebsockets::Event& args ) {
+    readyToSend = true;
+    useWebSockets = true;
+}
+
+void ofxRemoteUIServer::onOpen( ofxLibwebsockets::Event& args ){
+    readyToSend = true;
+    useWebSockets = true;
+}
+void ofxRemoteUIServer::onClose( ofxLibwebsockets::Event& args ){
+    useWebSockets = false;
+    readyToSend = false;
+    
+}
+
+void ofxRemoteUIServer::onMessage( ofxLibwebsockets::Event& args ){
+//    ofLogNotice() << "Got WS message " << args.json;
+    ofxOscMessage m = jsonToOsc(args.json);
+    m.setRemoteEndpoint(args.conn.getClientName(), wsPort);
+    wsDequeMut.lock();
+    wsMessages.push_back(m);
+    wsDequeMut.unlock();
+}
+
+void ofxRemoteUIServer::onIdle( ofxLibwebsockets::Event& args ){}
+void ofxRemoteUIServer::onBroadcast( ofxLibwebsockets::Event& args ){}
+
+#endif

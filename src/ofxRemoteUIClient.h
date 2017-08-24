@@ -65,6 +65,9 @@ public:
 
 	//send an "untracked" param, manually
 	void sendUntrackedParamUpdate(RemoteUIParam p, string paramName);
+    
+    // Send message via OSC
+    void sendMessage(ofxOscMessage m);
 
 	//get notified when server gets back to us
 	void setCallback( void (*callb)(RemoteUIClientCallBackArg) );

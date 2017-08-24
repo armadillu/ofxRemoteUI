@@ -98,7 +98,7 @@ void ofxRemoteUIClient::saveCurrentStateToDefaultXML(){
 
 void ofxRemoteUIClient::restoreAllParamsToInitialXML(){
 	OSC_CHECK;
-	sendRESX();
+	sendRESX(); 
 }
 
 
@@ -518,6 +518,9 @@ void ofxRemoteUIClient::sendTrackedParamUpdate(string paramName){
 	}
 }
 
+void ofxRemoteUIClient::sendMessage(ofxOscMessage m){
+    oscSender.sendMessage(m);
+}
 
 void ofxRemoteUIClient::requestCompleteUpdate(){
 	//cout << "ofxRemoteUIClient: requestCompleteUpdate()" ;
