@@ -2,7 +2,7 @@ meta:
 	ADDON_NAME = ofxRemoteUI
 	ADDON_DESCRIPTION = Tweak params from the network over OSC
 	ADDON_AUTHOR = Oriol Ferrer Mesià
-	ADDON_TAGS = "osc" "paramter" "tweak" 
+	ADDON_TAGS = "osc" "parameter" "tweak" 
 	ADDON_URL = https://github.com/armadillu/ofxRemoteUI
 
 common:
