@@ -3,4 +3,3 @@ ofxOsc
 ofxXmlSettings
 ofxPoco
 ofxGui
-ofxLibWebsockets
