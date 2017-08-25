@@ -9,6 +9,8 @@
 #ifndef ofxRemoteUIWebServer_h
 #define ofxRemoteUIWebServer_h
 
+#ifndef NO_RUI_WEBSERVER
+
 #include <ofMain.h>
 #include <Poco/Net/ServerSocket.h>
 #include <Poco/Net/HTTPServer.h>
@@ -18,6 +20,7 @@
 #include <Poco/Net/HTTPServerRequest.h>
 #include <Poco/Net/HTTPServerResponse.h>
 #include <Poco/Util/ServerApplication.h>
+
 
 class ofxRemoteUIWebServer : Poco::Util::ServerApplication {
 private:
@@ -49,6 +52,6 @@ public:
 };
 
 
-
+#endif
 
 #endif /* ofxRemoteUIWebServer_h */

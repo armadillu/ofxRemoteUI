@@ -6,6 +6,8 @@
 //
 //
 
+#ifndef NO_RUI_WEBSERVER
+
 #include "ofxRemoteUIWebServer.h"
 
 
@@ -62,6 +64,4 @@ void ofxRemoteUIWebServer::RUIRequestHandler::handleRequest(Poco::Net::HTTPServe
     resp.sendBuffer(RUI_WEB_BINARY_CONTENT, RUI_WEB_BINARY_SIZE);
 }
 
-
-
-
+#endif
