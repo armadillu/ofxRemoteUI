@@ -73,7 +73,8 @@
 
 //if we can't find ofxLibwebsockets, disable webscockets altogether.
 #if defined(__has_include) /*llvm only - query about header files being available or not*/
-	#if __has_include("ofxLibwebsockets.h") && !defined(DISABLE_AUTO_FIND_FONSTASH_HEADERS)
+	#if __has_include("ofxLibwebsockets.h")
+	#else
 		#define NO_RUI_WEBSOCKETS
 		#define NO_RUI_WEBSERVER
 	#endif
