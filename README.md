@@ -138,6 +138,8 @@ The web interface is developed in a separate repository [ofxRemoteUI-Web](https:
 
 The web client has completely been developed by [@jackosx](http://github.com/jackosx).
 
+Note that ofxLibwebsockets includes the jsoncpp lib, which is also included in ofxJSON. This means you might get duplicate symbol compile errors when using both in the same project; just remove the jsoncpp lib from one of them if that's the case.
+
 ## Random Notes
 
 **"Restore to initial XML Values"** sets alls params to whatever values they had at server app launch.  

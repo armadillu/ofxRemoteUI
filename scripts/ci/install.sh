@@ -6,7 +6,7 @@ echo "Executing ci/linux/install.sh"
 export OF_ROOT=~/openFrameworks
 export OF_ADDONS=$OF_ROOT/addons
 
-ADDONS="local-projects/ofxLibWebsockets"
+ADDONS="local-projects/ofxLibwebsockets"
 
 cd $OF_ADDONS
 
