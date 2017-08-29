@@ -2887,7 +2887,7 @@ void ofxRemoteUIServer::onOpen( ofxLibwebsockets::Event& args ){
 void ofxRemoteUIServer::onClose( ofxLibwebsockets::Event& args ){
     ofxOscMessage m;
     m.setAddress("/CIAO");
-    m.setRemoteEndpoint(args.conn.getClientName(), wsPort);
+    m.setRemoteEndpoint(args.conn.getClientIP(), wsPort);
     wsDequeMut.lock();
     wsMessages.push_back(m);
     wsDequeMut.unlock();
@@ -2896,7 +2896,7 @@ void ofxRemoteUIServer::onClose( ofxLibwebsockets::Event& args ){
 void ofxRemoteUIServer::onMessage( ofxLibwebsockets::Event& args ){
 //    ofLogNotice() << "Got WS message " << args.json;
     ofxOscMessage m = jsonToOsc(args.json);
-    m.setRemoteEndpoint(args.conn.getClientName(), wsPort);
+    m.setRemoteEndpoint(args.conn.getClientIP(), wsPort);
     wsDequeMut.lock();
     wsMessages.push_back(m);
     wsDequeMut.unlock();
