@@ -19,9 +19,9 @@
 #pragma comment(lib, "iphlpapi.lib")
 #endif
 
-void split(vector<string> &tokens, const string &text, char separator) {
+void split(vector<std::string> &tokens, const std::string &text, char separator) {
 	std::size_t start = 0, end = 0;
-	while ((end = text.find(separator, start)) != string::npos) {
+	while ((end = text.find(separator, start)) != std::string::npos) {
 		tokens.push_back(text.substr(start, end - start));
 		start = end + 1;
 	}
@@ -43,7 +43,7 @@ float ofxRemoteUI::connectionLag(){
 }
 
 
-vector<string> ofxRemoteUI::getPresetsList(){
+vector<std::string> ofxRemoteUI::getPresetsList(){
 	return presetNames;
 }
 
@@ -59,10 +59,10 @@ void ofxRemoteUI::printAllParamsDebug(){
 	cout << "####################################################" << endl;
 }
 
-void ofxRemoteUI::addParamToDB(const RemoteUIParam & p, string thisParamName){
+void ofxRemoteUI::addParamToDB(const RemoteUIParam & p, std::string thisParamName){
 
 	//see if we already had it, if we didnt, set its add order #
-	unordered_map<string, RemoteUIParam>::iterator it = params.find(thisParamName);
+	unordered_map<std::string, RemoteUIParam>::iterator it = params.find(thisParamName);
 	if ( it == params.end() ){	//not found!
 
 		params[thisParamName] = p;
@@ -88,8 +88,8 @@ void ofxRemoteUI::clearOscReceiverMsgQueue(){
 }
 
 
-vector<string> ofxRemoteUI::getChangedParamsList(){
-	std::vector<string> result (paramsChangedSinceLastCheck.begin(), paramsChangedSinceLastCheck.end());
+vector<std::string> ofxRemoteUI::getChangedParamsList(){
+	std::vector<std::string> result (paramsChangedSinceLastCheck.begin(), paramsChangedSinceLastCheck.end());
 	paramsChangedSinceLastCheck.clear();
 	return result;
 }
@@ -97,13 +97,13 @@ vector<string> ofxRemoteUI::getChangedParamsList(){
 
 DecodedMessage ofxRemoteUI::decode(const ofxOscMessage & m){
 
-	string msgAddress = m.getAddress();
+	std::string msgAddress = m.getAddress();
 	if(msgAddress.size() > 0){
 		if(msgAddress[0] == '/'){ //if address starts with "/", drop it to match the fucked up remoteUI protocol
 			msgAddress = msgAddress.substr(1, msgAddress.size() - 1);
 		}
 	}
-	string action = msgAddress.substr(0, 4);
+	std::string action = msgAddress.substr(0, 4);
 
 	//cout <<"Decode: "<< msgAddress << " action >> " << action << endl;
 	DecodedMessage dm;
@@ -132,7 +132,7 @@ DecodedMessage ofxRemoteUI::decode(const ofxOscMessage & m){
 	}
 
 	if (msgAddress.length() >= 8) {
-		string arg1 = msgAddress.substr(5, 3);
+		std::string arg1 = msgAddress.substr(5, 3);
 		//cout << "Decode"  << msgAddress << " arg1 >> " << arg1 << endl;
 		dm.argument = NULL_ARG;
 
@@ -148,7 +148,7 @@ DecodedMessage ofxRemoteUI::decode(const ofxOscMessage & m){
 	}
 
 	if (msgAddress.length() >= 9) {
-		string paramName = msgAddress.substr(9, msgAddress.length() - 9);
+		std::string paramName = msgAddress.substr(9, msgAddress.length() - 9);
 		dm.paramName = paramName;
 	}else{
 		//must be a LOG_ action
@@ -158,11 +158,11 @@ DecodedMessage ofxRemoteUI::decode(const ofxOscMessage & m){
 }
 
 
-string ofxRemoteUI::getMyIP(string userChosenInteface, string & subnetMask){
+std::string ofxRemoteUI::getMyIP(std::string userChosenInteface, std::string & subnetMask){
 
 	//from https://github.com/jvcleave/LocalAddressGrabber/blob/master/src/LocalAddressGrabber.h
 	//and http://stackoverflow.com/questions/17288908/get-network-interface-name-from-ipv4-address
-	string output = RUI_LOCAL_IP_ADDRESS;
+	std::string output = RUI_LOCAL_IP_ADDRESS;
 
 #if defined(__APPLE__) || defined(__linux__)
 	struct ifaddrs *myaddrs;
@@ -194,13 +194,13 @@ string ofxRemoteUI::getMyIP(string userChosenInteface, string & subnetMask){
 				if(inet_ntop(ifa->ifa_addr->sa_family, (void *)&(s4->sin_addr), buf, sizeof(buf)) == NULL){
 					RLOG_ERROR <<ifa->ifa_name << ": inet_ntop for address failed!";
 				}else{
-					string interface = string(ifa->ifa_name);
+					std::string interface = std::string(ifa->ifa_name);
 					if(verbose_) RLOG_VERBOSE << "found interface: " << interface ;
 					if( interface.length() > 2 || interface == userSuppliedNetInterface ){
 						if (userSuppliedNetInterface.length() > 0){
 							if (interface == userSuppliedNetInterface){
-								output = string(buf);
-								subnetMask = string(SnAddressBuffer);
+								output = std::string(buf);
+								subnetMask = std::string(SnAddressBuffer);
 								RLOG_VERBOSE << "using user chosen interface: " << interface;
 								break;
 							}
@@ -209,8 +209,8 @@ string ofxRemoteUI::getMyIP(string userChosenInteface, string & subnetMask){
 								if(strlen(buf) > 2){
 									bool is169 = buf[0] == '1' && buf[1] == '6' && buf[2] == '9';
 									if(!is169){ //avoid 169.x.x.x addresses
-										output = string(buf);
-										subnetMask = string(SnAddressBuffer);
+										output = std::string(buf);
+										subnetMask = std::string(SnAddressBuffer);
 										RLOG_NOTICE << "Using interface: " << interface << "       IP: " << output << "       SubnetMask: " << subnetMask;
 										break;
 									}
@@ -246,7 +246,7 @@ string ofxRemoteUI::getMyIP(string userChosenInteface, string & subnetMask){
 		//this is crappy, we get the first non 0.0.0.0 interface (no idea which order they come in) TODO!
 		for (IP_ADAPTER_INFO *pAdapter = pAdapterInfo; pAdapter; pAdapter = pAdapter->Next) {
 			//printf("%s (%s)\n", pAdapter->IpAddressList.IpAddress.String, pAdapter->Description);
-			string ip = pAdapter->IpAddressList.IpAddress.String;
+			std::string ip = pAdapter->IpAddressList.IpAddress.String;
 			if (ip != "0.0.0.0"){
 				output = ip;
 				subnetMask = pAdapter->IpAddressList.IpMask.String;
@@ -277,10 +277,10 @@ void GetHostName(std::string& host_name){
 
 void ofxRemoteUI::updateParamFromDecodedMessage(const ofxOscMessage & m, DecodedMessage dm){
 
-	string paramName = dm.paramName;
+	std::string paramName = dm.paramName;
 	RemoteUIParam original;
 	bool newParam = true;
-	unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+	unordered_map<std::string, RemoteUIParam>::iterator it = params.find(paramName);
 	if ( it != params.end() ){	//found the param, we already had it
 		original = params[paramName];
 		newParam = false;
@@ -387,23 +387,23 @@ void ofxRemoteUI::updateParamFromDecodedMessage(const ofxOscMessage & m, Decoded
 
 
 
-vector<string> ofxRemoteUI::getAllParamNamesList(){
+vector<std::string> ofxRemoteUI::getAllParamNamesList(){
 
-	vector<string>paramsList;
+	vector<std::string>paramsList;
 	//get list of params in add order
-	for( map<int,string>::iterator ii = orderedKeys.begin(); ii != orderedKeys.end(); ++ii ){
-		string paramName = (*ii).second;
+	for( map<int,std::string>::iterator ii = orderedKeys.begin(); ii != orderedKeys.end(); ++ii ){
+		std::string paramName = (*ii).second;
 		paramsList.push_back(paramName);
 	}
 	return paramsList;
 }
 
 
-vector<string> ofxRemoteUI::scanForUpdatedParamsAndSync(){
+vector<std::string> ofxRemoteUI::scanForUpdatedParamsAndSync(){
 
-	vector<string>paramsPendingUpdate;
+	vector<std::string>paramsPendingUpdate;
 
-	for( unordered_map<string, RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+	for( unordered_map<std::string, RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 
 		RemoteUIParam p = (*ii).second;
 		if ( hasParamChanged(p) ){
@@ -415,11 +415,11 @@ vector<string> ofxRemoteUI::scanForUpdatedParamsAndSync(){
 }
 
 
-void ofxRemoteUI::sendUpdateForParamsInList(vector<string>list){
+void ofxRemoteUI::sendUpdateForParamsInList(vector<std::string>list){
 
 	for(size_t i = 0; i < list.size(); i++){
-		string name = list[i];
-		unordered_map<string, RemoteUIParam>::const_iterator it = params.find(name);
+		std::string name = list[i];
+		unordered_map<std::string, RemoteUIParam>::const_iterator it = params.find(name);
 		if(it!=params.end()){
 			RemoteUIParam p = params[list[i]];
 			//cout << "ofxRemoteUIServer: sending updated param " + list[i]; p.print();
@@ -431,18 +431,18 @@ void ofxRemoteUI::sendUpdateForParamsInList(vector<string>list){
 }
 
 void ofxRemoteUI::syncAllParamsToPointers(){
-	for( unordered_map<string, RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+	for( unordered_map<std::string, RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		syncParamToPointer( (*ii).first );
 	}
 }
 
 void ofxRemoteUI::syncAllPointersToParams(){
-	for( unordered_map<string, RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+	for( unordered_map<std::string, RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		syncPointerToParam( (*ii).first );
 	}
 }
 
-void ofxRemoteUI::syncPointerToParam(string paramName){
+void ofxRemoteUI::syncPointerToParam(std::string paramName){
 
 	RemoteUIParam &p = params[paramName];
 
@@ -481,7 +481,7 @@ void ofxRemoteUI::syncPointerToParam(string paramName){
 }
 
 
-void ofxRemoteUI::syncParamToPointer(string paramName){
+void ofxRemoteUI::syncParamToPointer(std::string paramName){
 
 	RemoteUIParam & p = params[paramName];
 
@@ -562,7 +562,7 @@ bool ofxRemoteUI::hasParamChanged(const RemoteUIParam & p){
 }
 
 
-string ofxRemoteUI::stringForParamType(RemoteUIParamType t){
+std::string ofxRemoteUI::stringForParamType(RemoteUIParamType t){
 	switch (t) {
 		case REMOTEUI_PARAM_FLOAT: return "FLT";
 		case REMOTEUI_PARAM_INT: return "INT";
@@ -578,15 +578,15 @@ string ofxRemoteUI::stringForParamType(RemoteUIParamType t){
 }
 
 
-bool ofxRemoteUI::paramExistsForName(string paramName){
-	unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+bool ofxRemoteUI::paramExistsForName(std::string paramName){
+	unordered_map<std::string, RemoteUIParam>::iterator it = params.find(paramName);
 	return  it != params.end();
 }
 
-RemoteUIParam ofxRemoteUI::getParamForName(string paramName){
+RemoteUIParam ofxRemoteUI::getParamForName(std::string paramName){
 
 	RemoteUIParam p;
-	unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+	unordered_map<std::string, RemoteUIParam>::iterator it = params.find(paramName);
 	if ( it != params.end() ){	// found!
 		p = params[paramName];
 	}else{
@@ -595,8 +595,8 @@ RemoteUIParam ofxRemoteUI::getParamForName(string paramName){
 	return p;
 }
 
-RemoteUIParam& ofxRemoteUI::getParamRefForName(string paramName){
-	unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+RemoteUIParam& ofxRemoteUI::getParamRefForName(std::string paramName){
+	unordered_map<std::string, RemoteUIParam>::iterator it = params.find(paramName);
 	if ( it != params.end() ){	// found!
 		return params[paramName];
 	}else{
@@ -605,11 +605,11 @@ RemoteUIParam& ofxRemoteUI::getParamRefForName(string paramName){
 	return nullParam;
 }
 
-string ofxRemoteUI::getValuesAsString(vector<string>paramList){
+std::string ofxRemoteUI::getValuesAsString(vector<std::string>paramList){
 	stringstream out;
-	map<int,string>::iterator it = orderedKeys.begin();
+	map<int,std::string>::iterator it = orderedKeys.begin();
 	while( it != orderedKeys.end() ){
-		string pname = it->second;
+		std::string pname = it->second;
 		if(paramList.size() == 0 || find(paramList.begin(), paramList.end(), pname) != paramList.end()){
 			RemoteUIParam param = params[it->second];
 			if(param.type != REMOTEUI_PARAM_SPACER){
@@ -632,11 +632,11 @@ string ofxRemoteUI::getValuesAsString(vector<string>paramList){
 }
 
 
-void ofxRemoteUI::setValuesFromString( string values ){
+void ofxRemoteUI::setValuesFromString( std::string values ){
 
 	stringstream in(values);
-	string name, value;
-	vector<string>changedParam;
+	std::string name, value;
+	vector<std::string>changedParam;
 
 	while( !in.eof() ){
 		getline( in, name, '=' );
@@ -681,7 +681,7 @@ void ofxRemoteUI::setValuesFromString( string values ){
 		}
 	}
 
-	vector<string>::iterator it = changedParam.begin();
+	vector<std::string>::iterator it = changedParam.begin();
 	while( it != changedParam.end() ){
 		if ( params.find( *it ) != params.end()){
 			RemoteUIParam param = params[*it];
@@ -700,7 +700,7 @@ void ofxRemoteUI::setValuesFromString( string values ){
 }
 
 
-void ofxRemoteUI::sendParam(string paramName, const RemoteUIParam & p){
+void ofxRemoteUI::sendParam(std::string paramName, const RemoteUIParam & p){
 	ofxOscMessage m;
 	//if(verbose_){ ofLogVerbose("sending >> %s ", paramName.c_str()); p.print(); }
 	m.setAddress("/SEND " + stringForParamType(p.type) + " " + paramName);
@@ -775,7 +775,7 @@ void ofxRemoteUI::sendTEST(){
 
 //on client call, presetNames should be empty vector (request ing the list)
 //on server call, presetNames should have all the presetNames
-void ofxRemoteUI::sendPREL( vector<string> presetNames_ ){
+void ofxRemoteUI::sendPREL( vector<std::string> presetNames_ ){
 	if(verbose_) RLOG_VERBOSE << "sendPREL()";
 	ofxOscMessage m;
 	m.setAddress("/PREL");
@@ -791,7 +791,7 @@ void ofxRemoteUI::sendPREL( vector<string> presetNames_ ){
 
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
-void ofxRemoteUI::sendSAVP(string presetName, bool confirm){
+void ofxRemoteUI::sendSAVP(std::string presetName, bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendSAVP()";
 	ofxOscMessage m;
 	m.setAddress("/SAVP");
@@ -804,7 +804,7 @@ void ofxRemoteUI::sendSAVP(string presetName, bool confirm){
 
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
-void ofxRemoteUI::sendSETP(string presetName, bool confirm){
+void ofxRemoteUI::sendSETP(std::string presetName, bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendSETP()";
 	ofxOscMessage m;
 	m.setAddress("/SETP");
@@ -815,7 +815,7 @@ void ofxRemoteUI::sendSETP(string presetName, bool confirm){
 	sendMessage(m);
 }
 
-void ofxRemoteUI::sendMISP(vector<string> missingParamsInPreset){
+void ofxRemoteUI::sendMISP(vector<std::string> missingParamsInPreset){
 	if (missingParamsInPreset.size() == 0) return; //do nothing if no params are missing
 	if(verbose_) RLOG_VERBOSE << "sendMISP()";
 	ofxOscMessage m;
@@ -826,7 +826,7 @@ void ofxRemoteUI::sendMISP(vector<string> missingParamsInPreset){
 	sendMessage(m);
 }
 
-void ofxRemoteUI::sendDELP(string presetName, bool confirm){
+void ofxRemoteUI::sendDELP(std::string presetName, bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendDELP()";
 	ofxOscMessage m;
 	m.setAddress("/DELP");
@@ -851,7 +851,7 @@ void ofxRemoteUI::sendCIAO(){
 
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
-void ofxRemoteUI::sendSETp(string presetName, string group, bool confirm){
+void ofxRemoteUI::sendSETp(std::string presetName, std::string group, bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendSETp()";
 	ofxOscMessage m;
 	m.setAddress("/SETp");
@@ -865,7 +865,7 @@ void ofxRemoteUI::sendSETp(string presetName, string group, bool confirm){
 
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
-void ofxRemoteUI::sendSAVp(string presetName, string group, bool confirm){
+void ofxRemoteUI::sendSAVp(std::string presetName, std::string group, bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendSAVp()";
 	ofxOscMessage m;
 	m.setAddress("/SAVp");
@@ -879,7 +879,7 @@ void ofxRemoteUI::sendSAVp(string presetName, string group, bool confirm){
 
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
-void ofxRemoteUI::sendDELp(string presetName, string group, bool confirm){
+void ofxRemoteUI::sendDELp(std::string presetName, std::string group, bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendDELp()";
 	ofxOscMessage m;
 	m.setAddress("/DELp");

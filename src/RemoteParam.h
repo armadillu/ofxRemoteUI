@@ -60,7 +60,7 @@ enum ArgType{
 struct DecodedMessage{
 	ActionType action;
 	ArgType argument;
-	string paramName;
+	std::string paramName;
 };
 
 
@@ -150,7 +150,7 @@ public:
 		return equal;
 	}
 
-	string getValueAsString() const{
+	std::string getValueAsString() const{
 		std::ostringstream ss;
 		char aux[50];
 		switch (type) {
@@ -166,14 +166,14 @@ public:
 			case REMOTEUI_PARAM_STRING: return stringVal;
 			case REMOTEUI_PARAM_COLOR:{
 				sprintf(aux, "RGBA: [%d, %d, %d, %d]", redVal, greenVal, blueVal, alphaVal);
-				return string(aux);
+				return std::string(aux);
 			}
 			case REMOTEUI_PARAM_SPACER: return "";
 			default: return "unknown value (BUG!)";
 		}
 	}
 
-	string getValueAsStringFromPointer(){
+	std::string getValueAsStringFromPointer(){
 		std::ostringstream ss;
 		char aux[50];
 		switch (type) {
@@ -191,7 +191,7 @@ public:
 			case REMOTEUI_PARAM_STRING: return *stringValAddr;
 			case REMOTEUI_PARAM_COLOR:{
 				sprintf(aux, "RGBA: [%d, %d, %d, %d]", redValAddr[0], redValAddr[1], redValAddr[2], redValAddr[3]);
-				return string(aux);
+				return std::string(aux);
 			}
 			case REMOTEUI_PARAM_SPACER: return "";
 			default: return "unknown value (BUG!)";
@@ -234,14 +234,14 @@ public:
 	bool * boolValAddr;
 	bool boolVal;
 
-	string * stringValAddr;
-	string stringVal;
+	std::string * stringValAddr;
+	std::string stringVal;
 
 	unsigned char redVal, greenVal, blueVal, alphaVal;
 	unsigned char * redValAddr;
 
-	string group;
-	vector<string> enumList; //for enum type
+	std::string group;
+	std::vector<std::string> enumList; //for enum type
 
 	unsigned char r,g,b,a; // param bg color [0,255]
 };
@@ -249,20 +249,20 @@ public:
 
 struct RemoteUIClientCallBackArg{
 	RemoteUICallClientAction action;
-	string msg; //sort of a wildcard; usually its the preset name
-	string host;
-	string group;
+	std::string msg; //sort of a wildcard; usually its the preset name
+	std::string host;
+	std::string group;
 	int port;
-	vector<string> paramList; //wildacard, used for missing param list
+	std::vector<std::string> paramList; //wildacard, used for missing param list
 };
 
 struct RemoteUIServerCallBackArg{
 	RemoteUICallServerAction action;
-	string paramName;
+	std::string paramName;
 	RemoteUIParam param; //get a copy o the new value of the param (only makes sense when action==SERVER_SENT_FULL_PARAMS_UPDATE)
-	string msg; //sort of a wildcard; usually its the preset name
-	string host;
-	string group;
+	std::string msg; //sort of a wildcard; usually its the preset name
+	std::string host;
+	std::string group;
 };
 
 struct RemoteUIServerValueWatch{
@@ -272,7 +272,7 @@ struct RemoteUIServerValueWatch{
 	bool * boolAddress;
 	ofColor color;
 	RemoteUIServerValueWatch(){ floatAddress = nullptr; intAddress = nullptr; boolAddress = nullptr;}
-	string getValueAsString(){
+	std::string getValueAsString(){
 		switch(type){
 			case REMOTEUI_PARAM_FLOAT: return ofToString(*floatAddress, 4);
 			case REMOTEUI_PARAM_INT: return ofToString(*intAddress);

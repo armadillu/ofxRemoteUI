@@ -220,15 +220,15 @@ class ofxRemoteUI{
 
 public:
 
-	vector<string> getAllParamNamesList();
-	vector<string> getChangedParamsList(); //in user add order
-	RemoteUIParam getParamForName(string paramName);
-	RemoteUIParam& getParamRefForName(string paramName); //careful with this!
-	bool paramExistsForName(string paramName);
-	vector<string> getPresetsList();
+	vector<std::string> getAllParamNamesList();
+	vector<std::string> getChangedParamsList(); //in user add order
+	RemoteUIParam getParamForName(std::string paramName);
+	RemoteUIParam& getParamRefForName(std::string paramName); //careful with this!
+	bool paramExistsForName(std::string paramName);
+	vector<std::string> getPresetsList();
 
-	string getValuesAsString(vector<string>paramList = vector<string>()); //supply param list to get only those, supply empty list to get all params
-	void setValuesFromString( string values );
+	std::string getValuesAsString(vector<std::string>paramList = vector<std::string>()); //supply param list to get only those, supply empty list to get all params
+	void setValuesFromString( std::string values );
 
 	virtual void restoreAllParamsToInitialXML() = 0;	//call this on client to request server to do so
 	virtual void restoreAllParamsToDefaultValues() = 0;
@@ -237,28 +237,28 @@ public:
 	float connectionLag();
 	void setVerbose(bool b);
 
-	virtual void sendUntrackedParamUpdate(RemoteUIParam p, string paramName){};
+	virtual void sendUntrackedParamUpdate(RemoteUIParam p, std::string paramName){};
 
-	string getMyIP(string userChosenInteface, string & subnetMask);
+	std::string getMyIP(std::string userChosenInteface, std::string & subnetMask);
 
 protected:
 
 	virtual void update(float dt) = 0;
-	void sendParam(string paramName, const RemoteUIParam & p);
+	void sendParam(std::string paramName, const RemoteUIParam & p);
 	DecodedMessage decode(const ofxOscMessage & m);
 
-	vector<string> scanForUpdatedParamsAndSync();	//goes through all params, comparing * to real value
+	vector<std::string> scanForUpdatedParamsAndSync();	//goes through all params, comparing * to real value
 													//reports those that are out of sync
 
-	void sendUpdateForParamsInList(vector<string>paramsPendingUpdate);
+	void sendUpdateForParamsInList(vector<std::string>paramsPendingUpdate);
 	bool hasParamChanged(const RemoteUIParam & p);
 
 	void updateParamFromDecodedMessage(const ofxOscMessage & m, DecodedMessage dm);
 	void syncAllParamsToPointers();
 	void syncAllPointersToParams();
-	void syncParamToPointer(string paramName); //copies the param0s pointer value over the value
-	void syncPointerToParam(string paramName); //the other way around
-	void addParamToDB(const RemoteUIParam & p, string paramName);
+	void syncParamToPointer(std::string paramName); //copies the param0s pointer value over the value
+	void syncPointerToParam(std::string paramName); //the other way around
+	void addParamToDB(const RemoteUIParam & p, std::string paramName);
 
 	void clearOscReceiverMsgQueue();
 
@@ -266,19 +266,19 @@ protected:
 	void sendHELLO();
 	void sendCIAO();
 	void sendTEST();
-	void sendPREL(vector<string> presetNames);
-	void sendSAVP(string presetName, bool confirm = false);
-	void sendSETP(string presetName, bool confirm = false);
-	void sendDELP(string presetName, bool confirm = false);
+	void sendPREL(vector<std::string> presetNames);
+	void sendSAVP(std::string presetName, bool confirm = false);
+	void sendSETP(std::string presetName, bool confirm = false);
+	void sendDELP(std::string presetName, bool confirm = false);
 	void sendRESX(bool confirm = false); //send a "restore fom first loaded XML" msg
 	void sendRESD(bool confirm = false); //send a "restore fom code defaults" msg
 	void sendSAVE(bool confirm = false);
-	void sendMISP(vector<string> missingParamsInPreset);
+	void sendMISP(vector<std::string> missingParamsInPreset);
 
 	//group preset methods (note lowercase p, l)
-	void sendSAVp(string presetName, string group, bool confirm = false);
-	void sendSETp(string presetName, string group, bool confirm = false);
-	void sendDELp(string presetName, string group, bool confirm = false);
+	void sendSAVp(std::string presetName, std::string group, bool confirm = false);
+	void sendSETp(std::string presetName, std::string group, bool confirm = false);
+	void sendDELp(std::string presetName, std::string group, bool confirm = false);
     
     virtual void sendMessage(ofxOscMessage m) = 0; // b/c native Client only uses an OSC sender, but server might use WS
 
@@ -299,20 +299,20 @@ protected:
 	float							updateInterval;
 	int								port;
 
-	string							userSuppliedNetInterface; //store user preference on network interface to use
+	std::string							userSuppliedNetInterface; //store user preference on network interface to use
 
-	unordered_map<string, RemoteUIParam>		params;
-	map<int, string>							orderedKeys; // used to keep the order in which the params were added
-	vector<string>								presetNames;
+	unordered_map<std::string, RemoteUIParam>		params;
+	map<int, std::string>							orderedKeys; // used to keep the order in which the params were added
+	vector<std::string>								presetNames;
 
-	vector<string>								paramsChangedSinceLastCheck;
+	vector<std::string>								paramsChangedSinceLastCheck;
 
-	unordered_map<string, RemoteUIParam>		paramsFromCode; //this will hold a copy of all the params as they where when shared first
-	unordered_map<string, RemoteUIParam>		paramsFromXML; //this will hold a copy of all the params as they where when first loaded from XML
-	unordered_map<string, bool>					paramsLoadedFromXML;
+	unordered_map<std::string, RemoteUIParam>		paramsFromCode; //this will hold a copy of all the params as they where when shared first
+	unordered_map<std::string, RemoteUIParam>		paramsFromXML; //this will hold a copy of all the params as they where when first loaded from XML
+	unordered_map<std::string, bool>					paramsLoadedFromXML;
 
 	struct ScreenNotifArg{
-		string paramName;
+		std::string paramName;
 		RemoteUIParam p;
 		ofColor bgColor;
 	};
@@ -323,11 +323,11 @@ protected:
 															//screen notifications on the server triggered from the supper class
 private:
 
-	string stringForParamType(RemoteUIParamType t);
+	std::string stringForParamType(RemoteUIParamType t);
 	RemoteUIParam nullParam;
 
 };
 
-void split(vector<string> &tokens, const string &text, char separator);
+void split(vector<std::string> &tokens, const std::string &text, char separator);
 
 #endif
