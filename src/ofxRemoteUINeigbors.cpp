@@ -10,6 +10,8 @@
 #include <sstream>
 #include <iostream>
 
+using namespace std;
+
 ofxRemoteUINeigbors::ofxRemoteUINeigbors(){
 	time = 0;
 }

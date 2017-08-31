@@ -18,8 +18,8 @@
 
 struct Neighbor{
 	Neighbor(){};
-	Neighbor(string ip, int p, float t, string n, string bin){IP = ip; port = p; timeLastSeen = t; name = n; binary = bin;}
-	string IP,name, binary;
+	Neighbor(std::string ip, int p, float t, std::string n, std::string bin){IP = ip; port = p; timeLastSeen = t; name = n; binary = bin;}
+	std::string IP, name, binary;
 	int port;
 	float timeLastSeen;
 };
@@ -30,13 +30,13 @@ public:
 
 	ofxRemoteUINeigbors();
 	bool update(float dt); //return false if no update, true if theres an update
-	bool gotPing(string ip, int port, string name, string binaryName); //idem
+	bool gotPing(std::string ip, int port, std::string name, std::string binaryName); //idem
 	void print();
-	vector<Neighbor> getNeighbors();
+	std::vector<Neighbor> getNeighbors();
 
 private:
 
-	unordered_map<string,Neighbor>neigbhors; //this will be kept updated, key is a combostring of "IP:PORT"
+	std::unordered_map<std::string,Neighbor>neigbhors; //this will be kept updated, key is a combostring of "IP:PORT"
 	float time; //secs
 
 };

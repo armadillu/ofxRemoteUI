@@ -9,6 +9,8 @@
 #include "ofxRemoteUIClient.h"
 #include <iostream>
 
+using namespace std;
+
 ofxRemoteUIClient::ofxRemoteUIClient(){
 	readyToSend = false;
 	timeSinceLastReply = 0;

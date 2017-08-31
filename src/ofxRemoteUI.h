@@ -81,7 +81,6 @@
 
 
 #define RUI_LOCAL_IP_ADDRESS "127.0.0.1"
-using namespace std;
 
 /*
 
@@ -220,15 +219,15 @@ class ofxRemoteUI{
 
 public:
 
-	vector<std::string> getAllParamNamesList();
-	vector<std::string> getChangedParamsList(); //in user add order
+	std::vector<std::string> getAllParamNamesList();
+	std::vector<std::string> getChangedParamsList(); //in user add order
 	RemoteUIParam getParamForName(std::string paramName);
 	RemoteUIParam& getParamRefForName(std::string paramName); //careful with this!
 	bool paramExistsForName(std::string paramName);
-	vector<std::string> getPresetsList();
+	std::vector<std::string> getPresetsList();
 
-	std::string getValuesAsString(vector<std::string>paramList = vector<std::string>()); //supply param list to get only those, supply empty list to get all params
-	void setValuesFromString( std::string values );
+	std::string getValuesAsString(std::vector<std::string>paramList = std::vector<std::string>()); //supply param list to get only those, supply empty list to get all params
+	void setValuesFromString(std::string values);
 
 	virtual void restoreAllParamsToInitialXML() = 0;	//call this on client to request server to do so
 	virtual void restoreAllParamsToDefaultValues() = 0;
@@ -247,10 +246,10 @@ protected:
 	void sendParam(std::string paramName, const RemoteUIParam & p);
 	DecodedMessage decode(const ofxOscMessage & m);
 
-	vector<std::string> scanForUpdatedParamsAndSync();	//goes through all params, comparing * to real value
-													//reports those that are out of sync
+	std::vector<std::string> scanForUpdatedParamsAndSync();	//goes through all params, comparing * to real value
+															//reports those that are out of sync
 
-	void sendUpdateForParamsInList(vector<std::string>paramsPendingUpdate);
+	void sendUpdateForParamsInList(std::vector<std::string>paramsPendingUpdate);
 	bool hasParamChanged(const RemoteUIParam & p);
 
 	void updateParamFromDecodedMessage(const ofxOscMessage & m, DecodedMessage dm);
@@ -266,14 +265,14 @@ protected:
 	void sendHELLO();
 	void sendCIAO();
 	void sendTEST();
-	void sendPREL(vector<std::string> presetNames);
+	void sendPREL(std::vector<std::string> presetNames);
 	void sendSAVP(std::string presetName, bool confirm = false);
 	void sendSETP(std::string presetName, bool confirm = false);
 	void sendDELP(std::string presetName, bool confirm = false);
 	void sendRESX(bool confirm = false); //send a "restore fom first loaded XML" msg
 	void sendRESD(bool confirm = false); //send a "restore fom code defaults" msg
 	void sendSAVE(bool confirm = false);
-	void sendMISP(vector<std::string> missingParamsInPreset);
+	void sendMISP(std::vector<std::string> missingParamsInPreset);
 
 	//group preset methods (note lowercase p, l)
 	void sendSAVp(std::string presetName, std::string group, bool confirm = false);
@@ -301,15 +300,15 @@ protected:
 
 	std::string							userSuppliedNetInterface; //store user preference on network interface to use
 
-	unordered_map<std::string, RemoteUIParam>		params;
-	map<int, std::string>							orderedKeys; // used to keep the order in which the params were added
-	vector<std::string>								presetNames;
+	std::unordered_map<std::string, RemoteUIParam>		params;
+	std::map<int, std::string>							orderedKeys; // used to keep the order in which the params were added
+	std::vector<std::string>								presetNames;
 
-	vector<std::string>								paramsChangedSinceLastCheck;
+	std::vector<std::string>								paramsChangedSinceLastCheck;
 
-	unordered_map<std::string, RemoteUIParam>		paramsFromCode; //this will hold a copy of all the params as they where when shared first
-	unordered_map<std::string, RemoteUIParam>		paramsFromXML; //this will hold a copy of all the params as they where when first loaded from XML
-	unordered_map<std::string, bool>					paramsLoadedFromXML;
+	std::unordered_map<std::string, RemoteUIParam>		paramsFromCode; //this will hold a copy of all the params as they where when shared first
+	std::unordered_map<std::string, RemoteUIParam>		paramsFromXML; //this will hold a copy of all the params as they where when first loaded from XML
+	std::unordered_map<std::string, bool>					paramsLoadedFromXML;
 
 	struct ScreenNotifArg{
 		std::string paramName;
@@ -328,6 +327,6 @@ private:
 
 };
 
-void split(vector<std::string> &tokens, const std::string &text, char separator);
+void split(std::vector<std::string> &tokens, const std::string &text, char separator);
 
 #endif

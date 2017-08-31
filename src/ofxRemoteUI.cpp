@@ -19,6 +19,8 @@
 #pragma comment(lib, "iphlpapi.lib")
 #endif
 
+using namespace std;
+
 void split(vector<std::string> &tokens, const std::string &text, char separator) {
 	std::size_t start = 0, end = 0;
 	while ((end = text.find(separator, start)) != std::string::npos) {
