@@ -1030,11 +1030,8 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		RLOG_NOTICE << "Listening for commands at " << computerIP << ":" << port;
 		oscReceiver.setup(port);
         
-        #ifndef NO_RUI_WEBSOCKETS
+        #ifdef RUI_WEB_INTERFACE
             listenWebSocket(port + 1);
-        #endif
-        
-        #ifndef NO_RUI_WEBSERVER
             startWebServer(port + 2);
         #endif
         
@@ -1125,7 +1122,7 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				}
 			}break;
 
-			#ifndef NO_RUI_WEBSOCKETS
+			#ifdef RUI_WEB_INTERFACE
 			case 'c':{
 				string url = ofToString(computerIP) + ":" + ofToString(webPort);
 				string wsUrl = ofToString(computerIP) + ":" + ofToString(wsPort);
@@ -1498,27 +1495,19 @@ void ofxRemoteUIServer::draw(int x, int y){
             string reachableAt;
             if (enabled) {
                 reachableAt = "Server reachable at " + computerIP + ":";
-                
-                #if !defined(NO_RUI_WEBSOCKETS) || !defined(NO_RUI_WEBSERVER)
-                     reachableAt += " ";
-                #endif
-                
-                reachableAt += ofToString(port);
-                
-                #if !defined(NO_RUI_WEBSOCKETS) || !defined(NO_RUI_WEBSERVER)
-                    reachableAt += "(OSC)";
-                #endif
-                
-                #ifndef NO_RUI_WEBSOCKETS
-                    reachableAt += " " + ofToString(wsPort) + "(WS)";
-                #endif
-                
-                #ifndef NO_RUI_WEBSERVER
-                     reachableAt += " " + ofToString(webPort) + "(Web)";
-                #endif
-            }
-            else {
-                reachableAt = "Server disabled";
+				#if defined(RUI_WEB_INTERFACE)
+				reachableAt += " ";
+				#endif
+
+				reachableAt += ofToString(port);
+
+				#if defined(RUI_WEB_INTERFACE)
+				reachableAt += "(OSC)";
+				reachableAt += " " + ofToString(wsPort) + "(WS)";
+				reachableAt += " " + ofToString(webPort) + "(Web)";
+				#endif
+            }else {
+				reachableAt = "Server disabled";
             }
             
 			ofSetColor(255);
@@ -1527,7 +1516,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 			"Press 'r' to restore all params's launch state. '+'/'-' to set UI Scale. 'N' to toggle screen notif.\n" +
 			"Press Arrow Keys to edit values. SPACEBAR + Arrow Keys for bigger increments. ',' and '.' Keys to scroll.\n" +
 			"Press 'TAB' to hide. Press 'RETURN' to cycle through RGBA components.";
-			#ifndef NO_RUI_WEBSOCKETS
+			#ifdef RUI_WEB_INTERFACE
 			instructions += " Press 'c' to launch a web client.";
 			#endif
 
@@ -1840,9 +1829,9 @@ void ofxRemoteUIServer::updateServer(float dt){
 	//let everyone know I exist and which is my port, every now and then
 	handleBroadcast();
 
-#ifndef NO_RUI_WEBSOCKETS
+	#ifdef RUI_WEB_INTERFACE
     lock_guard<std::mutex> guard(wsDequeMut);
-#endif
+	#endif
     
 	while( oscReceiver.hasWaitingMessages() or wsMessages.size()){// check for waiting messages from client
 
@@ -2755,7 +2744,7 @@ void ofxRemoteUIServer::onShowParamUpdateNotification(ScreenNotifArg& a){
 }
 
 
-#ifndef NO_RUI_WEBSERVER
+#ifdef RUI_WEB_INTERFACE
 void ofxRemoteUIServer::startWebServer(int _port) {
     webPort = _port;
     webServer.setup(_port);
@@ -2765,7 +2754,7 @@ void ofxRemoteUIServer::startWebServer(int _port) {
 
 void ofxRemoteUIServer::sendMessage(ofxOscMessage m) {
         if (useWebSockets){
-            #ifndef NO_RUI_WEBSOCKETS
+            #ifdef RUI_WEB_INTERFACE
             string json = oscToJson(m);
             wsServer.send(json);
             #endif
@@ -2776,7 +2765,7 @@ void ofxRemoteUIServer::sendMessage(ofxOscMessage m) {
 }
 
 
-#ifndef NO_RUI_WEBSOCKETS
+#ifdef RUI_WEB_INTERFACE
 
 void ofxRemoteUIServer::listenWebSocket(int port) {
     ofxLibwebsockets::ServerOptions options = ofxLibwebsockets::defaultServerOptions();

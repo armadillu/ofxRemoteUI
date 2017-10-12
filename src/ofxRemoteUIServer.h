@@ -71,22 +71,9 @@
 #endif
 
 
-//if we can't find ofxLibwebsockets, disable webscockets altogether.
-#if defined(__has_include) /*llvm only - query about header files being available or not*/
-	#if __has_include("ofxLibwebsockets.h")
-	#else
-		#define NO_RUI_WEBSOCKETS
-		#define NO_RUI_WEBSERVER
-	#endif
-#endif
-
-// Define NO_RUI_WEBSOCKETS and/or NO_RUI_WEBSERVER
-// to turn off websockets/webserver
-#ifndef NO_RUI_WEBSOCKETS
+// Define RUI_WEB_INTERFACE to turn ON websockets/webserver
+#ifdef RUI_WEB_INTERFACE
     #include "ofxLibwebsockets.h"
-#endif
-
-#ifndef NO_RUI_WEBSERVER
     #include "ofxRemoteUIWebServer.h"
 #endif
 
@@ -227,7 +214,7 @@ public:
 	void addVariableWatch(const string & varName, bool* varPtr, ofColor c = ofColor(0,0,0,0));
 	//void removeVariableWatch(const string &varName);
 
-#ifndef NO_RUI_WEBSOCKETS
+#ifdef RUI_WEB_INTERFACE
     // WebSocket Events
     void    onConnect( ofxLibwebsockets::Event& args );
     void    onOpen( ofxLibwebsockets::Event& args );
@@ -386,7 +373,7 @@ protected:
     bool useWebSockets = false;
     deque<ofxOscMessage> wsMessages;
 
-#ifndef NO_RUI_WEBSOCKETS
+#ifdef RUI_WEB_INTERFACE
     //---Web Sockets (OSC Port + 1)---
     void    listenWebSocket(int port);
     int     wsPort;
@@ -398,7 +385,7 @@ protected:
     
     
     //---Web Server (OSC Port + 2)---
-#ifndef NO_RUI_WEBSERVER
+#ifdef RUI_WEB_INTERFACE
     ofxRemoteUIWebServer webServer;
     int  webPort;
     void startWebServer(int port);
