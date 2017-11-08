@@ -72,10 +72,6 @@ void ofApp::setup(){
 	//to do so, you first share the param, then load from XML, then remove the param
 	RUI_SHARE_PARAM(unloadTest);
 
-	RUI_LOAD_FROM_XML();	//load values from XML, if you want to do so
-							//this will result on the UI showing the params
-							//as they were when last saved (saved on app quit by default)
-
 	//this efectively removes all remoteUI references to this param
 	//but bc it's been loaded from xml in the previous step before,
 	//the end result is that you get to load its value from XML

@@ -365,7 +365,7 @@ void ofxRemoteUI::updateParamFromDecodedMessage(const ofxOscMessage & m, Decoded
 		default: RLOG_ERROR << "updateParamFromDecodedMessage unknown type!"; break;
 	}
 
-	if(m.getNumArgs() > 1){
+	if(m.getNumArgs() > arg){
 		p.r = m.getArgAsInt32(arg); arg++;
 		p.g = m.getArgAsInt32(arg); arg++;
 		p.b = m.getArgAsInt32(arg); arg++;
