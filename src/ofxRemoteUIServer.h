@@ -154,6 +154,8 @@ public:
 												//avoid crowding the UI too much
 
 	void watchParamOnScreen(const string& paramName);
+	void removeParamWatch(const string& paramName);
+	void removeAllParamWatches();
 
 	void setShowInterfaceKey(char key){showInterfaceKey = key;};
 	void setAutomaticBackupsEnabled(bool enabled){autoBackups = enabled;}

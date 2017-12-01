@@ -2167,6 +2167,23 @@ void ofxRemoteUIServer::watchParamOnScreen(const string & paramName){
 	}
 }
 
+void ofxRemoteUIServer::removeParamWatch(const string & paramName){
+	if (params.find(paramName) != params.end()){
+		auto it = std::find(paramsToWatch.begin(), paramsToWatch.end(), paramName);
+		if(it != paramsToWatch.end()){
+			paramsToWatch.erase(it);
+		}else{
+			RLOG_ERROR << "can't remove watch for that param; it isn't being watched! " << paramName;
+		}
+	}else{
+		RLOG_ERROR << "can't remove watch for that param; it doesnt exist! " << paramName;
+	}
+}
+
+void ofxRemoteUIServer::removeAllParamWatches(){
+	RLOG_NOTICE << "Removing all Param Watches";
+	paramsToWatch.clear();
+}
 
 void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamName){
 
