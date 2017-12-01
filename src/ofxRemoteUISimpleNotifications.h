@@ -320,6 +320,33 @@ public:
 		paramWatch[paramName] = n;
 	};
 
+	void removeParamWatch(const string & paramName){
+		auto it = paramWatch.find(paramName);
+		if(it != paramWatch.end()){
+			paramWatch.erase(it);
+			int count = 0;
+			bool found = false;
+			for(auto i : paramWatchOrder){
+				if(i.second == paramName){
+					found = true;
+					break;
+				}
+				count++;
+			}
+			if(found){
+				auto f = paramWatchOrder.find(count);
+				if(f != paramWatchOrder.end()){
+					paramWatchOrder.erase(f);
+				}
+			}
+		}
+	}
+
+	void removeAllParamWatches(){
+		paramWatch.clear();
+		paramWatchOrder.clear();
+	}
+
 	void addVariableWatch(const string &paramName, const string& paramValue, const ofColor & paramC){
 		ParamNotification n;
 		n.color = paramC;
