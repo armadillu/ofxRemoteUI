@@ -2,4 +2,3 @@ ofxRemoteUI
 ofxOsc
 ofxXmlSettings
 ofxPoco
-ofxLibwebsockets
