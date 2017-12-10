@@ -9,7 +9,7 @@ export OF_ADDONS=$OF_ROOT/addons
 pwd;
 echo "OF_ADDONS: $OF_ADDONS"
 
-ADDONS="local-projects/ofxLibwebsockets"
+ADDONS=""
 
 cd $OF_ADDONS
 
