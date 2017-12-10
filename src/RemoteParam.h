@@ -197,17 +197,26 @@ public:
 			default: return "unknown value (BUG!)";
 		}
 	}
+	
+	string getInfoAsString(){
+		char aux[2048];
+		switch (type) {
+			case REMOTEUI_PARAM_FLOAT: sprintf(aux, "Float: %f [%f, %f]", floatVal, minFloat, maxFloat); break;
+			case REMOTEUI_PARAM_INT: sprintf(aux, "Int: %d [%d, %d]", intVal, minInt, maxInt); break;
+			case REMOTEUI_PARAM_COLOR: sprintf(aux, "Color: RGBA(%d %d %d %d)", redVal, greenVal, blueVal, alphaVal); break;
+			case REMOTEUI_PARAM_ENUM: sprintf(aux, "Enum: %d [%d, %d]", intVal, minInt, maxInt); break;
+			case REMOTEUI_PARAM_BOOL: sprintf(aux, "Bool: %s", boolVal ? "TRUE" : "FALSE"); break;
+			case REMOTEUI_PARAM_STRING: sprintf(aux, "String: \"%s\"", stringVal.c_str()); break;
+			case REMOTEUI_PARAM_SPACER: sprintf(aux, "Group: \"%s\"", group.c_str()); break;
+			default: ofLogError("RemoteParam") << "weird RemoteUIParam at print()!"; break;
+		}
+		return string(aux);
+	}
 
 	void print(){
+		printf("%s\n", getInfoAsString().c_str());
 		switch (type) {
-			case REMOTEUI_PARAM_FLOAT: printf("float: %.2f [%.2f, %.2f]\n", floatVal, minFloat, maxFloat); break;
-			case REMOTEUI_PARAM_INT: printf("int: %d [%d, %d]\n", intVal, minInt, maxInt); break;
-			case REMOTEUI_PARAM_COLOR: printf("color: RGBA(%d %d %d %d)\n", redVal, greenVal, blueVal, alphaVal); break;
-			case REMOTEUI_PARAM_ENUM: printf("enum: %d [%d, %d]\n", intVal, minInt, maxInt); break;
-			case REMOTEUI_PARAM_BOOL: printf("bool: %s\n", boolVal ? "TRUE" : "FALSE"); break;
-			case REMOTEUI_PARAM_STRING: printf("string: %s\n", stringVal.c_str()); break;
-			case REMOTEUI_PARAM_SPACER: printf("Spacer\n"); break;
-			default: printf("weird RemoteUIParam at print()!\n"); break;
+			default: ofLogError("RemoteParam") << "weird RemoteUIParam at print()!"; break;
 		}
 	};
 

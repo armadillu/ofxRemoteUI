@@ -302,13 +302,13 @@ protected:
 
 	std::unordered_map<std::string, RemoteUIParam>		params;
 	std::map<int, std::string>							orderedKeys; // used to keep the order in which the params were added
-	std::vector<std::string>								presetNames;
+	std::vector<std::string>							presetNames;
 
-	std::vector<std::string>								paramsChangedSinceLastCheck;
+	std::vector<std::string>							paramsChangedSinceLastCheck;
 
 	std::unordered_map<std::string, RemoteUIParam>		paramsFromCode; //this will hold a copy of all the params as they where when shared first
 	std::unordered_map<std::string, RemoteUIParam>		paramsFromXML; //this will hold a copy of all the params as they where when first loaded from XML
-	std::unordered_map<std::string, bool>					paramsLoadedFromXML;
+	std::unordered_map<std::string, bool>				paramsLoadedFromXML;
 
 	struct ScreenNotifArg{
 		std::string paramName;
