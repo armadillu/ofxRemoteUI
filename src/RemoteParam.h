@@ -198,7 +198,7 @@ public:
 		}
 	}
 	
-	string getInfoAsString(){
+	std::string getInfoAsString(){
 		char aux[2048];
 		switch (type) {
 			case REMOTEUI_PARAM_FLOAT: sprintf(aux, "Float: %f [%f, %f]", floatVal, minFloat, maxFloat); break;
@@ -210,7 +210,7 @@ public:
 			case REMOTEUI_PARAM_SPACER: sprintf(aux, "Group: \"%s\"", group.c_str()); break;
 			default: ofLogError("RemoteParam") << "weird RemoteUIParam at print()!"; break;
 		}
-		return string(aux);
+		return std::string(aux);
 	}
 
 	void print(){
