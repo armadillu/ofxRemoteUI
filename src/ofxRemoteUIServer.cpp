@@ -904,8 +904,11 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	bool exists = true;
 	ofxXmlSettings s;
 	#ifdef OF_AVAILABLE
+
+	bool wasEnabledB4setup = enabled;
 	configFile = ofToDataPath(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME));
 	exists = s.loadFile(configFile);
+	
 	if(exists){
 		bool pushed = false;
 		if(s.getNumTags(OFXREMOTEUI_XML_ROOT_TAG)){ //v2
@@ -914,6 +917,10 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		}
 		if( s.getNumTags(OFXREMOTEUI_XML_ENABLED_TAG) > 0 ){
 			enabled = (1 == s.getValue(OFXREMOTEUI_XML_ENABLED_TAG, 0));
+			if(!wasEnabledB4setup){
+				enabled = false;
+				RLOG_WARNING << "xml config set to enabled=true, but we were disabled b4 setup. Launching disabled!";
+			}
 			if (!enabled){
 				RLOG_WARNING << "launching disabled!" ;
 			}
