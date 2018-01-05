@@ -359,6 +359,7 @@ protected:
 	#endif
 
 	bool													headlessMode;
+	string													dataPath;
 
 	void			refreshPresetsCache();
 	void			drawString(const string & text, const float & x, const float & y);

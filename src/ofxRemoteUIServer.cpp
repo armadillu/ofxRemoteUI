@@ -533,7 +533,14 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 		s.addValue(OFXREMOTEUI_XML_PORT_TAG, port);
 	}
 	s.addValue(OFXREMOTEUI_XML_ENABLED_TAG, enabled);
-	s.save(fileName );
+
+	//s.save(fileName); //this is replaced by the code below to avoid this crash on exit https://github.com/openframeworks/openFrameworks/issues/5298
+
+	ofstream myfile;
+	string fullPath = dataPath + "/" + fileName;
+	myfile.open(fullPath.c_str());
+	myfile << s.toString();
+	myfile.close();
 
 	RLOG_NOTICE << "Done saving! (using the V2 format) '" << fileName << "'" ;
 }
@@ -905,6 +912,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	ofxXmlSettings s;
 	#ifdef OF_AVAILABLE
 
+	dataPath = ofToDataPath("", true);
 	bool wasEnabledB4setup = enabled;
 	configFile = ofToDataPath(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME));
 	exists = s.loadFile(configFile);
