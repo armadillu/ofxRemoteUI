@@ -215,9 +215,6 @@ public:
 
 	void print(){
 		printf("%s\n", getInfoAsString().c_str());
-		switch (type) {
-			default: ofLogError("RemoteParam") << "weird RemoteUIParam at print()!"; break;
-		}
 	};
 
 	ofColor getColor(){
