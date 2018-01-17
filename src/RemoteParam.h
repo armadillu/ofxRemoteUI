@@ -15,6 +15,20 @@
 #endif
 
 
+
+#ifdef OF_AVAILABLE
+	#define RLOG_NOTICE		(ofLogNotice("ofxRemoteUI"))
+	#define RLOG_ERROR		(ofLogError("ofxRemoteUI"))
+	#define RLOG_WARNING		(ofLogWarning("ofxRemoteUI"))
+	#define RLOG_VERBOSE		(ofLogVerbose("ofxRemoteUI"))
+#else
+	#define RLOG_NOTICE		(cout << endl) //TODO!
+	#define RLOG_ERROR		(cout << endl)
+	#define RLOG_WARNING		(cout << endl)
+	#define RLOG_VERBOSE		(cout << endl)
+#endif
+
+
 enum RemoteUICallClientAction{
 	SERVER_CONNECTED, SERVER_DISCONNECTED, SERVER_SENT_FULL_PARAMS_UPDATE, SERVER_PRESETS_LIST_UPDATED,
 	SERVER_CONFIRMED_SAVE, SERVER_DID_RESET_TO_DEFAULTS, SERVER_DELETED_PRESET,
@@ -208,7 +222,7 @@ public:
 			case REMOTEUI_PARAM_BOOL: sprintf(aux, "Bool: %s", boolVal ? "TRUE" : "FALSE"); break;
 			case REMOTEUI_PARAM_STRING: sprintf(aux, "String: \"%s\"", stringVal.c_str()); break;
 			case REMOTEUI_PARAM_SPACER: sprintf(aux, "Group: \"%s\"", group.c_str()); break;
-			default: ofLogError("RemoteParam") << "weird RemoteUIParam at print()!"; break;
+			default: RLOG_ERROR << "weird RemoteUIParam at print()!"; break;
 		}
 		return std::string(aux);
 	}
@@ -288,16 +302,3 @@ struct RemoteUIServerValueWatch{
 		return "unknown var type?";
 	}
 };
-
-#ifdef OF_AVAILABLE
-	#define RLOG_NOTICE		(ofLogNotice("ofxRemoteUI"))
-	#define RLOG_ERROR		(ofLogError("ofxRemoteUI"))
-	#define RLOG_WARNING		(ofLogWarning("ofxRemoteUI"))
-	#define RLOG_VERBOSE		(ofLogVerbose("ofxRemoteUI"))
-#else
-	#define RLOG_NOTICE		(cout << endl) //TODO!
-	#define RLOG_ERROR		(cout << endl)
-	#define RLOG_WARNING		(cout << endl)
-	#define RLOG_VERBOSE		(cout << endl)
-#endif
-
