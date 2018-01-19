@@ -319,6 +319,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 
 	[[NSColorPanel sharedColorPanel] setShowsAlpha: YES];
+	[[NSColorPanel sharedColorPanel] setHidesOnDeactivate:NO];
+	//[[NSColorPanel sharedColorPanel] setFloatingPanel:NO];
+	[[NSColorPanel sharedColorPanel] setContinuous:YES];
+
 
 	CALayer *viewLayer = [CALayer layer];
 	//[viewLayer setBackgroundColor:CGColorCreateGenericRGB(0,0,0,0.1)];
