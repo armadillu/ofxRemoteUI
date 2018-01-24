@@ -303,7 +303,7 @@ float convertHueToMidiFigtherHue(float hue){
 					string paramName = bindingsMap[controllerUniqueAddress];
 					unordered_map<string,ParamUI*>::iterator it = widgets->find(paramName);
 					if ( it == widgets->end() ){	//not found! wtf?
-						NSLog(@"uh? midi binding pointing to an unexisting param!");
+						//NSLog(@"uh? midi binding pointing to an unexisting param!");
 					}else{
 						ParamUI * item = widgets->at(paramName);
 						RemoteUIParam p = client->getParamForName(paramName);
@@ -474,9 +474,9 @@ float convertHueToMidiFigtherHue(float hue){
 	std::advance(ii, row);
 
 	if([[tc identifier] isEqualToString:@"Device @"]){
-		return [NSString stringWithFormat:@"%s",(*ii).first.c_str()];
+		return [NSString stringWithUTF8String: (*ii).first.c_str()];
 	}else{
-		return [NSString stringWithFormat:@"%s",(*ii).second.c_str()];
+		return [NSString stringWithUTF8String: (*ii).second.c_str()];
 	}
 }
 

@@ -376,7 +376,7 @@
 			[groupPresetDeleteButton removeFromSuperviewWithoutNeedingDisplay];
 			[enumeratorMenu removeAllItems];
 			for(int i = 0; i < param.enumList.size(); i++){
-				[enumeratorMenu addItemWithTitle:[NSString stringWithFormat:@"%s", param.enumList[i].c_str()]];
+				[enumeratorMenu addItemWithTitle:[NSString stringWithUTF8String:param.enumList[i].c_str()]];
 			}
 			}break;
 
@@ -461,7 +461,7 @@
 	if(currentPreset == ""){
 		[groupPresetMenu selectItemAtIndex:0];
 	}else{
-		[groupPresetMenu selectItemWithTitle:[NSString stringWithFormat:@"%s",currentPreset.c_str()]];
+		[groupPresetMenu selectItemWithTitle:[NSString stringWithUTF8String: currentPreset.c_str()]];
 	}
 }
 

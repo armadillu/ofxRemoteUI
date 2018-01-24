@@ -17,7 +17,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	AppDelegate * me = (AppDelegate *)[NSApp delegate];
 	LogWindows * logs = [me getLogWindows];
-	NSString * remoteIP = [NSString stringWithFormat:@"%s", a.host.c_str()];
+	NSString * remoteIP = [NSString stringWithUTF8String: a.host.c_str()];
 	
 	switch (a.action) {
 
@@ -438,7 +438,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	string val = client->getValuesAsString();
     [[NSPasteboard generalPasteboard] declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
-    [[NSPasteboard generalPasteboard] setString:[NSString stringWithFormat:@"%s", val.c_str()] forType:NSStringPboardType];
+	[[NSPasteboard generalPasteboard] setString:[NSString stringWithUTF8String: val.c_str()] forType:NSStringPboardType];
 }
 
 
@@ -820,7 +820,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	vector<string> allGroupNames = [self getAllGroupsInParams];
 	if (allGroupNames.size() == 1 ) allGroupNames.clear(); //if only default group found, dont show it
 	for(int i = 0 ; i < allGroupNames.size(); i++){
-		[menuItemNameArray addObject: [NSString stringWithFormat:@"%s",allGroupNames[i].c_str()] ];
+		[menuItemNameArray addObject: [NSString stringWithUTF8String: allGroupNames[i].c_str()] ];
 	}
     [groupsMenu removeAllItems];
     [groupsMenu addItemsWithTitles: menuItemNameArray];
@@ -847,7 +847,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	}
 
 	if(currentGroup.size() > 0){
-		[groupsMenu selectItemWithTitle:[NSString stringWithFormat:@"%s",currentGroup.c_str()] ];
+		[groupsMenu selectItemWithTitle:[NSString stringWithUTF8String: currentGroup.c_str()] ];
 	}else{
 		[groupsMenu selectItemAtIndex:0];
 	}
@@ -866,12 +866,12 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	for(int i = 0 ; i < presetsList.size(); i++){
 		bool isGroupPreset = presetsList[i].find_first_of("/") != std::string::npos;
 		if ( presetsList[i] != OFXREMOTEUI_NO_PRESETS && !isGroupPreset){
-			[menuItemNameArray addObject: [NSString stringWithFormat:@"%s",presetsList[i].c_str()] ];
+			[menuItemNameArray addObject: [NSString stringWithUTF8String: presetsList[i].c_str()] ];
 		}
 	}
     [presetsMenu removeAllItems];
     [presetsMenu addItemsWithTitles: menuItemNameArray];
-	NSString* selPres = [NSString stringWithFormat:@"%s", currentPreset.c_str()];
+	NSString* selPres = [NSString stringWithUTF8String:  currentPreset.c_str()];
 	if ([selPres length] > 0){
 		if ([menuItemNameArray containsObject:selPres]) {
 			[presetsMenu selectItemWithTitle:selPres];
@@ -918,7 +918,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 			string groupName = sides[0];
 			string presetName = sides[1];
 			NSPopUpButton * popup = [spacerGroups[groupName] getPresetsMenu];
-			[popup addItemWithTitle:[NSString stringWithFormat:@"%s",presetName.c_str()]];
+			[popup addItemWithTitle:[NSString stringWithUTF8String: presetName.c_str()]];
 			[spacerGroups[groupName] updatePresetMenuSelectionToCurrent];
 		}
 	}
@@ -939,7 +939,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	for( unordered_map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
 		string key = (*ii).first;
 		ParamUI* t = widgets[key];
-		NSString * paramName = [NSString stringWithFormat:@"%s", t->paramName.c_str()];
+		NSString * paramName = [NSString stringWithUTF8String:  t->paramName.c_str()];
 		if ([paramName rangeOfString:filter options:NSCaseInsensitiveSearch].location != NSNotFound || [filter length] == 0){
 			[t fadeIn];
 		}else{
@@ -977,7 +977,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 		if (host_ == localIP && onlyAutoConnectToLocalHost || !onlyAutoConnectToLocalHost){
 			if ([[connectButton title] isEqualToString:CONNECT_STRING] || connecting){ //we are not connected, let's connect to this newly launched neighbor!
-				NSString * host = [NSString stringWithFormat:@"%s", host_.c_str()];
+				NSString * host = [NSString stringWithUTF8String: host_.c_str()];
 				NSString * port = [NSString stringWithFormat:@"%d", port_];
 				[addressField setStringValue: host];
 				[portField setStringValue: port];
