@@ -153,6 +153,10 @@ public:
 												//to load from xml and then remove from the list to
 												//avoid crowding the UI too much
 
+	//param ignore list - use this if you want to load presets but want to ignore certain
+	//params that are defined in those presets (ie a "debug" or similar param)
+	void addParamToPresetLoadIgnoreList(const std::string & param);
+	void clearParamToPresetLoadIgnoreList();
 
 	void watchParamOnScreen(const std::string& paramName);
 	void removeParamWatch(const std::string& paramName);
@@ -402,7 +406,10 @@ protected:
 
 	map<std::string, RemoteUIServerValueWatch> 				varWatches;
 
-	static ofxRemoteUIServer* 							singleton;
+	static ofxRemoteUIServer* 								singleton;
+
+	//handle params that are to be ignored when loading presets
+	vector<std::string>										paramsToIgnoreWhenLoadingPresets;
 
 
 };
