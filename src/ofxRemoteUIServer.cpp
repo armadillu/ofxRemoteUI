@@ -40,7 +40,7 @@
 
 #endif
 
-
+using namespace std;
 
 ofxRemoteUIServer* ofxRemoteUIServer::singleton = NULL;
 

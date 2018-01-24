@@ -99,22 +99,22 @@ public:
 	#endif
 	void close();
 
-	vector<string> loadFromXML(string fileName); //returns list of param names in current setup but not set in XML
+	vector<std::string> loadFromXML(std::string fileName); //returns list of param names in current setup but not set in XML
 
-	void saveToXML(string fileName, bool oldFormat = false); //save the whole list of params to an xml
-	void saveGroupToXML(string fileName, string groupName, bool oldFormat = false); //save only a subset of params into xml
+	void saveToXML(std::string fileName, bool oldFormat = false); //save the whole list of params to an xml
+	void saveGroupToXML(std::string fileName, std::string groupName, bool oldFormat = false); //save only a subset of params into xml
 
-	void shareParam(string paramName, float* param, float min, float max, ofColor bgColor = ofColor(0,0,0,0) );
-	void shareParam(string paramName, bool* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
-	void shareParam(string paramName, int* param, int min, int max, ofColor bgColor = ofColor(0,0,0,0) );
-	void shareParam(string paramName, string* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
-	void shareParam(string paramName, int* param, int min, int max, vector<string> names, ofColor c = ofColor(0,0,0,0)); //enum!
-	void shareParam(string paramName, int* param, int min, int max, string* names, ofColor c = ofColor(0,0,0,0)); //enum with old school string array
-	void shareParam(string paramName, unsigned char* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 );	//ofColor
+	void shareParam(std::string paramName, float* param, float min, float max, ofColor bgColor = ofColor(0,0,0,0) );
+	void shareParam(std::string paramName, bool* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
+	void shareParam(std::string paramName, int* param, int min, int max, ofColor bgColor = ofColor(0,0,0,0) );
+	void shareParam(std::string paramName, std::string* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
+	void shareParam(std::string paramName, int* param, int min, int max, vector<std::string> names, ofColor c = ofColor(0,0,0,0)); //enum!
+	void shareParam(std::string paramName, int* param, int min, int max, std::string* names, ofColor c = ofColor(0,0,0,0)); //enum with old school string array
+	void shareParam(std::string paramName, unsigned char* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 );	//ofColor
 
-	void addSpacer(string name);
+	void addSpacer(std::string name);
 
-	void setParamGroup(string g);		//set for all the upcoming params
+	void setParamGroup(std::string g);		//set for all the upcoming params
 
 	void setNewParamColor(int num); //randomly sets a new param color for all upcoming params
 	void setNewParamColorVariation(bool dontChangeVariation = false); //set a slight change to the new param, inside the same group hue
@@ -141,20 +141,21 @@ public:
 	void setSaveToXMLOnExit(bool save){saveToXmlOnExit = save;};
 	void setDrawsNotificationsAutomaticallly(bool draw){drawNotifications = draw;}
 	void setShowUIDuringEdits(bool s){showUIduringEdits = s;} 
-	void setNetworkInterface(const string & iface){userSuppliedNetInterface = iface;}
+	void setNetworkInterface(const std::string & iface){userSuppliedNetInterface = iface;}
 	void pushParamsToClient(); //pushes all param values to client, updating its UI
 	void sendLogToClient(const char* format, ...);
-	void sendLogToClient(const string & message);
+	void sendLogToClient(const std::string & message);
     void sendMessage(ofxOscMessage m);
 	void setClearXMLonSave(bool clear){clearXmlOnSaving = clear;} //this only affects xml v1 - not relevant nowadays
-	void setDirectoryPrefix(const string & _directoryPrefix); // set the optional directory prefix
+	void setDirectoryPrefix(const std::string & _directoryPrefix); // set the optional directory prefix
 
-	void removeParamFromDB(const string & paramName);	//useful for params its value is kinda set and will not change,
+	void removeParamFromDB(const std::string & paramName);	//useful for params its value is kinda set and will not change,
 												//to load from xml and then remove from the list to
 												//avoid crowding the UI too much
 
-	void watchParamOnScreen(const string& paramName);
-	void removeParamWatch(const string& paramName);
+
+	void watchParamOnScreen(const std::string& paramName);
+	void removeParamWatch(const std::string& paramName);
 	void removeAllParamWatches();
 
 	void setShowInterfaceKey(char key){showInterfaceKey = key;};
@@ -166,21 +167,21 @@ public:
 
 	void drawUiWithBitmapFont();
 	#ifdef USE_OFX_FONTSTASH
-	void drawUiWithFontStash(string fontPath, float fontSize = 15 /*good with veraMono*/ );
+	void drawUiWithFontStash(std::string fontPath, float fontSize = 15 /*good with veraMono*/ );
 	ofxFontStash & getFont(){return font;}
 	#endif
 
 	#if defined(USE_OFX_FONTSTASH2)
-	void drawUiWithFontStash2(string fontPath, float fontSize = 15.0f /*good with VeraMonoBold*/);
+	void drawUiWithFontStash2(std::string fontPath, float fontSize = 15.0f /*good with VeraMonoBold*/);
 	ofxFontStash2::Fonts & getFont2(){return font2;}
 	#endif
 
 	bool builtInClientIsVisible(){return showUI;}
 	
 	//get host info
-	string getComputerIP(){return computerIP;}
-	string getComputerName(){return computerName;}
-	string getBinaryName(){return binaryName;}
+	std::string getComputerIP(){return computerIP;}
+	std::string getComputerName(){return computerName;}
+	std::string getBinaryName(){return binaryName;}
     
     
 #ifdef OF_AVAILABLE
@@ -211,10 +212,10 @@ public:
 	//These are used to monitor on screen any value you need; similar to watchParam
 	//WARNING - make sure the pointer you provide is VALID during the whole program duration
 	//or you will crash!
-	void addVariableWatch(const string & varName, float* varPtr, ofColor c = ofColor(0,0,0,0));
-	void addVariableWatch(const string & varName, int* varPtr, ofColor c = ofColor(0,0,0,0));
-	void addVariableWatch(const string & varName, bool* varPtr, ofColor c = ofColor(0,0,0,0));
-	//void removeVariableWatch(const string &varName);
+	void addVariableWatch(const std::string & varName, float* varPtr, ofColor c = ofColor(0,0,0,0));
+	void addVariableWatch(const std::string & varName, int* varPtr, ofColor c = ofColor(0,0,0,0));
+	void addVariableWatch(const std::string & varName, bool* varPtr, ofColor c = ofColor(0,0,0,0));
+	//void removeVariableWatch(const std::string &varName);
 
 #ifdef RUI_WEB_INTERFACE
     // WebSocket Events
@@ -236,42 +237,42 @@ protected:
 		int numFloats, numInts, numStrings, numBools, numEnums, numColors;
 	};
 
-	vector<string> loadFromXMLv1(string fileName); //returns list of param names in current setup but not set in XML
+	vector<std::string> loadFromXMLv1(std::string fileName); //returns list of param names in current setup but not set in XML
 	#ifdef OF_AVAILABLE
-	vector<string> loadFromXMLv2(string fileName); //returns list of param names in current setup but not set in XML
+	vector<std::string> loadFromXMLv2(std::string fileName); //returns list of param names in current setup but not set in XML
 	#endif
 
-	void			saveToXMLv1(string fileName); //save the whole list of params to an xml
+	void			saveToXMLv1(std::string fileName); //save the whole list of params to an xml
 	#ifdef OF_AVAILABLE
-	void			saveToXMLv2(string fileName, string group); //save the whole list of params to an xml
+	void			saveToXMLv2(std::string fileName, std::string group); //save the whole list of params to an xml
 	#endif
 
-	void			saveGroupToXMLv1(string fileName, string groupName); //save only a subset of params into xml
+	void			saveGroupToXMLv1(std::string fileName, std::string groupName); //save only a subset of params into xml
 
 	void			onShowParamUpdateNotification(ScreenNotifArg& a);
 
 	void			restoreAllParamsToInitialXML();
 	void			restoreAllParamsToDefaultValues();
-	void			connect(string address, int port);
+	void			connect(std::string address, int port);
 	void			setColorForParam(RemoteUIParam &p, ofColor c);
-	vector<string>	getAvailablePresets(bool onlyGlobal = false); //all, including group presets! group presets have group/presetName name pattern
-	vector<string>	getAvailablePresetsForGroup(string group);
+	vector<std::string>	getAvailablePresets(bool onlyGlobal = false); //all, including group presets! group presets have group/presetName name pattern
+	vector<std::string>	getAvailablePresetsForGroup(std::string group);
 
-	void			deletePreset(string name, string group=""); //if group is not "", then this is a global preset. otherwise its a group preset
+	void			deletePreset(std::string name, std::string group=""); //if group is not "", then this is a global preset. otherwise its a group preset
 	void			updateServer(float dt);
 	void			handleBroadcast();
 	void			(*callBack)(RemoteUIServerCallBackArg);
 	void			threadedFunction();
 
-	void			saveParamToXmlSettings(const RemoteUIParam & p, string key, ofxXmlSettings & s, XmlCounter & counter);
+	void			saveParamToXmlSettings(const RemoteUIParam & p, std::string key, ofxXmlSettings & s, XmlCounter & counter);
 	#ifdef OF_AVAILABLE
-	void			saveParamToXmlSettings(const RemoteUIParam & p, string key, ofXmlObject & s, int index, bool active);
+	void			saveParamToXmlSettings(const RemoteUIParam & p, std::string key, ofXmlObject & s, int index, bool active);
 	#endif
 	void			saveSettingsBackup();
 
-	void 			addParamToDB(const RemoteUIParam & p, string thisParamName);
+	void 			addParamToDB(const RemoteUIParam & p, std::string thisParamName);
 
-	string 			getFinalPath(const string &);
+	std::string 			getFinalPath(const std::string &);
 
 	vector<ofColor> colorTables;
 	int				colorTableIndex;
@@ -281,17 +282,17 @@ protected:
 	ofColor			paramColorCurrentVariation; //a small hue change from the master hue for the current group
 	int				newColorInGroupCounter;
 
-	string			upcomingGroup;
+	std::string			upcomingGroup;
 	ofxOscSender	broadcastSender;
 	float			broadcastTime;
 	int				broadcastCount;
 	bool			portIsSet;
 
-	string			computerName;
-	string			binaryName;
-	string			computerIP;
+	std::string			computerName;
+	std::string			binaryName;
+	std::string			computerIP;
 
-	string			directoryPrefix; // the optional directory prefix where we should store data
+	std::string			directoryPrefix; // the optional directory prefix where we should store data
 
 
 	bool			doBroadcast; //controls if the server advertises itself
@@ -312,7 +313,7 @@ protected:
 
 	bool			autoDraw;
 
-	vector			<string> paramsToWatch;
+	vector			<std::string> paramsToWatch;
 
 #ifdef OF_AVAILABLE
 	
@@ -325,11 +326,11 @@ protected:
 	ofVboMesh												uiLines;
 	ofxRemoteUISimpleNotifications							onScreenNotifications;
 
-	vector<string>											presetsCached; //for the built in client
-	unordered_map<string, vector<string> > 					groupPresetsCached;
+	vector<std::string>											presetsCached; //for the built in client
+	unordered_map<std::string, vector<std::string> > 					groupPresetsCached;
 	int 													selectedGroupPreset;
 	int 													selectedPreset;
-	string													lastChosenPreset;
+	std::string													lastChosenPreset;
 	float													uiColumnWidth;
 	float													uiAlpha;
 	float													uiScale;
@@ -348,24 +349,24 @@ protected:
 
 	#ifdef USE_OFX_FONTSTASH
 	ofxFontStash											font;
-	string													fontFile;
+	std::string													fontFile;
 	float													fontSize;
 	#endif
 
 	#ifdef USE_OFX_FONTSTASH2
-	string 													fontStashFile2;
+	std::string 													fontStashFile2;
 	ofxFontStash2::Fonts									font2;
 	float													fontSize2;
 	#endif
 
 	bool													headlessMode;
-	string													dataPath;
+	std::string													dataPath;
 
 	void			refreshPresetsCache();
-	void			drawString(const string & text, const float & x, const float & y);
-	void			drawString(const string & text, const ofVec2f & pos);
+	void			drawString(const std::string & text, const float & x, const float & y);
+	void			drawString(const std::string & text, const ofVec2f & pos);
 
-	string 			cleanCharsForFileSystem(const string & s);
+	std::string 			cleanCharsForFileSystem(const std::string & s);
 	const float 											ruiLineH = 20;
 	float 													lineH = ruiLineH;
 	float													charW = 8;
@@ -382,7 +383,7 @@ protected:
     int     wsPort;
     class mutex    wsDequeMut;
     ofxOscMessage  jsonToOsc(Json::Value json);
-    string         oscToJson(ofxOscMessage m);
+    std::string         oscToJson(ofxOscMessage m);
     ofxLibwebsockets::Server wsServer;
 #endif
     
@@ -396,10 +397,10 @@ protected:
     
 
 	//keep track of params we added and then removed
-	unordered_map<string, RemoteUIParam>				params_removed;
-	unordered_map<int, string>							orderedKeys_removed; // used to keep the order in which the params were added
+	unordered_map<std::string, RemoteUIParam>				params_removed;
+	unordered_map<int, std::string>							orderedKeys_removed; // used to keep the order in which the params were added
 
-	map<string, RemoteUIServerValueWatch> 				varWatches;
+	map<std::string, RemoteUIServerValueWatch> 				varWatches;
 
 	static ofxRemoteUIServer* 							singleton;
 
