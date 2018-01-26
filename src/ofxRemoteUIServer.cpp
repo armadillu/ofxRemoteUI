@@ -40,7 +40,7 @@
 
 #endif
 
-
+using namespace std;
 
 ofxRemoteUIServer* ofxRemoteUIServer::singleton = NULL;
 
@@ -599,6 +599,12 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 		string paramName = s.getAttribute("name");
 		string type = s.getAttribute("type");
 		bool inactive = s.getAttribute("disabled") == "1";
+		if (std::find(paramsToIgnoreWhenLoadingPresets.begin(), paramsToIgnoreWhenLoadingPresets.end(), paramName) !=
+			paramsToIgnoreWhenLoadingPresets.end()){
+			RLOG_NOTICE << "Ignoring the param \"" << paramName << "\" defined in preset because its in the ignore list.";
+			s.setToParent();
+			continue;
+		}
 
 		unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
 		bool isAParamWeKnowOf = it != params.end();
@@ -2724,6 +2730,16 @@ void ofxRemoteUIServer::addVariableWatch(const string & varName, float* varPtr, 
 	w.color = c;
 	varWatches[varName] = w;
 	RLOG_NOTICE << "addVariableWatch() - added a watch for var named \"" << varName << "\"";
+}
+
+
+void ofxRemoteUIServer::addParamToPresetLoadIgnoreList(const std::string & param){
+	paramsToIgnoreWhenLoadingPresets.push_back(param);
+}
+
+
+void ofxRemoteUIServer::clearParamToPresetLoadIgnoreList(){
+	paramsToIgnoreWhenLoadingPresets.clear();
 }
 
 
