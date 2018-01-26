@@ -402,6 +402,7 @@ void ofxRemoteUIClient::fillPresetListFromMessage(ofxOscMessage m){
 	for(int i = 0; i < n; i++){
 		presetNames.push_back( m.getArgAsString(i));
 	}
+	std::sort(presetNames.begin(), presetNames.end());
 }
 
 
