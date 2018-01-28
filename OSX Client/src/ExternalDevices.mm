@@ -274,7 +274,7 @@ float convertHueToMidiFigtherHue(float hue){
 	}
 }
 
-
+#pragma mark MIDI_RX
 - (void) receivedMIDI:(NSArray *)a fromNode:(VVMIDINode *)n	{
 
 	if(!client->isReadyToSend()) return;
@@ -284,17 +284,51 @@ float convertHueToMidiFigtherHue(float hue){
 
 	while (msgPtr = [it nextObject]){
 		Byte b = [msgPtr type];
-		//only slider type , noteOn and noteOff
+		//only some msg types matter , noteOn and noteOff
 		bool slider = ( b >= 0xb0 && b <= 0xbF );
 		bool noteOff = ( b >= 0x80 && b <= 0x8F );
 		bool noteOn = ( b >= 0x90 && b <= 0x9F );
+		bool sysEx = (b == 0xF0);
+		bool isMidiFighterHighRes = false;
+		int channel;
+		int knobID;
+		float value;
 
-		if( slider || noteOff || noteOn ) {
+		if(sysEx){ //look for special midifighter twister firmware with 14bit encoded knob data through sysEx https://github.com/armadillu/Midi_Fighter_Twister_Open_Source
+			NSMutableArray * sysData = [msgPtr sysexArray];
+			if([sysData count] == 8){
+				int manufact1 = [[sysData objectAtIndex:1] intValue];
+				int manufact2 = [[sysData objectAtIndex:2] intValue];
+				if(manufact1 == 1 && manufact2 == 121){ //dj techtools
+					int command = [[sysData objectAtIndex:3] intValue];
+					if(command == 6){ //high res knob data see https://github.com/armadillu/Midi_Fighter_Twister_Open_Source
+						isMidiFighterHighRes = true;
+						channel = [[sysData objectAtIndex:4] intValue];
+						knobID = [[sysData objectAtIndex:5] intValue];
+						unsigned char knobDataMSB = [[sysData objectAtIndex:6] intValue];
+						unsigned char knobDataLSB = [[sysData objectAtIndex:7] intValue];
+
+						//we get 2 x 7bit values in 2 x 8bit chars to represent 14bit value with a max val of 16383
+						unsigned int knobVal = ((knobDataMSB & 0x7f) << 7 ) | (knobDataLSB & 0x7f);
+						value = knobVal / float(16383);
+
+						//NSLog(@"chan:%d knobID:%d lsb:%d msb:%d val: %d", channel, knobID, knobDataMSB, knobDataLSB, knobVal);
+					}
+				}
+			}
+		}
+
+		if( slider || noteOff || noteOn || isMidiFighterHighRes ) {
 
 			//NSLog(@"%@ %f", [msgPtr description], [msgPtr doubleValue]);
+			if(!isMidiFighterHighRes){
+				channel = [msgPtr channel];
+				knobID = [msgPtr data1];
+				value = [msgPtr doubleValue];
+			}
 			string desc = [[[n deviceName] stringByReplacingOccurrencesOfString:@" " withString:@"_"] UTF8String];
-			string channel = [ [NSString stringWithFormat:@"[%d#%d]", [msgPtr data1], [msgPtr channel]] UTF8String];
-			string controllerUniqueAddress = channel + "@" + desc;
+			string channelStr = [ [NSString stringWithFormat:@"[%d#%d]", knobID, channel] UTF8String];
+			string controllerUniqueAddress = channelStr + "@" + desc;
 
 			if( upcomingDeviceParam == nil ){ //we are not setting a midi binding
 
@@ -307,30 +341,29 @@ float convertHueToMidiFigtherHue(float hue){
 					}else{
 						ParamUI * item = widgets->at(paramName);
 						RemoteUIParam p = client->getParamForName(paramName);
-						float val = [msgPtr doubleValue];
 
-						if(slider){ //control type midi msg (slider)
+						if(slider || isMidiFighterHighRes){ //control type midi msg (slider)
 							switch(p.type){
 								case REMOTEUI_PARAM_BOOL:
-									p.boolVal = val > 0.5f;
+									p.boolVal = value > 0.5f;
 									break;
 								case REMOTEUI_PARAM_FLOAT:
-									p.floatVal = p.minFloat + (p.maxFloat - p.minFloat) * val;
+									p.floatVal = p.minFloat + (p.maxFloat - p.minFloat) * value;
 									break;
 								case REMOTEUI_PARAM_ENUM:
 								case REMOTEUI_PARAM_INT:{
-									p.intVal = round(p.minInt + (p.maxInt - p.minInt) * val);
+									p.intVal = round(p.minInt + (p.maxInt - p.minInt) * value);
 									}break;
 								case REMOTEUI_PARAM_COLOR:{
 									if(knobColorAffectsAlpha){
-										p.alphaVal = val * 255;
+										p.alphaVal = value * 255;
 
 									}else{
 										NSColor * c = [NSColor colorWithSRGBRed:p.redVal/255.0f green:p.greenVal/255.0f blue:p.blueVal/255.0f alpha:p.alphaVal/255.0f];
 										float sat = [c saturationComponent];
 										float bri = [c brightnessComponent];
 										float a = [c alphaComponent];
-										NSColor * c2 = [NSColor colorWithSRGBRed:val saturation:sat brightness:bri alpha:a];
+										NSColor * c2 = [NSColor colorWithSRGBRed:value saturation:sat brightness:bri alpha:a];
 										p.redVal = [c2 redComponent] * 255.0f;
 										p.greenVal = [c2 greenComponent] * 255.0f;
 										p.blueVal = [c2 blueComponent] * 255.0f;
@@ -362,7 +395,9 @@ float convertHueToMidiFigtherHue(float hue){
 				if (
 					( upcomingDeviceParam->param.type == REMOTEUI_PARAM_BOOL && (noteOn || noteOff ) ) //piano keys only for bools
 					||
-					slider //slider midi msg for any valid param
+					slider//slider midi msg for any valid param
+					||
+					isMidiFighterHighRes
 					){
 					string paramN = [upcomingDeviceParam getParamName];
 					bindingsMap[controllerUniqueAddress] = paramN;
