@@ -45,7 +45,11 @@ bool ofxRemoteUIClient::setup(string address, int port_){
 	host = address;
 	RLOG_NOTICE << "listening at port " << port + 1 << " ... " ;
 	clearOscReceiverMsgQueue();
-	oscReceiver.setup(port + 1);
+	try{
+		oscReceiver.setup(port + 1);
+	}catch(...){
+		RLOG_ERROR << "exception setting up OSC RX";
+	}
 
 	if(verbose_) RLOG_NOTICE << "connecting to " << address;
 	try{
