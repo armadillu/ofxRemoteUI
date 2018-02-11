@@ -217,6 +217,8 @@ void GetHostName(std::string& host_name);
 
 class ofxRemoteUI{
 
+friend class OscQueryServerMgr;
+
 public:
 
 	std::vector<std::string> getAllParamNamesList();
@@ -301,7 +303,7 @@ protected:
 	std::string							userSuppliedNetInterface; //store user preference on network interface to use
 
 	std::unordered_map<std::string, RemoteUIParam>		params;
-	std::map<int, std::string>							orderedKeys; // used to keep the order in which the params were added
+	std::map<int, std::string>						orderedKeys; // used to keep the order in which the params were added
 	std::vector<std::string>							presetNames;
 
 	std::vector<std::string>							paramsChangedSinceLastCheck;

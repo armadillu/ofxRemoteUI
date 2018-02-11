@@ -84,6 +84,8 @@ class ofxRemoteUIServer: public ofxRemoteUI
 #endif
 {
 
+friend class OscQueryServerMgr;
+
 public:
 
 	static ofxRemoteUIServer* instance();
