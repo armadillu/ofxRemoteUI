@@ -93,6 +93,7 @@ float convertHueToMidiFigtherHue(float hue){
 
 //midi setup delegate
 - (void) setupChanged{
+	NSLog(@"setupChanged: Midi Device connected/disconnected!");
 	[self updateDevicesWithClientValues:FALSE resetToZero:FALSE paramName:""];
 }
 
@@ -137,7 +138,8 @@ float convertHueToMidiFigtherHue(float hue){
 							if(!reset){
 								switch(p.type){
 									case REMOTEUI_PARAM_BOOL:
-										if(p.boolVal) value = 127; break;
+										if(p.boolVal) value = 127/2 + 3;
+										else value = 127/2 - 3; break;
 									case REMOTEUI_PARAM_FLOAT:
 										value = valMap(p.floatVal, p.minFloat, p.maxFloat, 0, 127);
 										break;
@@ -165,6 +167,7 @@ float convertHueToMidiFigtherHue(float hue){
 							[msg setData2:(unsigned char)(value)]; //value
 							[device sendMsg:msg];
 
+							//NSLog(@"sending %s update", paramName.c_str());
 							//set param highlight color to match midiFigtherTwister color //TODO make UI to toggle this behavior!
 							if(p.type != REMOTEUI_PARAM_COLOR){
 								NSColor * paramColor = [NSColor colorWithSRGBRed:p.r/255.0f green:p.g/255.0f blue:p.b/255.0f alpha:1.0];
@@ -211,6 +214,9 @@ float convertHueToMidiFigtherHue(float hue){
 			midiOutConfig.deviceName = devNameAndAddress.substr(found + 1, devNameAndAddress.size() - found - 1);
 			int i;
 			for(i = 1; i < devNameAndAddress.size(); i++){
+				if (devNameAndAddress[i] == ':') break;
+			}
+			for(i = i + 1; i < devNameAndAddress.size(); i++){ //reading into "[ cc :nn#xx]
 				if (devNameAndAddress[i] == '#') break;
 				midiOutConfig.controlID += devNameAndAddress[i];
 			}
@@ -225,6 +231,7 @@ float convertHueToMidiFigtherHue(float hue){
 		}
 		midiOutConfig.channelInt = atoi(midiOutConfig.channel.c_str());
 		midiOutConfig.controlIDInt = atoi(midiOutConfig.controlID.c_str());
+		//NSLog(@"%s : %d %d", devNameAndAddress.c_str(), midiOutConfig.controlIDInt, midiOutConfig.channelInt);
 		midiDevCache[devNameAndAddress] = midiOutConfig;
 	}else{
 		midiOutConfig = cacheIt->second;
@@ -277,10 +284,14 @@ float convertHueToMidiFigtherHue(float hue){
 #pragma mark MIDI_RX
 - (void) receivedMIDI:(NSArray *)a fromNode:(VVMIDINode *)n	{
 
+	//NSLog(@"rx midi");
+
 	if(!client->isReadyToSend()) return;
 	
 	NSEnumerator		*it = [a objectEnumerator];
 	VVMIDIMessage		*msgPtr;
+
+	vector<string> updatedParamsThisLoop;
 
 	while (msgPtr = [it nextObject]){
 		Byte b = [msgPtr type];
@@ -326,9 +337,16 @@ float convertHueToMidiFigtherHue(float hue){
 				knobID = [msgPtr data1];
 				value = [msgPtr doubleValue];
 			}
+			//NSLog(@"_%@_ _%@_ _%@_", [n name], [n deviceName], [n fullName]);
+			string type = "??";
+			if(noteOff || noteOn) type = "note";
+			if(slider || isMidiFighterHighRes) type = "cc";
+
 			string desc = [[[n deviceName] stringByReplacingOccurrencesOfString:@" " withString:@"_"] UTF8String];
-			string channelStr = [ [NSString stringWithFormat:@"[%d#%d]", knobID, channel] UTF8String];
+			string channelStr = [[NSString stringWithFormat:@"[%s:%d#%d]", type.c_str(), knobID, channel] UTF8String];
 			string controllerUniqueAddress = channelStr + "@" + desc;
+
+			//NSLog(@"## %s ###############################################", controllerUniqueAddress.c_str());
 
 			if( upcomingDeviceParam == nil ){ //we are not setting a midi binding
 
@@ -339,6 +357,7 @@ float convertHueToMidiFigtherHue(float hue){
 					if ( it == widgets->end() ){	//not found! wtf?
 						//NSLog(@"uh? midi binding pointing to an unexisting param!");
 					}else{
+						updatedParamsThisLoop.push_back(paramName);
 						ParamUI * item = widgets->at(paramName);
 						RemoteUIParam p = client->getParamForName(paramName);
 
@@ -360,10 +379,7 @@ float convertHueToMidiFigtherHue(float hue){
 
 									}else{
 										NSColor * c = [NSColor colorWithSRGBRed:p.redVal/255.0f green:p.greenVal/255.0f blue:p.blueVal/255.0f alpha:p.alphaVal/255.0f];
-										float sat = [c saturationComponent];
-										float bri = [c brightnessComponent];
-										float a = [c alphaComponent];
-										NSColor * c2 = [NSColor colorWithSRGBRed:value saturation:sat brightness:bri alpha:a];
+										NSColor * c2 = [NSColor colorWithHue:value saturation:[c saturationComponent] brightness:[c brightnessComponent] alpha:[c alphaComponent]];
 										p.redVal = [c2 redComponent] * 255.0f;
 										p.greenVal = [c2 greenComponent] * 255.0f;
 										p.blueVal = [c2 blueComponent] * 255.0f;
@@ -376,7 +392,7 @@ float convertHueToMidiFigtherHue(float hue){
 						}else{ //must be noteOn or noteOff midi msg
 							if(p.type == REMOTEUI_PARAM_BOOL){
 								if(externalButtonsBehaveAsToggle){
-									if(noteOn){ //ignore onRelease event if we toggle
+									if(noteOn || noteOff){ //ignore onRelease event if we toggle
 										p.boolVal = !p.boolVal;
 									}
 								}else{
@@ -417,7 +433,10 @@ float convertHueToMidiFigtherHue(float hue){
 		}
 	}
 
-	[self updateDevicesWithClientValues:false resetToZero:FALSE paramName:""];
+	for(auto & pn : updatedParamsThisLoop){
+		[self updateDevicesWithClientValues:false resetToZero:FALSE paramName:pn];
+	}
+
 }
 
 
@@ -558,7 +577,7 @@ float convertHueToMidiFigtherHue(float hue){
 
 	char numstr[21]; // enough to hold all numbers up to 64-bits
 	sprintf(numstr, "%d", axisIndex);
-	string controllerAddress = "Axis_" + (string)numstr + "@" + desc;
+	string controllerAddress = "[axis_" + (string)numstr + "]@" + desc;
 
 	if( upcomingDeviceParam == nil ){ //we are not setting a midi binding
 
@@ -626,7 +645,7 @@ float convertHueToMidiFigtherHue(float hue){
 	string desc = [[[joystick productName] stringByReplacingOccurrencesOfString:@" " withString:@"_"] UTF8String];
 	char numstr[21]; // enough to hold all numbers up to 64-bits
 	sprintf(numstr, "%d", buttonIndex);
-	string controllerAddress = "Button_" + (string)numstr + "@" + desc;
+	string controllerAddress = "[btn_" + (string)numstr + "]@" + desc;
 
 	if( upcomingDeviceParam == nil ){ //we are not setting a midi binding
 
