@@ -197,6 +197,7 @@ void ofxRemoteUIServer::setNewParamColor(int num){
 
 void ofxRemoteUIServer::removeParamFromDB(const string & paramName){
 
+	dataMutex.lock();
 	unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
 
 	if (it != params.end()){
@@ -239,6 +240,7 @@ void ofxRemoteUIServer::removeParamFromDB(const string & paramName){
 	}else{
 		RLOG_ERROR << "removeParamFromDB >> trying to delete an unexistant param (" << paramName << ")" ;
 	}
+	dataMutex.unlock();
 }
 
 
@@ -479,6 +481,9 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 
 	//save all params
 	int numSaved = 0;
+
+	dataMutex.lock();
+
 	vector<string> savedParams;
 	for(int i = 0; i < orderedKeys.size(); i++){
 		string key = orderedKeys[i];
@@ -527,6 +532,7 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 			}
 		}
 	}
+	dataMutex.unlock();
 
 	s.setToParent(); //up 1 level
 	if(!savingGroupOnly){ //group presets dont embed port
@@ -591,6 +597,8 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 	s.setTo(OFXREMOTEUI_XML_TAG);
 
 	int numc = s.getNumChildren();
+
+	dataMutex.lock();
 
 	for(int i = 0; i < numc; i++){
 
@@ -755,12 +763,18 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 		}
 	}
 	loadedFromXML = true;
+
+	dataMutex.unlock();
+
 	return paramsNotInXML;
 }
 #endif
 
 
 void ofxRemoteUIServer::restoreAllParamsToInitialXML(){
+
+	dataMutex.lock();
+
 	for( unordered_map<string, RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		string key = (*ii).first;
 		if (params[key].type != REMOTEUI_PARAM_SPACER){
@@ -798,20 +812,24 @@ void ofxRemoteUIServer::restoreAllParamsToInitialXML(){
 			}
 		}
 	}
+	dataMutex.unlock();
 }
 
 void ofxRemoteUIServer::restoreAllParamsToDefaultValues(){
+	dataMutex.lock();
 	for( unordered_map<string, RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		string key = (*ii).first;
 		params[key] = paramsFromCode[key];
 		syncPointerToParam(key);
 	}
+	dataMutex.unlock();
 }
 
 void ofxRemoteUIServer::pushParamsToClient(){
 
 	vector<string>changedParams = scanForUpdatedParamsAndSync();
 	#ifdef OF_AVAILABLE
+	dataMutex.lock();
 	for(int i = 0 ; i < changedParams.size(); i++){
 		string pName = changedParams[i];
 		RemoteUIParam &p = params[pName];
@@ -823,6 +841,7 @@ void ofxRemoteUIServer::pushParamsToClient(){
 			);
 
 	}
+	dataMutex.unlock();
 	#endif
 	
 	if(readyToSend){
@@ -1069,6 +1088,13 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	setNewParamColor(1);
 	setNewParamColorVariation(true);
 	RUI_LOAD_FROM_XML(); //we load at setup time - all values are store even b4 they are defined in src!
+
+	#ifdef TARGET_OSX
+	if(oscQueryServer == nullptr){
+		oscQueryServer = new OscQueryServerMgr();
+		oscQueryServer->setup();
+	}
+	#endif
 }
 
 #ifdef OF_AVAILABLE
@@ -1082,6 +1108,12 @@ void ofxRemoteUIServer::_appExited(ofEventArgs &e){
 	}else{
 		RLOG_NOTICE << "We were supposed to Save to XML on exit, but we haven't loaded an XML yet... So not saving!";
 	}
+
+	#ifdef TARGET_OSX
+	if(oscQueryServer){
+		delete oscQueryServer;
+	}
+	#endif
 }
 
 
@@ -1102,12 +1134,14 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				string formatExt = string(saveInV1 ? "_v1" : "");
 				string groupName;
 				if (selectedItem >= 0){ //selection on params list
+					dataMutex.lock();
 					string key = orderedKeys[selectedItem];
 					RemoteUIParam &p = params[key];
 					if (p.type == REMOTEUI_PARAM_SPACER){
 						groupIsSelected = true;
 						groupName = p.group;
 					}
+					dataMutex.unlock();
 				}
 				string presetName = ofSystemTextBoxDialog(groupIsSelected ?
 														  "Create a New Group Preset For " + groupName
@@ -1165,6 +1199,7 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 			case 'N': drawNotifications ^= true; break;
 			case ' ': { //press spacebar to edit string fields! return didnt work well on windows
 				if (selectedItem >= 0) { //selection on params list
+					dataMutex.lock();
 					string key = orderedKeys[selectedItem];
 					RemoteUIParam & p = params[key];
 					if (p.type == REMOTEUI_PARAM_STRING) {
@@ -1182,10 +1217,12 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 						#endif
 						if (callBack) callBack(cbArg);
 					}
+					dataMutex.unlock();
 				}
 			}break;
 
 			case OF_KEY_RETURN:
+				dataMutex.lock();
 				if(selectedItem == -1 && selectedPreset >= 0 && presetsCached.size()){ //global presets
 					lastChosenPreset = presetsCached[selectedPreset];
 					loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + lastChosenPreset + ".xml");
@@ -1224,6 +1261,7 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 						if (selectedColorComp > 3) selectedColorComp = 0;
 					}
 				}
+				dataMutex.unlock();
 				break;
 
 			case OF_KEY_DOWN:
@@ -1246,6 +1284,7 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 			case OF_KEY_LEFT:
 			case OF_KEY_RIGHT:{
 
+				dataMutex.lock();
 				float sign = e.key == OF_KEY_RIGHT ? 1.0 : -1.0;
 				if(ofGetKeyPressed(' ')){ //hold spacebar to increment faster
 					sign *= 10;					
@@ -1311,6 +1350,7 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 						}
 					}
 				}
+				dataMutex.unlock();
 			}break;
 		}
 	}
@@ -1343,11 +1383,13 @@ void ofxRemoteUIServer::refreshPresetsCache(){
 
 	//get all group presets
 	groupPresetsCached.clear();
+	dataMutex.lock();
 	for( unordered_map<string, RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		if((*ii).second.type == REMOTEUI_PARAM_SPACER){
 			groupPresetsCached[(*ii).second.group] = getAvailablePresetsForGroup((*ii).second.group);
 		};
 	}
+	dataMutex.unlock();
 
 	presetsCached = getAvailablePresets(true);
 
@@ -1592,6 +1634,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 			ofTranslate(xOffset, 0);
 
 			//param list
+			dataMutex.lock();
 			for(int i = 0; i < orderedKeys.size(); i++){
 
 				string key = orderedKeys[i];
@@ -1700,6 +1743,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 					y = initialY;
 				}
 			}
+			dataMutex.unlock();
 			ofSetColor(32);
 			ofSetLineWidth(1);
 			uiLines.draw();
@@ -1828,6 +1872,7 @@ void ofxRemoteUIServer::handleBroadcast(){
 
 void ofxRemoteUIServer::updateServer(float dt){
 
+
 	#ifdef OF_AVAILABLE
 	onScreenNotifications.update(dt);
 	#endif
@@ -1853,7 +1898,9 @@ void ofxRemoteUIServer::updateServer(float dt){
 	#ifdef RUI_WEB_INTERFACE
     lock_guard<std::mutex> guard(wsDequeMut);
 	#endif
-    
+
+	dataMutex.lock();
+
 	while( oscReceiver.hasWaitingMessages() or wsMessages.size()){// check for waiting messages from client
 
 		ofxOscMessage m;
@@ -2077,6 +2124,8 @@ void ofxRemoteUIServer::updateServer(float dt){
 			default: RLOG_ERROR << "updateServer >> ERR!"; break;
 		}
 	}
+	dataMutex.unlock();
+
 }
 
 void ofxRemoteUIServer::deletePreset(string name, string group){
@@ -2181,14 +2230,17 @@ void ofxRemoteUIServer::setColorForParam(RemoteUIParam &p, ofColor c){
 }
 
 void ofxRemoteUIServer::watchParamOnScreen(const string & paramName){
+	dataMutex.lock();
 	if (params.find(paramName) != params.end()){
 		paramsToWatch.push_back(paramName);
 	}else{
 		RLOG_ERROR << "can't watch that param; it doesnt exist! " << paramName << endl;
 	}
+	dataMutex.unlock();
 }
 
 void ofxRemoteUIServer::removeParamWatch(const string & paramName){
+	dataMutex.lock();
 	if (params.find(paramName) != params.end()){
 		auto it = std::find(paramsToWatch.begin(), paramsToWatch.end(), paramName);
 		if(it != paramsToWatch.end()){
@@ -2200,6 +2252,7 @@ void ofxRemoteUIServer::removeParamWatch(const string & paramName){
 	}else{
 		RLOG_ERROR << "can't remove watch for that param; it doesnt exist! " << paramName;
 	}
+	dataMutex.unlock();
 }
 
 void ofxRemoteUIServer::removeAllParamWatches(){
@@ -2210,6 +2263,7 @@ void ofxRemoteUIServer::removeAllParamWatches(){
 
 void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamName){
 
+
 	if(p.type != REMOTEUI_PARAM_SPACER && params.size() == 0){ //adding first param! and its not spacer!
 		upcomingGroup = OFXREMOTEUI_DEFAULT_PARAM_GROUP;
 		newColorInGroupCounter = 1;
@@ -2219,6 +2273,7 @@ void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamNa
 	if(loadedFromXML){ //lets see if we had loaded this param from xml - will upate its values if so
 		auto it = params_removed.find(thisParamName);
 		ofxRemoteUI::addParamToDB(p, thisParamName);
+		dataMutex.lock();
 		if(it != params_removed.end()){
 			RemoteUIParam & pRem = params_removed[thisParamName];
 			RemoteUIParam & xmlP = paramsFromXML[thisParamName];
@@ -2275,10 +2330,12 @@ void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamNa
 				if (verbose_) RLOG_NOTICE << "updating value of param \"" << thisParamName << "\" according to the previously loaded XML!";
 			}
 		}
+		dataMutex.unlock();
 	}else{
 		ofxRemoteUI::addParamToDB(p, thisParamName);
 	}
 }
+
 
 void ofxRemoteUIServer::addSpacer(string title){
 	RemoteUIParam p;
@@ -2437,6 +2494,7 @@ void ofxRemoteUIServer::sendLogToClient(const string & message){
 
 void ofxRemoteUIServer::saveToXMLv1(string fileName){
 
+	dataMutex.lock();
 	saveSettingsBackup(); //every time , before we save
 
 #ifdef OF_AVAILABLE
@@ -2470,6 +2528,7 @@ void ofxRemoteUIServer::saveToXMLv1(string fileName){
 		s.setValue(OFXREMOTEUI_XML_PORT_TAG, port, 0);
 	}
 	s.saveFile(fileName);
+	dataMutex.unlock();
 }
 
 vector<string> ofxRemoteUIServer::loadFromXMLv1(string fileName){

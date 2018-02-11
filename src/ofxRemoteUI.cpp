@@ -52,18 +52,21 @@ vector<std::string> ofxRemoteUI::getPresetsList(){
 
 void ofxRemoteUI::printAllParamsDebug(){
 	if(orderedKeys.size() == 0) return;
+	dataMutex.lock();
 	cout << "#### FULL PARAM LIST ################################" << endl;
 	for(size_t i = 0; i < orderedKeys.size(); i++){
 		string key = orderedKeys[i];
 		RemoteUIParam thisP = params[key];
 		cout << "   index: " << i << "  list: " << key << " > "; thisP.print();
 	}
+	dataMutex.unlock();
 	cout << "####################################################" << endl;
 }
 
-void ofxRemoteUI::addParamToDB(const RemoteUIParam & p, std::string thisParamName){
+void ofxRemoteUI::addParamToDB(const RemoteUIParam & p, const std::string & thisParamName){
 
 	//see if we already had it, if we didnt, set its add order #
+	dataMutex.lock();
 	unordered_map<std::string, RemoteUIParam>::iterator it = params.find(thisParamName);
 	if ( it == params.end() ){	//not found!
 
@@ -75,6 +78,7 @@ void ofxRemoteUI::addParamToDB(const RemoteUIParam & p, std::string thisParamNam
 		RLOG_ERROR << "already have a Param with that name on the DB : '" << thisParamName << "'. Ignoring it!";
 		//params[thisParamName] = p;
 	}
+	dataMutex.unlock();
 }
 
 
@@ -306,8 +310,10 @@ void ofxRemoteUI::updateParamFromDecodedMessage(const ofxOscMessage & m, Decoded
 		case INT_ARG:
 			p.type = REMOTEUI_PARAM_INT;
 			p.intVal = m.getArgAsInt32(arg); arg++;
-			p.minInt = m.getArgAsInt32(arg); arg++;
-			p.maxInt = m.getArgAsInt32(arg); arg++;
+			if(m.getNumArgs() > 1){
+				p.minInt = m.getArgAsInt32(arg); arg++;
+				p.maxInt = m.getArgAsInt32(arg); arg++;
+			}
 			if (p.intValAddr){
 				*p.intValAddr = p.intVal;
 			}break;
@@ -328,8 +334,10 @@ void ofxRemoteUI::updateParamFromDecodedMessage(const ofxOscMessage & m, Decoded
 		case ENUM_ARG:{
 			p.type = REMOTEUI_PARAM_ENUM;
 			p.intVal = m.getArgAsInt32(arg); arg++;
-			p.minInt = m.getArgAsInt32(arg); arg++;
-			p.maxInt = m.getArgAsInt32(arg); arg++;
+			if(m.getNumArgs() > 1){
+				p.minInt = m.getArgAsInt32(arg); arg++;
+				p.maxInt = m.getArgAsInt32(arg); arg++;
+			}
 			if (p.intValAddr){
 				*p.intValAddr = p.intVal;
 			}
@@ -393,10 +401,12 @@ vector<std::string> ofxRemoteUI::getAllParamNamesList(){
 
 	vector<std::string>paramsList;
 	//get list of params in add order
+	dataMutex.lock();
 	for( map<int,std::string>::iterator ii = orderedKeys.begin(); ii != orderedKeys.end(); ++ii ){
 		std::string paramName = (*ii).second;
 		paramsList.push_back(paramName);
 	}
+	dataMutex.unlock();
 	return paramsList;
 }
 
@@ -405,6 +415,7 @@ vector<std::string> ofxRemoteUI::scanForUpdatedParamsAndSync(){
 
 	vector<std::string>paramsPendingUpdate;
 
+	dataMutex.lock();
 	for( unordered_map<std::string, RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 
 		RemoteUIParam p = (*ii).second;
@@ -413,12 +424,14 @@ vector<std::string> ofxRemoteUI::scanForUpdatedParamsAndSync(){
 			syncParamToPointer((*ii).first);
 		}
 	}
+	dataMutex.unlock();
 	return paramsPendingUpdate;
 }
 
 
 void ofxRemoteUI::sendUpdateForParamsInList(vector<std::string>list){
 
+	dataMutex.lock();
 	for(size_t i = 0; i < list.size(); i++){
 		std::string name = list[i];
 		unordered_map<std::string, RemoteUIParam>::const_iterator it = params.find(name);
@@ -430,21 +443,26 @@ void ofxRemoteUI::sendUpdateForParamsInList(vector<std::string>list){
 			RLOG_ERROR << "param not found?!";
 		}
 	}
+	dataMutex.unlock();
 }
 
 void ofxRemoteUI::syncAllParamsToPointers(){
+	dataMutex.lock();
 	for( unordered_map<std::string, RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		syncParamToPointer( (*ii).first );
 	}
+	dataMutex.unlock();
 }
 
 void ofxRemoteUI::syncAllPointersToParams(){
+	dataMutex.lock();
 	for( unordered_map<std::string, RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
 		syncPointerToParam( (*ii).first );
 	}
+	dataMutex.unlock();
 }
 
-void ofxRemoteUI::syncPointerToParam(std::string paramName){
+void ofxRemoteUI::syncPointerToParam(const std::string & paramName){
 
 	RemoteUIParam &p = params[paramName];
 
@@ -483,7 +501,7 @@ void ofxRemoteUI::syncPointerToParam(std::string paramName){
 }
 
 
-void ofxRemoteUI::syncParamToPointer(std::string paramName){
+void ofxRemoteUI::syncParamToPointer(const std::string & paramName){
 
 	RemoteUIParam & p = params[paramName];
 
@@ -580,24 +598,28 @@ std::string ofxRemoteUI::stringForParamType(RemoteUIParamType t){
 }
 
 
-bool ofxRemoteUI::paramExistsForName(std::string paramName){
+bool ofxRemoteUI::paramExistsForName(const std::string & paramName){
+	dataMutex.lock();
 	unordered_map<std::string, RemoteUIParam>::iterator it = params.find(paramName);
+	dataMutex.unlock();
 	return  it != params.end();
 }
 
-RemoteUIParam ofxRemoteUI::getParamForName(std::string paramName){
+RemoteUIParam ofxRemoteUI::getParamForName(const std::string & paramName){
 
 	RemoteUIParam p;
+	dataMutex.lock();
 	unordered_map<std::string, RemoteUIParam>::iterator it = params.find(paramName);
 	if ( it != params.end() ){	// found!
 		p = params[paramName];
 	}else{
 		RLOG_ERROR << "getParamForName >> param " + paramName + " not found!";
 	}
+	dataMutex.unlock();
 	return p;
 }
 
-RemoteUIParam& ofxRemoteUI::getParamRefForName(std::string paramName){
+RemoteUIParam& ofxRemoteUI::getParamRefForName(const std::string & paramName){
 	unordered_map<std::string, RemoteUIParam>::iterator it = params.find(paramName);
 	if ( it != params.end() ){	// found!
 		return params[paramName];
@@ -607,8 +629,8 @@ RemoteUIParam& ofxRemoteUI::getParamRefForName(std::string paramName){
 	return nullParam;
 }
 
-std::string ofxRemoteUI::getValuesAsString(vector<std::string>paramList){
-	stringstream out;
+std::string ofxRemoteUI::getValuesAsString(const vector<std::string> & paramList){
+	std::stringstream out;
 	map<int,std::string>::iterator it = orderedKeys.begin();
 	while( it != orderedKeys.end() ){
 		std::string pname = it->second;
@@ -634,7 +656,7 @@ std::string ofxRemoteUI::getValuesAsString(vector<std::string>paramList){
 }
 
 
-void ofxRemoteUI::setValuesFromString( std::string values ){
+void ofxRemoteUI::setValuesFromString( const std::string & values ){
 
 	stringstream in(values);
 	std::string name, value;
@@ -643,6 +665,8 @@ void ofxRemoteUI::setValuesFromString( std::string values ){
 	while( !in.eof() ){
 		getline( in, name, '=' );
 		getline( in, value, '\n' );
+
+		dataMutex.lock();
 
 		if( params.find( name ) != params.end() ){
 			RemoteUIParam param = params[name];
@@ -676,6 +700,7 @@ void ofxRemoteUI::setValuesFromString( std::string values ){
 					paramsChangedSinceLastCheck.push_back(name);
 				}
 			}
+			dataMutex.unlock();
 		}else{
 			if(name.size()){
 				RLOG_NOTICE << "unknown param name; ignoring (" << name << ")";
@@ -685,6 +710,7 @@ void ofxRemoteUI::setValuesFromString( std::string values ){
 
 	vector<std::string>::iterator it = changedParam.begin();
 	while( it != changedParam.end() ){
+		dataMutex.lock();
 		if ( params.find( *it ) != params.end()){
 			RemoteUIParam param = params[*it];
 			sendUntrackedParamUpdate(param, *it);
@@ -697,6 +723,7 @@ void ofxRemoteUI::setValuesFromString( std::string values ){
 			ofNotifyEvent(eventShowParamUpdateNotification, arg, this);
 			#endif
 		}
+		dataMutex.unlock();
 		it++;
 	}
 }

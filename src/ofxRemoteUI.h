@@ -223,13 +223,13 @@ public:
 
 	std::vector<std::string> getAllParamNamesList();
 	std::vector<std::string> getChangedParamsList(); //in user add order
-	RemoteUIParam getParamForName(std::string paramName);
-	RemoteUIParam& getParamRefForName(std::string paramName); //careful with this!
-	bool paramExistsForName(std::string paramName);
+	RemoteUIParam getParamForName(const std::string & paramName);
+	RemoteUIParam& getParamRefForName(const std::string & paramName); //careful with this!
+	bool paramExistsForName(const std::string & paramName);
 	std::vector<std::string> getPresetsList();
 
-	std::string getValuesAsString(std::vector<std::string>paramList = std::vector<std::string>()); //supply param list to get only those, supply empty list to get all params
-	void setValuesFromString(std::string values);
+	std::string getValuesAsString(const std::vector<std::string> & paramList = std::vector<std::string>()); //supply param list to get only those, supply empty list to get all params
+	void setValuesFromString(const std::string & values);
 
 	virtual void restoreAllParamsToInitialXML() = 0;	//call this on client to request server to do so
 	virtual void restoreAllParamsToDefaultValues() = 0;
@@ -241,6 +241,8 @@ public:
 	virtual void sendUntrackedParamUpdate(RemoteUIParam p, std::string paramName){};
 
 	std::string getMyIP(std::string userChosenInteface, std::string & subnetMask);
+
+	std::recursive_mutex & getDataMutex(){return dataMutex;}
 
 protected:
 
@@ -257,9 +259,9 @@ protected:
 	void updateParamFromDecodedMessage(const ofxOscMessage & m, DecodedMessage dm);
 	void syncAllParamsToPointers();
 	void syncAllPointersToParams();
-	void syncParamToPointer(std::string paramName); //copies the param0s pointer value over the value
-	void syncPointerToParam(std::string paramName); //the other way around
-	void addParamToDB(const RemoteUIParam & p, std::string paramName);
+	void syncParamToPointer(const std::string & paramName); //copies the param0s pointer value over the value
+	void syncPointerToParam(const std::string & paramName); //the other way around
+	void addParamToDB(const RemoteUIParam & p, const std::string & paramName);
 
 	void clearOscReceiverMsgQueue();
 
@@ -322,6 +324,9 @@ protected:
 	ofFastEvent<ScreenNotifArg> eventShowParamUpdateNotification; //this is a horrible hack to be able to show
 	#endif
 															//screen notifications on the server triggered from the supper class
+
+	std::recursive_mutex dataMutex;
+
 private:
 
 	std::string stringForParamType(RemoteUIParamType t);

@@ -18,8 +18,14 @@
 #include <map>
 #include <set>
 #include <vector>
-#include "ofxRemoteUISimpleNotifications.h"
 #include "ofxRemoteUIServerMacros.h"
+#ifdef OF_AVAILABLE
+	#include "ofxRemoteUISimpleNotifications.h"
+	#ifdef TARGET_OSX
+		#include "OscQueryServerMgr.h"
+	#endif
+#endif
+
 
 // ofxFontStash ///////////////////////////////////////////////////////////////////////////////////
 
@@ -377,6 +383,14 @@ protected:
 	float 													lineH = ruiLineH;
 	float													charW = 8;
 
+	#ifdef TARGET_OSX
+	//this is OSX only as it relies on Bonjour advertizing for it to work with Vezér
+	//windows possible but will require additional installs/libs so on hold for now
+	OscQueryServerMgr *	oscQueryServer = nullptr;
+										//this allows any other app getting a proper list of all the parameters available
+										//https://imimot.com/help/vezer/osc-track-extras/#osc-query-server-support
+										//follows https://github.com/mrRay/OSCQueryProposal
+	#endif
 #endif
 
     //---WebSockets---

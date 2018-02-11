@@ -23,6 +23,7 @@
 
 
 class ofxRemoteUIWebServer : Poco::Util::ServerApplication {
+
 private:
     class RUIRequestHandler : public Poco::Net::HTTPRequestHandler {
         virtual void handleRequest(Poco::Net::HTTPServerRequest &req,
