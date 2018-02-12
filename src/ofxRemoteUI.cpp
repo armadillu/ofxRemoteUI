@@ -110,7 +110,10 @@ DecodedMessage ofxRemoteUI::decode(const ofxOscMessage & m){
 			msgAddress = msgAddress.substr(1, msgAddress.size() - 1);
 		}
 		//allow address to use the standard style /SEND/FLT/paramName instead of the legacy "SEND FLT paramName"
-		ofStringReplace(msgAddress, "/", " ");
+		//allow /bbb/jjj/ syntax, but convert to space-based to avoid changing all the internal logic
+		for(int i = 0; i < msgAddress.size(); i++){
+			if(msgAddress[i] == '/') msgAddress[i] = ' ';
+		}
 	}
 	std::string action = msgAddress.substr(0, 4);
 
@@ -324,12 +327,15 @@ void ofxRemoteUI::updateParamFromDecodedMessage(const ofxOscMessage & m, Decoded
 		case COLOR_ARG:
 			p.type = REMOTEUI_PARAM_COLOR;
 			if(m.getNumArgs() == 1){ //hex rgba encoded in one single int - vezér style
+				#ifdef OF_AVAILABLE
 				std::uint32_t rgba = m.getArgAsRgbaColor(arg); arg++;
+				#else
+				std::uint32_t rgba = m.getArgAsInt32(arg); arg++;
+				#endif
 				p.redVal = (rgba & 0xFF000000) >> 24;
 				p.greenVal = (rgba & 0x00FF0000) >> 16;
 				p.blueVal = (rgba & 0x0000FF00) >> 8;
 				p.alphaVal = (rgba & 0x000000FF);
-				ofLogNotice() << p.getInfoAsString();
 			}else{ //legacy ofxRemoteUI
 				p.redVal = (int)m.getArgAsInt32(arg); arg++;
 				p.greenVal = (int)m.getArgAsInt32(arg); arg++;
