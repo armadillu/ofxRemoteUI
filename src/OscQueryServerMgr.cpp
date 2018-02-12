@@ -65,7 +65,6 @@ ofJson OscQueryServerMgr::buildJSON(){
 
 	string currentParam = "unGrouped";
 	for(auto it : keys){
-		ofLogNotice() << "key: " << it.second;
 		const std::string & paramName = it.second;
 		const RemoteUIParam & param = params.at(paramName);
 		if(param.type == REMOTEUI_PARAM_SPACER){
@@ -74,7 +73,7 @@ ofJson OscQueryServerMgr::buildJSON(){
 		}
 		if(param.type == REMOTEUI_PARAM_FLOAT || param.type == REMOTEUI_PARAM_INT ||
 		   param.type == REMOTEUI_PARAM_ENUM || param.type == REMOTEUI_PARAM_BOOL ||
-		   param.type == REMOTEUI_PARAM_COLOR){
+		   param.type == REMOTEUI_PARAM_COLOR || param.type == REMOTEUI_PARAM_STRING){
 			paramsByGroup[currentParam].push_back(paramName);
 		}
 	}
@@ -97,16 +96,12 @@ ofJson OscQueryServerMgr::buildJSON(){
 			if(param.type == REMOTEUI_PARAM_ENUM) addEnumParam(paramName, param, group[paramName]);
 			if(param.type == REMOTEUI_PARAM_BOOL) addBoolParam(paramName, param, group[paramName]);
 			if(param.type == REMOTEUI_PARAM_COLOR) addColorParam(paramName, param, group[paramName]);
+			if(param.type == REMOTEUI_PARAM_STRING) addStringParam(paramName, param, group[paramName]);
 		}
 	}
 
 	((ofxRemoteUI*)s)->getDataMutex().unlock();
 	return root;
-}
-
-
-void OscQueryServerMgr::addGroup(const string & gName, ofJson & json){
-
 }
 
 
@@ -171,21 +166,36 @@ void OscQueryServerMgr::addColorParam(const string & paramName, const RemoteUIPa
 	json["RANGE"][0]["MIN"] = 0;
 	json["TAGS"] = {"ofColor input"};
 	json["TYPE"] = "r";
-	json["UNIT"][0] = "color.rgba8";
+	//json["UNIT"][0] = "color.rgba8";
+}
+
+void OscQueryServerMgr::addStringParam(const string & paramName, const RemoteUIParam & p, ofJson & json){
+	json["ACCESS"] = 3;
+	json["CONTENTS"] = ofJson::object();
+	json["DESCRIPTION"] = paramName + " string parameter";
+	json["FULL_PATH"] = "/SEND/STR/" + paramName + " <\"newValue\">";
+	json["TAGS"] = {"ofColor input"};
+	json["TYPE"] = "s";
 }
 
 
 void OscQueryServerMgr::threadedFunction(){
 
-	ofxRemoteUIServer * s = RUI_GET_INSTANCE();
-	string IP = s->getComputerIP();
-	string serverName = s->getBinaryName() + "@" + s->getComputerName();
-	//string command = "dns-sd -P ofxRemoteUI _oscjson._tcp. local 3333 armadillu.local 192.168.5.30"
-	string command = "dns-sd -P ofxRemoteUI _oscjson._tcp. local " + ofToString(OSC_QUERY_SERVER_PORT) + " ofxRemoteUI.local " + IP;
-	//string ret = ofSystem(command);
-	//ofLogNotice() << ret;
+	//first off, kill any other old "dns-sd" process instances.
+	//this is necessary (and dodgy) bc the way this works, it spawns a "dns-sd" process to handle the
+	//bonjour advertising. This is a secondary process; if for some reason this app crashes or is killed,
+	//this object's destructor is never reached and the process stays alive, owned by "init" now.
+	ofSystem("killall dns-sd"); //this is quite rude, hopefully the user wasn't running "dns-sd" for anything else but this...
 
-	Poco::Process::Args args = { "-P", serverName, "_oscjson._tcp.",  "local", ofToString(OSC_QUERY_SERVER_PORT), "ofxRemoteUI.local", IP };
+	ofxRemoteUIServer * s = RUI_GET_INSTANCE();
+	//string IP = s->getComputerIP();
+	string port = ofToString(s->port);
+	string serverName = "ofxRemoteUI: " + s->getBinaryName() + "@" + s->getComputerName() + ":" + port;
+	//string command = "dns-sd -P ofxRemoteUI _oscjson._tcp. local 3333 armadillu.local 192.168.5.30"
+	//string command = "dns-sd -R ofxRemoteUI _oscjson._tcp. local 3333"
+	//string command = "dns-sd -P ofxRemoteUI _oscjson._tcp. local " + ofToString(OSC_QUERY_SERVER_PORT) + " ofxRemoteUI.local " + IP;
+
+	Poco::Process::Args args = { "-R", serverName, "_oscjson._tcp.",  "local", ofToString(OSC_QUERY_SERVER_PORT)};
 	try{
 		Poco::ProcessHandle ph = Poco::Process::launch("dns-sd", args);
 		phPtr = &ph;
@@ -207,14 +217,10 @@ void OscQueryServerMgr::threadedFunction(){
 
 void OscQueryServerMgr::stopBonjour(){
 
-	if (phPtr != nullptr) {
+	if (phPtr != nullptr && Poco::Process::isRunning(*phPtr)) {
 		ofLogWarning("OscQueryServerMgr") << "Trying to stop Bonjour advertising!";
 		try {
-			#ifdef TARGET_WIN32
 			Poco::Process::kill(*phPtr);
-			#else
-			Poco::Process::requestTermination(phPtr->id()); //slightly nicer kill on unix based
-			#endif
 		} catch (exception e) {
 			ofLogError("OscQueryServerMgr") << e.what();
 		}

@@ -38,8 +38,8 @@ protected:
 	static void addEnumParam(const string & paramName, const RemoteUIParam & p, ofJson & json);
 	static void addBoolParam(const string & paramName, const RemoteUIParam & p, ofJson & json);
 	static void addColorParam(const string & paramName, const RemoteUIParam & p, ofJson & json);
+	static void addStringParam(const string & paramName, const RemoteUIParam & p, ofJson & json);
 
-	static void addGroup(const string & gName, ofJson & json);
 
 	class RUIRequestHandler : public Poco::Net::HTTPRequestHandler {
 		virtual void handleRequest(Poco::Net::HTTPServerRequest &req,
