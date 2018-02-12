@@ -332,7 +332,7 @@ float convertHueToMidiFigtherHue(float hue){
 		if( slider || noteOff || noteOn || isMidiFighterHighRes ) {
 
 			NSString * dn = [n deviceName];
-			if(n == nil){continue; } //ignore virtual devices?
+			if(dn == nil){continue;} //ignore virtual devices?
 
 			//NSLog(@"%@ %f", [msgPtr description], [msgPtr doubleValue]);
 			if(!isMidiFighterHighRes){
