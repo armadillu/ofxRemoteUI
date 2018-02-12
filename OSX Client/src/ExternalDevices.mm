@@ -331,6 +331,9 @@ float convertHueToMidiFigtherHue(float hue){
 
 		if( slider || noteOff || noteOn || isMidiFighterHighRes ) {
 
+			NSString * dn = [n deviceName];
+			if(n == nil){continue; } //ignore virtual devices?
+
 			//NSLog(@"%@ %f", [msgPtr description], [msgPtr doubleValue]);
 			if(!isMidiFighterHighRes){
 				channel = [msgPtr channel];
@@ -342,7 +345,7 @@ float convertHueToMidiFigtherHue(float hue){
 			if(noteOff || noteOn) type = "note";
 			if(slider || isMidiFighterHighRes) type = "cc";
 
-			string desc = [[[n deviceName] stringByReplacingOccurrencesOfString:@" " withString:@"_"] UTF8String];
+			string desc = [[dn stringByReplacingOccurrencesOfString:@" " withString:@"_"] UTF8String];
 			string channelStr = [[NSString stringWithFormat:@"[%s:%d#%d]", type.c_str(), knobID, channel] UTF8String];
 			string controllerUniqueAddress = channelStr + "@" + desc;
 
