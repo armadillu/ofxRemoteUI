@@ -112,10 +112,10 @@ void OscQueryServerMgr::addGroup(const string & gName, ofJson & json){
 
 void OscQueryServerMgr::addFloatParam(const string & paramName, const RemoteUIParam & p, ofJson & json){
 	json["ACCESS"] = 3;
-	//json["CLIPMODE"] = ofJson::object();
+	json["CLIPMODE"] = {"none"};
 	json["CONTENTS"] = ofJson::object();
 	json["DESCRIPTION"] = paramName + " float parameter";
-	json["FULL_PATH"] = "/SEND FLT " + paramName;
+	json["FULL_PATH"] = "/SEND/FLT/" + paramName;
 	json["RANGE"][0]["MAX"] = p.maxFloat;
 	json["RANGE"][0]["MIN"] = p.minFloat;
 	json["TAGS"] = {"float input"};
@@ -128,49 +128,45 @@ void OscQueryServerMgr::addIntParam(const string & paramName, const RemoteUIPara
 	json["ACCESS"] = 3;
 	json["CLIPMODE"] = {"none"};
 	json["CONTENTS"] = ofJson::object();
-	json["FULL_PATH"] = "/SEND INT " + paramName;
-	//json["RANGE"] = ofJson::array();
+	json["FULL_PATH"] = "/SEND/INT/" + paramName;
 	json["RANGE"][0]["MAX"] = p.maxInt;
 	json["RANGE"][0]["MIN"] = p.minInt;
 	json["TAGS"] = {"integer input"};
 	json["TYPE"] = "i";
 	json["DESCRIPTION"] = paramName + " integer parameter";
-	//json["UNIT"][0] = "percent";
 }
 
 void OscQueryServerMgr::addEnumParam(const string & paramName, const RemoteUIParam & p, ofJson & json){
 	json["ACCESS"] = 3;
 	json["CONTENTS"] = ofJson::object();
+	json["CLIPMODE"] = {"both"};
 	json["DESCRIPTION"] = paramName + " enum parameter";
-	json["FULL_PATH"] = "/SEND ENU " + paramName;
-	//json["RANGE"] = ofJson::array();
+	json["FULL_PATH"] = "/SEND/ENU/" + paramName;
 	json["RANGE"][0]["MAX"] = p.maxInt;
 	json["RANGE"][0]["MIN"] = p.minInt;
 	json["TAGS"] = {"int input"};
 	json["TYPE"] = "i";
-	//json["UNIT"][0] = "percent";
 }
 
 
 void OscQueryServerMgr::addBoolParam(const string & paramName, const RemoteUIParam & p, ofJson & json){
 	json["ACCESS"] = 3;
-	//json["CLIPMODE"] = ofJson::object();
+	json["CLIPMODE"] = {"none"};
 	json["CONTENTS"] = ofJson::object();
 	json["DESCRIPTION"] = paramName + " boolean parameter";
-	json["FULL_PATH"] = "/SEND BOL " + paramName;
-	//json["RANGE"] = ofJson::array();
+	json["FULL_PATH"] = "/SEND/BOL/" + paramName;
 	json["RANGE"][0]["MAX"] = 1;
 	json["RANGE"][0]["MIN"] = 0;
 	json["TAGS"] = {"bool input"};
 	json["TYPE"] = "i";
-	//json["UNIT"][0] = "true - false";
 }
 
 void OscQueryServerMgr::addColorParam(const string & paramName, const RemoteUIParam & p, ofJson & json){
 	json["ACCESS"] = 3;
+	json["CLIPMODE"] = {"none"};
 	json["CONTENTS"] = ofJson::object();
 	json["DESCRIPTION"] = paramName + " ofColor parameter";
-	json["FULL_PATH"] = "/SEND COL " + paramName;
+	json["FULL_PATH"] = "/SEND/COL/" + paramName;
 	json["RANGE"][0]["MAX"] = 255;
 	json["RANGE"][0]["MIN"] = 0;
 	json["TAGS"] = {"ofColor input"};
@@ -183,12 +179,13 @@ void OscQueryServerMgr::threadedFunction(){
 
 	ofxRemoteUIServer * s = RUI_GET_INSTANCE();
 	string IP = s->getComputerIP();
+	string serverName = s->getBinaryName() + "@" + s->getComputerName();
 	//string command = "dns-sd -P ofxRemoteUI _oscjson._tcp. local 3333 armadillu.local 192.168.5.30"
 	string command = "dns-sd -P ofxRemoteUI _oscjson._tcp. local " + ofToString(OSC_QUERY_SERVER_PORT) + " ofxRemoteUI.local " + IP;
 	//string ret = ofSystem(command);
 	//ofLogNotice() << ret;
 
-	Poco::Process::Args args = { "-P", "ofxRemoteUI", "_oscjson._tcp.",  "local", ofToString(OSC_QUERY_SERVER_PORT), "ofxRemoteUI.local", IP };
+	Poco::Process::Args args = { "-P", serverName, "_oscjson._tcp.",  "local", ofToString(OSC_QUERY_SERVER_PORT), "ofxRemoteUI.local", IP };
 	try{
 		Poco::ProcessHandle ph = Poco::Process::launch("dns-sd", args);
 		phPtr = &ph;

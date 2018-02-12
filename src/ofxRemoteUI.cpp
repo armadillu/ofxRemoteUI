@@ -105,9 +105,12 @@ DecodedMessage ofxRemoteUI::decode(const ofxOscMessage & m){
 
 	std::string msgAddress = m.getAddress();
 	if(msgAddress.size() > 0){
+
 		if(msgAddress[0] == '/'){ //if address starts with "/", drop it to match the fucked up remoteUI protocol
 			msgAddress = msgAddress.substr(1, msgAddress.size() - 1);
 		}
+		//allow address to use the standard style /SEND/FLT/paramName instead of the legacy "SEND FLT paramName"
+		ofStringReplace(msgAddress, "/", " ");
 	}
 	std::string action = msgAddress.substr(0, 4);
 
@@ -320,10 +323,19 @@ void ofxRemoteUI::updateParamFromDecodedMessage(const ofxOscMessage & m, Decoded
 
 		case COLOR_ARG:
 			p.type = REMOTEUI_PARAM_COLOR;
-			p.redVal = (int)m.getArgAsInt32(arg); arg++;
-			p.greenVal = (int)m.getArgAsInt32(arg); arg++;
-			p.blueVal = (int)m.getArgAsInt32(arg); arg++;
-			p.alphaVal = (int)m.getArgAsInt32(arg); arg++;
+			if(m.getNumArgs() == 1){ //hex rgba encoded in one single int - vezér style
+				std::uint32_t rgba = m.getArgAsRgbaColor(arg); arg++;
+				p.redVal = (rgba & 0xFF000000) >> 24;
+				p.greenVal = (rgba & 0x00FF0000) >> 16;
+				p.blueVal = (rgba & 0x0000FF00) >> 8;
+				p.alphaVal = (rgba & 0x000000FF);
+				ofLogNotice() << p.getInfoAsString();
+			}else{ //legacy ofxRemoteUI
+				p.redVal = (int)m.getArgAsInt32(arg); arg++;
+				p.greenVal = (int)m.getArgAsInt32(arg); arg++;
+				p.blueVal = (int)m.getArgAsInt32(arg); arg++;
+				p.alphaVal = (int)m.getArgAsInt32(arg); arg++;
+			}
 			if (p.redValAddr){
 				*p.redValAddr = p.redVal;
 				*(p.redValAddr+1) = p.greenVal;
@@ -373,7 +385,7 @@ void ofxRemoteUI::updateParamFromDecodedMessage(const ofxOscMessage & m, Decoded
 		default: RLOG_ERROR << "updateParamFromDecodedMessage unknown type!"; break;
 	}
 
-	if(m.getNumArgs() > arg){
+	if(m.getNumArgs() > arg){ //if msg contains bg color, parse it
 		p.r = m.getArgAsInt32(arg); arg++;
 		p.g = m.getArgAsInt32(arg); arg++;
 		p.b = m.getArgAsInt32(arg); arg++;

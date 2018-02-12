@@ -1928,34 +1928,39 @@ void ofxRemoteUIServer::updateServer(float dt){
 				onScreenNotifications.addNotification("CONNECTED (" + cbArg.host +  ")!");
 				ofNotifyEvent(clientAction, cbArg, this);
 				#endif
-				if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " says HELLO!"  ;
+				if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " says HELLO!";
 
 				break;
 
 			case REQUEST_ACTION:{ //send all params to client
-				if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " sends REQU!"  ;
+				if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " sends REQU!";
 				pushParamsToClient();
 				}break;
 
 			case SEND_PARAM_ACTION:{ //client is sending us an updated val
-				if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " sends SEND!"  ;
-				updateParamFromDecodedMessage(m, dm);
-				cbArg.action = CLIENT_UPDATED_PARAM;
-				cbArg.paramName = dm.paramName;
-				cbArg.param = params[dm.paramName];  //copy the updated param to the callbakc arg
-				cbArg.group = cbArg.param.group;
-				if(callBack) callBack(cbArg);
-				#ifdef OF_AVAILABLE
-				RemoteUIParam & p = params[dm.paramName];
-				onScreenNotifications.addParamUpdate(dm.paramName, p,
-													 ofColor(p.r, p.g, p.b, p.a),
-													 p.type == REMOTEUI_PARAM_COLOR ?
-													 ofColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal):
-													 ofColor(0,0,0,0)
-													 );
-				ofNotifyEvent(clientAction, cbArg, this);
-				#endif
-			}
+				if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " sends SEND!";
+				auto it = params.find(dm.paramName);
+				if(it != params.end()){ //ignore param updates that talk about params we dont know about
+					updateParamFromDecodedMessage(m, dm);
+					cbArg.action = CLIENT_UPDATED_PARAM;
+					cbArg.paramName = dm.paramName;
+					cbArg.param = params[dm.paramName];  //copy the updated param to the callbakc arg
+					cbArg.group = cbArg.param.group;
+					if(callBack) callBack(cbArg);
+					#ifdef OF_AVAILABLE
+					RemoteUIParam & p = params[dm.paramName];
+					onScreenNotifications.addParamUpdate(dm.paramName, p,
+														 ofColor(p.r, p.g, p.b, p.a),
+														 p.type == REMOTEUI_PARAM_COLOR ?
+														 ofColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal):
+														 ofColor(0,0,0,0)
+														 );
+					ofNotifyEvent(clientAction, cbArg, this);
+					#endif
+				}else{
+					RLOG_WARNING << "ignore param update msg, as \"" << dm.paramName << "\" is not a param we know about!";
+				}
+				}
 				break;
 
 			case CIAO_ACTION:{
