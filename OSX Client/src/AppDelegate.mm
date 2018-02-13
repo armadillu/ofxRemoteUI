@@ -380,9 +380,25 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification{
 
+	NSLog(@"become active %@", [NSDate date]);
 	if(connectButton.state == 0 && launched && client->isSetup()){
 		[self connect];
 	}
+}
+
+NSDate * willResign = nil;
+
+- (void)applicationWillResignActive:(NSNotification *)notification{
+	willResign = [[NSDate date] retain];
+}
+
+- (void)applicationDidResignActive:(NSNotification *)notification{
+	if(willResign){
+		//NSLog(@"resign interval: %f ms", 1000 * [willResign timeIntervalSinceDate:[NSDate date]]);
+		[willResign release];
+		willResign = nil;
+	}
+	//NSLog(@"did resign active %@", [NSDate date]);
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification;{
@@ -625,6 +641,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	//NSDisableScreenUpdates();
 	//remove all views, start over
+	NSDate * time1 = [NSDate date];
 	NSArray * subviews = [listContainer subviews];
 	for( int i = (int)[subviews count] - 1 ; i >= 0 ; i-- ){
 		if( [[subviews objectAtIndex:i] isKindOfClass:[NSBox class]]){
@@ -642,13 +659,14 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	int colIndex = 0;
 	int maxInACol = 0;
 
+	NSMutableArray * array = [NSMutableArray arrayWithCapacity:10];
+	
 	for(int i = 0; i < numParams; i++){
 		string key = paramsInGroup[i];
 		ParamUI * item = widgets[key];
 		NSRect r = item->ui.frame;
 
 		item->ui.frame = NSMakeRect( colIndex * p.rowW, (numParams - 1) * ROW_HEIGHT - h , p.rowW, r.size.height);
-		[listContainer addSubview: item->ui];
 		h += r.size.height;
 
 		howManyThisCol++;
@@ -659,8 +677,12 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		}
 		[item updateUI];
 		[item remapSlider];
+		[array addObject:item->ui];
+		//[listContainer addSubview: item->ui];
 		if(howManyThisCol > maxInACol) maxInACol = howManyThisCol;
 	}
+
+	[listContainer setSubviews:array];
 
 
 	int off = ((int)[scroll.contentView frame].size.height + 1) % ((int)(ROW_HEIGHT));
@@ -686,6 +708,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	//NSLog(@"totalCols %d", totalCols);
 	[listContainer setFrameSize: NSMakeSize( listContainer.frame.size.width, totalCols * ROW_HEIGHT + off - 1) ];
 	//NSEnableScreenUpdates();
+
+	float interval = [time1 timeIntervalSinceDate:[NSDate date]];
+	NSLog(@"interval: %f ms", -interval * 1000);
+
 }
 
 
