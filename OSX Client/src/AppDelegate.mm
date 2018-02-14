@@ -242,7 +242,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 		return [externalDevices parseDeviceBindingsFromFile: [NSURL fileURLWithPath:fileName]];
 	}
 
-	if([extension isEqualToString:@"xml"]){
+	if([extension isEqualToString:@"xml"] || [extension isEqualToString:[NSString stringWithUTF8String:OFXREMOTEUI_PRESET_FILE_EXTENSION]]){
 		[self openLocalPresetFile:[fileName UTF8String]];
 	}
 	return NO;
@@ -804,8 +804,7 @@ NSDate * willResign = nil;
 	//NSEnableScreenUpdates();
 
 	float interval = [time1 timeIntervalSinceDate:[NSDate date]];
-	NSLog(@"interval: %f ms", -interval * 1000);
-
+	//NSLog(@"interval: %f ms", -interval * 1000);
 }
 
 
