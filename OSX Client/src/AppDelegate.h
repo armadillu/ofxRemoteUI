@@ -136,6 +136,8 @@ void clientCallback(RemoteUIClientCallBackArg a);
 -(void)autoConnectToNeighbor:(string) host port:(int)p;
 -(void)update;
 
+-(void)openLocalPresetFile:(string) file;
+
 -(void)fullParamsUpdate;
 -(void)partialParamsUpdate;
 
@@ -155,6 +157,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 -(vector<string>)getAllGroupsInParams;
 -(unordered_map<string, ParamUI*>)getAllGroupSpacerParams;
 
+- (void) filesWereDropped:(NSNotification *) notification;
 
 //growl
 -(void)showNotificationWithTitle:(NSString*)title description:(NSString*)desc ID:(NSString*)key priority:(int)p;

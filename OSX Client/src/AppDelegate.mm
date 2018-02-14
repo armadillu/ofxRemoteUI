@@ -9,7 +9,7 @@
 #import "ParamUI.h"
 #import "AppDelegate.h"
 #import "NSColorStringExtension.h"
-
+#include "ofxXmlSettings.h"
 
 //ofxRemoteUIClient callback entry point
 #pragma mark - CALLBACKS
@@ -153,11 +153,100 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	return externalDevices;
 }
 
-- (BOOL)application:(NSApplication *)sender openFile:(NSString *)fileName{
-	return [externalDevices parseDeviceBindingsFromFile: [NSURL fileURLWithPath:fileName]];
+- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender{
+	return YES;
+}
+
+//we want to copy the files
+- (NSDragOperation)draggingEntered:(id<NSDraggingInfo>)sender{
+	return NSDragOperationCopy;
+}
+
+//perform the drag and log the files that are dropped
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender{
+	NSPasteboard *pboard;
+	NSDragOperation sourceDragMask;
+
+	sourceDragMask = [sender draggingSourceOperationMask];
+	pboard = [sender draggingPasteboard];
+
+	if ( [[pboard types] containsObject:NSFilenamesPboardType] ) {
+		NSArray *files = [pboard propertyListForType:NSFilenamesPboardType];
+		[[NSNotificationCenter defaultCenter] postNotificationName:@"FilesDropped" object:files];
+	}
+	return YES;
+}
+
+- (void) filesWereDropped:(NSNotification *) notification{
+
+	NSArray * filePaths = [notification object];
+	for(id file in filePaths){
+		NSLog(@"dropped file: %@", file);
+		[self openLocalPresetFile: [file UTF8String]];
+	}
+}
+
+-(void)openLocalPresetFile:(string) file{
+
+	string valuesToPaste;
+	ofxXmlSettings data;
+	bool ok = data.loadFile(file);
+	if(ok){
+		data.pushTag("OFX_REMOTE_UI");
+		int v = data.getValue("OFX_REMOTE_UI_V", -1);
+		if (v == 2){
+			data.pushTag("OFX_REMOTE_UI_PARAMS");
+			int nV = data.getNumTags("P");
+			for(int i = 0; i < nV; i++){
+				string type = data.getAttribute("P", "type", "", i);
+				string name = data.getAttribute("P", "name", "", i);
+				bool disabled = data.getAttribute("P", "disabled", "", i) == "1";
+
+				if(!disabled  && type.size()){
+					if(type=="bool"){
+						bool val = data.getValue("P", 0, i);
+						valuesToPaste += name + "=" + string(val?"1":"0") + "\n";
+					}
+					if(type=="float"){
+						float val = data.getValue("P", 0.0f, i);
+						valuesToPaste += name + "=" + ofToString(val) + "\n";
+					}
+					if(type=="int" || type=="enum"){
+						float val = data.getValue("P", 0, i);
+						valuesToPaste += name + "=" + ofToString(val) + "\n";
+					}
+					if(type=="color"){
+						int r = data.getAttribute("P", "c0.red", 0, i);
+						int g = data.getAttribute("P", "c1.green", 0, i);
+						int b = data.getAttribute("P", "c2.blue", 0, i);
+						int a = data.getAttribute("P", "c3.alpha", 0, i);
+						valuesToPaste += name + "=" + ofToString(r) + " " + ofToString(g) + " " + ofToString(b) + " " + ofToString(a) + "\n";
+					}
+					if(type=="string"){
+						string val = data.getValue("P", "", i);
+						valuesToPaste += name + "=" + val + "\n";
+					}
+				}
+			}
+		}
+	}
+	NSLog(@"User opened preset file!\n%s", valuesToPaste.c_str());
+	client->setValuesFromString(valuesToPaste);
+	[self partialParamsUpdate];
 }
 
 
+- (BOOL)application:(NSApplication *)sender openFile:(NSString *)fileName{
+	NSString * extension = [fileName pathExtension];
+	if([extension isEqualToString:@"ctrlrBind"]){
+		return [externalDevices parseDeviceBindingsFromFile: [NSURL fileURLWithPath:fileName]];
+	}
+
+	if([extension isEqualToString:@"xml"]){
+		[self openLocalPresetFile:[fileName UTF8String]];
+	}
+	return NO;
+}
 
 
 #pragma mark applescript
@@ -317,6 +406,10 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(windowBecameMain:) name:NSWindowDidBecomeKeyNotification object:window];
 
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(filesWereDropped:)
+												 name:@"FilesDropped"
+											   object:nil];
 
 	[[NSColorPanel sharedColorPanel] setShowsAlpha: YES];
 	[[NSColorPanel sharedColorPanel] setHidesOnDeactivate:NO];
@@ -328,6 +421,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	//[viewLayer setBackgroundColor:CGColorCreateGenericRGB(0,0,0,0.1)];
 	[listContainer setWantsLayer:YES]; // view's backing store is using a Core Animation Layer
 	[listContainer setLayer:viewLayer];
+	[window registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
 
 	//disable implicit CAAnims
 	NSMutableDictionary *newActions = [[NSMutableDictionary alloc] initWithObjectsAndKeys:

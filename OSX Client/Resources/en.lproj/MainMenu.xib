@@ -576,7 +576,7 @@ DQ
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <view canDrawConcurrently="YES" id="736">
-                                    <rect key="frame" x="0.0" y="0.0" width="409" height="258"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="413" height="258"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 </view>
                             </subviews>
@@ -684,6 +684,9 @@ DQ
                 </subviews>
             </view>
             <contentBorderThickness minY="0.0" maxY="13"/>
+            <connections>
+                <outlet property="delegate" destination="494" id="F8C-IH-fhd"/>
+            </connections>
             <point key="canvasLocation" x="115" y="-117"/>
         </window>
         <window title="Actions Log" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="logView" animationBehavior="default" id="902">
