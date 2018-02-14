@@ -561,11 +561,27 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 
 	ofxXmlSettings s;
 	bool exists = s.loadFile(fileName);
-	bool newVersion = s.getNumTags(string(OFXREMOTEUI_XML_ROOT_TAG) + ":" + string(OFXREMOTEUI_XML_V_TAG)) > 0;
-
 	RLOG_NOTICE << "Loading from XML! \"" << fileName << "\"";
 
+	#ifdef OF_AVAILABLE
+	if(!exists){
+		string extension = ofFilePath::getFileExt(fileName);
+		if(extension == OFXREMOTEUI_PRESET_FILE_EXTENSION){ //loading "rui" file not found
+			string ruiFileName = fileName;
+			fileName = fileName.substr(0, fileName.size() - extension.size());
+			fileName += "xml"; //legacy file extension
+			exists = s.loadFile(fileName);
+			RLOG_WARNING << "Can't find file! Trying out legacy file extension at! \"" << fileName << "\"";
+			if(exists){ //same file as .xml exists?
+				ofFile::moveFromTo(fileName, ruiFileName); //then rename it to .rui
+				fileName = ruiFileName;
+			}
+		}
+	}
+	#endif
+
 	if (exists){
+		bool newVersion = s.getNumTags(string(OFXREMOTEUI_XML_ROOT_TAG) + ":" + string(OFXREMOTEUI_XML_V_TAG)) > 0;
 		#ifdef OF_AVAILABLE
 		if( newVersion ){ //if we have a version tag, it must be v2
 			return loadFromXMLv2(fileName);
@@ -881,8 +897,8 @@ void ofxRemoteUIServer::saveSettingsBackup(){
 		string basePath = OFXREMOTEUI_SETTINGS_BACKUP_FOLDER + string("/") + ofFilePath::removeExt(OFXREMOTEUI_SETTINGS_FILENAME) + ".";
 		basePath = getFinalPath(basePath);
 		for (int i = OFXREMOTEUI_NUM_BACKUPS - 1; i >= 0; i--){
-			string originalPath = basePath + ofToString(i) + ".xml";
-			string destPath = basePath + ofToString(i+1) + ".xml";
+			string originalPath = basePath + ofToString(i) + "." + OFXREMOTEUI_PRESET_FILE_EXTENSION;
+			string destPath = basePath + ofToString(i+1) + "." + OFXREMOTEUI_PRESET_FILE_EXTENSION;
 			ofFile og;
 			og.open(originalPath);
 			if ( og.exists() ){
@@ -896,7 +912,7 @@ void ofxRemoteUIServer::saveSettingsBackup(){
 		f.open(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME));
 		if(f.exists()){
 			try{
-				ofFile::copyFromTo(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME), basePath + "0.xml");
+				ofFile::copyFromTo(getFinalPath(OFXREMOTEUI_SETTINGS_FILENAME), basePath + "0." + OFXREMOTEUI_PRESET_FILE_EXTENSION);
 			}catch(...){}
 		}
 		f.close();
@@ -1153,7 +1169,7 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				if(presetName.size()){
 					RemoteUIServerCallBackArg cbArg;
 					if (groupIsSelected){
-						saveGroupToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName + "/" + presetName + formatExt + ".xml", groupName, saveInV1);
+						saveGroupToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName + "/" + presetName + formatExt + "." + OFXREMOTEUI_PRESET_FILE_EXTENSION, groupName, saveInV1);
 						if(callBack) callBack(cbArg);
 						cbArg.action = CLIENT_SAVED_GROUP_PRESET;
 						cbArg.msg = presetName;
@@ -1164,7 +1180,7 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 						#endif
 					}else{
 						if(verbose_) RLOG_NOTICE << "saving NEW preset: " << presetName ;
-						saveToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + formatExt + ".xml", saveInV1);
+						saveToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + formatExt + "." + OFXREMOTEUI_PRESET_FILE_EXTENSION, saveInV1);
 						cbArg.action = CLIENT_SAVED_PRESET;
 						cbArg.msg = presetName;
 						#ifdef OF_AVAILABLE
@@ -1225,7 +1241,7 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				dataMutex.lock();
 				if(selectedItem == -1 && selectedPreset >= 0 && presetsCached.size()){ //global presets
 					lastChosenPreset = presetsCached[selectedPreset];
-					loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + lastChosenPreset + ".xml");
+					loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + lastChosenPreset + "." + OFXREMOTEUI_PRESET_FILE_EXTENSION);
 					syncAllPointersToParams();
 					uiAlpha = 0;
 					if(verbose_) RLOG_NOTICE << "setting preset: " << lastChosenPreset ;
@@ -1244,7 +1260,7 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 
 					if(p.type == REMOTEUI_PARAM_SPACER && groupPresetsCached[p.group].size() > 0){
 						string presetName = p.group + "/" + groupPresetsCached[p.group][selectedGroupPreset];
-						loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
+						loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + "." + OFXREMOTEUI_PRESET_FILE_EXTENSION);
 						syncAllPointersToParams();
 						uiAlpha = 0;
 						if(verbose_) RLOG_NOTICE << "setting preset: " << presetName ;
@@ -1995,7 +2011,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 
 			case SET_PRESET_ACTION:{ // client wants to set a preset
 				string presetName = cleanCharsForFileSystem(m.getArgAsString(0));
-				vector<string> missingParams = loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
+				vector<string> missingParams = loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + "." + OFXREMOTEUI_PRESET_FILE_EXTENSION);
 				sendSETP(presetName);
 				sendMISP(missingParams);
 				cbArg.action = CLIENT_DID_SET_PRESET;
@@ -2010,7 +2026,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 
 			case SAVE_PRESET_ACTION:{ //client wants to save current xml as a new preset
 				string presetName = cleanCharsForFileSystem(m.getArgAsString(0));
-				saveToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + ".xml");
+				saveToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + "." + OFXREMOTEUI_PRESET_FILE_EXTENSION);
 				sendSAVP(presetName);
 				cbArg.action = CLIENT_SAVED_PRESET;
 				cbArg.msg = presetName;
@@ -2075,7 +2091,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case SET_GROUP_PRESET_ACTION:{ // client wants to set a preset for a group
 				string presetName = cleanCharsForFileSystem(m.getArgAsString(0));
 				string groupName = cleanCharsForFileSystem(m.getArgAsString(1));
-				vector<string> missingParams = loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName + "/" + presetName + ".xml");
+				vector<string> missingParams = loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName + "/" + presetName + "." + OFXREMOTEUI_PRESET_FILE_EXTENSION);
 				vector<string> filtered;
 				for(int i = 0; i < missingParams.size(); i++){
 					if ( params[ missingParams[i] ].group == groupName ){
@@ -2098,7 +2114,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case SAVE_GROUP_PRESET_ACTION:{ //client wants to save current xml as a new preset
 				string presetName = cleanCharsForFileSystem(m.getArgAsString(0));
 				string groupName = cleanCharsForFileSystem(m.getArgAsString(1));
-				saveGroupToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName + "/" + presetName + ".xml", groupName);
+				saveGroupToXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + groupName + "/" + presetName + "." + OFXREMOTEUI_PRESET_FILE_EXTENSION, groupName);
 				sendSAVp(presetName, groupName);
 				cbArg.action = CLIENT_SAVED_GROUP_PRESET;
 				cbArg.msg = presetName;
@@ -2136,15 +2152,15 @@ void ofxRemoteUIServer::updateServer(float dt){
 void ofxRemoteUIServer::deletePreset(string name, string group){
 	#ifdef OF_AVAILABLE
 	if (group == ""){ //global preset
-		string path = getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + name + ".xml";
+		string path = getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + name + "." + OFXREMOTEUI_PRESET_FILE_EXTENSION;
 		ofFile::removeFile(path);
 	}else{
-		string path = getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + group + "/" + name + ".xml";
+		string path = getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + group + "/" + name + "." + OFXREMOTEUI_PRESET_FILE_EXTENSION;
 		ofFile::removeFile(path);
 	}
 	#else //TODO this wont work, relative path
-	string file = getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + name + ".xml";
-	if (group != "") file = getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + group + "/" + name + ".xml";
+	string file = getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + name + "." + OFXREMOTEUI_PRESET_FILE_EXTENSION;
+	if (group != "") file = getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + group + "/" + name + "." + OFXREMOTEUI_PRESET_FILE_EXTENSION;
 	remove( file.c_str() );
 	#endif
 }
@@ -2162,7 +2178,7 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(bool onlyGlobal){
 		string fileName = files[i].getFileName();
 		string extension = files[i].getExtension();
 		std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-		if (files[i].isFile() && extension == "xml"){
+		if (files[i].isFile() && (extension == "xml" || extension == OFXREMOTEUI_PRESET_FILE_EXTENSION)){
 			string presetName = fileName.substr(0, fileName.size()-4);
 			presets.push_back(presetName);
 		}
@@ -2174,7 +2190,7 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(bool onlyGlobal){
 				string fileName2 = files2[j].getFileName();
 				string extension2 = files2[j].getExtension();
 				std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-				if (files2[j].isFile() && extension2 == "xml"){
+				if (files2[j].isFile() && (extension2 == "xml" || extension2 == OFXREMOTEUI_PRESET_FILE_EXTENSION)){
 					string presetName2 = fileName2.substr(0, fileName2.size()-4);
 					presets.push_back(fileName + "/" + presetName2);
 				}
@@ -2186,7 +2202,7 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(bool onlyGlobal){
 	struct dirent *ent;
 	if ((dir2 = opendir(getFinalPath(OFXREMOTEUI_PRESET_DIR).c_str() )) != NULL) {
 		while ((ent = readdir (dir2)) != NULL) {
-			if ( strcmp( get_filename_ext(ent->d_name), "xml") == 0 ){
+			if ( strcmp( get_filename_ext(ent->d_name), OFXREMOTEUI_PRESET_FILE_EXTENSION) == 0 ){
 				string fileName = string(ent->d_name);
 				string presetName = fileName.substr(0, fileName.size()-4);
 				presets.push_back(presetName);
@@ -2212,7 +2228,7 @@ vector<string>	ofxRemoteUIServer::getAvailablePresetsForGroup(string group){
 			string fileName = files[i].getFileName();
 			string extension = files[i].getExtension();
 			std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-			if (files[i].isFile() && extension == "xml"){
+			if (files[i].isFile() && (extension == "xml" || extension == OFXREMOTEUI_PRESET_FILE_EXTENSION)){
 				string presetName = fileName.substr(0, fileName.size()-4);
 				presets.push_back(presetName);
 			}
