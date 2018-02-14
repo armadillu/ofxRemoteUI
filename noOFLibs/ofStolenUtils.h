@@ -22,10 +22,9 @@
 #include <sstream>
 #include <iomanip>
 
-
-int ofToInt(const std::string& intString) ;
-float ofToFloat(const std::string& floatString);
-float ofClamp(float value, float min, float max) ;
+static inline int ofToInt(const std::string& intString);
+static inline float ofToFloat(const std::string& floatString);
+static inline float ofClamp(float value, float min, float max) ;
 
 
 template <class T>
@@ -59,4 +58,11 @@ std::string ofToString(const T& value, int precision, int width, char fill ){
 	return out.str();
 }
 
+static inline int ofToInt(const std::string& intString){
+	return atoi(intString.c_str());
+}
+
+static inline float ofToFloat(const std::string& floatString){
+	return atof(floatString.c_str());
+}
 #endif
