@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		73002CDB140ABCF60035299A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73002CDA140ABCF60035299A /* Cocoa.framework */; };
 		BB09FCA9198DDB8000E04B02 /* uriencode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB09FCA8198DDB8000E04B02 /* uriencode.cpp */; };
+		BB583D412034F98A00FBFAD1 /* PresetIcon.iconset in Resources */ = {isa = PBXBuildFile; fileRef = BB583D402034F98A00FBFAD1 /* PresetIcon.iconset */; };
 		BB5CC60C177E49D500B595F8 /* IpEndpointName.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5DD177E49D500B595F8 /* IpEndpointName.cpp */; };
 		BB5CC60D177E49D500B595F8 /* NetworkingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5E2177E49D500B595F8 /* NetworkingUtils.cpp */; };
 		BB5CC60E177E49D500B595F8 /* UdpSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC5E3177E49D500B595F8 /* UdpSocket.cpp */; };
@@ -92,6 +93,7 @@
 		73002CDF140ABCF60035299A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		BB09FCA8198DDB8000E04B02 /* uriencode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = uriencode.cpp; sourceTree = "<group>"; };
 		BB4B54F0177FAD5D004838E4 /* ToDo.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ToDo.txt; sourceTree = "<group>"; };
+		BB583D402034F98A00FBFAD1 /* PresetIcon.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = PresetIcon.iconset; path = Resources/PresetIcon.iconset; sourceTree = "<group>"; };
 		BB5CC5D7177E49D500B595F8 /* ofStolenUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofStolenUtils.h; sourceTree = "<group>"; };
 		BB5CC5DD177E49D500B595F8 /* IpEndpointName.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IpEndpointName.cpp; sourceTree = "<group>"; };
 		BB5CC5DE177E49D500B595F8 /* IpEndpointName.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IpEndpointName.h; sourceTree = "<group>"; };
@@ -272,6 +274,7 @@
 		BB089AC11799C437009C4BC7 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				BB583D402034F98A00FBFAD1 /* PresetIcon.iconset */,
 				BBB627EA191C4D1A005F95BF /* en.lproj */,
 				BBB627E2191C4D06005F95BF /* Growl Registration Ticket.growlRegDict */,
 				BBB627E3191C4D06005F95BF /* icon.icns */,
@@ -612,6 +615,7 @@
 				BBB627F7191C4D1A005F95BF /* Credits.rtf in Resources */,
 				BBB627E9191C4D0C005F95BF /* RestartXcodeApp.scptd in Resources */,
 				BBB627E1191C4CFB005F95BF /* warning@2x.png in Resources */,
+				BB583D412034F98A00FBFAD1 /* PresetIcon.iconset in Resources */,
 				BBB627FA191C4D1A005F95BF /* View20.xib in Resources */,
 				BBB627E4191C4D06005F95BF /* Growl Registration Ticket.growlRegDict in Resources */,
 				BBB627FB191C4D1A005F95BF /* View26.xib in Resources */,
