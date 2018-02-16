@@ -540,9 +540,14 @@
 			[colorWell setColor:col];
 			}break;
 
-		case REMOTEUI_PARAM_ENUM:
-			[enumeratorMenu selectItemAtIndex: param.intVal - param.minInt];
-			break;
+		case REMOTEUI_PARAM_ENUM:{
+			int index = param.intVal - param.minInt;
+			if(index >= 0 && index < [enumeratorMenu numberOfItems]){
+				[enumeratorMenu selectItemAtIndex: index];
+			}else{
+				NSLog(@"Parameter \"%s\" Enum index out of bounds!", paramName.c_str());
+			}
+			}break;
 
 		case REMOTEUI_PARAM_BOOL:
 			[button setState:param.boolVal];
