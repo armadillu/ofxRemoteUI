@@ -909,7 +909,9 @@ NSDate * willResign = nil;
 
 
 -(IBAction)userAddPreset:(id)sender{
-	NSString * newPreset = [self showAlertWithInput:@"Add a new Preset" defaultValue:@"myPreset"];
+	NSString * title = [presetsMenu titleOfSelectedItem];
+	NSString * proposedTitle = [title isEqualToString:@"*No Preset"] ? @"myPreset" : title;
+	NSString * newPreset = [self showAlertWithInput:@"Add a new Preset" defaultValue:proposedTitle];
 	//NSLog(@"user add preset: %@", newPreset);
 	if(newPreset != nil){
 		currentPreset = [newPreset UTF8String];
