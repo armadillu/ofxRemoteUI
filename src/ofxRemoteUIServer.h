@@ -194,7 +194,10 @@ public:
 	std::string getComputerIP(){return computerIP;}
 	std::string getComputerName(){return computerName;}
 	std::string getBinaryName(){return binaryName;}
-    
+
+	///to load a preset from disk, supply a string "myPresetName" - not the missing file extension
+	///if you want to load a local preset, supply a string like "MyGroup/myLocalPreset"
+	void loadPresetNamed(std::string presetName);
     
 #ifdef OF_AVAILABLE
 	void toggleBuiltInClientUI(); //show hide the "built in client" GUI screen

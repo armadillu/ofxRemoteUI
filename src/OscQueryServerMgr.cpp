@@ -139,6 +139,7 @@ void OscQueryServerMgr::addEnumParam(const string & paramName, const RemoteUIPar
 	json["FULL_PATH"] = "/SEND/ENU/" + paramName;
 	json["RANGE"][0]["MAX"] = p.maxInt;
 	json["RANGE"][0]["MIN"] = p.minInt;
+	json["VALUE"][0] = p.intVal;
 	json["TAGS"] = {"int input"};
 	json["TYPE"] = "i";
 }

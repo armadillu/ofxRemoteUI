@@ -552,6 +552,16 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 }
 #endif
 
+void ofxRemoteUIServer::loadPresetNamed(std::string presetName){
+	bool ok = false;
+	string path = getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + presetName;
+	string ext = ofFilePath::getFileExt(path);
+	if (ext != OFXREMOTEUI_PRESET_FILE_EXTENSION){
+		path += "." + string(OFXREMOTEUI_PRESET_FILE_EXTENSION);
+	}
+	loadFromXMLv2(path);
+}
+
 vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 
 	vector<string> empty;
