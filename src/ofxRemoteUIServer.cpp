@@ -40,6 +40,7 @@
 
 #endif
 
+
 using namespace std;
 
 ofxRemoteUIServer* ofxRemoteUIServer::singleton = NULL;
@@ -614,29 +615,25 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 	vector<string> loadedParams;
 	unordered_map<string, bool> readKeys; //to keep track of duplicated keys;
 
-	ofXmlObject s;
-	bool loaded = s.load(fileName);
+	ofXml xml;
+	bool loaded = xml.load(fileName);
 	if(!loaded){
 		RLOG_ERROR << "can't load XML file at " << fileName;
 	}
-	s.setTo(OFXREMOTEUI_XML_ROOT_TAG);
-	s.setTo(OFXREMOTEUI_XML_TAG);
 
-	int numc = s.getNumChildren();
+	auto paramsXml = xml.findFirst("//" + string(OFXREMOTEUI_XML_ROOT_TAG) + "/" + string(OFXREMOTEUI_XML_TAG)).getChildren("P");
 
 	dataMutex.lock();
 
-	for(int i = 0; i < numc; i++){
+	for(auto & s : paramsXml){
 
-		s.setToChild(i);
+		string paramName = s.getAttribute("name").getValue();
+		string type = s.getAttribute("type").getValue();
+		bool inactive = s.getAttribute("disabled").getValue() == "1";
 
-		string paramName = s.getAttribute("name");
-		string type = s.getAttribute("type");
-		bool inactive = s.getAttribute("disabled") == "1";
 		if (std::find(paramsToIgnoreWhenLoadingPresets.begin(), paramsToIgnoreWhenLoadingPresets.end(), paramName) !=
 			paramsToIgnoreWhenLoadingPresets.end()){
 			RLOG_NOTICE << "Ignoring the param \"" << paramName << "\" defined in preset because its in the ignore list.";
-			s.setToParent();
 			continue;
 		}
 
@@ -646,8 +643,6 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 		if (readKeys.find(paramName) == readKeys.end()){ //lets not read keys twice, only read the first one we find in xml
 
 			if(type.length() >	0){
-
-				unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
 
 				readKeys[paramName] = true;
 				loadedParams.push_back(paramName);
@@ -669,7 +664,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 							p.floatVal = *p.floatValAddr = val;
 							if(verbose_) RLOG_NOTICE << "loading a FLOAT '" << paramName <<"' (" << ofToString( *p.floatValAddr, 3) << ") from XML" ;
 						}
-						}break;
+					}break;
 
 					case 'i':{ //int
 						if (!isAParamWeKnowOf){
@@ -681,7 +676,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 							p.intVal = *p.intValAddr = val;
 							if(verbose_) RLOG_NOTICE << "loading an INT '" << paramName <<"' (" << (int) *p.intValAddr << ") from XML" ;
 						}
-						}break;
+					}break;
 
 					case 's':{ //string
 						if (!isAParamWeKnowOf){
@@ -693,7 +688,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 							p.stringVal = *p.stringValAddr = val;
 							if(verbose_) RLOG_NOTICE << "loading a STRING '" << paramName <<"' (" << (string) *p.stringValAddr << ") from XML" ;
 						}
-						}break;
+					}break;
 
 					case 'e':{ //enum
 						if (!isAParamWeKnowOf){
@@ -705,7 +700,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 							p.intVal = *p.intValAddr = val;
 							if(verbose_) RLOG_NOTICE << "loading an ENUM '" << paramName <<"' (" << (int) *p.intValAddr << ") from XML" ;
 						}
-						}break;
+					}break;
 
 					case 'b':{ //bool
 						if (!isAParamWeKnowOf){
@@ -717,7 +712,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 							p.boolVal = *p.boolValAddr = val;
 							if(verbose_) RLOG_NOTICE << "loading a BOOL '" << paramName <<"' (" << (bool) *p.boolValAddr << ") from XML" ;
 						}
-						}break;
+					}break;
 
 					case 'g':{ //group
 						if (!isAParamWeKnowOf){
@@ -732,16 +727,16 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 					case 'c':{ //color
 						if (!isAParamWeKnowOf){
 							p.type = REMOTEUI_PARAM_COLOR;
-							p.redVal = ofToInt(s.getAttribute("c0.red"));
-							p.greenVal = ofToInt(s.getAttribute("c1.green"));
-							p.blueVal = ofToInt(s.getAttribute("c2.blue"));
-							p.alphaVal = ofToInt(s.getAttribute("c3.alpha"));
+							p.redVal = s.getAttribute("c0.red").getIntValue();
+							p.greenVal = s.getAttribute("c1.green").getIntValue();
+							p.blueVal = s.getAttribute("c2.blue").getIntValue();
+							p.alphaVal = s.getAttribute("c3.alpha").getIntValue();
 						}else{
 							if(p.type != REMOTEUI_PARAM_COLOR){ RLOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
-							unsigned char r = ofToInt(s.getAttribute("c0.red"));
-							unsigned char g = ofToInt(s.getAttribute("c1.green"));
-							unsigned char b = ofToInt(s.getAttribute("c2.blue"));
-							unsigned char a = ofToInt(s.getAttribute("c3.alpha"));
+							unsigned char r = s.getAttribute("c0.red").getIntValue();
+							unsigned char g = s.getAttribute("c1.green").getIntValue();
+							unsigned char b = s.getAttribute("c2.blue").getIntValue();
+							unsigned char a = s.getAttribute("c3.alpha").getIntValue();
 							if(p.redValAddr != NULL){
 								*p.redValAddr = p.redVal = r;
 								*(p.redValAddr + 1) = p.greenVal = g;
@@ -773,7 +768,6 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 				}
 			}
 		}
-		s.setToParent();
 	}
 
 	vector<string> paramsNotInXML;
@@ -789,11 +783,12 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 		}
 	}
 	loadedFromXML = true;
-
+	
 	dataMutex.unlock();
-
+	
 	return paramsNotInXML;
 }
+
 #endif
 
 
