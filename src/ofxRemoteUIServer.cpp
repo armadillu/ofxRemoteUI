@@ -326,25 +326,25 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string ke
 }
 
 #ifdef OF_AVAILABLE
-void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string key, ofXmlObject & s, int index, bool active){
+void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, const string & key, pugi::xml_node & s, int index, bool active){
 
-	string path = "P[" + ofToString(index)  + "]";
+	//1st att is name
+	s.append_attribute("name").set_value(key.c_str());
+
 	switch (t.type) {
 
 		case REMOTEUI_PARAM_FLOAT:{
 			float v = t.floatValAddr ? *t.floatValAddr : t.floatVal;
 			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << v <<") to XML" ;
-			s.addValue("P", v);
-			s.setTo(path);
-			s.setAttribute("type", "float");
+			s.append_child(pugi::node_pcdata).set_value(ofToString(v).c_str());
+			s.append_attribute("type").set_value("float");
 			}break;
-			
+
 		case REMOTEUI_PARAM_INT:{
 			int v = t.intValAddr ? *t.intValAddr : t.intVal;
 			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << v <<") to XML" ;
-			s.addValue("P", v);
-			s.setTo(path);
-			s.setAttribute("type", "int");
+			s.append_attribute("type").set_value("int");
+			s.append_child(pugi::node_pcdata).set_value(ofToString(v).c_str());
 			}break;
 
 		case REMOTEUI_PARAM_COLOR:{
@@ -357,48 +357,41 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string ke
 			}else{
 				r = t.redVal; g = t.greenVal; b = t.blueVal; a = t.alphaVal;
 			}
-			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << r << " " << g << " " << b << " " << a << ") to XML" ;
-			s.addChild("P");
-			s.setTo(path);
-			s.setAttribute("type", "color");
-			s.setAttribute("c0.red", ofToString((int)r));
-			s.setAttribute("c1.green", ofToString((int)g));
-			s.setAttribute("c2.blue", ofToString((int)b));
-			s.setAttribute("c3.alpha", ofToString((int)a));
+			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << r << " " << g << " " << b << " " << a << ") to XML";
+			s.append_attribute("type").set_value("color");
+			s.append_attribute("c0.red").set_value(ofToString((int)r).c_str());
+			s.append_attribute("c1.green").set_value(ofToString((int)g).c_str());
+			s.append_attribute("c2.blue").set_value(ofToString((int)b).c_str());
+			s.append_attribute("c3.alpha").set_value(ofToString((int)a).c_str());
 			}break;
 
 		case REMOTEUI_PARAM_ENUM:{
 			int v = t.intValAddr ? *t.intValAddr : t.intVal;
 			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << v <<") to XML" ;
-			s.addValue("P", v);
-			s.setTo(path);
-			s.setAttribute("type", "enum");
+			s.append_attribute("type").set_value("enum");
+			s.append_child(pugi::node_pcdata).set_value(ofToString(v).c_str());
 			}break;
 
 		case REMOTEUI_PARAM_BOOL:{
 			bool v = t.boolValAddr ? *t.boolValAddr : t.boolVal;
 			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << v <<") to XML" ;
-			s.addValue("P", v);
-			s.setTo(path);
-			s.setAttribute("type", "bool");
+			s.append_attribute("type").set_value("bool");
+			s.append_child(pugi::node_pcdata).set_value(ofToString(v).c_str());
 			}break;
 
 		case REMOTEUI_PARAM_STRING:{
 			string v = t.stringValAddr ? *t.stringValAddr : t.stringVal;
 			if(verbose_) RLOG_NOTICE << "saving '" << key << "' (" << v <<") to XML" ;
-			s.addValue("P", v);
-			s.setTo(path);
-			s.setAttribute("type", "string");
+			s.append_attribute("type").set_value("string");
+			s.append_child(pugi::node_pcdata).set_value(v.c_str());
 			}break;
 
 		case REMOTEUI_PARAM_SPACER:{
 			if(verbose_) RLOG_NOTICE << "save spacer '" << key << "' to XML" ;
-			s.addChild("P");
-			s.setTo(path);
-			s.setAttribute("type", "group");
-			Poco::XML::Element *el = s.getPocoElement();
-			Poco::XML::Comment *ce = s.getPocoDocument()->createComment(Poco::XML::toXMLString(" # " + ofToString(key) + " ############################ "));
-			el->parentNode()->appendChild((Poco::XML::Node*)ce);
+			s.append_attribute("type").set_value("group");
+			string comment = " # " + ofToString(key) + " ################################################################################# ";
+			s.parent().insert_child_before(pugi::node_comment, s).set_value(comment.c_str());
+			
 			}break;
 
 		case REMOTEUI_PARAM_UNKNOWN:
@@ -406,12 +399,11 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string ke
 			break;
 	}
 
-	s.setAttribute("name", key);
 	if(!active){
-		s.setAttribute("disabled", "1");
+		s.append_attribute("disabled").set_value("1");
 	}
-	s.setToParent();
 }
+
 #endif
 
 void ofxRemoteUIServer::saveGroupToXML(string fileName, string groupName, bool oldFormat){
@@ -460,6 +452,7 @@ void ofxRemoteUIServer::saveToXML(string fileName, bool oldFormat){
 #ifdef OF_AVAILABLE
 void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 
+	TS_START_NIF("saveToXMLv2");
 	bool savingGroupOnly = groupName.size() != 0;
 	if(!savingGroupOnly){
 		saveSettingsBackup(); //every time , before we save
@@ -470,15 +463,11 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 	}
 
 	RLOG_NOTICE << "Saving to XML (using the V2 format) '" << fileName << "'" ;
-	ofXmlObject s;
+	pugi::xml_document s;
 
-	s.addChild(OFXREMOTEUI_XML_ROOT_TAG);
-	s.setTo(OFXREMOTEUI_XML_ROOT_TAG); //get into root
-
-	s.addValue(OFXREMOTEUI_XML_V_TAG, OFXREMOTEUI_XML_FORMAT_VER); //v2
-
-	s.addChild(OFXREMOTEUI_XML_TAG); //add and dive into OFX_REMOTE_UI_PARAMS
-	s.setTo(OFXREMOTEUI_XML_TAG);
+	pugi::xml_node root = s.append_child(OFXREMOTEUI_XML_ROOT_TAG);
+	root.append_child(OFXREMOTEUI_XML_V_TAG).append_child(pugi::node_pcdata).set_value(OFXREMOTEUI_XML_FORMAT_VER);
+	pugi::xml_node paramsList = root.append_child(OFXREMOTEUI_XML_TAG);
 
 	//save all params
 	int numSaved = 0;
@@ -499,7 +488,8 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 				save = true;
 			}
 			if(save){
-				saveParamToXmlSettings(t, key, s, numSaved, true);
+				auto thisParamXml = paramsList.append_child("P");
+				saveParamToXmlSettings(t, key, thisParamXml, numSaved, true);
 				numSaved++;
 				savedParams.push_back(key);
 			}
@@ -511,13 +501,9 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 	if(!savingGroupOnly){ //group presets dont save disabled stuff
 		//add comment separating enabled params from disabled params
 		if(orderedKeys_removed.size()){
-			Poco::XML::Element *el = s.getPocoElement();
-			Poco::XML::Comment *ce = s.getPocoDocument()->createComment(Poco::XML::toXMLString("                                                                                 "));
-			el->appendChild((Poco::XML::Node*)ce);
-			ce = s.getPocoDocument()->createComment(Poco::XML::toXMLString(" ############################## DISABLED PARAMS ################################# "));
-			el->appendChild((Poco::XML::Node*)ce);
-			ce = s.getPocoDocument()->createComment(Poco::XML::toXMLString("                                                                                 "));
-			el->appendChild((Poco::XML::Node*)ce);
+			paramsList.append_child(pugi::node_comment).set_value("                                                                                                  ");
+			paramsList.append_child(pugi::node_comment).set_value(" ###################################### DISABLED PARAMS ######################################### ");
+			paramsList.append_child(pugi::node_comment).set_value("                                                                                                  ");
 		}
 		//save removed params
 		int c = 0;
@@ -525,7 +511,8 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 			string key = orderedKeys_removed[i];
 			if (find(savedParams.begin(), savedParams.end(), key) == savedParams.end()){
 				RemoteUIParam &t = params_removed[key];
-				saveParamToXmlSettings(t, key, s, numSaved + c, false);
+				auto thisParamXml = paramsList.append_child("P");
+				saveParamToXmlSettings(t, key, thisParamXml, numSaved + c, false);
 				c++;
 			}else{
 				//param is defined as both params_removed[] and params[], most likely we loaded XML b4 we finished defining all code params...
@@ -535,21 +522,35 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 	}
 	dataMutex.unlock();
 
-	s.setToParent(); //up 1 level
 	if(!savingGroupOnly){ //group presets dont embed port
-		s.addValue(OFXREMOTEUI_XML_PORT_TAG, port);
+		root.append_child(OFXREMOTEUI_XML_PORT_TAG).append_child(pugi::node_pcdata).set_value(ofToString(port).c_str());
 	}
-	s.addValue(OFXREMOTEUI_XML_ENABLED_TAG, enabled);
+
+	root.append_child(OFXREMOTEUI_XML_ENABLED_TAG).append_child(pugi::node_pcdata).set_value(ofToString(enabled).c_str());
+
+	s.save_file(ofToDataPath("test.xml").c_str());
+
 
 	//s.save(fileName); //this is replaced by the code below to avoid this crash on exit https://github.com/openframeworks/openFrameworks/issues/5298
+
+	struct xml_string_writer: pugi::xml_writer{
+		std::string result;
+		virtual void write(const void* data, size_t size){
+			result.append(static_cast<const char*>(data), size);
+		}
+	};
+
+	xml_string_writer writer;
+	s.print(writer);
 
 	ofstream myfile;
 	string fullPath = dataPath + "/" + fileName;
 	myfile.open(fullPath.c_str());
-	myfile << s.toString();
+	myfile << writer.result;
 	myfile.close();
-
 	RLOG_NOTICE << "Done saving! (using the V2 format) '" << fileName << "'" ;
+
+	TS_STOP_NIF("saveToXMLv2");
 }
 #endif
 

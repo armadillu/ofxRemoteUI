@@ -67,6 +67,7 @@
 
 #define BG_COLOR_ALPHA			55
 
+
 //handle poco being a separate addon after 0.9.8 - and ofXML went from a pocoXML based implementation
 //to a pugiXML based implementation
 #if OF_VERSION_MAJOR>0 || (OF_VERSION_MAJOR==0 && OF_VERSION_MINOR>=10)
@@ -281,7 +282,7 @@ protected:
 
 	void			saveParamToXmlSettings(const RemoteUIParam & p, std::string key, ofxXmlSettings & s, XmlCounter & counter);
 	#ifdef OF_AVAILABLE
-	void			saveParamToXmlSettings(const RemoteUIParam & p, std::string key, ofXmlObject & s, int index, bool active);
+	void			saveParamToXmlSettings(const RemoteUIParam & p, const std::string & key, pugi::xml_node & s, int index, bool active);
 	#endif
 	void			saveSettingsBackup();
 
