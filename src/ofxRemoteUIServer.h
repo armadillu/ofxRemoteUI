@@ -165,6 +165,8 @@ public:
 	//param ignore list - use this if you want to load presets but want to ignore certain
 	//params that are defined in those presets (ie a "debug" or similar param)
 	void addParamToPresetLoadIgnoreList(const std::string & param);
+	void removeParamFromPresetLoadIgnoreList(const std::string & param);
+	bool paramIsInPresetLoadIgnoreList(const std::string & param);
 	void clearParamToPresetLoadIgnoreList();
 
 	void watchParamOnScreen(const std::string& paramName);

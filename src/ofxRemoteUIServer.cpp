@@ -528,11 +528,7 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 
 	root.append_child(OFXREMOTEUI_XML_ENABLED_TAG).append_child(pugi::node_pcdata).set_value(ofToString(enabled).c_str());
 
-	s.save_file(ofToDataPath("test.xml").c_str());
-
-
 	//s.save(fileName); //this is replaced by the code below to avoid this crash on exit https://github.com/openframeworks/openFrameworks/issues/5298
-
 	struct xml_string_writer: pugi::xml_writer{
 		std::string result;
 		virtual void write(const void* data, size_t size){
@@ -562,6 +558,13 @@ void ofxRemoteUIServer::loadPresetNamed(std::string presetName){
 		path += "." + string(OFXREMOTEUI_PRESET_FILE_EXTENSION);
 	}
 	loadFromXMLv2(path);
+	RemoteUIServerCallBackArg cbArg;
+	cbArg.action = SERVER_DID_PROGRAMATICALLY_LOAD_PRESET;
+	cbArg.msg = presetName;
+	if(callBack) callBack(cbArg);
+	#ifdef OF_AVAILABLE
+	ofNotifyEvent(clientAction, cbArg, this);
+	#endif
 }
 
 vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
@@ -620,6 +623,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 	bool loaded = xml.load(fileName);
 	if(!loaded){
 		RLOG_ERROR << "can't load XML file at " << fileName;
+		return loadedParams;
 	}
 
 	auto paramsXml = xml.findFirst("//" + string(OFXREMOTEUI_XML_ROOT_TAG) + "/" + string(OFXREMOTEUI_XML_TAG)).getChildren("P");
@@ -2823,6 +2827,18 @@ void ofxRemoteUIServer::addParamToPresetLoadIgnoreList(const std::string & param
 	paramsToIgnoreWhenLoadingPresets.push_back(param);
 }
 
+bool ofxRemoteUIServer::paramIsInPresetLoadIgnoreList(const std::string & param){
+	auto it = std::find(paramsToIgnoreWhenLoadingPresets.begin(), paramsToIgnoreWhenLoadingPresets.end(), param);
+	return it != paramsToIgnoreWhenLoadingPresets.end();
+}
+
+
+void ofxRemoteUIServer::removeParamFromPresetLoadIgnoreList(const std::string & param){
+	auto it = std::find(paramsToIgnoreWhenLoadingPresets.begin(), paramsToIgnoreWhenLoadingPresets.end(), param);
+	if(it != paramsToIgnoreWhenLoadingPresets.end()){
+		paramsToIgnoreWhenLoadingPresets.erase(it);
+	}
+}
 
 void ofxRemoteUIServer::clearParamToPresetLoadIgnoreList(){
 	paramsToIgnoreWhenLoadingPresets.clear();
