@@ -11,14 +11,17 @@
 @implementation LogWindows
 
 -(id)init{
+	return self;
+}
 
-	NSFont * font = [NSFont fontWithName:@"Monaco" size:10];
-	[[serverLogView textStorage] setFont:font];
-	[[logView  textStorage] setFont:font];
+
+-(void)awakeFromNib{
+	NSFont * font = [NSFont systemFontOfSize:11];
+	[serverLogView setFont:font];
+	[logView setFont:font];
 	[self appendToServerLog:@"\n"];
 	[self appendToLog:@"\n"];
 
-	return self;
 }
 
 
@@ -82,6 +85,12 @@
 -(void)appendToLog:(NSString*)line{
 	[[logView textStorage] beginEditing];
 	[[[logView textStorage] mutableString] appendString:line];
+	[[logView textStorage] endEditing];
+}
+
+-(void)appendToLogWithAttr:(NSAttributedString*) line;{
+	[[logView textStorage] beginEditing];
+	[[logView textStorage] appendAttributedString:line];
 	[[logView textStorage] endEditing];
 }
 

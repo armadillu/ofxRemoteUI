@@ -58,6 +58,7 @@
 -(void)fadeOutSlowly;
 -(void)flashWarning:(NSNumber *)times;
 -(void)flashBackground:(NSNumber *)times;
+-(void)flashDiff:(NSNumber *)times;
 -(void)hideWarning;
 -(void)disableChanges;
 -(void)enableChanges;

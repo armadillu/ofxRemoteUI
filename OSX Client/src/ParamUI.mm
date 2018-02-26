@@ -48,7 +48,7 @@
 	[ui setWantsLayer:YES];
 	CALayer *viewLayer = [CALayer layer];
 	[ui setLayer:viewLayer];
-	//[viewLayer setOpaque:YES];
+	[viewLayer setOpaque:NO];
 
 	[paramLabel setButtonType:NSMomentaryChangeButton];
 
@@ -61,27 +61,28 @@
 
 	//disable implicit caAnims
 	NSMutableDictionary *newActions = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-									   [NSNull null], @"onOrderIn",
-									   [NSNull null], @"onOrderOut",
+									   [NSNull null], kCAOnOrderIn,
+									   [NSNull null], kCAOnOrderOut,
 									   [NSNull null], @"sublayers",
 									   [NSNull null], @"contents",
 									   [NSNull null], @"bounds",
 									   nil];
 	viewLayer.actions = newActions;
 	l.actions = newActions;
+	[paramLabel layer].actions = newActions;
 	[newActions release];
 	return self;
 }
 
 -(void)fadeOut{
-	[ui setWantsLayer:YES];
+	//[ui setWantsLayer:YES];
 	[ui layer].opacity = 0.25;
 }
 
 
 -(void)fadeIn{
 	[ui layer].opacity = 1;
-	[ui setWantsLayer:NO];
+	//[ui setWantsLayer:NO];
 }
 
 -(void)fadeOutSlowly{
@@ -196,6 +197,47 @@
 	[CATransaction commit];
 }
 
+
+-(void)flashDiff:(NSNumber *) times{
+
+	__block int localTimes = (int)[times integerValue];
+	//NSLog(@"flash diff %d", [times intValue]);
+
+	if([times intValue] == NUM_DIFF_FLASH){
+		[paramLabel setWantsLayer:YES];
+		[paramLabel setLayer:[CALayer layer]];
+		[[paramLabel layer] removeAllAnimations];
+	}else{	//not first call, we've been flashing for a while!
+		if (localTimes <= 1){ //last flash
+			//NSLog(@"done");
+			[paramLabel layer].backgroundColor = nil;
+			[paramLabel setWantsLayer:NO];
+			[paramLabel setLayer:nil];
+			return;
+		}
+	}
+	float duration = 0.2;
+	[CATransaction begin];
+	[CATransaction setAnimationDuration:duration];
+	[CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
+	[CATransaction setCompletionBlock:^{
+		localTimes--;
+		if(localTimes > 0){
+			[self performSelector:@selector(flashDiff:) withObject:[NSNumber numberWithInt:localTimes] afterDelay:0];
+		}
+	}];
+	if(localTimes%2 == 1){
+		//NSLog(@"back!");
+		//[paramLabel layer].transform = CATransform3DMakeTranslation(0,0,0);
+		[paramLabel layer].backgroundColor = [NSColor clearColor].CGColor;
+	}else{
+		//NSLog(@"go!");
+		//[paramLabel layer].transform = CATransform3DMakeTranslation(10, 0, 0);
+		[paramLabel layer].backgroundColor = [NSColor redColor].CGColor;
+	}
+	[CATransaction commit];
+}
+
 -(void)awakeFromNib{
 
 	// create alternating row look
@@ -252,7 +294,7 @@
 }
 
 -(void)waitForMIDIAnimationTrigger{
-	[ui setWantsLayer:YES];
+	//[ui setWantsLayer:YES];
 	[CATransaction begin];
 	[CATransaction setAnimationDuration: 0.33];
 		if([ui layer].opacity < 0.66 || !midiHighlightAnim){
@@ -265,12 +307,12 @@
 	if(!midiHighlightAnim){
 		[waitingForMidiTimer invalidate];
 		waitingForMidiTimer = nil;
-		[ui setWantsLayer:NO];
+		//[ui setWantsLayer:NO];
 	}
 }
 
 -(void)stopMidiAnim{
-	[ui setWantsLayer:NO];
+	//[ui setWantsLayer:NO];
 	midiHighlightAnim = false;
 }
 
@@ -512,6 +554,16 @@
 	[del clearSelectionPresetMenu];
 	[del getClient]->setGroupPreset(currentPreset, param.group);
 	NSLog(@"user chose group preset: %s", currentPreset.c_str() );
+
+	del->userPresetSelectionHistory.push_back(currentPreset);
+	while(del->userPresetSelectionHistory.size() > 2){ //only keep last 2
+		del->userPresetSelectionHistory.erase(del->userPresetSelectionHistory.begin());
+	}
+
+	del->previousParams.clear();
+	for(int i = 0; i < del->orderedKeys.size(); i++){
+		del->previousParams[del->orderedKeys[i]] = del->widgets[ del->orderedKeys[i] ]->param;
+	}
 }
 
 

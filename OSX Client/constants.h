@@ -17,6 +17,7 @@
 #define DIRTY_PRESET_NAME		@"*No Preset"
 #define NUM_FLASH_WARNING		5
 #define NUM_BOUND_FLASH			15
+#define NUM_DIFF_FLASH			10
 #define MAIN_WINDOW_NON_LIST_H (82 + 66)
 
 #define DEFAULT_BINDINGS_FOLDER ([NSString stringWithFormat:@"%@/Library/Application Support/ofxRemoteUIClient/",NSHomeDirectory()])

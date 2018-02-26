@@ -70,8 +70,11 @@ void clientCallback(RemoteUIClientCallBackArg a);
 
 	NSMutableArray*					currentNeighbors;
 
-	unordered_map<string, ParamUI*>			widgets;
+	unordered_map<string, ParamUI*>	widgets;
 	vector<string>					orderedKeys; // used to keep the order in which the items were added
+
+	unordered_map<string, RemoteUIParam> previousParams;
+	vector<string> userPresetSelectionHistory;
 
 	unordered_map<string, ParamUI*>	spacerGroups; // a subset of the params, only the spacer params
 	ofxRemoteUIClient *				client;

@@ -23,6 +23,7 @@
 -(IBAction)clearServerLog:(id)sender;
 -(void)appendToServerLog:(NSString*)line ;
 -(void)appendToLog:(NSString*) line;
+-(void)appendToLogWithAttr:(NSAttributedString*) line;
 
 
 @end

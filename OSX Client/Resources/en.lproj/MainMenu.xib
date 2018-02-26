@@ -572,8 +572,8 @@ DQ
                         <rect key="frame" x="0.0" y="67" width="372" height="258"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" copiesOnScroll="NO" id="ujQ-Be-xjs">
-                            <rect key="frame" x="0.0" y="0.0" width="361" height="258"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <rect key="frame" x="0.0" y="0.0" width="357" height="258"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <view canDrawConcurrently="YES" id="736">
                                     <rect key="frame" x="0.0" y="0.0" width="413" height="258"/>
@@ -694,6 +694,7 @@ DQ
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="211" y="124" width="276" height="378"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1178"/>
+            <value key="minSize" type="size" width="276" height="378"/>
             <view key="contentView" id="903">
                 <rect key="frame" x="0.0" y="0.0" width="276" height="378"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -703,7 +704,7 @@ DQ
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="QVp-Gz-07t">
                             <rect key="frame" x="1" y="1" width="276" height="357"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="panel" spellingCorrection="YES" id="905">
                                     <rect key="frame" x="0.0" y="0.0" width="276" height="357"/>
@@ -1053,6 +1054,7 @@ DQ
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="211" y="124" width="276" height="378"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1178"/>
+            <value key="minSize" type="size" width="276" height="378"/>
             <view key="contentView" id="emX-Uc-Fwf">
                 <rect key="frame" x="0.0" y="0.0" width="276" height="378"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -1062,7 +1064,7 @@ DQ
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="Ou1-1I-RwU">
                             <rect key="frame" x="1" y="1" width="276" height="357"/>
-                            <autoresizingMask key="autoresizingMask"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="panel" spellingCorrection="YES" id="uDF-AI-XiX">
                                     <rect key="frame" x="0.0" y="0.0" width="276" height="357"/>

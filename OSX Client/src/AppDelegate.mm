@@ -71,7 +71,61 @@ void clientCallback(RemoteUIClientCallBackArg a){
 				[[me getExternalDevices] updateDevicesWithClientValues:FALSE resetToZero: FALSE paramName:""]; //udpate
 			}
 			[me updateGroupPopup];
-			
+
+			NSDictionary *normalAtts = @{NSFontAttributeName: [NSFont systemFontOfSize:11],
+										 NSForegroundColorAttributeName: [NSColor blackColor]};
+
+			NSDictionary *boldAtts = @{NSFontAttributeName: [NSFont boldSystemFontOfSize:11],
+										 NSForegroundColorAttributeName: [NSColor blackColor]};
+
+			NSDictionary *valueAtts = @{NSFontAttributeName: [NSFont boldSystemFontOfSize:11],
+										 NSForegroundColorAttributeName: [NSColor redColor]};
+
+			for(auto & it : me->previousParams){
+				auto it2 = me->widgets.find(it.first);
+				if(it2 != me->widgets.end()){
+					bool equal = it.second.isEqualTo(it2->second->param);
+					if(it.second.type != REMOTEUI_PARAM_SPACER && !equal ){
+						//NSLog(@"param diff: %s", it.first.c_str());
+						std::stringstream ss;
+						if(me->userPresetSelectionHistory.size() >= 2){
+							string oldPresetName = me->userPresetSelectionHistory[0];
+							string newPresetName = me->userPresetSelectionHistory[1];
+
+							NSMutableAttributedString *mutableAttString = [[NSMutableAttributedString alloc] init] ;
+							[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: @"\t"  attributes:normalAtts] autorelease]];
+							[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String:it.first.c_str()]  attributes:boldAtts] autorelease]];
+							[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: @" >> "  attributes:normalAtts] autorelease]];
+							[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String:it.second.getValueAsString().c_str()] attributes:valueAtts] autorelease]];
+							[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: @" ("  attributes:normalAtts] autorelease]];
+							[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String:oldPresetName.c_str()]  attributes:normalAtts] autorelease]];
+							[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: @") / "  attributes:normalAtts] autorelease]];
+							[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String:it2->second->param.getValueAsString().c_str()] attributes:valueAtts] autorelease]];
+							[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: @" (" attributes:normalAtts] autorelease]];
+							[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String:newPresetName.c_str()] attributes:normalAtts] autorelease]];
+							[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: @")" attributes:normalAtts] autorelease]];
+
+							[logs appendToLogWithAttr:mutableAttString];
+							[mutableAttString release];
+							[logs appendToLog:@"\n"];
+
+						}else{
+							NSMutableAttributedString *mutableAttString = [[NSMutableAttributedString alloc] init] ;
+							[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: @"\t"  attributes:normalAtts] autorelease]];
+							[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String:it.first.c_str()]  attributes:boldAtts] autorelease]];
+							[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: @" >> "  attributes:normalAtts] autorelease]];
+							[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String:it.second.getValueAsString().c_str()] attributes:valueAtts] autorelease]];
+							[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: @" <-> "  attributes:normalAtts] autorelease]];
+							[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String:it2->second->param.getValueAsString().c_str()] attributes:valueAtts] autorelease]];
+
+							[logs appendToLogWithAttr:mutableAttString];
+							[mutableAttString release];
+							[logs appendToLog:@"\n"];
+						}
+						[it2->second flashDiff:[NSNumber numberWithInt:NUM_DIFF_FLASH]];
+					}
+				}
+			}
 			}break;
 
 		case SERVER_PRESETS_LIST_UPDATED:{
@@ -474,7 +528,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification{
 
-	NSLog(@"become active %@", [NSDate date]);
+	//NSLog(@"become active %@", [NSDate date]);
 	if(connectButton.state == 0 && launched && client->isSetup()){
 		[self connect];
 	}
@@ -860,6 +914,7 @@ NSDate * willResign = nil;
 	}else{
 		currentGroup = [groupName UTF8String];
 	}
+
 	//NSLog(@"user chose group: _%s_",currentGroup.c_str());
 	[self layoutWidgetsWithConfig: [self calcLayoutParams]];
 }
@@ -874,6 +929,16 @@ NSDate * willResign = nil;
 	string prest = [[[sender itemAtIndex:index] title] UTF8String];
 	client->setPreset(prest);
 	currentPreset = prest;
+
+	userPresetSelectionHistory.push_back(currentPreset);
+	while(userPresetSelectionHistory.size() > 2){ //only keep last 2
+		userPresetSelectionHistory.erase(userPresetSelectionHistory.begin());
+	}
+
+	previousParams.clear();
+	for(int i = 0; i < orderedKeys.size(); i++){
+		previousParams[orderedKeys[i]] = widgets[ orderedKeys[i] ]->param;
+	}
 
 	//set all group presets to dirty
 	for(int i = 0; i < orderedKeys.size(); i++){
@@ -1116,6 +1181,9 @@ NSDate * willResign = nil;
 
 	NSString * date = [[NSDate date] descriptionWithCalendarFormat:@"%H:%M:%S" timeZone:nil locale:nil];
 
+	//clear all diff related history
+	userPresetSelectionHistory.clear();
+	previousParams.clear();
 
 	if ([[connectButton title] isEqualToString:CONNECT_STRING]){ //we are not connected, let's connect
 
