@@ -1930,20 +1930,23 @@ void ofxRemoteUIServer::updateServer(float dt){
 	while( oscReceiver.hasWaitingMessages() or wsMessages.size()){// check for waiting messages from client
 
 		ofxOscMessage m;
+		string remoteIP;
         if (useWebSockets && wsMessages.size()) {
             m = ofxOscMessage(wsMessages.front());
+			remoteIP = m.getRemoteIp();
             wsMessages.pop_front();
         }
         else {
             oscReceiver.getNextMessage(m);
+			remoteIP = m.getRemoteIp();
             if (!readyToSend ){ // if not connected, connect to our friend so we can talk back
-                connect(m.getRemoteIp(), port + 1);
+                connect(remoteIP, port + 1);
             }
         }
 
 		DecodedMessage dm = decode(m);
 		RemoteUIServerCallBackArg cbArg; // to notify our "delegate"
-		cbArg.host = m.getRemoteIp();
+		cbArg.host = remoteIP;
 		switch (dm.action) {
 
 			case HELO_ACTION: //if client says hi, say hi back
@@ -1954,17 +1957,17 @@ void ofxRemoteUIServer::updateServer(float dt){
 				onScreenNotifications.addNotification("CONNECTED (" + cbArg.host +  ")!");
 				ofNotifyEvent(clientAction, cbArg, this);
 				#endif
-				if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " says HELLO!";
+				if(verbose_) RLOG_VERBOSE << remoteIP << " says HELLO!";
 
 				break;
 
 			case REQUEST_ACTION:{ //send all params to client
-				if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " sends REQU!";
+				if(verbose_) RLOG_VERBOSE << remoteIP << " sends REQU!";
 				pushParamsToClient();
 				}break;
 
 			case SEND_PARAM_ACTION:{ //client is sending us an updated val
-				if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " sends SEND!";
+				if(verbose_) RLOG_VERBOSE << remoteIP << " sends SEND!";
 				auto it = params.find(dm.paramName);
 				if(it != params.end()){ //ignore param updates that talk about params we dont know about
 					updateParamFromDecodedMessage(m, dm);
@@ -2003,12 +2006,12 @@ void ofxRemoteUIServer::updateServer(float dt){
 				#endif
 				clearOscReceiverMsgQueue();
 				readyToSend = false;
-				if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " says CIAO!" ;
+				if(verbose_) RLOG_VERBOSE << remoteIP << " says CIAO!" ;
 			}break;
 
 			case TEST_ACTION: // we got a request from client, lets bounce back asap.
 				sendTEST();
-				//if(verbose)RLOG_VERBOSE << "ofxRemoteUIServer: " << m.getRemoteIp() << " says TEST!" ;
+				//if(verbose)RLOG_VERBOSE << "ofxRemoteUIServer: " << remoteIP << " says TEST!" ;
 				break;
 
 			case PRESET_LIST_ACTION: //client wants us to send a list of all available presets
