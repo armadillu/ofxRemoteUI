@@ -210,13 +210,19 @@
 	}else{	//not first call, we've been flashing for a while!
 		if (localTimes <= 1){ //last flash
 			//NSLog(@"done");
-			[paramLabel layer].backgroundColor = nil;
-			[paramLabel setWantsLayer:NO];
-			[paramLabel setLayer:nil];
+
+			// in 3 seconds, start fading out
+			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 3 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+				[CATransaction begin]; //last blink fades out slowly towards normal
+				[CATransaction setAnimationDuration:3];
+				[CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
+				[paramLabel layer].backgroundColor = nil;
+				[CATransaction commit];
+			});
 			return;
 		}
 	}
-	float duration = 0.2;
+	float duration = 0.1;
 	[CATransaction begin];
 	[CATransaction setAnimationDuration:duration];
 	[CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
