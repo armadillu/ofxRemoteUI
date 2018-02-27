@@ -75,6 +75,9 @@ void clientCallback(RemoteUIClientCallBackArg a);
 
 	unordered_map<string, RemoteUIParam> previousParams;
 	vector<string> userPresetSelectionHistory;
+	float userChosePresetTimeout; //we use this to keep track of users chosing presets; when user chose a preset, this timer
+									//counts N seconds back to zero. If we get a "SERVER_SENT_FULL_PARAMS_UPDATE" callback, we know its
+									//bc the user asked for a preset (so we can do the diff thing)
 
 	unordered_map<string, ParamUI*>	spacerGroups; // a subset of the params, only the spacer params
 	ofxRemoteUIClient *				client;

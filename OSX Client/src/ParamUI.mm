@@ -555,6 +555,7 @@
 	[del getClient]->setGroupPreset(currentPreset, param.group);
 	NSLog(@"user chose group preset: %s", currentPreset.c_str() );
 
+	del->userChosePresetTimeout = PRESET_REQUEST_REPLY_TIMEOUT;
 	del->userPresetSelectionHistory.push_back(currentPreset);
 	while(del->userPresetSelectionHistory.size() > 2){ //only keep last 2
 		del->userPresetSelectionHistory.erase(del->userPresetSelectionHistory.begin());
