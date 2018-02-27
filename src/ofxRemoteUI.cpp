@@ -352,20 +352,22 @@ void ofxRemoteUI::updateParamFromDecodedMessage(const ofxOscMessage & m, Decoded
 		case ENUM_ARG:{
 			p.type = REMOTEUI_PARAM_ENUM;
 			p.intVal = m.getArgAsInt32(arg); arg++;
-			if(m.getNumArgs() > 1){
-				p.minInt = m.getArgAsInt32(arg); arg++;
-				p.maxInt = m.getArgAsInt32(arg); arg++;
-			}
 			if (p.intValAddr){
 				*p.intValAddr = p.intVal;
 			}
-			int n = m.getNumArgs() - 5 - 3; // 3 >> the int vals, 5 >> 4 colors + 1 group
-			int i = 0;
-			p.enumList.clear();
-			for (i = 0; i < n; i++) {
-				p.enumList.push_back( m.getArgAsString(arg + i) );
+			if(m.getNumArgs() > 1){ //for standard RUI client
+				p.minInt = m.getArgAsInt32(arg); arg++;
+				p.maxInt = m.getArgAsInt32(arg); arg++;
+				int n = m.getNumArgs() - 5 - 3; // 3 >> the int vals, 5 >> 4 colors + 1 group
+				int i = 0;
+				p.enumList.clear();
+				for (i = 0; i < n; i++) {
+					p.enumList.push_back( m.getArgAsString(arg + i) );
+				}
+				arg = arg + i;
+			}else{ //for basic enum suppport, where only the enum int value is sent (ie vezer)
+				arg ++; //only one param was used
 			}
-			arg = arg + i;
 		}break;
 
 		case BOL_ARG:
