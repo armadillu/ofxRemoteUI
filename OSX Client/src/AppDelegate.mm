@@ -106,24 +106,21 @@ void clientCallback(RemoteUIClientCallBackArg a){
 								[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String:it2->second->param.getValueAsString().c_str()] attributes:valueAtts] autorelease]];
 								[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: @" (" attributes:normalAtts] autorelease]];
 								[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String:newPresetName.c_str()] attributes:normalAtts] autorelease]];
-								[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: @")" attributes:normalAtts] autorelease]];
-
+								[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: @")\n" attributes:normalAtts] autorelease]];
 								[logs appendToLogWithAttr:mutableAttString];
 								[mutableAttString release];
-								[logs appendToLog:@"\n"];
 
 							}else{
 								NSMutableAttributedString *mutableAttString = [[NSMutableAttributedString alloc] init] ;
-								[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: @"\t"  attributes:normalAtts] autorelease]];
+								[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: @"\t" attributes:normalAtts] autorelease]];
 								[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String:it.first.c_str()]  attributes:boldAtts] autorelease]];
-								[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: @" >> "  attributes:normalAtts] autorelease]];
+								[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: @" >> " attributes:normalAtts] autorelease]];
 								[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String:it.second.getValueAsString().c_str()] attributes:valueAtts] autorelease]];
-								[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: @" <-> "  attributes:normalAtts] autorelease]];
+								[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: @" <-> " attributes:normalAtts] autorelease]];
 								[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: [NSString stringWithUTF8String:it2->second->param.getValueAsString().c_str()] attributes:valueAtts] autorelease]];
-
+								[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: @"\n" attributes:normalAtts] autorelease]];
 								[logs appendToLogWithAttr:mutableAttString];
 								[mutableAttString release];
-								[logs appendToLog:@"\n"];
 							}
 							[it2->second flashDiff:[NSNumber numberWithInt:NUM_DIFF_FLASH]];
 						}
