@@ -179,12 +179,13 @@ void OscQueryServerMgr::addStringParam(const string & paramName, const RemoteUIP
 
 void OscQueryServerMgr::threadedFunction(){
 
-
 	auto micros = ofGetSystemTimeMicros();
 	webPort = OSC_QUERY_SERVER_PORT_RANGE_LO + micros%(OSC_QUERY_SERVER_PORT_RANGE_HI - OSC_QUERY_SERVER_PORT_RANGE_LO);
 	server = make_shared<Poco::Net::HTTPServer>(new OscQueryServerMgr::RUIRequestHandlerFactory,
 												Poco::Net::ServerSocket(webPort),
 												new Poco::Net::HTTPServerParams);
+
+	ofLogNotice("ofxRemoteUI") << "Starting OSC Query Server at port " << webPort << ".";
 	server->start();
 
 	ofxRemoteUIServer * s = RUI_GET_INSTANCE();
@@ -229,7 +230,7 @@ void OscQueryServerMgr::threadedFunction(){
 		try {
 			int statusCode = ph.wait();
 		} catch (exception e) {
-			ofLogError("ofxRemoteUI::OscQueryServerMgr") << "Wxception while process running \"dns-sd\"";
+			ofLogError("ofxRemoteUI::OscQueryServerMgr") << "Exception while process running \"dns-sd\"";
 			ofLogError("ofxRemoteUI::OscQueryServerMgr") << e.what();
 		}
 
