@@ -16,7 +16,8 @@
 #include "RemoteParam.h"
 #include <Poco/Process.h>
 
-#define OSC_QUERY_SERVER_PORT	24689
+#define OSC_QUERY_SERVER_PORT_RANGE_LO		25000
+#define OSC_QUERY_SERVER_PORT_RANGE_HI		26000
 
 class OscQueryServerMgr : Poco::Util::ServerApplication , public ofThread{
 
@@ -56,5 +57,7 @@ protected:
 	void stopBonjour();
 
 	Poco::ProcessHandle * phPtr = nullptr;
+
+	int webPort = -1;
 };
 

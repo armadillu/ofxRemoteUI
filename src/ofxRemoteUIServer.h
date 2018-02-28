@@ -67,17 +67,6 @@
 
 #define BG_COLOR_ALPHA			55
 
-
-//handle poco being a separate addon after 0.9.8 - and ofXML went from a pocoXML based implementation
-//to a pugiXML based implementation
-#if OF_VERSION_MAJOR>0 || (OF_VERSION_MAJOR==0 && OF_VERSION_MINOR>=10)
-	#include "ofxXmlPoco.h"
-	#define ofXmlObject ofxXmlPoco
-#else
-	#define ofXmlObject ofXml
-#endif
-
-
 // Define RUI_WEB_INTERFACE to turn ON websockets/webserver
 #ifdef RUI_WEB_INTERFACE
     #include "ofxLibwebsockets.h"
