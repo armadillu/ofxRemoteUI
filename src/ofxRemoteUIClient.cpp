@@ -122,7 +122,8 @@ void ofxRemoteUIClient::updateAutoDiscovery(float dt){
 	while( broadcastReceiver.hasWaitingMessages() ){// check for waiting messages from client
 		ofxOscMessage m;
 		broadcastReceiver.getNextMessage(m);
-		neigbhorChange |= closebyServers.gotPing( m.getRemoteIp(), m.getArgAsInt32(0)/*port*/, m.getArgAsString(1)/*computerName*/, m.getArgAsString(2)/*binaryName*/);
+		string host = m.getRemoteIp();
+		neigbhorChange |= closebyServers.gotPing( host, m.getArgAsInt32(0)/*port*/, m.getArgAsString(1)/*computerName*/, m.getArgAsString(2)/*binaryName*/);
 		//read the broadcast sequence number
 		int broadcastSequenceNumber = m.getArgAsInt32(3);
 		neighborJustLaunched = (broadcastSequenceNumber == 0); //keep track of just launched apps
@@ -130,12 +131,12 @@ void ofxRemoteUIClient::updateAutoDiscovery(float dt){
 			if(callBack != NULL){
 				RemoteUIClientCallBackArg cbArg; // to notify our "delegate"
 				cbArg.action = NEIGHBOR_JUST_LAUNCHED_SERVER;
-				cbArg.host = m.getRemoteIp();
+				cbArg.host = host;
 				cbArg.port = m.getArgAsInt32(0);
 				callBack(cbArg);
 			}
 		}
-		//cout << "got broadcast message from " << m.getRemoteIp() << ":" << m.getArgAsInt32(0) ;
+		//cout << "got broadcast message from " << host << ":" << m.getArgAsInt32(0) ;
 		//closebyServers.print();
 	}
 
@@ -192,7 +193,8 @@ void ofxRemoteUIClient::update(float dt){
 
 			DecodedMessage dm = decode(m);
 			RemoteUIClientCallBackArg cbArg; // to notify our "delegate"
-			cbArg.host = m.getRemoteIp();
+			string host = m.getRemoteIp();
+			cbArg.host = host;
 
 			switch (dm.action) {
 
@@ -215,7 +217,7 @@ void ofxRemoteUIClient::update(float dt){
 				}break;
 
 				case REQUEST_ACTION: //server closed the REQU, so we should have all the params
-					if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " says REQUEST_ACTION!" ;
+					if(verbose_) RLOG_VERBOSE << host << " says REQUEST_ACTION!" ;
 					if(callBack != NULL){
 						cbArg.action = SERVER_SENT_FULL_PARAMS_UPDATE;
 						callBack(cbArg);
@@ -223,14 +225,14 @@ void ofxRemoteUIClient::update(float dt){
 					break;
 
 				case SEND_PARAM_ACTION:{ //server is sending us an updated val
-					if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " says SEND_PARAM_ACTION!" ;
+					if(verbose_) RLOG_VERBOSE << host << " says SEND_PARAM_ACTION!" ;
 					updateParamFromDecodedMessage(m, dm);
 					gotNewInfo = true;
 				}
 					break;
 
 				case CIAO_ACTION:{
-					if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " says CIAO!" ;
+					if(verbose_) RLOG_VERBOSE << host << " says CIAO!" ;
 					if(callBack != NULL){
 						cbArg.action = SERVER_DISCONNECTED;
 						callBack(cbArg);
@@ -253,7 +255,7 @@ void ofxRemoteUIClient::update(float dt){
 					break;
 
 				case PRESET_LIST_ACTION: //server sends us the list of current presets
-					if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " says PRESET_LIST_ACTION!" ;
+					if(verbose_) RLOG_VERBOSE << host << " says PRESET_LIST_ACTION!" ;
 					fillPresetListFromMessage(m);
 					if(callBack != NULL){
 						cbArg.action = SERVER_PRESETS_LIST_UPDATED;
@@ -272,7 +274,7 @@ void ofxRemoteUIClient::update(float dt){
 					break;
 
 				case SET_PRESET_ACTION: // server confirms that it has set the preset, request a full update
-					if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " says SET_PRESET_ACTION!" ;
+					if(verbose_) RLOG_VERBOSE << host << " says SET_PRESET_ACTION!" ;
 					requestCompleteUpdate();
 					if(callBack != NULL){
 						cbArg.action = SERVER_DID_SET_PRESET;
@@ -282,7 +284,7 @@ void ofxRemoteUIClient::update(float dt){
 					break;
 
 				case SAVE_PRESET_ACTION:{ // server confirms that it has save the preset,
-					if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " says SAVE_PRESET_ACTION!" ;
+					if(verbose_) RLOG_VERBOSE << host << " says SAVE_PRESET_ACTION!" ;
 					vector<string> a;
 					sendPREL(a); //request preset list to server, send empty vector
 					cbArg.action = SERVER_SAVED_PRESET;
@@ -291,7 +293,7 @@ void ofxRemoteUIClient::update(float dt){
 				}break;
 
 				case DELETE_PRESET_ACTION:{ // server confirms that it has deleted preset
-					if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " says DELETE_PRESET_ACTION!" ;
+					if(verbose_) RLOG_VERBOSE << host << " says DELETE_PRESET_ACTION!" ;
 					vector<string> a;
 					sendPREL(a); //request preset list to server, send empty vector
 					if(callBack != NULL){
@@ -302,7 +304,7 @@ void ofxRemoteUIClient::update(float dt){
 				}break;
 
 				case RESET_TO_XML_ACTION:{ // server confrims
-					if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " says RESET_TO_XML_ACTION!" ;
+					if(verbose_) RLOG_VERBOSE << host << " says RESET_TO_XML_ACTION!" ;
 					requestCompleteUpdate();
 					if(callBack != NULL){
 						cbArg.action = SERVER_DID_RESET_TO_XML;
@@ -311,7 +313,7 @@ void ofxRemoteUIClient::update(float dt){
 				}break;
 
 				case RESET_TO_DEFAULTS_ACTION:{ // server confrims
-					if(verbose_) RLOG_VERBOSE  << m.getRemoteIp() << " says RESET_TO_DEFAULTS_ACTION!" ;
+					if(verbose_) RLOG_VERBOSE  << host << " says RESET_TO_DEFAULTS_ACTION!" ;
 					requestCompleteUpdate();
 					if(callBack != NULL){
 						cbArg.action = SERVER_DID_RESET_TO_DEFAULTS;
@@ -320,7 +322,7 @@ void ofxRemoteUIClient::update(float dt){
 				}break;
 
 				case SAVE_CURRENT_STATE_ACTION: // server confirms that it has saved
-					if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " says SAVE_CURRENT_STATE_ACTION!" ;
+					if(verbose_) RLOG_VERBOSE << host << " says SAVE_CURRENT_STATE_ACTION!" ;
 					if(callBack != NULL){
 						cbArg.action = SERVER_CONFIRMED_SAVE;
 						callBack(cbArg);
@@ -328,7 +330,7 @@ void ofxRemoteUIClient::update(float dt){
 					break;
 
 				case SET_GROUP_PRESET_ACTION: // server confirms that it has set the group preset, request a full update
-					if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " says SET_GROUP_PRESET_ACTION!" ;
+					if(verbose_) RLOG_VERBOSE << host << " says SET_GROUP_PRESET_ACTION!" ;
 					requestCompleteUpdate();
 					if(callBack != NULL){
 						cbArg.action = SERVER_DID_SET_GROUP_PRESET;
@@ -339,7 +341,7 @@ void ofxRemoteUIClient::update(float dt){
 					break;
 
 				case SAVE_GROUP_PRESET_ACTION:{ // server confirms that it has saved the group preset,
-					if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " says SAVE_GROUP_PRESET_ACTION!" ;
+					if(verbose_) RLOG_VERBOSE << host << " says SAVE_GROUP_PRESET_ACTION!" ;
 					vector<string> a;
 					sendPREL(a); //request preset list to server, send empty vector
 					cbArg.action = SERVER_SAVED_GROUP_PRESET;
@@ -349,7 +351,7 @@ void ofxRemoteUIClient::update(float dt){
 				}break;
 
 				case DELETE_GROUP_PRESET_ACTION:{ // server confirms that it has deleted the group preset
-					if(verbose_) RLOG_VERBOSE << m.getRemoteIp() << " says DELETE_GROUP_PRESET_ACTION!" ;
+					if(verbose_) RLOG_VERBOSE << host << " says DELETE_GROUP_PRESET_ACTION!" ;
 					vector<string> a;
 					sendPREL(a); //request preset list to server, send empty vector
 					if(callBack != NULL){
