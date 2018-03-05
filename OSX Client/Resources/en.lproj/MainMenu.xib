@@ -704,7 +704,7 @@ DQ
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="QVp-Gz-07t">
                             <rect key="frame" x="1" y="1" width="276" height="357"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="panel" spellingCorrection="YES" id="905">
                                     <rect key="frame" x="0.0" y="0.0" width="276" height="357"/>
@@ -758,6 +758,7 @@ DQ
                 <outlet property="externalDevices" destination="2Zb-ca-xWd" id="ltN-5B-9Lp"/>
                 <outlet property="groupsMenu" destination="751" id="800"/>
                 <outlet property="groupsMenuBar" destination="813" id="890"/>
+                <outlet property="highlightParamDiffOnPresetLoad" destination="VRR-ve-jyb" id="Nlm-l8-aMv"/>
                 <outlet property="listContainer" destination="736" id="739"/>
                 <outlet property="logs" destination="3Oo-4X-4Jp" id="zoO-ug-YbX"/>
                 <outlet property="neigbhorsField" destination="7FO-s2-6sZ" id="0N8-pR-SOS"/>
@@ -779,31 +780,31 @@ DQ
         <window title="ofxRemoteUIClientOSX Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="prefs" animationBehavior="default" id="986" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES" texturedBackground="YES"/>
             <windowPositionMask key="initialPositionMask" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="344" y="728" width="308" height="213"/>
+            <rect key="contentRect" x="344" y="728" width="308" height="223"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1178"/>
             <value key="minSize" type="size" width="333" height="186"/>
             <value key="maxSize" type="size" width="333" height="187"/>
-            <view key="contentView" id="987">
-                <rect key="frame" x="0.0" y="0.0" width="308" height="213"/>
+            <view key="contentView" misplaced="YES" id="987">
+                <rect key="frame" x="0.0" y="0.0" width="308" height="223"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <box autoresizesSubviews="NO" borderType="line" titlePosition="noTitle" id="995">
-                        <rect key="frame" x="17" y="16" width="274" height="191"/>
+                    <box autoresizesSubviews="NO" misplaced="YES" borderType="line" titlePosition="noTitle" id="995">
+                        <rect key="frame" x="17" y="16" width="274" height="203"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <view key="contentView" id="ceq-iU-ZW0">
-                            <rect key="frame" x="1" y="1" width="272" height="189"/>
+                            <rect key="frame" x="1" y="1" width="272" height="201"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <colorWell id="988">
-                                    <rect key="frame" x="124" y="38" width="95" height="20"/>
+                                <colorWell misplaced="YES" id="988">
+                                    <rect key="frame" x="124" y="33" width="95" height="20"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <color key="color" red="1" green="0.30487959939999998" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                     <connections>
                                         <action selector="applyPrefs:" target="494" id="999"/>
                                     </connections>
                                 </colorWell>
-                                <button toolTip="The main window of ofxRemoteUI floats on top of any other windows" id="991">
-                                    <rect key="frame" x="15" y="157" width="218" height="20"/>
+                                <button toolTip="The main window of ofxRemoteUI floats on top of any other windows" misplaced="YES" id="991">
+                                    <rect key="frame" x="15" y="172" width="218" height="20"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="check" title="Main Window Always on Top" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="992">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -813,8 +814,8 @@ DQ
                                         <action selector="applyPrefs:" target="494" id="1000"/>
                                     </connections>
                                 </button>
-                                <textField toolTip="Tint the main ofxRemoteUI window" verticalHuggingPriority="750" id="989">
-                                    <rect key="frame" x="16" y="38" width="96" height="17"/>
+                                <textField toolTip="Tint the main ofxRemoteUI window" verticalHuggingPriority="750" misplaced="YES" id="989">
+                                    <rect key="frame" x="16" y="33" width="96" height="17"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Window Color:" id="990">
                                         <font key="font" metaFont="smallSystem"/>
@@ -822,8 +823,8 @@ DQ
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <button toolTip="Will Display Growl notifications when important events happen" id="2V9-4V-IRq">
-                                    <rect key="frame" x="15" y="140" width="218" height="20"/>
+                                <button toolTip="Will Display Growl notifications when important events happen" misplaced="YES" id="2V9-4V-IRq">
+                                    <rect key="frame" x="15" y="155" width="218" height="20"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="check" title="Show Notifications (Growl)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="Hmg-i2-mKA">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -833,8 +834,8 @@ DQ
                                         <action selector="applyPrefs:" target="494" id="Hh5-RP-iBx"/>
                                     </connections>
                                 </button>
-                                <button id="SUX-g4-3ud">
-                                    <rect key="frame" x="15" y="123" width="268" height="20"/>
+                                <button misplaced="YES" id="SUX-g4-3ud">
+                                    <rect key="frame" x="15" y="138" width="268" height="20"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <string key="toolTip">If enabled, Joystick and MIDI buttons will just change the boolean param state when  pressed; otherwise they set the value to TRUE for as long as being held down. Applies to Joystick Buttons and MIDI "Note" events.</string>
                                     <buttonCell key="cell" type="check" title="External Buttons are Toggle (joy/midi)" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="SqB-9T-V1B">
@@ -845,8 +846,8 @@ DQ
                                         <action selector="applyPrefs:" target="2Zb-ca-xWd" id="aAE-wW-l8U"/>
                                     </connections>
                                 </button>
-                                <button toolTip="If enabled, ofxRemoteUIClient will auto-connect to apps that just launched in the local neighbor (if not currently connected)" id="fxe-d6-Ssj">
-                                    <rect key="frame" x="15" y="88" width="257" height="20"/>
+                                <button toolTip="If enabled, ofxRemoteUIClient will auto-connect to apps that just launched in the local neighbor (if not currently connected)" misplaced="YES" id="fxe-d6-Ssj">
+                                    <rect key="frame" x="15" y="103" width="257" height="20"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="check" title="AutoConnect to just-launched Apps" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="HjG-CT-Kxg">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -856,8 +857,8 @@ DQ
                                         <action selector="applyPrefs:" target="494" id="NGm-5L-Xtg"/>
                                     </connections>
                                 </button>
-                                <popUpButton verticalHuggingPriority="750" id="kwe-yR-X90">
-                                    <rect key="frame" x="121" y="15" width="101" height="22"/>
+                                <popUpButton verticalHuggingPriority="750" misplaced="YES" id="kwe-yR-X90">
+                                    <rect key="frame" x="121" y="10" width="101" height="22"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <popUpButtonCell key="cell" type="push" title="Tiny (20px)" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="2" imageScaling="proportionallyDown" inset="2" selectedItem="dcg-nO-c5z" id="HSC-Sv-im6">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -874,8 +875,8 @@ DQ
                                         <action selector="applyPrefs:" target="494" id="paP-t7-Y72"/>
                                     </connections>
                                 </popUpButton>
-                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="1uT-aL-D0d">
-                                    <rect key="frame" x="16" y="16" width="124" height="18"/>
+                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" setsMaxLayoutWidthAtFirstLayout="YES" id="1uT-aL-D0d">
+                                    <rect key="frame" x="16" y="11" width="124" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Param List UI Size:" id="7HB-Gy-PhG">
                                         <font key="font" metaFont="smallSystem"/>
@@ -883,12 +884,12 @@ DQ
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <box verticalHuggingPriority="750" boxType="separator" id="DP9-nk-wZY">
-                                    <rect key="frame" x="18" y="63" width="240" height="5"/>
+                                <box verticalHuggingPriority="750" misplaced="YES" boxType="separator" id="DP9-nk-wZY">
+                                    <rect key="frame" x="18" y="58" width="240" height="5"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 </box>
-                                <button toolTip="If enabled, ofxRemoteUIClient will auto-connect to apps that just launched in the local neighbor (if not currently connected)" id="a7S-db-wpa">
-                                    <rect key="frame" x="30" y="71" width="257" height="20"/>
+                                <button toolTip="If enabled, ofxRemoteUIClient will auto-connect to apps that just launched in the local neighbor (if not currently connected)" misplaced="YES" id="a7S-db-wpa">
+                                    <rect key="frame" x="30" y="86" width="257" height="20"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="check" title="Only to Local ofxRemoteUIServers" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="I43-fA-5XH">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -898,8 +899,8 @@ DQ
                                         <action selector="applyPrefs:" target="494" id="EdT-Ym-C9q"/>
                                     </connections>
                                 </button>
-                                <button id="WN5-Pv-3OJ">
-                                    <rect key="frame" x="15" y="106" width="268" height="20"/>
+                                <button misplaced="YES" id="WN5-Pv-3OJ">
+                                    <rect key="frame" x="15" y="121" width="268" height="20"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <string key="toolTip">If enabled, Joystick and MIDI buttons will just change the boolean param state when  pressed; otherwise they set the value to TRUE for as long as being held down. Applies to Joystick Buttons and MIDI "Note" events.</string>
                                     <buttonCell key="cell" type="check" title="Knobs on Color controls Alpha / Hue" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="IKR-65-qfh">
@@ -910,13 +911,25 @@ DQ
                                         <action selector="applyPrefs:" target="2Zb-ca-xWd" id="aMt-dt-C5o"/>
                                     </connections>
                                 </button>
+                                <button misplaced="YES" id="VRR-ve-jyb">
+                                    <rect key="frame" x="15" y="68" width="268" height="20"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <string key="toolTip">If enabled, Joystick and MIDI buttons will just change the boolean param state when  pressed; otherwise they set the value to TRUE for as long as being held down. Applies to Joystick Buttons and MIDI "Note" events.</string>
+                                    <buttonCell key="cell" type="check" title="Highlight param diff's when loading presets" bezelStyle="regularSquare" imagePosition="left" controlSize="small" inset="2" id="DBO-kV-Rk3">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="smallSystem"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="applyPrefs:" target="494" id="fUw-EB-eTw"/>
+                                    </connections>
+                                </button>
                             </subviews>
                         </view>
                     </box>
                 </subviews>
             </view>
             <contentBorderThickness minY="0.0" maxY="100"/>
-            <point key="canvasLocation" x="647" y="733.5"/>
+            <point key="canvasLocation" x="647" y="738.5"/>
         </window>
         <window title="Device Bindings" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="midi" animationBehavior="default" id="4e2-9A-Dy9" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
@@ -1064,7 +1077,7 @@ DQ
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="Ou1-1I-RwU">
                             <rect key="frame" x="1" y="1" width="276" height="357"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="panel" spellingCorrection="YES" id="uDF-AI-XiX">
                                     <rect key="frame" x="0.0" y="0.0" width="276" height="357"/>

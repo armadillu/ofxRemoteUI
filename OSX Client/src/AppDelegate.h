@@ -61,6 +61,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 	IBOutlet NSButton *				autoConnectCheckbox;
 	IBOutlet NSButton *				onlyAutoConnectLocalCheckbox;
 	IBOutlet NSPopUpButton *		rowHeightMenu;
+	IBOutlet NSButton *				highlightParamDiffOnPresetLoad;
 
 
 	IBOutlet ExternalDevices*		externalDevices;
@@ -95,6 +96,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 																	//otherwise, it is true for as long as its pressed
 	BOOL							autoConnectToggle;
 	BOOL							onlyAutoConnectToLocalHost;
+	BOOL 							highlightDiffOnPresetLoad;
 	
 	bool							connecting;
 

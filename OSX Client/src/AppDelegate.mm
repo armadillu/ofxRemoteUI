@@ -72,7 +72,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 			}
 			[me updateGroupPopup];
 
-			if(me->userChosePresetTimeout > 0.01f){
+			if(me->highlightDiffOnPresetLoad && me->userChosePresetTimeout > 0.01f){
 
 				me->userChosePresetTimeout = 0.0f;
 				NSDictionary *normalAtts = @{NSFontAttributeName: [NSFont systemFontOfSize:11],
@@ -1328,6 +1328,9 @@ NSDate * willResign = nil;
 	onlyAutoConnectToLocalHost = (int)[d integerForKey:@"onlyAutoConnectToLocalHost"];
 	[onlyAutoConnectLocalCheckbox setState: onlyAutoConnectToLocalHost];
 
+	highlightDiffOnPresetLoad = (int)[d integerForKey:@"highlightParamDiffsOnPresetLoad"];
+	[highlightParamDiffOnPresetLoad setState: highlightDiffOnPresetLoad];
+
 	rowHeight = (RowHeightSize)[d integerForKey:@"rowHeightSize"];
 	[rowHeightMenu selectItemWithTag:(int)rowHeight];
 	[externalDevices loadPrefs];
@@ -1361,6 +1364,7 @@ NSDate * willResign = nil;
 	[window setColor:[colorWell color]];
 
 	autoConnectToggle = [autoConnectCheckbox state];
+	highlightDiffOnPresetLoad = [highlightParamDiffOnPresetLoad state];
 	onlyAutoConnectToLocalHost = [onlyAutoConnectLocalCheckbox state];
 	[externalDevices applyPrefs:self];
 }
@@ -1372,6 +1376,7 @@ NSDate * willResign = nil;
 	[d setInteger: ([window level] == NSScreenSaverWindowLevel) ? 1 : 0   forKey:@"alwaysOnTop"];
 	[d setInteger: showNotifications  forKey:@"showNotifications"];
 	[d setInteger: autoConnectToggle forKey:@"autoConnectToJustLaunchedApps"];
+	[d setInteger: highlightDiffOnPresetLoad forKey:@"highlightParamDiffsOnPresetLoad"];
 	[d setInteger: onlyAutoConnectToLocalHost forKey:@"onlyAutoConnectToLocalHost"];
 	[d setInteger: (int)rowHeight forKey:@"rowHeightSize"];
 	[externalDevices savePrefs:self];
