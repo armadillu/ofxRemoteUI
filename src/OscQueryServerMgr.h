@@ -9,7 +9,6 @@
 #pragma once
 
 #include "ofMain.h"
-#include <Poco/Util/ServerApplication.h>
 #include <Poco/Net/HTTPServer.h>
 #include <Poco/Net/HTTPRequestHandler.h>
 #include "ofxRemoteUI.h"
@@ -19,7 +18,7 @@
 #define OSC_QUERY_SERVER_PORT_RANGE_LO		25000
 #define OSC_QUERY_SERVER_PORT_RANGE_HI		26000
 
-class OscQueryServerMgr : Poco::Util::ServerApplication , public ofThread{
+class OscQueryServerMgr: public ofThread{
 
 public:
 	

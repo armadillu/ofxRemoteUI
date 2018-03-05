@@ -22,8 +22,12 @@ void OscQueryServerMgr::setup() {
 
 OscQueryServerMgr::~OscQueryServerMgr() {
 	if (server){
-		server->stop();
-		stopBonjour();
+		try{
+			stopBonjour();
+			server->stop();
+		}catch(std::exception e){
+			ofLogError("OscQueryServerMgr") << "Exception trying to stop server and bonjour! - " << e.what();
+		}
 		waitForThread();
 	}
 }
