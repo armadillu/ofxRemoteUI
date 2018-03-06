@@ -160,7 +160,7 @@ public:
 			case REMOTEUI_PARAM_SPACER:
 				equal = false;
 				break;
-			default: printf("weird RemoteUIParam at isEqualTo()!\n"); break;
+			default: RLOG_ERROR << "weird RemoteUIParam at isEqualTo()!"; break;
 		}
 		return equal;
 	}
@@ -229,7 +229,8 @@ public:
 	}
 
 	void print(){
-		printf("%s\n", getInfoAsString().c_str());
+		//printf("%s\n", getInfoAsString().c_str());
+		RLOG_NOTICE << getInfoAsString();
 	};
 
 	ofColor getColor(){
