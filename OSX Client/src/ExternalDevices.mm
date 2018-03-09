@@ -395,7 +395,7 @@ float convertHueToMidiFigtherHue(float hue){
 						}else{ //must be noteOn or noteOff midi msg
 							if(p.type == REMOTEUI_PARAM_BOOL){
 								if(externalButtonsBehaveAsToggle){
-									if(noteOn || noteOff){ //ignore onRelease event if we toggle
+									if(noteOn){ //ignore onRelease event if we toggle
 										p.boolVal = !p.boolVal;
 									}
 								}else{
