@@ -665,7 +665,12 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 							p.floatVal = s.getFloatValue();
 						}else{
 							if(p.type != REMOTEUI_PARAM_FLOAT){ RLOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
-							float val = ofClamp(s.getFloatValue(), p.minFloat, p.maxFloat);
+							float val;
+							if(loadFromXmlClampsToValidRange){
+								val = ofClamp(s.getFloatValue(), p.minFloat, p.maxFloat);
+							}else{
+								val = s.getFloatValue();
+							}
 							p.floatVal = *p.floatValAddr = val;
 							if(verbose_) RLOG_NOTICE << "loading a FLOAT '" << paramName <<"' (" << ofToString( *p.floatValAddr, 3) << ") from XML" ;
 						}
@@ -674,10 +679,15 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 					case 'i':{ //int
 						if (!isAParamWeKnowOf){
 							p.type = REMOTEUI_PARAM_INT;
-							p.intVal = s.getFloatValue();
+							p.intVal = s.getIntValue();
 						}else{
 							if(p.type != REMOTEUI_PARAM_INT){ RLOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
-							int val = ofClamp(s.getIntValue(), p.minInt, p.maxInt);
+							int val;
+							if(loadFromXmlClampsToValidRange){
+								val = ofClamp(s.getIntValue(), p.minInt, p.maxInt);
+							}else{
+								val = s.getIntValue();
+							}
 							p.intVal = *p.intValAddr = val;
 							if(verbose_) RLOG_NOTICE << "loading an INT '" << paramName <<"' (" << (int) *p.intValAddr << ") from XML" ;
 						}

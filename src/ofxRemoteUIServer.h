@@ -167,6 +167,8 @@ public:
 	void setAutoDraw(bool d){autoDraw = d;};
 	bool getAutoDraw(){return autoDraw;}
 
+	void setLoadFromXmlClampsToValidRange(bool clamp){ loadFromXmlClampsToValidRange = clamp;}
+
 	// Font render configs ///////
 
 	void drawUiWithBitmapFont();
@@ -312,6 +314,7 @@ protected:
 	bool			showUI; //displays all params on screen
 	bool			showUIduringEdits;
 	bool			clearXmlOnSaving;  //if false, allows you to keep defaults for old params that you are not sharing anymore
+	bool			loadFromXmlClampsToValidRange = true; //when you load from xml, params are clamped to the supplied min-max range
 
 	char			showInterfaceKey;
 
