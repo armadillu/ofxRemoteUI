@@ -29,6 +29,7 @@ OscQueryServerMgr::~OscQueryServerMgr() {
 			ofLogError("OscQueryServerMgr") << "Exception trying to stop server and bonjour! - " << e.what();
 		}
 		waitForThread();
+		ofSleepMillis(1);
 	}
 }
 
