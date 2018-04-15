@@ -19,7 +19,7 @@
 #include <set>
 #include <vector>
 #include "ofxRemoteUIServerMacros.h"
-#ifdef OF_AVAILABLE
+#if defined( OF_AVAILABLE )
 	#include "ofxRemoteUISimpleNotifications.h"
 	#ifdef TARGET_OSX
 		#include "OscQueryServerMgr.h"
