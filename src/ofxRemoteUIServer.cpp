@@ -452,7 +452,6 @@ void ofxRemoteUIServer::saveToXML(string fileName, bool oldFormat){
 #ifdef OF_AVAILABLE
 void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 
-	TS_START_NIF("saveToXMLv2");
 	bool savingGroupOnly = groupName.size() != 0;
 	if(!savingGroupOnly){
 		saveSettingsBackup(); //every time , before we save
@@ -546,7 +545,6 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 	myfile.close();
 	RLOG_NOTICE << "Done saving! (using the V2 format) '" << fileName << "'" ;
 
-	TS_STOP_NIF("saveToXMLv2");
 }
 #endif
 
