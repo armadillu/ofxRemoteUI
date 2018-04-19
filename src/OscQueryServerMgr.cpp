@@ -184,6 +184,14 @@ void OscQueryServerMgr::addStringParam(const string & paramName, const RemoteUIP
 
 void OscQueryServerMgr::threadedFunction(){
 
+	#ifdef TARGET_WIN32
+	#elif defined(TARGET_LINUX)
+	pthread_setname_np(pthread_self(), "ofxRemoteUI::OscQueryServerMgr");
+	#else
+	pthread_setname_np("ofxRemoteUI::OscQueryServerMgr");
+	#endif
+
+
 	auto micros = ofGetSystemTimeMicros();
 	webPort = OSC_QUERY_SERVER_PORT_RANGE_LO + micros%(OSC_QUERY_SERVER_PORT_RANGE_HI - OSC_QUERY_SERVER_PORT_RANGE_LO);
 	server = make_shared<Poco::Net::HTTPServer>(new OscQueryServerMgr::RUIRequestHandlerFactory,
