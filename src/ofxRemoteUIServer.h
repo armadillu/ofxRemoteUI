@@ -147,7 +147,7 @@ public:
 	void setClearXMLonSave(bool clear){clearXmlOnSaving = clear;} //this only affects xml v1 - not relevant nowadays
 	void setDirectoryPrefix(const std::string & _directoryPrefix); // set the optional directory prefix
 
-	void removeParamFromDB(const std::string & paramName);	//useful for params its value is kinda set and will not change,
+	void removeParamFromDB(const std::string & paramName, bool permanently = false);	//useful for params its value is kinda set and will not change,
 												//to load from xml and then remove from the list to
 												//avoid crowding the UI too much
 

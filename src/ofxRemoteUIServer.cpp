@@ -196,7 +196,7 @@ void ofxRemoteUIServer::setNewParamColor(int num){
 }
 
 
-void ofxRemoteUIServer::removeParamFromDB(const string & paramName){
+void ofxRemoteUIServer::removeParamFromDB(const string & paramName, bool permanently){
 
 	dataMutex.lock();
 	unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
@@ -205,9 +205,11 @@ void ofxRemoteUIServer::removeParamFromDB(const string & paramName){
 
 		if(verbose_) RLOG_WARNING << "removing Param '" << paramName << "' from DB!" ;
 
-		//keep it in the removed struct
-		params_removed[paramName] = it->second;
-		orderedKeys_removed[orderedKeys_removed.size()] = paramName;
+        if(!permanently){
+            //keep it in the removed struct
+            params_removed[paramName] = it->second;
+            orderedKeys_removed[orderedKeys_removed.size()] = paramName;
+        }
 
 		params.erase(it);
 
