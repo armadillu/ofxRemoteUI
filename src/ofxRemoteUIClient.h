@@ -87,6 +87,7 @@ public:
 
 private:
 
+	void 				removeParamFromDB(const string & paramName);
 
 	void					fillPresetListFromMessage(ofxOscMessage m);
 

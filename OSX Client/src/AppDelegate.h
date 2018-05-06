@@ -148,6 +148,7 @@ void clientCallback(RemoteUIClientCallBackArg a);
 
 -(void)fullParamsUpdate;
 -(void)partialParamsUpdate;
+-(void)removeParam:(string) paramName;
 
 -(void)hideAllWarnings;
 

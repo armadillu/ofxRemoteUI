@@ -361,9 +361,56 @@ void ofxRemoteUIClient::update(float dt){
 					}
 				}break;
 
+				case REMOVE_PARAM:{
+					if(verbose_) RLOG_NOTICE << "client confirms that it removed param named: " << dm.paramName;
+					removeParamFromDB(dm.paramName);
+					if(callBack != NULL){
+						cbArg.action = SERVER_ASKED_TO_REMOVE_PARAM;
+						cbArg.msg = dm.paramName;
+						callBack(cbArg);
+					}
+				}
+
 				default: RLOG_ERROR << "update >> UNKNOWN ACTION!!" <<endl; break;
 			}
 		}
+	}
+}
+
+void ofxRemoteUIClient::removeParamFromDB(const string & paramName){
+
+	auto it = params.find(paramName);
+
+	if (it != params.end()){
+
+		if(verbose_) RLOG_WARNING << "removing Param '" << paramName << "' from DB!" ;
+
+		params.erase(it);
+
+		it = paramsFromCode.find(paramName);
+		if (it != paramsFromCode.end()){
+			paramsFromCode.erase(paramsFromCode.find(paramName));
+		}
+
+		it = paramsFromXML.find(paramName);
+		if (it != paramsFromXML.end()){
+			paramsFromXML.erase(it);
+		}
+
+		//re-create orderedKeys
+		vector<string> myOrderedKeys;
+		for(auto iterator = orderedKeys.begin(); iterator != orderedKeys.end(); iterator++) {
+			if (iterator->second != paramName){
+				myOrderedKeys.emplace_back(iterator->second);
+			}
+		}
+		orderedKeys.clear();
+		for(int i = 0; i < myOrderedKeys.size(); i++){
+			orderedKeys[i] = myOrderedKeys[i];
+		}
+
+	}else{
+		RLOG_ERROR << "removeParamFromDB >> trying to delete an nonexistent param (" << paramName << ")" ;
 	}
 }
 
