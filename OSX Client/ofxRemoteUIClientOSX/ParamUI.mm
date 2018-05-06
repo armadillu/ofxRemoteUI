@@ -22,7 +22,7 @@
 	param = p;
 	deleting = false;
 	paramName = name;
-	AppDelegate * delegate = [NSApp delegate];
+	AppDelegate * delegate = (AppDelegate*)[NSApp delegate];
 	RowHeightSize rowH = [delegate getRowHeight];
 	BOOL didLoad = FALSE;
 	switch (rowH) {
@@ -179,7 +179,7 @@
 		float w = [s frame].size.width;
 		int numTicks = w / 7;
 
-		RowHeightSize rowH = [[NSApp delegate] getRowHeight];
+		RowHeightSize rowH = [(AppDelegate*)[NSApp delegate] getRowHeight];
 		if(rowH == LARGE_34){
 			if ([s allowsTickMarkValuesOnly]){ // for int sliders, lets make sure there arent more marks than possible values
 				int range = 1 + [s maxValue] - [s minValue];
