@@ -143,8 +143,8 @@ DecodedMessage ofxRemoteUI::decode(const ofxOscMessage & m){
 		else if (action == "LOG_") dm.action = SEND_LOG_LINE_ACTION;
 		//remove params
 		else if (action == "REMp") {
-			dm.action = SEND_LOG_LINE_ACTION;
-			dm.paramName = m.getArgAsString(1);
+			dm.action = REMOVE_PARAM;
+			dm.paramName = m.getArgAsString(0);
 		}
 	}
 

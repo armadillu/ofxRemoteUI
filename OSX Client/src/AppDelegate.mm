@@ -71,6 +71,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 				[[me getExternalDevices] updateDevicesWithClientValues:FALSE resetToZero: FALSE paramName:""]; //udpate
 			}
 			[me updateGroupPopup];
+			[me updateGroupPresetMenus];
 
 			if(me->highlightDiffOnPresetLoad && me->userChosePresetTimeout > 0.01f){
 
@@ -188,6 +189,13 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 		case NEIGHBOR_JUST_LAUNCHED_SERVER:
 			[me autoConnectToNeighbor:a.host port:a.port];
+			break;
+
+		case SERVER_ASKED_TO_REMOVE_PARAM:
+			[me removeParam: a.msg];
+			[me fullParamsUpdate];
+			[me updateGroupPopup];
+			[me updateGroupPresetMenus];
 			break;
 		default:
 			break;
@@ -673,6 +681,28 @@ NSDate * willResign = nil;
 //		[t disableChanges];
 //	}
 
+}
+
+-(void)removeParam:(string) paramName{
+	auto it = widgets.find(paramName);
+	if(it != widgets.end()){
+		[it->second release];
+		widgets.erase(it);
+	}
+
+	auto it3 = previousParams.find(paramName);
+	if(it3 != previousParams.end()){
+		previousParams.erase(it3);
+	}
+
+	auto it2 = find(orderedKeys.begin(), orderedKeys.end(), paramName);
+	if(it2 != orderedKeys.end()) orderedKeys.erase(it2);
+
+
+	auto it4 = spacerGroups.find(paramName);
+	if(it4 != spacerGroups.end()){
+		spacerGroups.erase(it4);
+	}
 }
 
 
@@ -1439,9 +1469,12 @@ bool resizeWindowUpDown = false; //if you keep changing paramUI size, with this 
 		[externalDevices updateDevicesWithClientValues:FALSE resetToZero: FALSE paramName:name]; //udpate midi motors to match values
 
 		if (spacerGroups.count(p.group) == 1){ //if the group of the param is there
-			ParamUI* pp = spacerGroups[p.group];
-			if (!pp->deleting){
-				[pp resetSelectedPreset];
+			auto it = spacerGroups.find(p.group);
+			if(it != spacerGroups.end()){
+				ParamUI* pp = it->second;
+				if (!pp->deleting){
+					[pp resetSelectedPreset];
+				}
 			}
 		}
 	}
