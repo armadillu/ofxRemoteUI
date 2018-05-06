@@ -82,7 +82,7 @@ void ofApp::setup(){
 	//This is meant to be a way to reduce clutter in the client,
 	//allowing you to phase out params that have settled down and dont
 	//need further editing, but still allowing you to load its value from the xml.
-	//RUI_REMOVE_PARAM(unloadTest);
+	RUI_REMOVE_PARAM(unloadTest);
 	cout << "unloadTest: '" << unloadTest << "'" << endl;
 
 	RUI_WATCH_PARAM(currentMouseX); //this will print the supplied param all the time on screen,
