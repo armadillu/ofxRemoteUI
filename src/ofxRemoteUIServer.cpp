@@ -205,6 +205,12 @@ void ofxRemoteUIServer::removeParamFromDB(const string & paramName, bool permane
 
 		if(verbose_) RLOG_WARNING << "removing Param '" << paramName << "' from DB!" ;
 
+		//remove the param trace as being sent over OSC , in case they want to add it again 
+		auto it2 = paramsSentOverOsc.find(paramName);
+		if(it2 != paramsSentOverOsc.end()){
+			paramsSentOverOsc.erase(it2);
+		}
+
         if(!permanently){
             //keep it in the removed struct
             params_removed[paramName] = it->second;
@@ -234,6 +240,8 @@ void ofxRemoteUIServer::removeParamFromDB(const string & paramName, bool permane
 		for(int i = 0; i < myOrderedKeys.size(); i++){
 			orderedKeys[i] = myOrderedKeys[i];
 		}
+
+		sendREMp(paramName);
 
 	}else{
 		RLOG_ERROR << "removeParamFromDB >> trying to delete an nonexistent param (" << paramName << ")" ;
@@ -2546,7 +2554,6 @@ void ofxRemoteUIServer::sendLogToClient(const string & message){
 	RLOG_WARNING << "RUI_LOG(" + message + ")";
 	onScreenNotifications.addLogLine(message, true);
 }
-
 
 
 void ofxRemoteUIServer::saveToXMLv1(string fileName){

@@ -17,7 +17,6 @@ void ofApp::setup(){
 	menu = MENU_OPTION_1;
 	unloadTest = "inited from source";
 
-
 	// START THE SERVER ///////////////////////////////////////////
 	RUI_SETUP(); 	//specify a port if you want a specific one
 					//if you dont specify, the server will choose a random one
@@ -83,7 +82,7 @@ void ofApp::setup(){
 	//This is meant to be a way to reduce clutter in the client,
 	//allowing you to phase out params that have settled down and dont
 	//need further editing, but still allowing you to load its value from the xml.
-	RUI_REMOVE_PARAM(unloadTest);
+	//RUI_REMOVE_PARAM(unloadTest);
 	cout << "unloadTest: '" << unloadTest << "'" << endl;
 
 	RUI_WATCH_PARAM(currentMouseX); //this will print the supplied param all the time on screen,
@@ -141,11 +140,6 @@ void ofApp::draw(){
 
 
 void ofApp::keyPressed( int key ){
-//	//force an update in the client side (same as pressing sync button on osx client)
-//	RUI_PUSH_TO_CLIENT();
-//
-//	//and also send a text log line to the client
-//	RUI_LOG("key pressed at %f", ofGetElapsedTimef());
 
 	if(key == '1'){
 		RUI_SHARE_PARAM(test, 0, 1);
@@ -155,6 +149,18 @@ void ofApp::keyPressed( int key ){
 		RUI_GET_INSTANCE()->removeParamFromDB("test");
 	}
 
+	if(key == '3'){
+		RUI_GET_INSTANCE()->removeParamFromDB("x");
+	}
+
+	if(key == '9'){
+		//force an update in the client side (same as pressing sync button on osx client)
+		RUI_PUSH_TO_CLIENT();
+	}
+	if(key == '0'){
+		//and also send a text log line to the client
+		RUI_LOG("key pressed at %f", ofGetElapsedTimef());
+	}
 }
 
 

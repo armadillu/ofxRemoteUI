@@ -282,6 +282,7 @@ protected:
 	void sendRESD(bool confirm = false); //send a "restore fom code defaults" msg
 	void sendSAVE(bool confirm = false);
 	void sendMISP(std::vector<std::string> missingParamsInPreset);
+	void sendREMp(const string & paramName); //server sends client a msg about removing a param from the GUI
 
 	//group preset methods (note lowercase p, l)
 	void sendSAVp(std::string presetName, std::string group, bool confirm = false);

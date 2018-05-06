@@ -881,6 +881,20 @@ void ofxRemoteUI::sendMISP(vector<std::string> missingParamsInPreset){
 	sendMessage(m);
 }
 
+void ofxRemoteUI::sendREMp(const string & paramName){
+	if(verbose_) RLOG_VERBOSE << "sendREMp() " << paramName ;
+	if(readyToSend){
+		ofxOscMessage m;
+		m.setAddress("/REMp");
+		m.addStringArg(paramName);
+		try{
+			sendMessage(m);
+		}catch(exception e){
+			RLOG_ERROR << "Exception sendREMp " << e.what() ;
+		}
+	}
+}
+
 void ofxRemoteUI::sendDELP(std::string presetName, bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendDELP()";
 	ofxOscMessage m;
