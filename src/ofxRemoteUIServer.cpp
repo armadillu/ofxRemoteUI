@@ -100,35 +100,35 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	for(int i = 0; i < numHues; i++){
 		float hue = fmod( i * ( 255.0f / numHues), 255.0f );
 		ofColor c = ofColor::fromHsb(hue, 255.0f, 230.0f, BG_COLOR_ALPHA);
-		colorTables.push_back( c );
+		colorTables.emplace_back( c );
 	}
-//	colorTables.push_back(ofColor(254,19,41,BG_COLOR_ALPHA) );
-//	colorTables.push_back(ofColor(255,82,0,BG_COLOR_ALPHA) );
-//	colorTables.push_back(ofColor(255,234,0,BG_COLOR_ALPHA) );
-//	colorTables.push_back(ofColor(86,203,0,BG_COLOR_ALPHA) );
-//	colorTables.push_back(ofColor(0,136,58,BG_COLOR_ALPHA) );
-//	colorTables.push_back(ofColor(23,234,237,BG_COLOR_ALPHA) );
-//	colorTables.push_back(ofColor(0,150,255,BG_COLOR_ALPHA) );
-//	colorTables.push_back(ofColor(11,51,255,BG_COLOR_ALPHA) );
-//	colorTables.push_back(ofColor(139,2,190,BG_COLOR_ALPHA) );
-//	colorTables.push_back(ofColor(255,20,214,BG_COLOR_ALPHA) );
+//	colorTables.emplace_back(ofColor(254,19,41,BG_COLOR_ALPHA) );
+//	colorTables.emplace_back(ofColor(255,82,0,BG_COLOR_ALPHA) );
+//	colorTables.emplace_back(ofColor(255,234,0,BG_COLOR_ALPHA) );
+//	colorTables.emplace_back(ofColor(86,203,0,BG_COLOR_ALPHA) );
+//	colorTables.emplace_back(ofColor(0,136,58,BG_COLOR_ALPHA) );
+//	colorTables.emplace_back(ofColor(23,234,237,BG_COLOR_ALPHA) );
+//	colorTables.emplace_back(ofColor(0,150,255,BG_COLOR_ALPHA) );
+//	colorTables.emplace_back(ofColor(11,51,255,BG_COLOR_ALPHA) );
+//	colorTables.emplace_back(ofColor(139,2,190,BG_COLOR_ALPHA) );
+//	colorTables.emplace_back(ofColor(255,20,214,BG_COLOR_ALPHA) );
 
 	uiLines.setMode(OF_PRIMITIVE_LINES);
 	ofAddListener(eventShowParamUpdateNotification, this, &ofxRemoteUIServer::onShowParamUpdateNotification);
 #else
 	int a = 44;
-	colorTables.push_back(ofColor(194,144,221,a) );
-	colorTables.push_back(ofColor(202,246,70,a)  );
-	colorTables.push_back(ofColor(74,236,173,a)  );
-	colorTables.push_back(ofColor(253,144,150,a) );
-	colorTables.push_back(ofColor(41,176,238,a)  );
-	colorTables.push_back(ofColor(180,155,45,a)  );
-	colorTables.push_back(ofColor(63,216,92,a)   );
-	colorTables.push_back(ofColor(226,246,139,a) );
-	colorTables.push_back(ofColor(239,209,46,a)  );
-	colorTables.push_back(ofColor(234,127,169,a) );
-	colorTables.push_back(ofColor(227,184,233,a) );
-	colorTables.push_back(ofColor(165,154,206,a) );
+	colorTables.emplace_back(ofColor(194,144,221,a) );
+	colorTables.emplace_back(ofColor(202,246,70,a)  );
+	colorTables.emplace_back(ofColor(74,236,173,a)  );
+	colorTables.emplace_back(ofColor(253,144,150,a) );
+	colorTables.emplace_back(ofColor(41,176,238,a)  );
+	colorTables.emplace_back(ofColor(180,155,45,a)  );
+	colorTables.emplace_back(ofColor(63,216,92,a)   );
+	colorTables.emplace_back(ofColor(226,246,139,a) );
+	colorTables.emplace_back(ofColor(239,209,46,a)  );
+	colorTables.emplace_back(ofColor(234,127,169,a) );
+	colorTables.emplace_back(ofColor(227,184,233,a) );
+	colorTables.emplace_back(ofColor(165,154,206,a) );
 #endif
 
 }
@@ -199,7 +199,7 @@ void ofxRemoteUIServer::setNewParamColor(int num){
 void ofxRemoteUIServer::removeParamFromDB(const string & paramName, bool permanently){
 
 	dataMutex.lock();
-	unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+	auto it = params.find(paramName);
 
 	if (it != params.end()){
 
@@ -223,25 +223,20 @@ void ofxRemoteUIServer::removeParamFromDB(const string & paramName, bool permane
 			paramsFromXML.erase(it);
 		}
 
-
 		//re-create orderedKeys
 		vector<string> myOrderedKeys;
-		map<int, string>::iterator iterator;
-
-		for(iterator = orderedKeys.begin(); iterator != orderedKeys.end(); iterator++) {
-
+		for(auto iterator = orderedKeys.begin(); iterator != orderedKeys.end(); iterator++) {
 			if (iterator->second != paramName){
-				//positionsToDelete.push_back(iterator->first);
-				myOrderedKeys.push_back(iterator->second);
+				myOrderedKeys.emplace_back(iterator->second);
 			}
 		}
-
 		orderedKeys.clear();
 		for(int i = 0; i < myOrderedKeys.size(); i++){
 			orderedKeys[i] = myOrderedKeys[i];
 		}
+
 	}else{
-		RLOG_ERROR << "removeParamFromDB >> trying to delete an unexistant param (" << paramName << ")" ;
+		RLOG_ERROR << "removeParamFromDB >> trying to delete an nonexistent param (" << paramName << ")" ;
 	}
 	dataMutex.unlock();
 }
@@ -492,7 +487,7 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 				auto thisParamXml = paramsList.append_child("P");
 				saveParamToXmlSettings(t, key, thisParamXml, numSaved, true);
 				numSaved++;
-				savedParams.push_back(key);
+				savedParams.emplace_back(key);
 			}
 		}else{
 			RLOG_WARNING << "param '" << key << "' not found in DB!";
@@ -642,7 +637,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 			continue;
 		}
 
-		unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+		auto it = params.find(paramName);
 		bool isAParamWeKnowOf = it != params.end();
 
 		if (readKeys.find(paramName) == readKeys.end()){ //lets not read keys twice, only read the first one we find in xml
@@ -650,7 +645,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 			if(type.length() >	0){
 
 				readKeys[paramName] = true;
-				loadedParams.push_back(paramName);
+				loadedParams.emplace_back(paramName);
 				RemoteUIParam p;
 
 				if(isAParamWeKnowOf){
@@ -775,9 +770,9 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 					params_removed[paramName] = p;
 				}
 
-				if(paramsLoadedFromXML.find(paramName) == paramsLoadedFromXML.end()){
+				if(paramsWereLoadedFromXML.find(paramName) == paramsWereLoadedFromXML.end()){
 					//if(isAParamWeKnowOf){ //defined in src by calling rui_share_param()
-					paramsLoadedFromXML[paramName] = true;
+					paramsWereLoadedFromXML[paramName] = true;
 					//}
 					paramsFromXML[paramName] = p;
 				}
@@ -786,14 +781,14 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 	}
 
 	vector<string> paramsNotInXML;
-	for( unordered_map<string, RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+	for( auto ii = params.begin(); ii != params.end(); ++ii ){
 		string paramName = (*ii).first;
 		//param name found in xml
 		if( find(loadedParams.begin(), loadedParams.end(), paramName) != loadedParams.end() ){
 
 		}else{ //param name not in xml
 			if ((*ii).second.type != REMOTEUI_PARAM_SPACER){ //spacers dont count as params really
-				paramsNotInXML.push_back(paramName);
+				paramsNotInXML.emplace_back(paramName);
 			}
 		}
 	}
@@ -811,7 +806,7 @@ void ofxRemoteUIServer::restoreAllParamsToInitialXML(){
 
 	dataMutex.lock();
 
-	for( unordered_map<string, RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+	for( auto ii = params.begin(); ii != params.end(); ++ii ){
 		string key = (*ii).first;
 		if (params[key].type != REMOTEUI_PARAM_SPACER){
 			if (paramsFromXML.find(key) != paramsFromXML.end()){
@@ -853,7 +848,7 @@ void ofxRemoteUIServer::restoreAllParamsToInitialXML(){
 
 void ofxRemoteUIServer::restoreAllParamsToDefaultValues(){
 	dataMutex.lock();
-	for( unordered_map<string, RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+	for( auto ii = params.begin(); ii != params.end(); ++ii ){
 		string key = (*ii).first;
 		params[key] = paramsFromCode[key];
 		syncPointerToParam(key);
@@ -869,8 +864,7 @@ void ofxRemoteUIServer::pushParamsToClient(){
 	for(int i = 0 ; i < changedParams.size(); i++){
 		string pName = changedParams[i];
 		RemoteUIParam &p = params[pName];
-		onScreenNotifications.addParamUpdate(pName, p,
-											 ofColor(p.r, p.g, p.b, p.a),
+		onScreenNotifications.addParamUpdate(pName, p, ofColor(p.r, p.g, p.b, p.a),
 			p.type == REMOTEUI_PARAM_COLOR ?
 			ofColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal) :
 			ofColor(0,0,0,0)
@@ -888,7 +882,7 @@ void ofxRemoteUIServer::pushParamsToClient(){
 		//also send the presets list
 		presetNames = getAvailablePresets();
 		if (presetNames.size() == 0){
-			presetNames.push_back(OFXREMOTEUI_NO_PRESETS);
+			presetNames.emplace_back(OFXREMOTEUI_NO_PRESETS);
 		}
 		sendPREL(presetNames);
 	}
@@ -1420,7 +1414,7 @@ void ofxRemoteUIServer::refreshPresetsCache(){
 	//get all group presets
 	groupPresetsCached.clear();
 	dataMutex.lock();
-	for( unordered_map<string, RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+	for( auto ii = params.begin(); ii != params.end(); ++ii ){
 		if((*ii).second.type == REMOTEUI_PARAM_SPACER){
 			groupPresetsCached[(*ii).second.group] = getAvailablePresetsForGroup((*ii).second.group);
 		};
@@ -1974,6 +1968,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case REQUEST_ACTION:{ //send all params to client
 				if(verbose_) RLOG_VERBOSE << remoteIP << " sends REQU!";
 				pushParamsToClient();
+				sentParamsToClient = true;
 				}break;
 
 			case SEND_PARAM_ACTION:{ //client is sending us an updated val
@@ -2027,7 +2022,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case PRESET_LIST_ACTION: //client wants us to send a list of all available presets
 				presetNames = getAvailablePresets();
 				if (presetNames.size() == 0){
-					presetNames.push_back(OFXREMOTEUI_NO_PRESETS);
+					presetNames.emplace_back(OFXREMOTEUI_NO_PRESETS);
 				}
 				sendPREL(presetNames);
 				break;
@@ -2118,7 +2113,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				vector<string> filtered;
 				for(int i = 0; i < missingParams.size(); i++){
 					if ( params[ missingParams[i] ].group == groupName ){
-						filtered.push_back(missingParams[i]);
+						filtered.emplace_back(missingParams[i]);
 					}
 				}
 				sendSETp(presetName, groupName);
@@ -2150,6 +2145,10 @@ void ofxRemoteUIServer::updateServer(float dt){
 				if(verbose_) RLOG_NOTICE << "saving NEW preset: " << presetName ;
 			}break;
 
+			case REMOVE_PARAM:{
+				if(verbose_) RLOG_NOTICE << "client confirms that it removed param named: " << dm.paramName;
+			}
+
 			case DELETE_GROUP_PRESET_ACTION:{
 				string presetName = cleanCharsForFileSystem(m.getArgAsString(0));
 				string groupName = cleanCharsForFileSystem(m.getArgAsString(1));
@@ -2168,9 +2167,24 @@ void ofxRemoteUIServer::updateServer(float dt){
 			default: RLOG_ERROR << "updateServer >> ERR!"; break;
 		}
 	}
-	dataMutex.unlock();
 
+	//let's see if there's some params that we have that have never been sent to the client
+	//this would happen if we added new params on the fly as the app runs
+	if(sentParamsToClient && readyToSend){ //only do this after a client successfully connected already (sentParamsToClient==true)
+		bool didSendSome = false;
+		for(auto & pit : params){
+			const string & pName = pit.first;
+			auto it = std::find(paramsSentOverOsc.begin(), paramsSentOverOsc.end(), pName);
+			if(it == paramsSentOverOsc.end() ){
+				sendParam(pName, params[pName]);
+				didSendSome = true;
+			}
+		}
+		if(didSendSome) sendREQU(true);
+	}
+	dataMutex.unlock();
 }
+
 
 void ofxRemoteUIServer::deletePreset(string name, string group){
 	#ifdef OF_AVAILABLE
@@ -2203,7 +2217,7 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(bool onlyGlobal){
 		std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 		if (files[i].isFile() && (extension == "xml" || extension == OFXREMOTEUI_PRESET_FILE_EXTENSION)){
 			string presetName = fileName.substr(0, fileName.size()-4);
-			presets.push_back(presetName);
+			presets.emplace_back(presetName);
 		}
 		if (files[i].isDirectory() && !onlyGlobal){
 			ofDirectory dir2;
@@ -2215,7 +2229,7 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(bool onlyGlobal){
 				std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 				if (files2[j].isFile() && (extension2 == "xml" || extension2 == OFXREMOTEUI_PRESET_FILE_EXTENSION)){
 					string presetName2 = fileName2.substr(0, fileName2.size()-4);
-					presets.push_back(fileName + "/" + presetName2);
+					presets.emplace_back(fileName + "/" + presetName2);
 				}
 			}
 		}
@@ -2228,7 +2242,7 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(bool onlyGlobal){
 			if ( strcmp( get_filename_ext(ent->d_name), OFXREMOTEUI_PRESET_FILE_EXTENSION) == 0 ){
 				string fileName = string(ent->d_name);
 				string presetName = fileName.substr(0, fileName.size()-4);
-				presets.push_back(presetName);
+				presets.emplace_back(presetName);
 			}
 		}
 		closedir(dir2);
@@ -2253,7 +2267,7 @@ vector<string>	ofxRemoteUIServer::getAvailablePresetsForGroup(string group){
 			std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 			if (files[i].isFile() && (extension == "xml" || extension == OFXREMOTEUI_PRESET_FILE_EXTENSION)){
 				string presetName = fileName.substr(0, fileName.size()-4);
-				presets.push_back(presetName);
+				presets.emplace_back(presetName);
 			}
 		}
 	}
@@ -2276,7 +2290,7 @@ void ofxRemoteUIServer::setColorForParam(RemoteUIParam &p, ofColor c){
 void ofxRemoteUIServer::watchParamOnScreen(const string & paramName){
 	dataMutex.lock();
 	if (params.find(paramName) != params.end()){
-		paramsToWatch.push_back(paramName);
+		paramsToWatch.emplace_back(paramName);
 	}else{
 		RLOG_ERROR << "can't watch that param; it doesnt exist! " << paramName << endl;
 	}
@@ -2306,7 +2320,6 @@ void ofxRemoteUIServer::removeAllParamWatches(){
 }
 
 void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamName){
-
 
 	if(p.type != REMOTEUI_PARAM_SPACER && params.size() == 0){ //adding first param! and its not spacer!
 		upcomingGroup = OFXREMOTEUI_DEFAULT_PARAM_GROUP;
@@ -2460,7 +2473,7 @@ void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int ma
 	p.minInt = min;
 	vector<string> list;
 	for(int i = min; i <= max; i++){
-		list.push_back(names[i - min]);
+		list.emplace_back(names[i - min]);
 	}
 	p.enumList = list;
 	p.group = upcomingGroup;
@@ -2558,7 +2571,7 @@ void ofxRemoteUIServer::saveToXMLv1(string fileName){
 	s.pushTag(OFXREMOTEUI_XML_TAG);
 
 	XmlCounter counters;
-	//for( unordered_map<string, RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+	//for( auto ii = params.begin(); ii != params.end(); ++ii ){
 	for(int i = 0; i < orderedKeys.size(); i++){
 
 		string key = orderedKeys[i];
@@ -2593,16 +2606,16 @@ vector<string> ofxRemoteUIServer::loadFromXMLv1(string fileName){
 				if (readKeys.find(paramName) == readKeys.end()){
 					readKeys[paramName] = true;
 					float val = s.getValue(OFXREMOTEUI_FLOAT_PARAM_XML_TAG, 0.0, i);
-					unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+					auto it = params.find(paramName);
 					if ( it != params.end() ){  // found!
-						loadedParams.push_back(paramName);
+						loadedParams.emplace_back(paramName);
 						if(params[paramName].floatValAddr != NULL){
 							*params[paramName].floatValAddr = val;
 							params[paramName].floatVal = val;
 							*params[paramName].floatValAddr = ofClamp(*params[paramName].floatValAddr, params[paramName].minFloat, params[paramName].maxFloat);
-							if(!paramsLoadedFromXML[paramName]){
+							if(!paramsWereLoadedFromXML[paramName]){
 								paramsFromXML[paramName] = params[paramName];
-								paramsLoadedFromXML[paramName] = true;
+								paramsWereLoadedFromXML[paramName] = true;
 							}
 							if(verbose_) RLOG_VERBOSE << "loading a FLOAT '" << paramName <<"' (" << ofToString( *params[paramName].floatValAddr, 3) << ") from XML" ;
 						}else{
@@ -2622,16 +2635,16 @@ vector<string> ofxRemoteUIServer::loadFromXMLv1(string fileName){
 				if (readKeys.find(paramName) == readKeys.end()){
 					readKeys[paramName] = true;
 					float val = s.getValue(OFXREMOTEUI_INT_PARAM_XML_TAG, 0, i);
-					unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+					auto it = params.find(paramName);
 					if ( it != params.end() ){  // found!
-						loadedParams.push_back(paramName);
+						loadedParams.emplace_back(paramName);
 						if(params[paramName].intValAddr != NULL){
 							*params[paramName].intValAddr = val;
 							params[paramName].intVal = val;
 							*params[paramName].intValAddr = ofClamp(*params[paramName].intValAddr, params[paramName].minInt, params[paramName].maxInt);
-							if(!paramsLoadedFromXML[paramName]){
+							if(!paramsWereLoadedFromXML[paramName]){
 								paramsFromXML[paramName] = params[paramName];
-								paramsLoadedFromXML[paramName] = true;
+								paramsWereLoadedFromXML[paramName] = true;
 							}
 							if(verbose_) RLOG_VERBOSE << "loading an INT '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" ;
 						}else{
@@ -2655,9 +2668,9 @@ vector<string> ofxRemoteUIServer::loadFromXMLv1(string fileName){
 					int g = s.getValue("G", 0);
 					int b = s.getValue("B", 0);
 					int a = s.getValue("A", 0);
-					unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+					auto it = params.find(paramName);
 					if ( it != params.end() ){  // found!
-						loadedParams.push_back(paramName);
+						loadedParams.emplace_back(paramName);
 						if(params[paramName].redValAddr != NULL){
 							*params[paramName].redValAddr = r;
 							params[paramName].redVal = r;
@@ -2667,9 +2680,9 @@ vector<string> ofxRemoteUIServer::loadFromXMLv1(string fileName){
 							params[paramName].blueVal = b;
 							*(params[paramName].redValAddr+3) = a;
 							params[paramName].alphaVal = a;
-							if(!paramsLoadedFromXML[paramName]){
+							if(!paramsWereLoadedFromXML[paramName]){
 								paramsFromXML[paramName] = params[paramName];
-								paramsLoadedFromXML[paramName] = true;
+								paramsWereLoadedFromXML[paramName] = true;
 							}
 							if(verbose_) RLOG_VERBOSE << "loading a COLOR '" << paramName <<"' (" << (int)*params[paramName].redValAddr << " " << (int)*(params[paramName].redValAddr+1) << " " << (int)*(params[paramName].redValAddr+2) << " " << (int)*(params[paramName].redValAddr+3)  << ") from XML" ;
 						}else{
@@ -2690,16 +2703,16 @@ vector<string> ofxRemoteUIServer::loadFromXMLv1(string fileName){
 				if (readKeys.find(paramName) == readKeys.end()){
 					readKeys[paramName] = true;
 					float val = s.getValue(OFXREMOTEUI_ENUM_PARAM_XML_TAG, 0, i);
-					unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+					auto it = params.find(paramName);
 					if ( it != params.end() ){  // found!
-						loadedParams.push_back(paramName);
+						loadedParams.emplace_back(paramName);
 						if(params[paramName].intValAddr != NULL){
 							*params[paramName].intValAddr = val;
 							params[paramName].intVal = val;
 							*params[paramName].intValAddr = ofClamp(*params[paramName].intValAddr, params[paramName].minInt, params[paramName].maxInt);
-							if(!paramsLoadedFromXML[paramName]){
+							if(!paramsWereLoadedFromXML[paramName]){
 								paramsFromXML[paramName] = params[paramName];
-								paramsLoadedFromXML[paramName] = true;
+								paramsWereLoadedFromXML[paramName] = true;
 							}
 							if(verbose_) RLOG_VERBOSE << "loading an ENUM '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" ;
 						}else{
@@ -2720,15 +2733,15 @@ vector<string> ofxRemoteUIServer::loadFromXMLv1(string fileName){
 				if (readKeys.find(paramName) == readKeys.end()){
 					readKeys[paramName] = true;
 					float val = s.getValue(OFXREMOTEUI_BOOL_PARAM_XML_TAG, false, i);
-					unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+					auto it = params.find(paramName);
 					if ( it != params.end() ){  // found!
-						loadedParams.push_back(paramName);
+						loadedParams.emplace_back(paramName);
 						if(params[paramName].boolValAddr != NULL){
 							*params[paramName].boolValAddr = val;
 							params[paramName].boolVal = val;
-							if(!paramsLoadedFromXML[paramName]){
+							if(!paramsWereLoadedFromXML[paramName]){
 								paramsFromXML[paramName] = params[paramName];
-								paramsLoadedFromXML[paramName] = true;
+								paramsWereLoadedFromXML[paramName] = true;
 							}
 							if(verbose_) RLOG_VERBOSE << "loading a BOOL '" << paramName <<"' (" << (bool) *params[paramName].boolValAddr << ") from XML" ;
 						}else{
@@ -2748,15 +2761,15 @@ vector<string> ofxRemoteUIServer::loadFromXMLv1(string fileName){
 				if (readKeys.find(paramName) == readKeys.end()){
 					readKeys[paramName] = true;
 					string val = s.getValue(OFXREMOTEUI_STRING_PARAM_XML_TAG, "", i);
-					unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+					auto it = params.find(paramName);
 					if ( it != params.end() ){  // found!
-						loadedParams.push_back(paramName);
+						loadedParams.emplace_back(paramName);
 						if(params[paramName].stringValAddr != NULL){
 							params[paramName].stringVal = val;
 							*params[paramName].stringValAddr = val;
-							if(!paramsLoadedFromXML[paramName]){
+							if(!paramsWereLoadedFromXML[paramName]){
 								paramsFromXML[paramName] = params[paramName];
-								paramsLoadedFromXML[paramName] = true;
+								paramsWereLoadedFromXML[paramName] = true;
 							}
 							if(verbose_) RLOG_VERBOSE << "loading a STRING '" << paramName <<"' (" << (string) *params[paramName].stringValAddr << ") from XML" ;
 						}
@@ -2772,7 +2785,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv1(string fileName){
 	}
 
 	vector<string> paramsNotInXML;
-	for( unordered_map<string, RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+	for( auto ii = params.begin(); ii != params.end(); ++ii ){
 
 		string paramName = (*ii).first;
 
@@ -2781,7 +2794,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv1(string fileName){
 
 		}else{ //param name not in xml
 			if ((*ii).second.type != REMOTEUI_PARAM_SPACER){ //spacers dont count as params really
-				paramsNotInXML.push_back(paramName);
+				paramsNotInXML.emplace_back(paramName);
 			}
 		}
 	}
@@ -2812,7 +2825,7 @@ void ofxRemoteUIServer::saveGroupToXMLv1(string filePath, string groupName){
 	s.pushTag(OFXREMOTEUI_XML_TAG);
 	XmlCounter counters;
 
-	for( unordered_map<string, RemoteUIParam>::iterator ii = params.begin(); ii != params.end(); ++ii ){
+	for( auto ii = params.begin(); ii != params.end(); ++ii ){
 		string key = (*ii).first;
 		RemoteUIParam t = params[key];
 		if( t.group != OFXREMOTEUI_DEFAULT_PARAM_GROUP && t.group == groupName ){
@@ -2837,7 +2850,7 @@ void ofxRemoteUIServer::addVariableWatch(const string & varName, float* varPtr, 
 
 
 void ofxRemoteUIServer::addParamToPresetLoadIgnoreList(const std::string & param){
-	paramsToIgnoreWhenLoadingPresets.push_back(param);
+	paramsToIgnoreWhenLoadingPresets.emplace_back(param);
 }
 
 bool ofxRemoteUIServer::paramIsInPresetLoadIgnoreList(const std::string & param){
@@ -3043,7 +3056,7 @@ void ofxRemoteUIServer::onClose( ofxLibwebsockets::Event& args ){
     m.setAddress("/CIAO");
     m.setRemoteEndpoint(args.conn.getClientIP(), wsPort);
     wsDequeMut.lock();
-    wsMessages.push_back(m);
+    wsMessages.emplace_back(m);
     wsDequeMut.unlock();
 }
 
@@ -3052,7 +3065,7 @@ void ofxRemoteUIServer::onMessage( ofxLibwebsockets::Event& args ){
     ofxOscMessage m = jsonToOsc(args.json);
     m.setRemoteEndpoint(args.conn.getClientIP(), wsPort);
     wsDequeMut.lock();
-    wsMessages.push_back(m);
+    wsMessages.emplace_back(m);
     wsDequeMut.unlock();
 }
 

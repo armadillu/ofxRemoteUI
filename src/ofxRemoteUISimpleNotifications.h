@@ -85,7 +85,7 @@ public:
 		for(size_t i = 0; i < notifications.size(); i++){
 			notifications[i].time -= dt;
 			if( notifications[i].time < 0.0f ){
-				toDeleteIndexes.push_back(i);
+				toDeleteIndexes.emplace_back(i);
 			}
 		}
 		//delete expired notifications
@@ -99,7 +99,7 @@ public:
 			//it->first;
 			it->second.time -= dt;
 			if( it->second.time < 0.0f ){
-				toDeleteParams.push_back(it->first);
+				toDeleteParams.emplace_back(it->first);
 			}
 		}
 
@@ -114,7 +114,7 @@ public:
 			logLines[i].time -= dt;
 			if (logLines[i].highlight > 0.0f) logLines[i].highlight -= dt * 0.75;
 			if( logLines[i].time < 0.0f ){
-				toDeleteIndexes.push_back(i);
+				toDeleteIndexes.emplace_back(i);
 			}
 		}
 
@@ -248,7 +248,7 @@ public:
 		SimpleNotification n;
 		n.msg = msg;
 		n.time = screenTime;
-		notifications.push_back(n);
+		notifications.emplace_back(n);
 	};
 
 	void addLogLine(const string & msg, bool merge){ //if merge==true, will look for existing log lines and increase their counter
@@ -271,7 +271,7 @@ public:
 			n.time = logScreenTime;
 			n.repeatCount = 1;
 			n.highlight = 1.0;
-			//logLines.push_back(n);
+			//logLines.emplace_back(n);
 			logLines.insert(logLines.begin(), n);
 
 		}

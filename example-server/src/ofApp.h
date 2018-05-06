@@ -32,6 +32,8 @@ public:
 		string currentSentence;
 		int currentMouseX;
 
+		int test = 0;
+
 };
 
 #endif

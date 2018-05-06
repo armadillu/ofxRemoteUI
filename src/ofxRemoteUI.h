@@ -171,6 +171,10 @@
  SERVER:	/SEND *****							//server sends all params -- TODO only send params in this group!
  SERVER:	/REQU OK								//server closes REQU
 
+ //server wants to remove a param
+ SERVER: /REMp PARAM_NAME
+ CLIENT: /REMp PARAM_NAME OK
+
  // client disconnects
  CLIENT:	/CIAO								//client disconnects
  SERVER:	/CIAO								//server disconnects
@@ -306,14 +310,19 @@ protected:
 	std::string							userSuppliedNetInterface; //store user preference on network interface to use
 
 	std::unordered_map<std::string, RemoteUIParam>		params;
-	std::map<int, std::string>						orderedKeys; // used to keep the order in which the params were added
-	std::vector<std::string>							presetNames;
+	std::map<int, std::string>								orderedKeys; // used to keep the order in which the params were added
 
-	std::vector<std::string>							paramsChangedSinceLastCheck;
+	std::vector<std::string>								presetNames;
+	std::vector<std::string>								paramsChangedSinceLastCheck;
 
 	std::unordered_map<std::string, RemoteUIParam>		paramsFromCode; //this will hold a copy of all the params as they where when shared first
 	std::unordered_map<std::string, RemoteUIParam>		paramsFromXML; //this will hold a copy of all the params as they where when first loaded from XML
-	std::unordered_map<std::string, bool>				paramsLoadedFromXML;
+	std::unordered_map<std::string, bool>				paramsWereLoadedFromXML;
+
+	//lets keep track of all params that have been sent through OSC we are trying to solve
+	//the situation where params are added and removed on the fly as the app runs
+	std::set<std::string>								paramsSentOverOsc;
+
 
 	struct ScreenNotifArg{
 		std::string paramName;

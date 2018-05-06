@@ -60,8 +60,8 @@ ofJson OscQueryServerMgr::buildJSON(){
 	root["DESCRIPTION"] = "root node";
 	root["FULL_PATH"] = "/";
 
-	const std::map<int, std::string> & keys = s->orderedKeys;
-	const std::unordered_map<std::string, RemoteUIParam> & params = s->params;
+	const auto & keys = s->orderedKeys;
+	const auto & params = s->params;
 
 	std::map<string, vector<string>> paramsByGroup;
 
@@ -76,7 +76,7 @@ ofJson OscQueryServerMgr::buildJSON(){
 		if(param.type == REMOTEUI_PARAM_FLOAT || param.type == REMOTEUI_PARAM_INT ||
 		   param.type == REMOTEUI_PARAM_ENUM || param.type == REMOTEUI_PARAM_BOOL ||
 		   param.type == REMOTEUI_PARAM_COLOR || param.type == REMOTEUI_PARAM_STRING){
-			paramsByGroup[currentParam].push_back(paramName);
+			paramsByGroup[currentParam].emplace_back(paramName);
 		}
 	}
 

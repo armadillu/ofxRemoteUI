@@ -29,7 +29,7 @@ bool ofxRemoteUINeigbors::update(float dt){
 		float timeLastSeen = n.timeLastSeen;
 		float lastSeenSecAgo = time - timeLastSeen;
 		if (lastSeenSecAgo > OFXREMOTEUI_NEIGHBOR_DEATH_BY_TIME){
-			idsToDelete.push_back(ID);
+			idsToDelete.emplace_back(ID);
 			updated = true;
 		}
 	}
@@ -75,7 +75,7 @@ vector<Neighbor> ofxRemoteUINeigbors::getNeighbors(){
 	unordered_map<string, Neighbor>::iterator iterator;
 	vector<Neighbor>ns;
 	for( iterator = neigbhors.begin(); iterator != neigbhors.end(); iterator++) {
-		ns.push_back(iterator->second);
+		ns.emplace_back(iterator->second);
 	}
 	return ns;
 }

@@ -72,28 +72,28 @@ void ofxRemoteUIofParamaterSync::recursiveSetup(ofParameterGroup & _parameters){
 		if(type==typeid(ofParameter<int>).name()){ //INT
 			ofParameter<int> p = _parameters.getInt(i);
 			RUI_DEFINE_VAR_WV(int, fullRUIparamName, p, p.getMin(), p.getMax());
-			ofParamRuiList.push_back(fullRUIparamName);
+			ofParamRuiList.emplace_back(fullRUIparamName);
 
 		}else if(type==typeid(ofParameter<float>).name()){ //FLOAT
 			ofParameter<float> p = _parameters.getFloat(i);
 			RUI_DEFINE_VAR_WV(float, fullRUIparamName, p, p.getMin(), p.getMax());
-			ofParamRuiList.push_back(fullRUIparamName);
+			ofParamRuiList.emplace_back(fullRUIparamName);
 
 		}else if(type==typeid(ofParameter<bool>).name()){ //BOOL
 			ofParameter<bool> p = _parameters.getBool(i);
 			RUI_DEFINE_VAR_WV(bool, fullRUIparamName, p);
-			ofParamRuiList.push_back(fullRUIparamName);
+			ofParamRuiList.emplace_back(fullRUIparamName);
 
 		}else if(type==typeid(ofParameter<string>).name()){ //STRING
 			ofParameter<string> p = _parameters.getString(i);
 			RUI_DEFINE_VAR_WV(string, fullRUIparamName, p);
-			ofParamRuiList.push_back(fullRUIparamName);
+			ofParamRuiList.emplace_back(fullRUIparamName);
 
 		}else if(type==typeid(ofParameter<ofColor>).name()){ //COLOR
 			ofParameter<ofColor> p = _parameters.getColor(i);
 			ofColor * c = ofxRemoteUIVars<ofColor>::one().defineParam(fullRUIparamName, p);
 			server->shareParam(fullRUIparamName, &(*c)[0] );
-			ofParamRuiList.push_back(fullRUIparamName);
+			ofParamRuiList.emplace_back(fullRUIparamName);
 		#ifdef GLM_SWIZZLE
 		}else if(type==typeid(ofParameter<ofDefaultVec2>).name()){ //ofVec2f
 		#else
@@ -104,8 +104,8 @@ void ofxRemoteUIofParamaterSync::recursiveSetup(ofParameterGroup & _parameters){
 			float * y = ofxRemoteUIVars<float>::one().defineParam(fullRUIparamName + compSEP + "2y", p->y);
 			server->shareParam(fullRUIparamName + compSEP + "2x", x, p.getMin().x, p.getMax().x);
 			server->shareParam(fullRUIparamName + compSEP + "2y", y, p.getMin().y, p.getMax().y);
-			ofParamRuiList.push_back(fullRUIparamName + compSEP + "2x");
-			ofParamRuiList.push_back(fullRUIparamName + compSEP + "2y");
+			ofParamRuiList.emplace_back(fullRUIparamName + compSEP + "2x");
+			ofParamRuiList.emplace_back(fullRUIparamName + compSEP + "2y");
 		#ifdef GLM_SWIZZLE
 		}else if (type == typeid(ofParameter<ofDefaultVec3>).name()) { //ofVec3f
 		#else
@@ -118,9 +118,9 @@ void ofxRemoteUIofParamaterSync::recursiveSetup(ofParameterGroup & _parameters){
 			server->shareParam(fullRUIparamName + compSEP + "3x", x, p.getMin().x, p.getMax().x);
 			server->shareParam(fullRUIparamName + compSEP + "3y", y, p.getMin().y, p.getMax().y);
 			server->shareParam(fullRUIparamName + compSEP + "3z", z, p.getMin().z, p.getMax().z);
-			ofParamRuiList.push_back(fullRUIparamName + compSEP + "3x");
-			ofParamRuiList.push_back(fullRUIparamName + compSEP + "3y");
-			ofParamRuiList.push_back(fullRUIparamName + compSEP + "3z");
+			ofParamRuiList.emplace_back(fullRUIparamName + compSEP + "3x");
+			ofParamRuiList.emplace_back(fullRUIparamName + compSEP + "3y");
+			ofParamRuiList.emplace_back(fullRUIparamName + compSEP + "3z");
 		#ifdef GLM_SWIZZLE
 		}else if (type == typeid(ofParameter<ofDefaultVec2>).name()) { //ofVec2f
 		#else
@@ -136,10 +136,10 @@ void ofxRemoteUIofParamaterSync::recursiveSetup(ofParameterGroup & _parameters){
 			server->shareParam(fullRUIparamName + compSEP + "4y", y, p.getMin().y, p.getMax().y);
 			server->shareParam(fullRUIparamName + compSEP + "4z", z, p.getMin().z, p.getMax().z);
 			server->shareParam(fullRUIparamName + compSEP + "4w", w, p.getMin().w, p.getMax().w);
-			ofParamRuiList.push_back(fullRUIparamName + compSEP + "4x");
-			ofParamRuiList.push_back(fullRUIparamName + compSEP + "4y");
-			ofParamRuiList.push_back(fullRUIparamName + compSEP + "4z");
-			ofParamRuiList.push_back(fullRUIparamName + compSEP + "4w");
+			ofParamRuiList.emplace_back(fullRUIparamName + compSEP + "4x");
+			ofParamRuiList.emplace_back(fullRUIparamName + compSEP + "4y");
+			ofParamRuiList.emplace_back(fullRUIparamName + compSEP + "4z");
+			ofParamRuiList.emplace_back(fullRUIparamName + compSEP + "4w");
 		}else if(type==typeid(ofParameterGroup).name()){
 			ofParameterGroup p = _parameters.getGroup(i);
 			recursiveSetup(p);

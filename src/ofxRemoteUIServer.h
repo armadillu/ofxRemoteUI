@@ -246,9 +246,9 @@ protected:
 		int numFloats, numInts, numStrings, numBools, numEnums, numColors;
 	};
 
-	vector<std::string> loadFromXMLv1(std::string fileName); //returns list of param names in current setup but not set in XML
+	std::vector<std::string> loadFromXMLv1(std::string fileName); //returns list of param names in current setup but not set in XML
 	#ifdef OF_AVAILABLE
-	vector<std::string> loadFromXMLv2(std::string fileName); //returns list of param names in current setup but not set in XML
+	std::vector<std::string> loadFromXMLv2(std::string fileName); //returns list of param names in current setup but not set in XML
 	#endif
 
 	void			saveToXMLv1(std::string fileName); //save the whole list of params to an xml
@@ -264,8 +264,8 @@ protected:
 	void			restoreAllParamsToDefaultValues();
 	void			connect(std::string address, int port);
 	void			setColorForParam(RemoteUIParam &p, ofColor c);
-	vector<std::string>	getAvailablePresets(bool onlyGlobal = false); //all, including group presets! group presets have group/presetName name pattern
-	vector<std::string>	getAvailablePresetsForGroup(std::string group);
+	std::vector<std::string>	getAvailablePresets(bool onlyGlobal = false); //all, including group presets! group presets have group/presetName name pattern
+	std::vector<std::string>	getAvailablePresetsForGroup(std::string group);
 
 	void			deletePreset(std::string name, std::string group=""); //if group is not "", then this is a global preset. otherwise its a group preset
 	void			updateServer(float dt);
@@ -283,7 +283,7 @@ protected:
 
 	std::string 			getFinalPath(const std::string &);
 
-	vector<ofColor> colorTables;
+	std::vector<ofColor> colorTables;
 	int				colorTableIndex;
 	bool			colorSet; //if user called setParamColor()
 
@@ -323,7 +323,7 @@ protected:
 
 	bool			autoDraw;
 
-	vector			<std::string> paramsToWatch;
+	std::vector<std::string> paramsToWatch;
 
 #ifdef OF_AVAILABLE
 	
@@ -336,11 +336,11 @@ protected:
 	ofVboMesh												uiLines;
 	ofxRemoteUISimpleNotifications							onScreenNotifications;
 
-	vector<std::string>											presetsCached; //for the built in client
-	unordered_map<std::string, vector<std::string> > 					groupPresetsCached;
+	std::vector<std::string>										presetsCached; //for the built in client
+	std::unordered_map<std::string, vector<std::string> > 		groupPresetsCached;
 	int 													selectedGroupPreset;
 	int 													selectedPreset;
-	std::string													lastChosenPreset;
+	std::string												lastChosenPreset;
 	float													uiColumnWidth;
 	float													uiAlpha;
 	float													uiScale;
@@ -359,18 +359,18 @@ protected:
 
 	#ifdef USE_OFX_FONTSTASH
 	ofxFontStash											font;
-	std::string													fontFile;
+	std::string												fontFile;
 	float													fontSize;
 	#endif
 
 	#ifdef USE_OFX_FONTSTASH2
-	std::string 													fontStashFile2;
+	std::string 											fontStashFile2;
 	ofxFontStash2::Fonts									font2;
 	float													fontSize2;
 	#endif
 
 	bool													headlessMode;
-	std::string													dataPath;
+	std::string												dataPath;
 
 	void			refreshPresetsCache();
 	void			drawString(const std::string & text, const float & x, const float & y);
@@ -393,7 +393,7 @@ protected:
 
     //---WebSockets---
     bool useWebSockets = false;
-    deque<ofxOscMessage> wsMessages;
+	std::deque<ofxOscMessage> wsMessages;
 
 #ifdef RUI_WEB_INTERFACE
     //---Web Sockets (OSC Port + 1)---
@@ -415,15 +415,17 @@ protected:
     
 
 	//keep track of params we added and then removed
-	unordered_map<std::string, RemoteUIParam>				params_removed;
-	unordered_map<int, std::string>							orderedKeys_removed; // used to keep the order in which the params were added
+	std::unordered_map<std::string, RemoteUIParam>				params_removed;		// params to not show in the GUI, but to keep around to make sure they stay saved in the XML
+	std::unordered_map<int, std::string>						orderedKeys_removed; // used to keep the order in which the params were added
 
-	map<std::string, RemoteUIServerValueWatch> 				varWatches;
+	bool														sentParamsToClient = false; //keep track of a client having been connected far enough for us to send them param list
 
-	static ofxRemoteUIServer* 								singleton;
+	std::map<std::string, RemoteUIServerValueWatch> 			varWatches;
+
+	static ofxRemoteUIServer* 							singleton;
 
 	//handle params that are to be ignored when loading presets
-	vector<std::string>										paramsToIgnoreWhenLoadingPresets;
+	std::vector<std::string>										paramsToIgnoreWhenLoadingPresets;
 
 
 };

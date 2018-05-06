@@ -227,7 +227,6 @@ void ofxRemoteUIClient::update(float dt){
 				case SEND_PARAM_ACTION:{ //server is sending us an updated val
 					if(verbose_) RLOG_VERBOSE << host << " says SEND_PARAM_ACTION!" ;
 					updateParamFromDecodedMessage(m, dm);
-					gotNewInfo = true;
 				}
 					break;
 
@@ -267,7 +266,7 @@ void ofxRemoteUIClient::update(float dt){
 					if(callBack != NULL){
 						cbArg.action = SERVER_REPORTS_MISSING_PARAMS_IN_PRESET;
 						for (int i = 0; i < m.getNumArgs(); i++){
-							cbArg.paramList.push_back(m.getArgAsString(i));
+							cbArg.paramList.emplace_back(m.getArgAsString(i));
 						}
 						callBack(cbArg);
 					}
@@ -406,7 +405,7 @@ void ofxRemoteUIClient::fillPresetListFromMessage(ofxOscMessage m){
 	}
 	presetNames.clear();
 	for(int i = 0; i < n; i++){
-		presetNames.push_back( m.getArgAsString(i));
+		presetNames.emplace_back( m.getArgAsString(i));
 	}
 	std::sort(presetNames.begin(), presetNames.end());
 }
@@ -414,7 +413,7 @@ void ofxRemoteUIClient::fillPresetListFromMessage(ofxOscMessage m){
 
 void ofxRemoteUIClient::trackParam(string paramName, float* param){
 	RemoteUIParam p;
-	unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+	auto it = params.find(paramName);
 	if ( it == params.end() ){	//not found! we add it
 		p.type = REMOTEUI_PARAM_FLOAT;
 	}else{
@@ -430,7 +429,7 @@ void ofxRemoteUIClient::trackParam(string paramName, float* param){
 
 void ofxRemoteUIClient::trackParam(string paramName, int* param){
 	RemoteUIParam p;
-	unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+	auto it = params.find(paramName);
 	if ( it == params.end() ){	//not found! we add it
 		p.type = REMOTEUI_PARAM_INT;
 	}else{
@@ -446,7 +445,7 @@ void ofxRemoteUIClient::trackParam(string paramName, int* param){
 
 void ofxRemoteUIClient::trackParam(string paramName, int* param, vector<string> list){ //TODO!
 	RemoteUIParam p;
-	unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+	auto it = params.find(paramName);
 	if ( it == params.end() ){	//not found! we add it
 		p.type = REMOTEUI_PARAM_ENUM;
 	}else{
@@ -462,7 +461,7 @@ void ofxRemoteUIClient::trackParam(string paramName, int* param, vector<string> 
 
 void ofxRemoteUIClient::trackParam(string paramName, string* param){
 	RemoteUIParam p;
-	unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+	auto it = params.find(paramName);
 	if ( it == params.end() ){	//not found! we add it
 		p.type = REMOTEUI_PARAM_STRING;
 	}else{
@@ -478,7 +477,7 @@ void ofxRemoteUIClient::trackParam(string paramName, string* param){
 
 void ofxRemoteUIClient::trackParam(string paramName, bool* param){
 	RemoteUIParam p;
-	unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+	auto it = params.find(paramName);
 	if ( it == params.end() ){	//not found! we add it
 		p.type = REMOTEUI_PARAM_BOOL;
 	}else{
@@ -494,7 +493,7 @@ void ofxRemoteUIClient::trackParam(string paramName, bool* param){
 
 void ofxRemoteUIClient::trackParam(string paramName, unsigned char* param){
 	RemoteUIParam p;
-	unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+	auto it = params.find(paramName);
 	if ( it == params.end() ){	//not found! we add it
 		p.type = REMOTEUI_PARAM_COLOR;
 	}else{
@@ -512,13 +511,13 @@ void ofxRemoteUIClient::sendUntrackedParamUpdate(RemoteUIParam p, string paramNa
 	//p.print();
 	params[paramName] = p; //TODO error check!
 	vector<string>list;
-	list.push_back(paramName);
+	list.emplace_back(paramName);
 	sendUpdateForParamsInList(list);
 }
 
 void ofxRemoteUIClient::sendTrackedParamUpdate(string paramName){
 
-	unordered_map<string, RemoteUIParam>::iterator it = params.find(paramName);
+	auto it = params.find(paramName);
 	if ( it != params.end() ){
 		syncParamToPointer(paramName);
 		sendParam(paramName, params[paramName]);

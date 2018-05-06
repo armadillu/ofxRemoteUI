@@ -36,7 +36,7 @@ public:
 
 private:
 
-	std::unordered_map<std::string,Neighbor>neigbhors; //this will be kept updated, key is a combostring of "IP:PORT"
+	std::unordered_map<std::string, Neighbor> neigbhors; //this will be kept updated, key is a combostring of "IP:PORT"
 	float time; //secs
 
 };

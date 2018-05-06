@@ -92,7 +92,6 @@ private:
 
 	bool					OSCsetup;
 	std::string				host;
-	bool					gotNewInfo;
 	int						pendingOperations;
 	ofxOscReceiver			broadcastReceiver;
 	ofxRemoteUINeigbors		closebyServers;

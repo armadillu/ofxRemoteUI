@@ -17,6 +17,7 @@ void ofApp::setup(){
 	menu = MENU_OPTION_1;
 	unloadTest = "inited from source";
 
+
 	// START THE SERVER ///////////////////////////////////////////
 	RUI_SETUP(); 	//specify a port if you want a specific one
 					//if you dont specify, the server will choose a random one
@@ -25,6 +26,9 @@ void ofApp::setup(){
 	// SETUP A CALLBACK ///////////////////////////////////////////
 	ofAddListener(RUI_GET_OF_EVENT(), this, &ofApp::clientDidSomething);
 
+	//extra verbose!
+	ofSetLogLevel("ofxRemoteUIServer", OF_LOG_VERBOSE);
+	ofSetLogLevel("ofxRemoteUI", OF_LOG_VERBOSE);
 	RUI_GET_INSTANCE()->setVerbose(true);
 
 	// SET PARAM GROUPS / COLORS //////////////////////////////////
@@ -137,11 +141,20 @@ void ofApp::draw(){
 
 
 void ofApp::keyPressed( int key ){
-	//force an update in the client side (same as pressing sync button on osx client)
-	RUI_PUSH_TO_CLIENT();
+//	//force an update in the client side (same as pressing sync button on osx client)
+//	RUI_PUSH_TO_CLIENT();
+//
+//	//and also send a text log line to the client
+//	RUI_LOG("key pressed at %f", ofGetElapsedTimef());
 
-	//and also send a text log line to the client
-	RUI_LOG("key pressed at %f", ofGetElapsedTimef());
+	if(key == '1'){
+		RUI_SHARE_PARAM(test, 0, 1);
+	}
+
+	if(key == '2'){
+		RUI_GET_INSTANCE()->removeParamFromDB("test");
+	}
+
 }
 
 
