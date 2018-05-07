@@ -536,6 +536,8 @@
 		BBDCBDF416A051B000F1C5EC /* src */ = {
 			isa = PBXGroup;
 			children = (
+				BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */,
+				BBAAAFA8173BF54B00FE94C4 /* ofxRemoteUIClient.h */,
 				BBB62808191C4EC9005F95BF /* ofxRemoteUI.cpp */,
 				BBB62809191C4EC9005F95BF /* ofxRemoteUI.h */,
 				BBEE7854182302FF00D93161 /* ofxRemoteUINeigbors.cpp */,
@@ -543,8 +545,6 @@
 				BBFB932A17785ECC00A5E741 /* RemoteParam.h */,
 				BB09FCA8198DDB8000E04B02 /* uriencode.cpp */,
 				BB5F5EB01769462600F1FA92 /* uriencode.h */,
-				BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */,
-				BBAAAFA8173BF54B00FE94C4 /* ofxRemoteUIClient.h */,
 			);
 			name = src;
 			path = ../src;

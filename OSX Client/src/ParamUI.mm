@@ -489,10 +489,18 @@
 	}
 	paramLabel.title = [self stringFromString:paramName];
 	int t = param.type;
-	if (t == REMOTEUI_PARAM_FLOAT || t == REMOTEUI_PARAM_INT || t == REMOTEUI_PARAM_BOOL || t == REMOTEUI_PARAM_ENUM ){
-		[paramLabel setToolTip: [NSString stringWithFormat:@"\"%@\" Parameter\nPress Button to start controller binding process", paramLabel.title]];
+	if(param.description.size()){
+		if (t == REMOTEUI_PARAM_FLOAT || t == REMOTEUI_PARAM_INT || t == REMOTEUI_PARAM_BOOL || t == REMOTEUI_PARAM_ENUM ){
+			[paramLabel setToolTip: [NSString stringWithFormat:@"\"%@\" Parameter\nPress Button to start controller binding process\n\nDescription: \"%s\"", paramLabel.title, param.description.c_str()]];
+		}else{
+			[paramLabel setToolTip: [NSString stringWithFormat:@"\"%@\" Parameter\nNot bindable to a controller\n\nDescription: \"%s\"",paramLabel.title, param.description.c_str()]];
+		}
 	}else{
-		[paramLabel setToolTip: [NSString stringWithFormat:@"\"%@\" Parameter\nNot bindable to a controller", paramLabel.title]];
+		if (t == REMOTEUI_PARAM_FLOAT || t == REMOTEUI_PARAM_INT || t == REMOTEUI_PARAM_BOOL || t == REMOTEUI_PARAM_ENUM ){
+			[paramLabel setToolTip: [NSString stringWithFormat:@"\"%@\" Parameter\nPress Button to start controller binding process", paramLabel.title]];
+		}else{
+			[paramLabel setToolTip: [NSString stringWithFormat:@"\"%@\" Parameter\nNot bindable to a controller", paramLabel.title]];
+		}
 	}
 	[paramLabel sizeToFit];
 	

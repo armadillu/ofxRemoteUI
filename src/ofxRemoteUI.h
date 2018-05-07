@@ -233,6 +233,8 @@ public:
 	bool paramExistsForName(const std::string & paramName);
 	std::vector<std::string> getPresetsList();
 
+	void setParamDescription(const std::string & param, const std::string & description);
+
 	std::string getValuesAsString(const std::vector<std::string> & paramList = std::vector<std::string>()); //supply param list to get only those, supply empty list to get all params
 	void setValuesFromString(const std::string & values);
 

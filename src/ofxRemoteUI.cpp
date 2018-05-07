@@ -81,6 +81,15 @@ void ofxRemoteUI::addParamToDB(const RemoteUIParam & p, const std::string & this
 	dataMutex.unlock();
 }
 
+void ofxRemoteUI::setParamDescription(const std::string & paramName, const std::string & description){
+	dataMutex.lock();
+	auto it = params.find(paramName);
+	if ( it != params.end() ){	//not found!
+		it->second.description = description;
+	}
+	dataMutex.unlock();
+}
+
 
 void ofxRemoteUI::clearOscReceiverMsgQueue(){
 	ofxOscMessage tempM;
@@ -404,6 +413,9 @@ void ofxRemoteUI::updateParamFromDecodedMessage(const ofxOscMessage & m, Decoded
 		p.b = m.getArgAsInt32(arg); arg++;
 		p.a = m.getArgAsInt32(arg); arg++;
 		p.group = m.getArgAsString(arg); arg++;
+		if(m.getNumArgs() > arg){ //if it provides a description, read it
+			p.description = m.getArgAsString(arg); arg++;
+		}
 	}
 
 	if ( !p.isEqualTo(original) || newParam ){ // if the udpdate changed the param, keep track of it
@@ -566,7 +578,6 @@ void ofxRemoteUI::syncParamToPointer(const std::string & paramName){
 
 
 bool ofxRemoteUI::hasParamChanged(const RemoteUIParam & p){
-
 	switch (p.type) {
 		case REMOTEUI_PARAM_FLOAT:
 			if (p.floatValAddr){
@@ -775,6 +786,7 @@ void ofxRemoteUI::sendParam(std::string paramName, const RemoteUIParam & p){
 	}
 	m.addIntArg(p.r); m.addIntArg(p.g); m.addIntArg(p.b); m.addIntArg(p.a); // set bg color!
 	m.addStringArg(p.group);
+	m.addStringArg(p.description);
 	try{
 		sendMessage(m);
 		paramsSentOverOsc.insert(paramName);

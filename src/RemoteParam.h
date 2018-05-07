@@ -162,7 +162,6 @@ public:
 		stringVal = "empty";
 		r = g = b = a = 0; //bg color
 		group = OFXREMOTEUI_DEFAULT_PARAM_GROUP;
-
 	};
 
 
@@ -195,6 +194,7 @@ public:
 				break;
 			default: RLOG_ERROR << "weird RemoteUIParam at isEqualTo()!"; break;
 		}
+		//if(equal) equal = description == p.description; //also compare param description
 		return equal;
 	}
 
@@ -299,6 +299,8 @@ public:
 	std::vector<std::string> enumList; //for enum type
 
 	unsigned char r,g,b,a; // param bg color [0,255]
+
+	string description;
 };
 
 

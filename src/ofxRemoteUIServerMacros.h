@@ -23,6 +23,9 @@
 #define OFX_REMOTEUI_SERVER_SHARE_PARAM(val, ...)						\
 ( ofxRemoteUIServer::instance()->shareParam( #val, &val, ##__VA_ARGS__ ) )
 
+#define OFX_REMOTEUI_SERVER_SHARE_PARAM_WITH_DESC(val, desc, ...)		\
+( ofxRemoteUIServer::instance()->shareParam( #val, &val, ##__VA_ARGS__ ); ofxRemoteUIServer::instance()->setParamDescription(#val, desc))
+
 //WCN - "with custom name" share a param with a custom string instead of taking the var name
 #define OFX_REMOTEUI_SERVER_SHARE_PARAM_WCN(pName, val, ...)			\
 ( ofxRemoteUIServer::instance()->shareParam( pName, &val, ##__VA_ARGS__ ) )
@@ -65,7 +68,6 @@
 /*allows you to get a param ref from anywhere in your code*/
 #define OFX_REMOTEUI_SERVER_GET_PARAM_REF(pname)							\
 ( ofxRemoteUIServer::instance()->getParamRefForName(pname) )
-
 
 /*setup the server-client callback. This will be called on important events
  and param updates from the UI. Supplied method should look like:
@@ -156,6 +158,15 @@
 #define OFX_REMOTEUI_SERVER_WATCH_PARAM_WCN(paramName)					\
 ( ofxRemoteUIServer::instance()->watchParamOnScreen(paramName) )
 
+//add a description to the last added param
+#define	OFX_REMOTEUI_SERVER_SET_PARAM_DESC(param,desc)		\
+( ofxRemoteUIServer::instance()->setParamDescription(param,desc) )
+
+#define	OFX_REMOTEUI_SERVER_SET_DESC_TO_LAST_PARAM(desc)		\
+( ofxRemoteUIServer::instance()->setDescriptionForLastAddedParam(desc) )
+
+
+
 #ifdef OF_AVAILABLE
 /*run the server on a back thread. Useful for apps with very low framerate.
  default is disabled in OF; only works in OF! */
@@ -173,6 +184,7 @@
 // shorter macros //
 #define RUI_SETUP					OFX_REMOTEUI_SERVER_SETUP
 #define RUI_SHARE_PARAM				OFX_REMOTEUI_SERVER_SHARE_PARAM
+#define RUI_SHARE_PARAM_DESC			OFX_REMOTEUI_SERVER_SHARE_PARAM_WITH_DESC
 #define RUI_SHARE_PARAM_WCN			OFX_REMOTEUI_SERVER_SHARE_PARAM_WCN
 #define RUI_SHARE_ENUM_PARAM		OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM
 #define RUI_SHARE_ENUM_PARAM_WCN    OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM_WCN
@@ -203,6 +215,8 @@
 #define RUI_GET_PARAM_REF			OFX_REMOTEUI_SERVER_GET_PARAM_REF
 #define RUI_UPDATE					OFX_REMOTEUI_SERVER_UPDATE
 #define	RUI_CLOSE					OFX_REMOTEUI_SERVER_CLOSE
+#define RUI_SET_PARAM_DESC			OFX_REMOTEUI_SERVER_SET_PARAM_DESC
+#define RUI_SET_LAST_PARAM_DESC			OFX_REMOTEUI_SERVER_SET_DESC_TO_LAST_PARAM
 //
 
 

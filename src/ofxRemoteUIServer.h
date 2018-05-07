@@ -114,6 +114,8 @@ public:
 
 	void setParamGroup(std::string g);		//set for all the upcoming params
 
+	void setDescriptionForLastAddedParam(const string & description); //add a description to the last shared added param
+
 	void setNewParamColor(int num); //randomly sets a new param color for all upcoming params
 	void setNewParamColorVariation(bool dontChangeVariation = false); //set a slight change to the new param, inside the same group hue
 	void unsetParamColor();  //back to un-colored params (shows alternating rows on OSX client)
@@ -279,23 +281,23 @@ protected:
 	#endif
 	void			saveSettingsBackup();
 
-	void 			addParamToDB(const RemoteUIParam & p, std::string thisParamName);
+	void 				addParamToDB(const RemoteUIParam & p, std::string thisParamName);
 
 	std::string 			getFinalPath(const std::string &);
 
 	std::vector<ofColor> colorTables;
-	int				colorTableIndex;
-	bool			colorSet; //if user called setParamColor()
+	int					colorTableIndex;
+	bool					colorSet; //if user called setParamColor()
 
-	ofColor			paramColor;					//a master hue for the current group
-	ofColor			paramColorCurrentVariation; //a small hue change from the master hue for the current group
-	int				newColorInGroupCounter;
+	ofColor				paramColor;					//a master hue for the current group
+	ofColor				paramColorCurrentVariation; //a small hue change from the master hue for the current group
+	int					newColorInGroupCounter;
 
 	std::string			upcomingGroup;
-	ofxOscSender	broadcastSender;
-	float			broadcastTime;
-	int				broadcastCount;
-	bool			portIsSet;
+	ofxOscSender			broadcastSender;
+	float				broadcastTime;
+	int					broadcastCount;
+	bool					portIsSet;
 
 	std::string			computerName;
 	std::string			binaryName;
@@ -303,6 +305,7 @@ protected:
 
 	std::string			directoryPrefix; // the optional directory prefix where we should store data
 
+	string				lastAddedParam;
 
 	bool			doBroadcast; //controls if the server advertises itself
 	bool			drawNotifications;
@@ -422,11 +425,10 @@ protected:
 
 	std::map<std::string, RemoteUIServerValueWatch> 			varWatches;
 
-	static ofxRemoteUIServer* 							singleton;
+	static ofxRemoteUIServer* 								singleton;
 
 	//handle params that are to be ignored when loading presets
-	std::vector<std::string>										paramsToIgnoreWhenLoadingPresets;
-
+	std::vector<std::string>									paramsToIgnoreWhenLoadingPresets;
 
 };
 

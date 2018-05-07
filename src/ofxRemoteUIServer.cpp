@@ -2402,6 +2402,21 @@ void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamNa
 }
 
 
+void ofxRemoteUIServer::setDescriptionForLastAddedParam(const string & description){
+	bool ok = false;
+	if(lastAddedParam.size()){
+		auto it = params.find(lastAddedParam);
+		if(it != params.end()){
+			params[lastAddedParam].description = description;
+			ok = true;
+		}
+	}
+	if(!ok){
+		RLOG_ERROR << "can't set description to last defined param! no last defined param!";
+	}
+}
+
+
 void ofxRemoteUIServer::addSpacer(string title){
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_SPACER;
@@ -2413,6 +2428,7 @@ void ofxRemoteUIServer::addSpacer(string title){
 	p.a = 255; //spacer has full alpha
 	addParamToDB(p, title);
 	if(verbose_) RLOG_NOTICE << "Adding Group '" << title << "' ######################################" ;
+	lastAddedParam = title;
 }
 
 
@@ -2428,6 +2444,7 @@ void ofxRemoteUIServer::shareParam(string paramName, float* param, float min, fl
 	setColorForParam(p, c);
 	addParamToDB(p, paramName);
 	if(verbose_) RLOG_NOTICE << "Sharing Float Param '" << paramName << "'" ;
+	lastAddedParam = paramName;
 }
 
 
@@ -2440,6 +2457,7 @@ void ofxRemoteUIServer::shareParam(string paramName, bool* param, ofColor c, int
 	setColorForParam(p, c);
 	addParamToDB(p, paramName);
 	if(verbose_) RLOG_NOTICE << "Sharing Bool Param '" << paramName << "'" ;
+	lastAddedParam = paramName;
 }
 
 
@@ -2454,6 +2472,7 @@ void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int ma
 	p.intVal = *param = ofClamp(*param, min, max);
 	addParamToDB(p, paramName);
 	if(verbose_) RLOG_NOTICE << "Sharing Int Param '" << paramName << "'" ;
+	lastAddedParam = paramName;
 }
 
 void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int max, vector<string> names, ofColor c ){
@@ -2471,6 +2490,7 @@ void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int ma
 	p.intVal = *param = ofClamp(*param, min, max);
 	addParamToDB(p, paramName);
 	if(verbose_) RLOG_NOTICE << "Sharing Enum Param '" << paramName << "'" ;
+	lastAddedParam = paramName;
 }
 
 void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int max, string* names, ofColor c ){
@@ -2489,6 +2509,7 @@ void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int ma
 	p.intVal = *param = ofClamp(*param, min, max);
 	addParamToDB(p, paramName);
 	if(verbose_) RLOG_NOTICE << "Sharing Enum Param '" << paramName << "'" ;
+	lastAddedParam = paramName;
 }
 
 
@@ -2502,6 +2523,7 @@ void ofxRemoteUIServer::shareParam(string paramName, string* param, ofColor c, i
 	setColorForParam(p, c);
 	addParamToDB(p, paramName);
 	if(verbose_) RLOG_NOTICE << "Sharing String Param '" << paramName << "'";
+	lastAddedParam = paramName;
 }
 
 void ofxRemoteUIServer::shareParam(string paramName, unsigned char* param, ofColor bgColor, int nothingUseful){
@@ -2516,6 +2538,7 @@ void ofxRemoteUIServer::shareParam(string paramName, unsigned char* param, ofCol
 	setColorForParam(p, bgColor);
 	addParamToDB(p, paramName);
 	if(verbose_) RLOG_NOTICE << "Sharing Color Param '" << paramName << "'";
+	lastAddedParam = paramName;
 }
 
 

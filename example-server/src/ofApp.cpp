@@ -36,7 +36,10 @@ void ofApp::setup(){
 
 	// SHARE A FLOAT PARAM ////////////////////////////////////////
 	RUI_SHARE_PARAM(x, 0, ofGetWidth() ); //add an "x" float param to the current group ("position")
+	RUI_SET_LAST_PARAM_DESC("move your particles left and right"); //add a description to the paramater u just shared
+
 	RUI_SHARE_PARAM(y, 0, ofGetHeight()); //provide a variable, a rangeMin and a rangeMax
+	RUI_SET_LAST_PARAM_DESC("move your particles up and down"); //add a description to the paramater u just shared
 
 	RUI_SHARE_PARAM_WCN("Z: what", z, 0, ofGetWidth() ); //add an "x" float param to the current group ("position")
 
@@ -95,6 +98,7 @@ void ofApp::setup(){
 							//potentially leading to problems. String params are
 							//especially very likely to cause crashes!
 							//so don't use this unless you know you need it!
+
 
 }
 
