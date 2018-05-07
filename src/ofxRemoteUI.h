@@ -266,7 +266,7 @@ protected:
 	void syncAllPointersToParams();
 	void syncParamToPointer(const std::string & paramName); //copies the param0s pointer value over the value
 	void syncPointerToParam(const std::string & paramName); //the other way around
-	void addParamToDB(const RemoteUIParam & p, const std::string & paramName);
+	bool addParamToDB(const RemoteUIParam & p, const std::string & paramName);
 
 	void clearOscReceiverMsgQueue();
 

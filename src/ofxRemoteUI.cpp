@@ -63,22 +63,24 @@ void ofxRemoteUI::printAllParamsDebug(){
 	cout << "####################################################" << endl;
 }
 
-void ofxRemoteUI::addParamToDB(const RemoteUIParam & p, const std::string & thisParamName){
+bool ofxRemoteUI::addParamToDB(const RemoteUIParam & p, const std::string & thisParamName){
 
 	//see if we already had it, if we didnt, set its add order #
 	dataMutex.lock();
+	bool ok;
 	auto it = params.find(thisParamName);
 	if ( it == params.end() ){	//not found!
 
 		params[thisParamName] = p;
 		orderedKeys[ (int)orderedKeys.size() ] = thisParamName;
 		paramsFromCode[thisParamName] = p; //cos this didnt exist before, we store it as "from code"
-
+		ok = true;
 	}else{
 		RLOG_ERROR << "already have a Param with that name on the DB : '" << thisParamName << "'. Ignoring it!";
-		//params[thisParamName] = p;
+		ok = false;
 	}
 	dataMutex.unlock();
+	return ok;
 }
 
 
