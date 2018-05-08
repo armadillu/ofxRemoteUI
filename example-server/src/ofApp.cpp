@@ -28,7 +28,7 @@ void ofApp::setup(){
 	//extra verbose!
 	ofSetLogLevel("ofxRemoteUIServer", OF_LOG_VERBOSE);
 	ofSetLogLevel("ofxRemoteUI", OF_LOG_VERBOSE);
-	RUI_GET_INSTANCE()->setVerbose(true);
+	RUI_GET_INSTANCE()->setVerbose(true);	
 
 	// SET PARAM GROUPS / COLORS //////////////////////////////////
 	RUI_NEW_GROUP("POSITION");	//make a new group (optional)
@@ -142,15 +142,29 @@ void ofApp::draw(){
 void ofApp::keyPressed( int key ){
 
 	if(key == '1'){
-		RUI_SHARE_PARAM(test, 0, 1);
+		ofLogNotice() << "b4 adding test, test is " << test;
+		RUI_SHARE_PARAM(test, 0, 100);
+		ofLogNotice() << "after adding test, test is " << test;
 	}
 
 	if(key == '2'){
-		RUI_GET_INSTANCE()->removeParamFromDB("test");
+		ofLogNotice() << "b4 remving test, test is " << test;
+		RUI_GET_INSTANCE()->removeParamFromDB("test", true);
+		ofLogNotice() << "after remving test, test is " << test;
+		test = 66;
+		ofLogNotice() << "setting test to 66 " << test;
 	}
 
 	if(key == '3'){
 		RUI_GET_INSTANCE()->removeParamFromDB("x");
+	}
+
+	if(key == '4'){
+		RUI_SHARE_PARAM(test2, 0, 100);
+	}
+
+	if(key == '5'){
+		RUI_GET_INSTANCE()->removeParamFromDB("test2", true);
 	}
 
 	if(key == '9'){

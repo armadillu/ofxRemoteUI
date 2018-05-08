@@ -279,6 +279,8 @@ protected:
 	#endif
 	void			saveSettingsBackup();
 
+	void 			recreateOrderedKeysWithoutParam(const string & removedParam);
+
 	void 			addParamToDB(const RemoteUIParam & p, std::string thisParamName);
 
 	std::string 			getFinalPath(const std::string &);

@@ -310,7 +310,7 @@ protected:
 
 	std::string							userSuppliedNetInterface; //store user preference on network interface to use
 
-	std::unordered_map<std::string, RemoteUIParam>		params;
+	std::unordered_map<std::string, RemoteUIParam>			params;
 	std::map<int, std::string>								orderedKeys; // used to keep the order in which the params were added
 
 	std::vector<std::string>								presetNames;

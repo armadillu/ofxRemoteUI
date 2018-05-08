@@ -779,6 +779,7 @@ void ofxRemoteUI::sendParam(std::string paramName, const RemoteUIParam & p){
 	m.addStringArg(p.group);
 	try{
 		sendMessage(m);
+		if(verbose_) RLOG_VERBOSE << "sendParam(" << paramName << ")";
 		paramsSentOverOsc.insert(paramName);
 	}catch(exception e){
 		RLOG_ERROR << "exception sendParam " << paramName;
@@ -822,7 +823,7 @@ void ofxRemoteUI::sendSAVE(bool confirm){
 
 
 void ofxRemoteUI::sendTEST(){
-	if(verbose_) RLOG_VERBOSE << "sendTEST()";
+	//if(verbose_) RLOG_VERBOSE << "sendTEST()";
 	waitingForReply = true;
 	timeSinceLastReply = 0.0f;
 	ofxOscMessage m;
