@@ -33,7 +33,9 @@ public:
 		int currentMouseX;
 
 		int test = 0;
+		int test2 = 0;
 
+		
 };
 
 #endif

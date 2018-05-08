@@ -220,26 +220,16 @@ void ofxRemoteUIServer::removeParamFromDB(const string & paramName, bool permane
 		params.erase(it);
 
 		it = paramsFromCode.find(paramName);
-		if (it != paramsFromCode.end()){
-			paramsFromCode.erase(paramsFromCode.find(paramName));
-		}
+		if (it != paramsFromCode.end()) paramsFromCode.erase(paramsFromCode.find(paramName));
 
 		it = paramsFromXML.find(paramName);
-		if (it != paramsFromXML.end()){
-			paramsFromXML.erase(it);
-		}
+		if (it != paramsFromXML.end()) paramsFromXML.erase(it);
 
-		//re-create orderedKeys
-		vector<string> myOrderedKeys;
-		for(auto iterator = orderedKeys.begin(); iterator != orderedKeys.end(); iterator++) {
-			if (iterator->second != paramName){
-				myOrderedKeys.emplace_back(iterator->second);
-			}
-		}
-		orderedKeys.clear();
-		for(int i = 0; i < myOrderedKeys.size(); i++){
-			orderedKeys[i] = myOrderedKeys[i];
-		}
+		auto it3 = paramsWereLoadedFromXML.find(paramName);
+		if(it3 != paramsWereLoadedFromXML.end()) paramsWereLoadedFromXML.erase(it3);
+
+		//re-create orderedKeys ignoring the param we are about to remove
+		recreateOrderedKeysWithoutParam(paramName);
 
 		sendREMp(paramName);
 
@@ -247,6 +237,20 @@ void ofxRemoteUIServer::removeParamFromDB(const string & paramName, bool permane
 		RLOG_ERROR << "removeParamFromDB() >> trying to delete an nonexistent param (" << paramName << ")" ;
 	}
 	dataMutex.unlock();
+}
+
+void ofxRemoteUIServer::recreateOrderedKeysWithoutParam(const string & removedParam){
+
+	vector<string> myOrderedKeys;
+	for(auto iterator = orderedKeys.begin(); iterator != orderedKeys.end(); iterator++) {
+		if (iterator->second != removedParam){
+			myOrderedKeys.emplace_back(iterator->second);
+		}
+	}
+	orderedKeys.clear();
+	for(int i = 0; i < myOrderedKeys.size(); i++){
+		orderedKeys[i] = myOrderedKeys[i];
+	}
 }
 
 
@@ -517,6 +521,7 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 				RemoteUIParam &t = params_removed[key];
 				auto thisParamXml = paramsList.append_child("P");
 				saveParamToXmlSettings(t, key, thisParamXml, numSaved + c, false);
+				savedParams.emplace_back(key);
 				c++;
 			}else{
 				//param is defined as both params_removed[] and params[], most likely we loaded XML b4 we finished defining all code params...
@@ -2180,8 +2185,8 @@ void ofxRemoteUIServer::updateServer(float dt){
 	//this would happen if we added new params on the fly as the app runs
 	if(sentParamsToClient && readyToSend){ //only do this after a client successfully connected already (sentParamsToClient==true)
 		bool didSendSome = false;
-		for(auto & pit : params){
-			const string & pName = pit.first;
+		for(auto & pit : orderedKeys){
+			const string & pName = pit.second;
 			auto it = std::find(paramsSentOverOsc.begin(), paramsSentOverOsc.end(), pName);
 			if(it == paramsSentOverOsc.end() ){
 				sendParam(pName, params[pName]);
