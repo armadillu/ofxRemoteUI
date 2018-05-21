@@ -93,7 +93,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	uiAlpha = 1.0f;
 	selectedPreset = selectedGroupPreset = 0;
 	selectedItem = -1;
-	ofSeedRandom(1979);
+	//ofSeedRandom(1979);
 	headlessMode = false;
 
 	int numHues = 9;
