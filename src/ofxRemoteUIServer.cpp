@@ -1399,7 +1399,8 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 	}
 
 	if(e.key == showInterfaceKey){
-		toggleBuiltInClientUI();
+	 	toggleBuiltInClientUI();
+		return true; //interrupt event chain
 	}
 	return showUI && e.key != OF_KEY_ESC;
 }
