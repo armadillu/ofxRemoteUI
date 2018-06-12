@@ -374,7 +374,7 @@ void ofxRemoteUI::updateParamFromDecodedMessage(const ofxOscMessage & m, Decoded
 			if(m.getNumArgs() > 1){ //for standard RUI client
 				p.minInt = m.getArgAsInt32(arg); arg++;
 				p.maxInt = m.getArgAsInt32(arg); arg++;
-				int n = m.getNumArgs() - 5 - 3; // 3 >> the int vals, 5 >> 4 colors + 1 group
+				int n = p.maxInt - p.minInt + 1; 
 				int i = 0;
 				p.enumList.clear();
 				for (i = 0; i < n; i++) {
