@@ -300,7 +300,7 @@ public:
 
 	unsigned char r,g,b,a; // param bg color [0,255]
 
-	string description;
+	std::string description;
 };
 
 
