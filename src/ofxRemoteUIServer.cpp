@@ -1133,10 +1133,12 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 	RUI_LOAD_FROM_XML(); //we load at setup time - all values are store even b4 they are defined in src!
 
 	#ifdef TARGET_OSX
+	#ifdef RUI_ENABLE_QUERYSERVER
 	if(oscQueryServer == nullptr){
 		oscQueryServer = new OscQueryServerMgr();
 		oscQueryServer->setup();
 	}
+	#endif
 	#endif
 }
 
@@ -1153,9 +1155,11 @@ void ofxRemoteUIServer::_appExited(ofEventArgs &e){
 	}
 
 	#ifdef TARGET_OSX
+	#ifdef RUI_ENABLE_QUERYSERVER
 	if(oscQueryServer){
 		delete oscQueryServer;
 	}
+	#endif
 	#endif
 }
 

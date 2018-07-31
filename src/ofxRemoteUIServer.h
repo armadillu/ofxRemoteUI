@@ -386,12 +386,14 @@ protected:
 	float													charW = 8;
 
 	#ifdef TARGET_OSX
+	#ifdef RUI_ENABLE_QUERYSERVER
 	//this is OSX only as it relies on Bonjour advertizing for it to work with Vezér
 	//windows possible but will require additional installs/libs so on hold for now
 	OscQueryServerMgr *	oscQueryServer = nullptr;
 										//this allows any other app getting a proper list of all the parameters available
 										//https://imimot.com/help/vezer/osc-track-extras/#osc-query-server-support
 										//follows https://github.com/mrRay/OSCQueryProposal
+	#endif
 	#endif
 #endif
 
