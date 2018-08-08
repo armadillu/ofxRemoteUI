@@ -1150,8 +1150,6 @@ void ofxRemoteUIServer::_appExited(ofEventArgs &e){
 	if(saveToXmlOnExit){
 		RLOG_NOTICE << "Saving to XML on exit...";
 		OFX_REMOTEUI_SERVER_SAVE_TO_XML();	//save values to XML
-	}else{
-		RLOG_NOTICE << "We were supposed to Save to XML on exit, but we haven't loaded an XML yet... So not saving!";
 	}
 
 	#ifdef TARGET_OSX
