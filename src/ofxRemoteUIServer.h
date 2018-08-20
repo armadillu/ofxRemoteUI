@@ -45,7 +45,9 @@
 
 #if defined(__has_include) /*llvm only - query about header files being available or not*/
 #if __has_include("ofxFontStash2.h") && !defined(DISABLE_AUTO_FIND_FONSTASH_HEADERS)
-#define USE_OFX_FONTSTASH2
+	#ifndef USE_OFX_FONTSTASH2
+		#define USE_OFX_FONTSTASH2
+	#endif
 #endif
 #endif
 
@@ -57,7 +59,9 @@
 
 #if defined(__has_include)
 	#if __has_include("ofxTimeMeasurements.h")
-		#define USE_OFX_TIME_MEASUREMENTS
+		#ifndef USE_OFX_TIME_MEASUREMENTS
+			#define USE_OFX_TIME_MEASUREMENTS
+		#endif
 	#endif
 #endif
 
