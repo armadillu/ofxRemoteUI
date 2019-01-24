@@ -19,11 +19,6 @@ matrix:
   # fully specify builds, include can't dynamically expand matrix entries
   # relative order of sudo and env is important so that addons: is recognized
 
-
-#branches: #only CI on the testing branch
-#  only:
-#  - feature/ci
-
 # Linux 64bit, OF master
   - os: linux
     dist: trusty
@@ -54,7 +49,7 @@ matrix:
 
 # OSX, OF master
   - os: osx
-    osx_image: xcode8
+    osx_image: xcode9.4
     compiler: clang
     env: TARGET="osx" OF_BRANCH="master"
 
@@ -195,10 +190,10 @@ install:
   - cd ~
   - git clone --depth=1 --branch=$OF_BRANCH https://github.com/openframeworks/openFrameworks
   - cd openFrameworks
-  - scripts/ci/addons/install.sh
+  - travis_wait 30 scripts/ci/addons/install.sh
 
 script:
-  - scripts/ci/addons/build.sh
+  - travis_wait 30 scripts/ci/addons/build.sh
 
 git:
   depth: 10
