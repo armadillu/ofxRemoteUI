@@ -930,7 +930,7 @@ void ofxRemoteUIServer::saveSettingsBackup(){
 			og.open(originalPath);
 			if ( og.exists() ){
 				try{
-					ofFile::moveFromTo(originalPath, destPath, true, true); //TODO complains on windows!
+					ofFile::moveFromTo(originalPath, destPath, true, true); //FIXME: complains on windows!
 				}catch(...){}
 			}
 			og.close();
@@ -1564,7 +1564,7 @@ void ofxRemoteUIServer::draw(int x, int y){
 	int screenH, screenW;
 
 	if(needsToDrawNotification | showUI){
-		ofSetupScreen(); //mmm this is a bit scary //TODO!
+		ofSetupScreen(); //FIXME: mmm this is a bit scary
 
 		ofPushStyle();
 		ofPushMatrix();
@@ -2213,7 +2213,7 @@ void ofxRemoteUIServer::deletePreset(string name, string group){
 		string path = getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + group + "/" + name + "." + OFXREMOTEUI_PRESET_FILE_EXTENSION;
 		ofFile::removeFile(path);
 	}
-	#else //TODO this wont work, relative path
+	#else //FIXME: this wont work, relative path
 	string file = getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + name + "." + OFXREMOTEUI_PRESET_FILE_EXTENSION;
 	if (group != "") file = getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + group + "/" + name + "." + OFXREMOTEUI_PRESET_FILE_EXTENSION;
 	remove( file.c_str() );

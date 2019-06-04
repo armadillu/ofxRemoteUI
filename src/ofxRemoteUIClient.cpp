@@ -490,7 +490,7 @@ void ofxRemoteUIClient::trackParam(string paramName, int* param){
 }
 
 
-void ofxRemoteUIClient::trackParam(string paramName, int* param, vector<string> list){ //TODO!
+void ofxRemoteUIClient::trackParam(string paramName, int* param, vector<string> list){ //FIXME: trackParam
 	RemoteUIParam p;
 	auto it = params.find(paramName);
 	if ( it == params.end() ){	//not found! we add it
@@ -556,7 +556,7 @@ void ofxRemoteUIClient::trackParam(string paramName, unsigned char* param){
 
 void ofxRemoteUIClient::sendUntrackedParamUpdate(RemoteUIParam p, string paramName){
 	//p.print();
-	params[paramName] = p; //TODO error check!
+	params[paramName] = p; //FIXME: error check!
 	vector<string>list;
 	list.emplace_back(paramName);
 	sendUpdateForParamsInList(list);

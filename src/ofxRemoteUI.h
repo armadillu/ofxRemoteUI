@@ -168,7 +168,7 @@
  SERVER:	/SETp PRESET_NAME OK					//server says ok
  SERVER:	/MISP PRESET_NAME (param list)		//server reports missing params not set in this group preset
  CLIENT:	/REQU								//client wants values for that preset
- SERVER:	/SEND *****							//server sends all params -- TODO only send params in this group!
+ SERVER:	/SEND *****							//server sends all params -- FIXME: only send params in this group!
  SERVER:	/REQU OK								//server closes REQU
 
  //server wants to remove a param

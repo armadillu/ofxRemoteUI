@@ -271,7 +271,7 @@ std::string ofxRemoteUI::getMyIP(std::string userChosenInteface, std::string & s
 	}
 
 	if (GetAdaptersInfo(pAdapterInfo, &buflen) == NO_ERROR) {
-		//this is crappy, we get the first non 0.0.0.0 interface (no idea which order they come in) TODO!
+		//FIXME: this is crappy, we get the first non 0.0.0.0 interface (no idea which order they come in)
 		for (IP_ADAPTER_INFO *pAdapter = pAdapterInfo; pAdapter; pAdapter = pAdapter->Next) {
 			//printf("%s (%s)\n", pAdapter->IpAddressList.IpAddress.String, pAdapter->Description);
 			std::string ip = pAdapter->IpAddressList.IpAddress.String;

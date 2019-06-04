@@ -287,7 +287,7 @@ void ofxRemoteUIofParamaterSync::updateOfParamFromRuiParam(string ruiParamName){
 
 		case REMOTEUI_PARAM_FLOAT:{
 
-			//most likely an ofVecN suffix compSEP + "Dx" - TODO  #############################
+			//FIXME: most likely an ofVecN suffix compSEP + "Dx"   #############################
 			if(paramName[paramName.size() - 3] == compSEP[0]){
 				char vecComp = paramName[paramName.size() - 1]; // x | y | z | w
 				char vecType = paramName[paramName.size() - 2]; // 2 | 3 | 4
