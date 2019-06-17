@@ -66,7 +66,7 @@ ofJson OscQueryServerMgr::buildJSON(){
 	std::map<string, vector<string>> paramsByGroup;
 
 	string currentParam = "unGrouped";
-	for(auto it : keys){
+	for(auto & it : keys){
 		const std::string & paramName = it.second;
 		const RemoteUIParam & param = params.at(paramName);
 		if(param.type == REMOTEUI_PARAM_SPACER){
@@ -80,7 +80,7 @@ ofJson OscQueryServerMgr::buildJSON(){
 		}
 	}
 
-	for(auto it : paramsByGroup){
+	for(auto & it : paramsByGroup){
 		string groupName = it.first;
 		vector<string> & paramsNames = it.second;
 
