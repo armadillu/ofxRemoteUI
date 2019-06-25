@@ -672,7 +672,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 							p.type = REMOTEUI_PARAM_FLOAT;
 							p.floatVal = s.getFloatValue();
 						}else{
-							if(p.type != REMOTEUI_PARAM_FLOAT){ RLOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
+							if(p.type != REMOTEUI_PARAM_FLOAT){ RLOG_ERROR << "type mismatch parsing '" << paramName << "'. Ignoring it!"; break;}
 							float val;
 							if(loadFromXmlClampsToValidRange){
 								val = ofClamp(s.getFloatValue(), p.minFloat, p.maxFloat);
@@ -689,7 +689,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 							p.type = REMOTEUI_PARAM_INT;
 							p.intVal = s.getIntValue();
 						}else{
-							if(p.type != REMOTEUI_PARAM_INT){ RLOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
+							if(p.type != REMOTEUI_PARAM_INT){ RLOG_ERROR << "type mismatch parsing '" << paramName << "'. Ignoring it!"; break;}
 							int val;
 							if(loadFromXmlClampsToValidRange){
 								val = ofClamp(s.getIntValue(), p.minInt, p.maxInt);
@@ -706,7 +706,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 							p.type = REMOTEUI_PARAM_STRING;
 							p.stringVal = s.getValue();
 						}else{
-							if(p.type != REMOTEUI_PARAM_STRING){ RLOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
+							if(p.type != REMOTEUI_PARAM_STRING){ RLOG_ERROR << "type mismatch parsing '" << paramName << "'. Ignoring it!"; break;}
 							string val = s.getValue();
 							p.stringVal = *p.stringValAddr = val;
 							if(verbose_) RLOG_NOTICE << "loading a STRING '" << paramName <<"' (" << (string) *p.stringValAddr << ") from XML" ;
@@ -718,7 +718,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 							p.type = REMOTEUI_PARAM_ENUM;
 							p.intVal = s.getIntValue();
 						}else{
-							if(p.type != REMOTEUI_PARAM_ENUM){ RLOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
+							if(p.type != REMOTEUI_PARAM_ENUM){ RLOG_ERROR << "type mismatch parsing '" << paramName << "'. Ignoring it!"; break;}
 							int val = ofClamp(s.getIntValue(), p.minInt, p.maxInt);
 							p.intVal = *p.intValAddr = val;
 							if(verbose_) RLOG_NOTICE << "loading an ENUM '" << paramName <<"' (" << (int) *p.intValAddr << ") from XML" ;
@@ -730,7 +730,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 							p.type = REMOTEUI_PARAM_BOOL;
 							p.boolVal = s.getIntValue();
 						}else{
-							if(p.type != REMOTEUI_PARAM_BOOL){ RLOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
+							if(p.type != REMOTEUI_PARAM_BOOL){ RLOG_ERROR << "type mismatch parsing '" << paramName << "'. Ignoring it!"; break;}
 							bool val = s.getIntValue();
 							p.boolVal = *p.boolValAddr = val;
 							if(verbose_) RLOG_NOTICE << "loading a BOOL '" << paramName <<"' (" << (bool) *p.boolValAddr << ") from XML" ;
@@ -755,7 +755,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
 							p.blueVal = s.getAttribute("c2.blue").getIntValue();
 							p.alphaVal = s.getAttribute("c3.alpha").getIntValue();
 						}else{
-							if(p.type != REMOTEUI_PARAM_COLOR){ RLOG_ERROR << "type missmatch parsing '" << paramName << "'. Ignoring it!"; break;}
+							if(p.type != REMOTEUI_PARAM_COLOR){ RLOG_ERROR << "type mismatch parsing '" << paramName << "'. Ignoring it!"; break;}
 							unsigned char r = s.getAttribute("c0.red").getIntValue();
 							unsigned char g = s.getAttribute("c1.green").getIntValue();
 							unsigned char b = s.getAttribute("c2.blue").getIntValue();
