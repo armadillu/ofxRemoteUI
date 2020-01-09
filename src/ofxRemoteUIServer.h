@@ -412,7 +412,7 @@ protected:
     void    listenWebSocket(int port);
     int     wsPort;
     class mutex    wsDequeMut;
-    ofxOscMessage  jsonToOsc(Json::Value json);
+    ofxOscMessage  jsonToOsc(ofJson json);
     std::string         oscToJson(ofxOscMessage m);
     ofxLibwebsockets::Server wsServer;
 #endif

@@ -3040,34 +3040,34 @@ string ofxRemoteUIServer::oscToJson(ofxOscMessage m) {
     
 }
 
-ofxOscMessage ofxRemoteUIServer::jsonToOsc(Json::Value json){
+ofxOscMessage ofxRemoteUIServer::jsonToOsc(ofJson json){
     ofxOscMessage m;
-    m.setAddress(json.get("addr", "NONE").asString());
+    m.setAddress(json.count("addr") > 0 ? json["addr"].get<std::string>() : "NONE");
     
-    Json::Value argv = json.get("args", Json::nullValue);
+    ofJson argv = json["args"];
     int argc = argv.size();
     
     for (int i = 0; i < argc; i++) {
         
-        Json::Value arg = argv.get(i, Json::nullValue);
+        ofJson arg = argv[i];
         
         switch (arg.type()) {
                 
-            case Json::intValue:
-            case Json::uintValue:
-                m.addIntArg(arg.asInt());
+            case ofJson::value_t::number_integer:
+            case ofJson::value_t::number_unsigned:
+                m.addIntArg(arg);
                 break;
                 
-            case Json::realValue:
-                m.addFloatArg(arg.asFloat());
+            case ofJson::value_t::number_float:
+                m.addFloatArg(arg);
                 break;
                 
-            case Json::stringValue:
-                m.addStringArg(arg.asString());
+            case ofJson::value_t::string:
+                m.addStringArg(arg.get<std::string>());
                 break;
                 
-            case Json::booleanValue:
-                m.addBoolArg(arg.asBool());
+            case ofJson::value_t::boolean:
+                m.addBoolArg(arg.get<bool>());
                 break;
                 
             default:
