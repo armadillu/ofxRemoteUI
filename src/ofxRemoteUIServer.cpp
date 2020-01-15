@@ -948,6 +948,13 @@ void ofxRemoteUIServer::saveSettingsBackup(){
 	#endif
 }
 
+void ofxRemoteUIServer::setShouldBroadcastServerAddress(bool shouldBroadcast){
+	userBroadcastPreference = shouldBroadcast;
+}
+
+bool ofxRemoteUIServer::getShouldBroadcastServerAddress(){
+	return userBroadcastPreference;
+}
 
 
 void ofxRemoteUIServer::setup(int port_, float updateInterval_){
@@ -1902,7 +1909,7 @@ void ofxRemoteUIServer::setCustomScreenWidth(int w){
 #endif
 
 void ofxRemoteUIServer::handleBroadcast(){
-	if(doBroadcast){
+	if(doBroadcast && userBroadcastPreference){
 		if(broadcastTime > OFXREMOTEUI_BORADCAST_INTERVAL){
 			broadcastTime = 0.0f;
 

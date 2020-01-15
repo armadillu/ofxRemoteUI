@@ -175,6 +175,9 @@ public:
 	void setAutoDraw(bool d){autoDraw = d;};
 	bool getAutoDraw(){return autoDraw;}
 
+	void setShouldBroadcastServerAddress(bool shouldBroadcast);
+	bool getShouldBroadcastServerAddress();
+
 	void setLoadFromXmlClampsToValidRange(bool clamp){ loadFromXmlClampsToValidRange = clamp;}
 
 	// Font render configs ///////
@@ -314,7 +317,8 @@ protected:
 
 	string				lastAddedParam;
 
-	bool			doBroadcast; //controls if the server advertises itself
+	bool			doBroadcast; //controls if the server advertises itself - controled by internal logic
+	bool			userBroadcastPreference = true; //does the user want broadcast ON? - control by user API
 	bool			drawNotifications;
 
 	bool			loadedFromXML; //we start with loadedFromXML=false; once loadXML is called, this becomes true
