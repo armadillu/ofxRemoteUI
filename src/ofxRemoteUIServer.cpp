@@ -1562,6 +1562,11 @@ void ofxRemoteUIServer::drawString(const string & text, const float & x, const f
 	}
 }
 
+void ofxRemoteUIServer::setCustomDrawPos(int x, int y){
+	customPos.x = x;
+	customPos.y = y;
+}
+
 //x and y of where the notifications will get draw
 void ofxRemoteUIServer::draw(int x, int y){
 
@@ -1575,7 +1580,9 @@ void ofxRemoteUIServer::draw(int x, int y){
 
 		ofPushStyle();
 		ofPushMatrix();
+		ofTranslate(customPos.x, customPos.y);
 		ofScale(uiScale,uiScale);
+
 		ofSetDrawBitmapMode(OF_BITMAPMODE_SIMPLE);
 		ofEnableBlendMode(OF_BLENDMODE_ALPHA);
 		ofSetRectMode(OF_RECTMODE_CORNER);
@@ -1926,7 +1933,6 @@ void ofxRemoteUIServer::handleBroadcast(){
 }
 
 void ofxRemoteUIServer::updateServer(float dt){
-
 
 	#ifdef OF_AVAILABLE
 	onScreenNotifications.update(dt);

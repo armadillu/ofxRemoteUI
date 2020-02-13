@@ -210,6 +210,7 @@ public:
 	void setBuiltInUiScale(float s);
 	void setCustomScreenHeight(int h);
 	void setCustomScreenWidth(int w);
+	void setCustomDrawPos(int x, int y);
 
 	void setNotificationScreenTime(float t){onScreenNotifications.setNotificationScreenTime(t);}
 	void setLogNotificationScreenTime(float t){onScreenNotifications.setLogNotificationScreenTime(t);}
@@ -362,6 +363,7 @@ protected:
 	float													xOffsetTarget; //smooth transitions scrolling
 	int														customScreenHeight;
 	int														customScreenWidth;
+	ofVec2f													customPos;
 	int														selectedColorComp; //[0..4]
 
 	enum FontRenderer{
