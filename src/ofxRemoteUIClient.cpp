@@ -265,7 +265,7 @@ void ofxRemoteUIClient::update(float dt){
 				case GET_MISSING_PARAMS_IN_PRESET:
 					if(callBack != NULL){
 						cbArg.action = SERVER_REPORTS_MISSING_PARAMS_IN_PRESET;
-						for (int i = 0; i < m.getNumArgs(); i++){
+						for (int i = 0; i < (int)m.getNumArgs(); i++){
 							cbArg.paramList.emplace_back(m.getArgAsString(i));
 						}
 						callBack(cbArg);
@@ -442,10 +442,10 @@ void ofxRemoteUIClient::deleteGroupPreset(string presetName, string group){
 
 void ofxRemoteUIClient::fillPresetListFromMessage(ofxOscMessage m){
 
-	int n = m.getNumArgs();
+	int n = (int)m.getNumArgs();
 
 	//check if server has no presets at all
-	if (m.getNumArgs() == 1){
+	if (n == 1){
 		if(m.getArgAsString(0) == OFXREMOTEUI_NO_PRESETS){ //if no prests, server sends only one with this value
 			//we know there's no presets
 		}
