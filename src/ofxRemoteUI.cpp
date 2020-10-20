@@ -115,14 +115,14 @@ vector<std::string> ofxRemoteUI::getChangedParamsList(){
 DecodedMessage ofxRemoteUI::decode(const ofxOscMessage & m){
 
 	std::string msgAddress = m.getAddress();
-	if(msgAddress.size() > 0){
+	if((int)msgAddress.size() > 0){
 
 		if(msgAddress[0] == '/'){ //if address starts with "/", drop it to match the fucked up remoteUI protocol
 			msgAddress = msgAddress.substr(1, msgAddress.size() - 1);
 		}
 		//allow address to use the standard style /SEND/FLT/paramName instead of the legacy "SEND FLT paramName"
 		//allow /bbb/jjj/ syntax, but convert to space-based to avoid changing all the internal logic
-		for(int i = 0; i < msgAddress.size(); i++){
+		for(int i = 0; i < (int)msgAddress.size(); i++){
 			if(msgAddress[i] == '/') msgAddress[i] = ' ';
 		}
 	}
@@ -315,7 +315,7 @@ void ofxRemoteUI::updateParamFromDecodedMessage(const ofxOscMessage & m, Decoded
 	}
 
 	RemoteUIParam p = original;
-	int arg = 0;
+	size_t arg = 0;
 
 	switch (dm.argument) {
 		case FLT_ARG:
