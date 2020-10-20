@@ -384,7 +384,7 @@ ofAbstractParameter& ofxRemoteUIofParamaterSync::findInChildren(ofParameterGroup
 
 void ofxRemoteUIofParamaterSync::forceRuiToOfParamSync(){
 
-	for(int i = 0; i < ofParamRuiList.size(); i++ ){
+	for(int i = 0; i < (int)ofParamRuiList.size(); i++ ){
 		updateOfParamFromRuiParam(ofParamRuiList[i]);
 	}
 }
