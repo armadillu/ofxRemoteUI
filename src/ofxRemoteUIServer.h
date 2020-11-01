@@ -15,8 +15,7 @@
 #include "ofxOsc.h"
 #include "ofxXmlSettings.h"
 #include "ofxRemoteUI.h"
-#include <map>
-#include <set>
+#include <unordered_map>
 #include <vector>
 #include "ofxRemoteUIServerMacros.h"
 #if defined( OF_AVAILABLE )

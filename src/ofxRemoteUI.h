@@ -71,12 +71,7 @@
 #define OFXREMOTEUI_PARAM_NAME_XML_KEY						"paramName"
 #define OFXREMOTEUI_UNKNOWN_PARAM_NAME_XML_KEY				"unnamedParamName"
 
-
-#ifdef OF_VERSION_MINOR
-    #define OF_AVAILABLE
-#else
-    //#error "no OF"
-#endif
+#include "ofExistsTest.h"
 
 #include "RemoteParam.h"
 
