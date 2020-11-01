@@ -55,7 +55,7 @@ bool ofxRemoteUIClient::setup(string address, int port_){
 	try{
 		oscSender.setup(address, port);
 		OSCsetup = true;
-	}catch(exception e){
+	}catch(std::exception & e){
 		RLOG_ERROR << "exception setting up oscSender" << e.what();
 		OSCsetup = false;
 	}

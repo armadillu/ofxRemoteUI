@@ -793,7 +793,7 @@ void ofxRemoteUI::sendParam(std::string paramName, const RemoteUIParam & p){
 		sendMessage(m);
 		if(verbose_) RLOG_VERBOSE << "sendParam(" << paramName << ")";
 		paramsSentOverOsc.insert(paramName);
-	}catch(exception e){
+	}catch(std::exception & e){
 		RLOG_ERROR << "exception sendParam " << paramName;
 	}
 }
@@ -904,7 +904,7 @@ void ofxRemoteUI::sendREMp(const string & paramName){
 		m.addStringArg(paramName);
 		try{
 			sendMessage(m);
-		}catch(exception e){
+		}catch(std::exception & e){
 			RLOG_ERROR << "Exception sendREMp " << e.what() ;
 		}
 	}

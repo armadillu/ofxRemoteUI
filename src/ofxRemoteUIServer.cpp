@@ -2595,7 +2595,7 @@ void ofxRemoteUIServer::sendLogToClient(const string & message){
 		m.addStringArg(message);
 		try{
 			sendMessage(m);
-		}catch(exception e){
+		}catch(std::exception & e){
 			RLOG_ERROR << "Exception sendLogToClient " << e.what() ;
 		}
 	}
