@@ -23,6 +23,7 @@ matrix:
   - os: linux
     dist: trusty
     sudo: required
+    cache: ccache
     env: TARGET="linux64" OF_BRANCH="master"
     addons:
       apt:
@@ -51,6 +52,7 @@ matrix:
   - os: osx
     osx_image: xcode9.4
     compiler: clang
+    cache: ccache
     env: TARGET="osx" OF_BRANCH="master"
 
 # OSX, OF stable:  Not supported yet
@@ -181,10 +183,6 @@ matrix:
 #        - ~/android-ndk-r12b
 
 
-  # Exclude the default build that would otherwise be generated
-  # see https://github.com/travis-ci/travis-ci/issues/1228
-  exclude:
-    - compiler: gcc
 
 install:
   - cd ~
@@ -193,7 +191,18 @@ install:
   - travis_wait 30 scripts/ci/addons/install.sh
 
 script:
+  - ccache -z
+  - ccache -s
+  - if [ "$TARGET" = "osx" ]; then
+      CXX="ccache clang++";
+      CC="ccache clang";
+    else
+      CXX="ccache g++";
+      CC="ccache gcc";
+    fi
   - travis_wait 30 scripts/ci/addons/build.sh
+  - ccache -s
+
 
 git:
   depth: 10
