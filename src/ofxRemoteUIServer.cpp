@@ -1928,6 +1928,9 @@ void ofxRemoteUIServer::handleBroadcast(){
 			m.addIntArg(broadcastCount); // 3
 			broadcastSender.sendMessage(m);
 			broadcastCount++;
+			if(broadcastCount == INT_MAX){
+				broadcastCount = 0;
+			}
 		}
 	}
 }
