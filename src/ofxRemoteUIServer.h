@@ -72,8 +72,6 @@
 
 #define BG_COLOR_ALPHA			55
 
-#define RUI_WEB_INTERFACE true ///////////////                                          !!!!!!!!!!
-
 // Define RUI_WEB_INTERFACE to turn ON websockets/webserver
 #ifdef RUI_WEB_INTERFACE
     #include "ofxRemoteUIWebServer.h"

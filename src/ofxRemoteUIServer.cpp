@@ -897,7 +897,11 @@ void ofxRemoteUIServer::pushParamsToClient(){
 	dataMutex.unlock();
 	#endif
 	
-	if(readyToSend || wsState.connected){
+	if(readyToSend
+		#ifdef RUI_WEB_INTERFACE
+	   || wsState.connected
+		#endif
+	   ){
 		vector<string>paramsList = getAllParamNamesList();
 		syncAllParamsToPointers();
 		sendUpdateForParamsInList(paramsList);
@@ -1975,16 +1979,23 @@ void ofxRemoteUIServer::updateServer(float dt){
 
 	dataMutex.lock();
 
-	while( oscReceiver.hasWaitingMessages() or wsState.messages.size()){// check for waiting messages from client
+	while( oscReceiver.hasWaitingMessages()
+		  #ifdef RUI_WEB_INTERFACE
+		  ||
+		  wsState.messages.size()
+			#endif
+		  ){// check for waiting messages from client
 
 		ofxOscMessage m;
 		string remoteIP;
+		#ifdef RUI_WEB_INTERFACE
         if (wsState.connected && wsState.messages.size()) {
             m = ofxOscMessage(wsState.messages.front());
 			remoteIP = m.getRemoteIp();
             wsState.messages.pop_front();
-        }
-        else {
+        }else
+		#endif
+		{
             oscReceiver.getNextMessage(m);
 			remoteIP = m.getRemoteIp();
             if (!readyToSend ){ // if not connected, connect to our friend so we can talk back
