@@ -72,8 +72,7 @@
 
 #define BG_COLOR_ALPHA			55
 
-// Define RUI_WEB_INTERFACE to turn ON websockets/webserver
-#ifdef RUI_WEB_INTERFACE
+#ifndef NO_RUI_WEB_INTERFACE
     #include "ofxRemoteUIWebServer.h"
 	#include "Poco/Net/HTTPServer.h"
 	#include "Poco/Net/WebSocket.h"
@@ -238,7 +237,7 @@ public:
 	void addVariableWatch(const std::string & varName, bool* varPtr, ofColor c = ofColor(0,0,0,0));
 	//void removeVariableWatch(const std::string &varName);
 
-#ifdef RUI_WEB_INTERFACE
+#ifndef NO_RUI_WEB_INTERFACE
 	struct WebSocketState{
 		int wsPort;
 		bool setup = false;
@@ -422,7 +421,7 @@ protected:
 	std::vector<std::string>									paramsToIgnoreWhenLoadingPresets;
 
 
-	#ifdef RUI_WEB_INTERFACE
+	#ifndef NO_RUI_WEB_INTERFACE
 	// WebSockets (OSC Port + 1)
 	void    					setupWebSocket(int port);
 	//ofxOscMessage			jsonToOsc(ofJson & json);

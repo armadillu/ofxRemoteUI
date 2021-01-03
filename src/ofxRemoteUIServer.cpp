@@ -40,7 +40,7 @@
 
 #endif
 
-#ifdef RUI_WEB_INTERFACE
+#ifndef NO_RUI_WEB_INTERFACE
 	#include "Poco/Net/WebSocket.h"
 	#include "Poco/Net/ServerSocket.h"
 
@@ -898,7 +898,7 @@ void ofxRemoteUIServer::pushParamsToClient(){
 	#endif
 	
 	if(readyToSend
-		#ifdef RUI_WEB_INTERFACE
+		#ifndef NO_RUI_WEB_INTERFACE
 	   || wsState.connected
 		#endif
 	   ){
@@ -1134,7 +1134,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		RLOG_NOTICE << "Listening for commands at " << computerIP << ":" << port;
 		oscReceiver.setup(port);
         
-        #ifdef RUI_WEB_INTERFACE
+        #ifndef NO_RUI_WEB_INTERFACE
 		if(!wsState.setup){
             setupWebSocket(port + 1);
             startWebServer(port + 2);
@@ -1245,7 +1245,7 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				}
 			}break;
 
-			#ifdef RUI_WEB_INTERFACE
+			#ifndef NO_RUI_WEB_INTERFACE
 			case 'c':{
 				string url = ofToString(computerIP) + ":" + ofToString(webPort);
 				string wsUrl = ofToString(computerIP) + ":" + ofToString(wsState.wsPort);
@@ -1347,8 +1347,8 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 
 			case '+': setBuiltInUiScale(uiScale + 0.1); break;
 			case '-': setBuiltInUiScale(MAX(uiScale - 0.1, 0.5)); break;
-			case ',': xOffsetTarget += (uiColumnWidth); xOffsetTarget = ofClamp(xOffsetTarget, -FLT_MAX, 4 * uiColumnWidth); break;
-			case '.': xOffsetTarget -= (uiColumnWidth); xOffsetTarget = ofClamp(xOffsetTarget, -FLT_MAX, 4 * uiColumnWidth); break;
+			case '.': xOffsetTarget += (uiColumnWidth); xOffsetTarget = ofClamp(xOffsetTarget, -FLT_MAX, 4 * uiColumnWidth); break;
+			case ',': xOffsetTarget -= (uiColumnWidth); xOffsetTarget = ofClamp(xOffsetTarget, -FLT_MAX, 4 * uiColumnWidth); break;
 			case OF_KEY_LEFT:
 			case OF_KEY_RIGHT:{
 
@@ -1631,29 +1631,25 @@ void ofxRemoteUIServer::draw(int x, int y){
 			ofSetColor(44, 245);
 			ofDrawRectangle(0,screenH / uiScale - bottomBarHeight, screenW / uiScale, bottomBarHeight );
 
-            string reachableAt;
-            if (enabled) {
-                reachableAt = "Server reachable at " + computerIP + ":";
-				#if defined(RUI_WEB_INTERFACE)
-				reachableAt += " ";
+			string reachableAt;
+			if (enabled) {
+				reachableAt = "Server reachable at " + computerIP + ":";
+				reachableAt += ofToString(port) + "(OSC) ";
+				#ifndef NO_RUI_WEB_INTERFACE
+				reachableAt += ofToString(wsState.wsPort) + "(WS) ";
+				reachableAt += ofToString(webPort) + "(Web)";
 				#endif
-				reachableAt += ofToString(port);
-				#if defined(RUI_WEB_INTERFACE)
-				reachableAt += "(OSC)";
-				reachableAt += " " + ofToString(wsState.wsPort) + "(WS)";
-				reachableAt += " " + ofToString(webPort) + "(Web)";
-				#endif
-            }else {
+			}else {
 				reachableAt = "Server disabled";
-            }
-            
+			}
+
 			ofSetColor(255);
 			string instructions = "ofxRemoteUI built in client. " + reachableAt +
 			"\nPress 's' to save current config, 'S' to make a new preset. ('E' to save in old format)\n" +
 			"Press 'r' to restore all params's launch state. '+'/'-' to set UI Scale. 'N' to toggle screen notif.\n" +
 			"Press Arrow Keys to edit values. SPACEBAR + Arrow Keys for bigger increments. ',' and '.' Keys to scroll.\n" +
 			"Press 'TAB' to hide. Press 'RETURN' to cycle through RGBA components.";
-			#ifdef RUI_WEB_INTERFACE
+			#ifndef NO_RUI_WEB_INTERFACE
 			instructions += " Press 'c' to launch a web client.";
 			#endif
 
@@ -1973,14 +1969,14 @@ void ofxRemoteUIServer::updateServer(float dt){
 	//let everyone know I exist and which is my port, every now and then
 	handleBroadcast();
 
-	#ifdef RUI_WEB_INTERFACE
+	#ifndef NO_RUI_WEB_INTERFACE
     lock_guard<std::mutex> guard(wsState.wsMutex);
 	#endif
 
 	dataMutex.lock();
 
 	while( oscReceiver.hasWaitingMessages()
-		  #ifdef RUI_WEB_INTERFACE
+		  #ifndef NO_RUI_WEB_INTERFACE
 		  ||
 		  wsState.messages.size()
 			#endif
@@ -1988,7 +1984,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 
 		ofxOscMessage m;
 		string remoteIP;
-		#ifdef RUI_WEB_INTERFACE
+		#ifndef NO_RUI_WEB_INTERFACE
         if (wsState.connected && wsState.messages.size()) {
             m = ofxOscMessage(wsState.messages.front());
 			remoteIP = m.getRemoteIp();
@@ -2997,7 +2993,7 @@ void ofxRemoteUIServer::onShowParamUpdateNotification(ScreenNotifArg& a){
 
 
 void ofxRemoteUIServer::sendMessage(const ofxOscMessage & m) {
-	#ifdef RUI_WEB_INTERFACE
+	#ifndef NO_RUI_WEB_INTERFACE
 	if (wsState.connected){
 		string json = oscToJson(m);
 		//wsState.wsMutex.lock();
@@ -3008,11 +3004,13 @@ void ofxRemoteUIServer::sendMessage(const ofxOscMessage & m) {
 	}
 	else
 	#endif
+	if(readyToSend && oscSender.getHost().size()){
 		oscSender.sendMessage(m);
+	}
 }
 
 
-#ifdef RUI_WEB_INTERFACE
+#ifndef NO_RUI_WEB_INTERFACE
 
 void ofxRemoteUIServer::startWebServer(int _port) {
 	webPort = _port;
@@ -3120,13 +3118,6 @@ public:
 
 		} while (  n > 0 && ( (flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) != Poco::Net::WebSocket::FRAME_OP_CLOSE) );
 
-//		ofxOscMessage m;
-//		m.setAddress("/CIAO");
-//		m.setRemoteEndpoint(request.clientAddress().host().toString(), state->wsPort);
-//		state->wsMutex.lock();
-//		state->messages.emplace_back(m);
-//		state->wsMutex.unlock();
-
 		ofLogNotice("MyWebSocketHandler") << "WS Client closing connection" << std::endl;
 		state->connected = false;
 		state->ws = nullptr;
@@ -3143,9 +3134,14 @@ public:
 		state = s;
 	};
 
-	Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request)   {
-		if (request.find("Upgrade") != request.end() && Poco::icompare(request["Upgrade"], "websocket") == 0){ //we only care about websockets
-			return new MyWebSocketHandler(state);
+	Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request){
+		if(!state->connected){
+			if (request.find("Upgrade") != request.end() && Poco::icompare(request["Upgrade"], "websocket") == 0){ //we only care about websockets
+				return new MyWebSocketHandler(state);
+			}
+		}else{
+			ofLogError("ofxRemoteUIServer") << "Web Client trying to connect but there's already one connected, ignoring...";
+			return nullptr;
 		}
 	}
 protected:
@@ -3207,36 +3203,4 @@ string ofxRemoteUIServer::oscToJson(const ofxOscMessage & m) {
 	return json;
 }
 
-//-----------------------------------------------
-//              WebSocket Events
-//-----------------------------------------------
-
-/*
-void ofxRemoteUIServer::onConnect( ofxLibwebsockets::Event& args ) {
-    readyToSend = true;
-    useWebSockets = true;
-}
-
-void ofxRemoteUIServer::onOpen( ofxLibwebsockets::Event& args ){
-    readyToSend = true;
-    useWebSockets = true;
-}
-void ofxRemoteUIServer::onClose( ofxLibwebsockets::Event& args ){
-    ofxOscMessage m;
-    m.setAddress("/CIAO");
-    m.setRemoteEndpoint(args.conn.getClientIP(), wsPort);
-    wsDequeMut.lock();
-    wsMessages.emplace_back(m);
-    wsDequeMut.unlock();
-}
-
-void ofxRemoteUIServer::onMessage( ofxLibwebsockets::Event& args ){
-//    ofLogNotice() << "Got WS message " << args.json;
-    ofxOscMessage m = jsonToOsc(args.json);
-    m.setRemoteEndpoint(args.conn.getClientIP(), wsPort);
-    wsDequeMut.lock();
-    wsMessages.emplace_back(m);
-    wsDequeMut.unlock();
-}
-*/
 #endif

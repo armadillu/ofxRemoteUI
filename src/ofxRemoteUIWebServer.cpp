@@ -6,7 +6,7 @@
 //
 //
 
-#ifdef RUI_WEB_INTERFACE
+#ifndef NO_RUI_WEB_INTERFACE
 
 #include "ofxRemoteUIWebServer.h"
 
