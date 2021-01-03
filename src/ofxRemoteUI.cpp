@@ -112,7 +112,7 @@ vector<std::string> ofxRemoteUI::getChangedParamsList(){
 }
 
 
-DecodedMessage ofxRemoteUI::decode(const ofxOscMessage & m){
+DecodedMessage ofxRemoteUI::decode(const ofxOscMessage & m) const{
 
 	std::string msgAddress = m.getAddress();
 	if((int)msgAddress.size() > 0){
@@ -251,14 +251,6 @@ std::string ofxRemoteUI::getMyIP(std::string userChosenInteface, std::string & s
 		}
 		freeifaddrs(myaddrs);
 	}
-
-	if (userSuppliedNetInterface.length() > 0){
-		if (output == RUI_LOCAL_IP_ADDRESS){
-			RLOG_ERROR << "could not find the user supplied net interface: " << userSuppliedNetInterface;
-			RLOG_ERROR << "automatic advertising will not work! ";
-		}
-	}
-
 #endif
 
 #ifdef _WIN32
@@ -284,6 +276,14 @@ std::string ofxRemoteUI::getMyIP(std::string userChosenInteface, std::string & s
 	}
 	if (pAdapterInfo) free(pAdapterInfo);
 #endif
+
+	if (userSuppliedNetInterface.length() > 0){
+		if (output == RUI_LOCAL_IP_ADDRESS){
+			RLOG_ERROR << "could not find the user supplied net interface: " << userSuppliedNetInterface;
+			RLOG_ERROR << "automatic advertising will not work! ";
+		}
+	}
+
 	return output;
 }
 

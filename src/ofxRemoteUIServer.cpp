@@ -40,6 +40,15 @@
 
 #endif
 
+#ifdef RUI_WEB_INTERFACE
+	#include "Poco/Net/WebSocket.h"
+	#include "Poco/Net/ServerSocket.h"
+
+	using Poco::Net::ServerSocket;
+	using Poco::Net::WebSocket;
+	using Poco::Net::WebSocketImpl;
+#endif
+
 
 using namespace std;
 
@@ -144,14 +153,15 @@ void ofxRemoteUIServer::setCallback( void (*callb)(RemoteUIServerCallBackArg) ){
 
 
 void ofxRemoteUIServer::close(){
-	if(readyToSend)
+	if(readyToSend){
 		sendCIAO();
+	}
 	if(threadedUpdate){
-#ifdef OF_AVAILABLE
+		#ifdef OF_AVAILABLE
 		stopThread();
 		RLOG_NOTICE << "Closing; waiting for update thread to end..." ;
 		waitForThread();
-#endif
+		#endif
 	}
 }
 
@@ -887,7 +897,7 @@ void ofxRemoteUIServer::pushParamsToClient(){
 	dataMutex.unlock();
 	#endif
 	
-	if(readyToSend){
+	if(readyToSend || wsState.connected){
 		vector<string>paramsList = getAllParamNamesList();
 		syncAllParamsToPointers();
 		sendUpdateForParamsInList(paramsList);
@@ -1121,10 +1131,12 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 		oscReceiver.setup(port);
         
         #ifdef RUI_WEB_INTERFACE
-            listenWebSocket(port + 1);
+		if(!wsState.setup){
+            setupWebSocket(port + 1);
             startWebServer(port + 2);
+			wsState.setup = true;
+		}
         #endif
-        
     }
 
 	//still get ui access despite being disabled
@@ -1232,7 +1244,7 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 			#ifdef RUI_WEB_INTERFACE
 			case 'c':{
 				string url = ofToString(computerIP) + ":" + ofToString(webPort);
-				string wsUrl = ofToString(computerIP) + ":" + ofToString(wsPort);
+				string wsUrl = ofToString(computerIP) + ":" + ofToString(wsState.wsPort);
 				ofLaunchBrowser("http://" + url + "?connect=" + wsUrl);
 				}break;
 			#endif
@@ -1621,12 +1633,10 @@ void ofxRemoteUIServer::draw(int x, int y){
 				#if defined(RUI_WEB_INTERFACE)
 				reachableAt += " ";
 				#endif
-
 				reachableAt += ofToString(port);
-
 				#if defined(RUI_WEB_INTERFACE)
 				reachableAt += "(OSC)";
-				reachableAt += " " + ofToString(wsPort) + "(WS)";
+				reachableAt += " " + ofToString(wsState.wsPort) + "(WS)";
 				reachableAt += " " + ofToString(webPort) + "(Web)";
 				#endif
             }else {
@@ -1960,19 +1970,19 @@ void ofxRemoteUIServer::updateServer(float dt){
 	handleBroadcast();
 
 	#ifdef RUI_WEB_INTERFACE
-    lock_guard<std::mutex> guard(wsDequeMut);
+    lock_guard<std::mutex> guard(wsState.wsMutex);
 	#endif
 
 	dataMutex.lock();
 
-	while( oscReceiver.hasWaitingMessages() or wsMessages.size()){// check for waiting messages from client
+	while( oscReceiver.hasWaitingMessages() or wsState.messages.size()){// check for waiting messages from client
 
 		ofxOscMessage m;
 		string remoteIP;
-        if (useWebSockets && wsMessages.size()) {
-            m = ofxOscMessage(wsMessages.front());
+        if (wsState.connected && wsState.messages.size()) {
+            m = ofxOscMessage(wsState.messages.front());
 			remoteIP = m.getRemoteIp();
-            wsMessages.pop_front();
+            wsState.messages.pop_front();
         }
         else {
             oscReceiver.getNextMessage(m);
@@ -2032,11 +2042,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				break;
 
 			case CIAO_ACTION:{
-                if (!useWebSockets){
-                    sendCIAO();
-                } else {
-                    useWebSockets = false;
-                }
+				sendCIAO(); //TODO !!!!!!!! this was only sent when !ws
 				cbArg.action = CLIENT_DISCONNECTED;
 				if(callBack) callBack(cbArg);
 				#ifdef OF_AVAILABLE
@@ -2198,7 +2204,8 @@ void ofxRemoteUIServer::updateServer(float dt){
 				if(callBack)callBack(cbArg);
 				if(verbose_) RLOG_NOTICE << "DELETE preset: " << presetName ;
 			}break;
-			default: RLOG_ERROR << "updateServer >> ERR!"; break;
+			default:
+				RLOG_ERROR << "updateServer >> ERR!"; break;
 		}
 	}
 
@@ -2969,137 +2976,231 @@ void ofxRemoteUIServer::removeVariableWatch(const string &varName){
 
 
 void ofxRemoteUIServer::onShowParamUpdateNotification(ScreenNotifArg& a){
-
 	onScreenNotifications.addParamUpdate(a.paramName, a.p,
 										 ofColor(a.p.r, a.p.g, a.p.b, a.p.a),
 										 a.p.type == REMOTEUI_PARAM_COLOR ?
 										 ofColor(a.p.redVal, a.p.greenVal, a.p.blueVal, a.p.alphaVal) :
 										 ofColor(0,0,0,0)
 										 );
+}
 
+
+void ofxRemoteUIServer::sendMessage(const ofxOscMessage & m) {
+	#ifdef RUI_WEB_INTERFACE
+	if (wsState.connected){
+		string json = oscToJson(m);
+		//wsState.wsMutex.lock();
+		//wsState.pendingMessages.push_back(json);
+		ofLogNotice("ofxRemoteUIServer") << "Ws sent msg '" << m.getAddress() << "'";
+		((Poco::Net::WebSocket*)wsState.ws)->sendFrame(json.c_str(), json.size(), Poco::Net::WebSocket::FRAME_TEXT);
+		//wsState.wsMutex.unlock();
+	}
+	else
+	#endif
+		oscSender.sendMessage(m);
 }
 
 
 #ifdef RUI_WEB_INTERFACE
+
 void ofxRemoteUIServer::startWebServer(int _port) {
-    webPort = _port;
-    webServer.setup(_port);
-    webServer.start();
-}
-#endif
-
-void ofxRemoteUIServer::sendMessage(ofxOscMessage m) {
-        if (useWebSockets){
-            #ifdef RUI_WEB_INTERFACE
-            string json = oscToJson(m);
-            wsServer.send(json);
-            #endif
-        }
-        else {
-            oscSender.sendMessage(m);
-        }
+	webPort = _port;
+	webServer.setup(_port);
+	webServer.start();
+	RLOG_NOTICE << "setting up ofxRemoteUI Server HTTP GUI at port " << _port;
 }
 
 
-#ifdef RUI_WEB_INTERFACE
+class MyWebSocketHandler: public Poco::Net::HTTPRequestHandler {
+public:
 
-void ofxRemoteUIServer::listenWebSocket(int port) {
-    ofxLibwebsockets::ServerOptions options = ofxLibwebsockets::defaultServerOptions();
-    options.port = port;
-    wsPort = port;
-    wsServer.addListener(this);
-    bool success = wsServer.setup( options );
-    if (success)
-        RLOG_NOTICE << "WebSocket server running on port " << port;
-    else
-        RLOG_NOTICE << "WebSocket server setup failed.";
-    
+	MyWebSocketHandler(ofxRemoteUIServer::WebSocketState * s){
+		state = s;
+	}
+
+	ofxOscMessage jsonToOsc(ofJson & json){
+
+		ofxOscMessage m;
+		m.setAddress(json.count("addr") > 0 ? json["addr"].get<std::string>() : "NONE");
+		ofJson & argv = json["args"];
+		int argc = argv.size();
+
+		for (int i = 0; i < argc; i++) {
+			ofJson & arg = argv[i];
+			switch (arg.type()) {
+
+				case ofJson::value_t::number_integer:
+				case ofJson::value_t::number_unsigned:
+					m.addIntArg(arg);
+					break;
+
+				case ofJson::value_t::number_float:
+					m.addFloatArg(arg);
+					break;
+
+				case ofJson::value_t::string:
+					m.addStringArg(arg.get<std::string>());
+					break;
+
+				case ofJson::value_t::boolean:
+					m.addBoolArg(arg.get<bool>());
+					break;
+
+				default:
+					RLOG_NOTICE << "Possibly malformed JSON message";
+					break;
+			}
+		}
+		return m;
+	}
+
+
+	virtual void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response){
+
+		Poco::Net::WebSocket ws(request, response);
+		ofLogNotice("MyWebSocketHandler") << "WebSocket handleRequest from " << request.clientAddress().toString();
+
+		state->connected = true;
+		state->ws = &ws;
+		int flags = 0;
+		int n = 0;
+		do { //loop for connection handling
+
+//			state->wsMutex.lock();
+//			if(state->pendingMessages.size()){ //see if we have something pending to TX
+//				auto & msg = state->pendingMessages.front();
+//				ofLogNotice("MyWebSocketHandler") << "Webserver msg processing send: '" << msg << "'";
+//				ws.sendFrame(msg.c_str(), msg.size(), Poco::Net::WebSocket::FRAME_TEXT);
+//				state->pendingMessages.erase(state->pendingMessages.begin());
+//			}
+//			state->wsMutex.unlock();
+
+			char buffer[4096] = { 0 };
+			int msgSize = 0;
+			do { //loop for message
+				ofLogNotice("MyWebSocketHandler") << "waiting ...";
+				n = ws.receiveFrame(buffer, sizeof(buffer), flags);
+				ofLogNotice("MyWebSocketHandler") << "RXd: " << buffer;
+				msgSize +=n;
+			} while ( n > 0 && ( (flags & 0xf0 /* masking op code bits*/) != Poco::Net::WebSocket::FRAME_FLAG_FIN) );
+
+			//ofLogNotice("MyWebSocketHandler") << "out of loop";
+
+			if(msgSize){
+				string jsonStr = std::string(buffer, msgSize);
+				ofJson json;
+				try{ //parse JSON
+					json = ofJson::parse(jsonStr);
+					ofLogNotice("MyWebSocketHandler") << "parsed json ok!" << jsonStr;
+				}catch(exception e){
+					ofLogError("MyWebSocketHandler") << "err parsing json!" << e.what();
+				}
+
+				ofxOscMessage m = jsonToOsc(json);
+				m.setRemoteEndpoint(request.clientAddress().host().toString(), state->wsPort);
+
+				state->wsMutex.lock();
+					state->messages.emplace_back(m); //store what we RX
+				state->wsMutex.unlock();
+				//ofSleepMillis(30);
+			}else{
+				ofLogWarning("MyWebSocketHandler") << "empty message!";
+			}
+
+		} while (  n > 0 && ( (flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) != Poco::Net::WebSocket::FRAME_OP_CLOSE) );
+
+//		ofxOscMessage m;
+//		m.setAddress("/CIAO");
+//		m.setRemoteEndpoint(request.clientAddress().host().toString(), state->wsPort);
+//		state->wsMutex.lock();
+//		state->messages.emplace_back(m);
+//		state->wsMutex.unlock();
+
+		ofLogNotice("MyWebSocketHandler") << "WS Client closing connection" << std::endl;
+		state->connected = false;
+		state->ws = nullptr;
+	}
+
+protected:
+	ofxRemoteUIServer::WebSocketState * state = nullptr;
+};
+
+
+class MyHTTPRequestHandlerFactory: public Poco::Net::HTTPRequestHandlerFactory {
+public:
+	MyHTTPRequestHandlerFactory(ofxRemoteUIServer::WebSocketState * s){
+		state = s;
+	};
+
+	Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request)   {
+		if (request.find("Upgrade") != request.end() && Poco::icompare(request["Upgrade"], "websocket") == 0){ //we only care about websockets
+			return new MyWebSocketHandler(state);
+		}
+	}
+protected:
+	ofxRemoteUIServer::WebSocketState * state = nullptr;
+};
+
+
+void ofxRemoteUIServer::setupWebSocket(int port) {
+
+	Poco::Net::HTTPServerParams * pParams = new Poco::Net::HTTPServerParams();
+	pParams->setMaxQueued(10);
+	pParams->setMaxThreads(2);
+
+	Poco::Net::ServerSocket srs(port);
+	wsState.wsPort = port;
+	RLOG_NOTICE << "setting up WebSocket Server at port " << port;
+	wsHttpServer = new Poco::Net::HTTPServer(new MyHTTPRequestHandlerFactory(&wsState), srs, pParams);
+	wsHttpServer->start();
 }
 
-string ofxRemoteUIServer::oscToJson(ofxOscMessage m) {
-    std::string json = " { \"addr\": \"" + m.getAddress() + "\", \"args\" : [ ";
-    
-    int argc = m.getNumArgs();
-    for (int i = 0; i < argc; i++) {
-        switch(m.getArgType(i)) {
-            case OFXOSC_TYPE_INT32:
-            case OFXOSC_TYPE_INT64:
-                json += to_string(m.getArgAsInt(i));
-                break;
-            case OFXOSC_TYPE_FLOAT:
-                json += to_string(m.getArgAsFloat(i));
-                break;
-            case OFXOSC_TYPE_DOUBLE:
-                json += to_string(m.getArgAsDouble(i));
-                break;
-            case OFXOSC_TYPE_STRING:
-                json += "\"" + m.getArgAsString(i) + "\"";
-                break;
-            case OFXOSC_TYPE_CHAR:
-                json += "\"" + to_string(m.getArgAsChar(i)) + "\"";
-                break;
-            case OFXOSC_TYPE_TRUE:
-            case OFXOSC_TYPE_FALSE:
-                json += to_string(m.getArgAsBool(i));
-                break;
-            case OFXOSC_TYPE_RGBA_COLOR:
-                json += to_string(m.getArgAsRgbaColor(i));
-                break;
-            default: break;
-        }
-        if ( i < (argc - 1))
-            json += ",";
-    }
-    json += "] }";
 
-    return json;
-    
+string ofxRemoteUIServer::oscToJson(const ofxOscMessage & m) {
+
+	std::string json = " { \"addr\": \"" + m.getAddress() + "\", \"args\" : [ ";
+	int argc = m.getNumArgs();
+
+	for (int i = 0; i < argc; i++) {
+		switch(m.getArgType(i)) {
+			case OFXOSC_TYPE_INT32:
+			case OFXOSC_TYPE_INT64:
+				json += to_string(m.getArgAsInt(i));
+				break;
+			case OFXOSC_TYPE_FLOAT:
+				json += to_string(m.getArgAsFloat(i));
+				break;
+			case OFXOSC_TYPE_DOUBLE:
+				json += to_string(m.getArgAsDouble(i));
+				break;
+			case OFXOSC_TYPE_STRING:
+				json += "\"" + m.getArgAsString(i) + "\"";
+				break;
+			case OFXOSC_TYPE_CHAR:
+				json += "\"" + to_string(m.getArgAsChar(i)) + "\"";
+				break;
+			case OFXOSC_TYPE_TRUE:
+			case OFXOSC_TYPE_FALSE:
+				json += to_string(m.getArgAsBool(i));
+				break;
+			case OFXOSC_TYPE_RGBA_COLOR:
+				json += to_string(m.getArgAsRgbaColor(i));
+				break;
+			default: break;
+		}
+		if ( i < (argc - 1)){
+			json += ",";
+		}
+	}
+	json += "] }";
+	return json;
 }
 
-ofxOscMessage ofxRemoteUIServer::jsonToOsc(ofJson json){
-    ofxOscMessage m;
-    m.setAddress(json.count("addr") > 0 ? json["addr"].get<std::string>() : "NONE");
-    
-    ofJson argv = json["args"];
-    int argc = argv.size();
-    
-    for (int i = 0; i < argc; i++) {
-        
-        ofJson arg = argv[i];
-        
-        switch (arg.type()) {
-                
-            case ofJson::value_t::number_integer:
-            case ofJson::value_t::number_unsigned:
-                m.addIntArg(arg);
-                break;
-                
-            case ofJson::value_t::number_float:
-                m.addFloatArg(arg);
-                break;
-                
-            case ofJson::value_t::string:
-                m.addStringArg(arg.get<std::string>());
-                break;
-                
-            case ofJson::value_t::boolean:
-                m.addBoolArg(arg.get<bool>());
-                break;
-                
-            default:
-                RLOG_NOTICE << "Possibly malformed JSON message";
-                break;
-        }
-    }
-    
-    return m;
-    
-}
 //-----------------------------------------------
 //              WebSocket Events
 //-----------------------------------------------
 
-
+/*
 void ofxRemoteUIServer::onConnect( ofxLibwebsockets::Event& args ) {
     readyToSend = true;
     useWebSockets = true;
@@ -3126,8 +3227,5 @@ void ofxRemoteUIServer::onMessage( ofxLibwebsockets::Event& args ){
     wsMessages.emplace_back(m);
     wsDequeMut.unlock();
 }
-
-void ofxRemoteUIServer::onIdle( ofxLibwebsockets::Event& args ){}
-void ofxRemoteUIServer::onBroadcast( ofxLibwebsockets::Event& args ){}
-
+*/
 #endif

@@ -573,7 +573,7 @@ void ofxRemoteUIClient::sendTrackedParamUpdate(string paramName){
 	}
 }
 
-void ofxRemoteUIClient::sendMessage(ofxOscMessage m){
+void ofxRemoteUIClient::sendMessage(const ofxOscMessage & m){
     oscSender.sendMessage(m);
 }
 
