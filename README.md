@@ -39,21 +39,20 @@ In order of appearance in the screenshot above, Mac OS X native Client, Built In
 * ofxRemoteUI can be used outside OF in any C++ project, and in Processing thx to [@kritzikratzi](http://github.com/kirtzikratzi)
 * Easy to use C++ Macros hide complexity away, very easy to plug into any existing project.
 * Support for native ofParameters of compatible types (int, float, bool, string ofColor, ofVec). Allows you to edit native OF ofParameter types from RemoteUI. See "example-ofParameter". *outdated!
-* Control parameters from any web browser through websockets (requires ofxLibWebsockets).
+* Control parameters from any web browser through its web gui.
 
 ## Dependencies
 
 * ofxXmlSettings
 * ofxOsc
 * ofxPoco in OperFrameworks version > 0.9.8
-* ofxLibWebsockets *optional
 
 ## Available Clients
 
 * Native OSX client, feature complete (this should be your first choice)
 * Built in client (inside the OF app) for basic edits, saving, resetting, and global and group preset loading and saving.
 * WebClient based on [dat.GUI](https://github.com/dataarts/dat.gui). Connect to OpenFrameworks through websockets (thx to [@jackosx](http://github.com/jackosx)).
-* Native iOS client (WIP - OSC is not very reliable over WIFI and only basic features implemented).
+* Native iOS client (WIP - OSC is not very reliable over WIFI and only basic features implemented - deprecated).
 
 
 ## Compatibility
@@ -128,17 +127,17 @@ Bindings are saved when the app is quit. You can also save any particular device
 
 ## Web Client
 
-The web client allows you to control the parameters of your OpenFrameworks app from a web browser. It does so by connecting your web browser to your OF app through websockets; and it uses [ofxLibwebsockets](https://github.com/robotconscience/ofxLibwebsockets) to handle the connection.
+The web client allows you to control the parameters of your OpenFrameworks app from a web browser. It does so by connecting your web browser to your OF app through websockets; it uses ofxPoco to handle the connection.
 
-ofxRemoteUIServer creates a minimal webserver that will serve a single-file HTML + JS + CSS gzipped package that your browser will interpret.
+ofxRemoteUIServer creates a minimal webserver that hosts a single-file HTML + JS + CSS gzipped package that your browser will interpret. You don't need to provide additional files.
 
-Because the use of the web client requires [ofxLibwebsockets](https://github.com/robotconscience/ofxLibwebsockets), the features is optional, and needs to be turned on with a preprocessor macro. ofxRemoteUI by default will no try to use and include ofxLibwebsockets. You will have to define two Pre-processor Macros in your project settings to use that feature; just define "RUI_WEBSOCKETS" and "RUI_WEB_INTERFACE" in your Pre-processor Macros to enable the feature. This will require correct setup of the project, including all the dependencies needed by ofxLibWebsockets.
+You can quickly load up the web GUI interface by getting into the built-in client (press 'tab' from the OF app), and from there press 'c' (for client). This will launch a web browser and load the web gui for you.
 
-The web interface is developed in a separate repository [ofxRemoteUI-Web](https://github.com/jackosx/ofxRemoteUI-Web). The whole interface is embedded into the [RUIWebBinary.cpp](https://github.com/armadillu/ofxRemoteUI/blob/master/src/RUIWebBinary.cpp) file, so if you want to modify / tweak the interface, go to the [ofxRemoteUI-Web](https://github.com/jackosx/ofxRemoteUI-Web) repo and create a new build of that file and drop it into ofxRemoteUI (replacing the old one).
+The web interface is developed in a separate repository [ofxRemoteUI-Web](https://github.com/armadillu/ofxRemoteUI-Web). The whole interface is packaged in the [RUIWebBinary.cpp](https://github.com/armadillu/ofxRemoteUI/blob/master/src/RUIWebBinary.cpp) file, so if you want to modify / tweak the interface, go to the [ofxRemoteUI-Web](https://github.com/jackosx/ofxRemoteUI-Web) repo and create a new build of that file and drop it into the ofxRemoteUI src folder (replacing the old one).
 
-The web client has completely been developed by [@jackosx](http://github.com/jackosx).
+The web client has completely been developed by [@jackosx](http://github.com/jackosx), with some quality-of-life tweaks by [@armadillu](http://github.com/armadillu).
 
-Note that ofxLibwebsockets includes the jsoncpp lib, which is also included in ofxJSON. This means you might get duplicate symbol compile errors when using both in the same project; just remove the jsoncpp lib from one of them if that's the case.
+Note that this interface is not very tested. Don't use several clients at the same time, only one will be alloewd to connect. Web client connection/disconnection doesnt seem very realiable at the moment, but should be ok for a quick edit.
 
 ## Random Notes
 
@@ -187,5 +186,3 @@ The OSX Client uses the [vvMidi](https://github.com/mrRay/vvopensource) framewor
 The OSX Client's HID capabilities come mostly from [@jotapeh](https://github.com/jotapeh/MacJoystickHIDTest).
 
 ofxRemoteUI bundles ofxXmlSettings and ofxOSC from [OpenFrameworks](http://openframeworks.cc) to allow non-OF C++ projects to use ofxRemoteUI.
-
-To use the web client, [ofxLibwebsockets](https://github.com/robotconscience/ofxLibwebsockets) is required (MIT license). The web client uses [dat.GUI](https://github.com/dataarts/dat.gui) (Apache 2.0 License).
