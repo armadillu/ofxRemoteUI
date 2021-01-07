@@ -1636,8 +1636,8 @@ void ofxRemoteUIServer::draw(int x, int y){
 				reachableAt = "Server reachable at " + computerIP + ":";
 				reachableAt += ofToString(port) + "(OSC) ";
 				#ifndef NO_RUI_WEB_INTERFACE
-				reachableAt += ofToString(wsState.wsPort) + "(WS) ";
-				reachableAt += ofToString(webPort) + "(Web)";
+				//reachableAt += ofToString(wsState.wsPort) + "(WS) ";
+				reachableAt += ofToString(webPort) + "(WebGUI)";
 				#endif
 			}else {
 				reachableAt = "Server disabled";
@@ -2998,7 +2998,7 @@ void ofxRemoteUIServer::sendMessage(const ofxOscMessage & m) {
 		string json = oscToJson(m);
 		//wsState.wsMutex.lock();
 		//wsState.pendingMessages.push_back(json);
-		ofLogNotice("ofxRemoteUIServer") << "Ws sent msg '" << m.getAddress() << "'";
+		//ofLogNotice("ofxRemoteUIServer") << "Ws sent msg '" << m.getAddress() << "'";
 		((Poco::Net::WebSocket*)wsState.ws)->sendFrame(json.c_str(), json.size(), Poco::Net::WebSocket::FRAME_TEXT);
 		//wsState.wsMutex.unlock();
 	}
@@ -3075,32 +3075,21 @@ public:
 		int n = 0;
 		do { //loop for connection handling
 
-//			state->wsMutex.lock();
-//			if(state->pendingMessages.size()){ //see if we have something pending to TX
-//				auto & msg = state->pendingMessages.front();
-//				ofLogNotice("MyWebSocketHandler") << "Webserver msg processing send: '" << msg << "'";
-//				ws.sendFrame(msg.c_str(), msg.size(), Poco::Net::WebSocket::FRAME_TEXT);
-//				state->pendingMessages.erase(state->pendingMessages.begin());
-//			}
-//			state->wsMutex.unlock();
-
 			char buffer[4096] = { 0 };
 			int msgSize = 0;
 			do { //loop for message
-				ofLogNotice("MyWebSocketHandler") << "waiting ...";
+				//ofLogNotice("MyWebSocketHandler") << "waiting ...";
 				n = ws.receiveFrame(buffer, sizeof(buffer), flags);
-				ofLogNotice("MyWebSocketHandler") << "RXd: " << buffer;
+				//ofLogNotice("MyWebSocketHandler") << "RXd: " << buffer;
 				msgSize +=n;
 			} while ( n > 0 && ( (flags & 0xf0 /* masking op code bits*/) != Poco::Net::WebSocket::FRAME_FLAG_FIN) );
-
-			//ofLogNotice("MyWebSocketHandler") << "out of loop";
 
 			if(msgSize){
 				string jsonStr = std::string(buffer, msgSize);
 				ofJson json;
 				try{ //parse JSON
 					json = ofJson::parse(jsonStr);
-					ofLogNotice("MyWebSocketHandler") << "parsed json ok!" << jsonStr;
+					//ofLogNotice("MyWebSocketHandler") << "parsed json ok!" << jsonStr;
 				}catch(exception e){
 					ofLogError("MyWebSocketHandler") << "err parsing json!" << e.what();
 				}
@@ -3111,7 +3100,6 @@ public:
 				state->wsMutex.lock();
 					state->messages.emplace_back(m); //store what we RX
 				state->wsMutex.unlock();
-				//ofSleepMillis(30);
 			}else{
 				ofLogWarning("MyWebSocketHandler") << "empty message!";
 			}
@@ -3138,11 +3126,14 @@ public:
 		if(!state->connected){
 			if (request.find("Upgrade") != request.end() && Poco::icompare(request["Upgrade"], "websocket") == 0){ //we only care about websockets
 				return new MyWebSocketHandler(state);
+			}else{
+				ofLogWarning("ofxRemoteUIServer") << "MyHTTPRequestHandlerFactory got request but no websocket support?";
 			}
 		}else{
 			ofLogError("ofxRemoteUIServer") << "Web Client trying to connect but there's already one connected, ignoring...";
 			return nullptr;
 		}
+		return nullptr;
 	}
 protected:
 	ofxRemoteUIServer::WebSocketState * state = nullptr;
