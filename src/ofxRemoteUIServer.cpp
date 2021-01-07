@@ -1137,6 +1137,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
         #ifndef NO_RUI_WEB_INTERFACE
 		if(!wsState.setup){
             setupWebSocket(port + 1);
+			ofLogNotice() << "setting up ofxRemoteUIServer web GUI at http://" << computerIP << ":" + ofToString(port + 2);
             startWebServer(port + 2);
 			wsState.setup = true;
 		}
