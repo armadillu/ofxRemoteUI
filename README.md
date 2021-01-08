@@ -125,7 +125,7 @@ Bools can also be bound to "piano keys"; params being set to true for as long as
 
 Bindings are saved when the app is quit. You can also save any particular device binding configuration into a ".midiBind" file. You can also double-click any .midiBind file form the finder to load your previously saved bindings. There is a "bindings" window that allows you to delete particular bindings. You can see what parameters are currently bound by choosing "File->Blink Bound Midi Controls".
 
-## Web Client
+## Web-based Interface
 
 The web client allows you to control the parameters of your OpenFrameworks app from a web browser. It does so by connecting your web browser to your OF app through websockets; it uses ofxPoco to handle the connection.
 
@@ -137,7 +137,7 @@ The web interface is developed in a separate repository [ofxRemoteUI-Web](https:
 
 The web client has completely been developed by [@jackosx](http://github.com/jackosx), with some quality-of-life tweaks by [@armadillu](http://github.com/armadillu).
 
-Note that this interface is not very tested. Don't use several clients at the same time, only one will be alloewd to connect. Web client connection/disconnection doesnt seem very realiable at the moment, but should be ok for a quick edit.
+Note that this interface is not very tested. Don't use several clients at the same time, only one will be alloewd to connect. Web client connection/disconnection doesnt seem very realiable at the moment, but should be ok for a quick edit. You can completely disable the web interface by defining the preprocessor macro "NO_RUI_WEB_INTERFACE" in your project. 
 
 ## Random Notes
 
