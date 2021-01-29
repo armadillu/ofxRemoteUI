@@ -237,6 +237,10 @@ public:
 	void addVariableWatch(const std::string & varName, bool* varPtr, ofColor c = ofColor(0,0,0,0));
 	//void removeVariableWatch(const std::string &varName);
 
+	//enumerate available presets
+	std::vector<std::string>	getAvailablePresets(bool onlyGlobal = false); //all, including group presets! group presets have group/presetName name pattern
+	std::vector<std::string>	getAvailablePresetsForGroup(std::string group);
+
 #ifndef NO_RUI_WEB_INTERFACE
 	struct WebSocketState{
 		int wsPort;
@@ -277,8 +281,6 @@ protected:
 	void			restoreAllParamsToDefaultValues();
 	void			connect(std::string address, int port);
 	void			setColorForParam(RemoteUIParam &p, ofColor c);
-	std::vector<std::string>	getAvailablePresets(bool onlyGlobal = false); //all, including group presets! group presets have group/presetName name pattern
-	std::vector<std::string>	getAvailablePresetsForGroup(std::string group);
 
 	void			deletePreset(std::string name, std::string group=""); //if group is not "", then this is a global preset. otherwise its a group preset
 	void			updateServer(float dt);

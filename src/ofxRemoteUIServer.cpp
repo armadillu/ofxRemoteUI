@@ -1019,7 +1019,7 @@ void ofxRemoteUIServer::setup(int port_, float updateInterval_){
 				RLOG_WARNING << "xml config set to enabled=true, but we were disabled b4 setup. Launching disabled!";
 			}
 			if (!enabled){
-				RLOG_WARNING << "launching disabled!" ;
+				RLOG_WARNING << "launching disabled! " << OFXREMOTEUI_XML_ENABLED_TAG << " set to 0 in settings file.";
 			}
 		}
 		if(pushed) s.popTag();
