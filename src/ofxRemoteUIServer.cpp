@@ -144,6 +144,13 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 
 ofxRemoteUIServer::~ofxRemoteUIServer(){
 	RLOG_NOTICE << "~ofxRemoteUIServer()" ;
+	#ifdef OF_AVAILABLE
+	ofRemoveListener(eventShowParamUpdateNotification, this, &ofxRemoteUIServer::onShowParamUpdateNotification);
+	ofAddListener(ofEvents().exit, this, &ofxRemoteUIServer::_appExited, OF_EVENT_ORDER_BEFORE_APP); //to save to xml, disconnect, etc
+	ofAddListener(ofEvents().keyPressed, this, &ofxRemoteUIServer::_keyPressed, OF_EVENT_ORDER_BEFORE_APP);
+	ofAddListener(ofEvents().update, this, &ofxRemoteUIServer::_update, OF_EVENT_ORDER_BEFORE_APP);
+	ofAddListener(ofEvents().draw, this, &ofxRemoteUIServer::_draw, OF_EVENT_ORDER_AFTER_APP + 110); //last thing to draw
+	#endif
 }
 
 
@@ -247,6 +254,22 @@ void ofxRemoteUIServer::removeParamFromDB(const string & paramName, bool permane
 		RLOG_ERROR << "removeParamFromDB() >> trying to delete an nonexistent param (" << paramName << ")" ;
 	}
 	dataMutex.unlock();
+}
+
+void ofxRemoteUIServer::removeAllParams(){
+	dataMutex.lock();
+
+	params.clear();
+	orderedKeys.clear();
+	presetNames.clear();
+	paramsChangedSinceLastCheck.clear();
+	paramsFromCode.clear();
+	paramsFromXML.clear();
+	paramsWereLoadedFromXML.clear();
+	paramsSentOverOsc.clear();
+
+	dataMutex.unlock();
+
 }
 
 void ofxRemoteUIServer::recreateOrderedKeysWithoutParam(const string & removedParam){

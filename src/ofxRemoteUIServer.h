@@ -140,6 +140,7 @@ public:
 	//			default:break;
 	//		}
 	//	}
+	
 
 	void setEnabled(bool enabled_){enabled = enabled_;};
 	bool getSaveToXMLOnExit(){ return saveToXmlOnExit; }
@@ -157,6 +158,8 @@ public:
 	void removeParamFromDB(const std::string & paramName, bool permanently = false);	//useful for params its value is kinda set and will not change,
 												//to load from xml and then remove from the list to
 												//avoid crowding the UI too much
+
+	void removeAllParams();
 
 	//param ignore list - use this if you want to load presets but want to ignore certain
 	//params that are defined in those presets (ie a "debug" or similar param)
