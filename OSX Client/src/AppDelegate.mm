@@ -1421,7 +1421,13 @@ bool resizeWindowUpDown = false; //if you keep changing paramUI size, with this 
 	float listH = [window frame].size.height - MAIN_WINDOW_NON_LIST_H;
 	float newWinH = MAIN_WINDOW_NON_LIST_H + listH + (resizeWindowUpDown ?  ROW_HEIGHT - fmodf(listH, ROW_HEIGHT) : -fmodf(listH, ROW_HEIGHT)) ;
 	NSRect frame = [window frame];
-	frame.size.height = newWinH;
+	int offset = 0;
+	switch (rowHeight) { //horrible hack to account to Big Sur's weird offset math changes
+		case LARGE_34: offset = 27; break;
+		case SMALL_26: offset = 19; break;
+		case TINY_20: offset = 14; break;
+	}
+	frame.size.height = newWinH - offset;
 	[window setFrame:frame display:YES];
 	[window setResizeIncrements:NSMakeSize(1, ROW_HEIGHT)];
 	resizeWindowUpDown ^= true;
@@ -1522,15 +1528,15 @@ bool resizeWindowUpDown = false; //if you keep changing paramUI size, with this 
 
 -(void)showNotificationWithTitle:(NSString*)title description:(NSString*)desc ID:(NSString*)key priority:(int)p{
 	if(showNotifications || p >= 2){
-		if ([GrowlApplicationBridge isGrowlRunning]){
-			[GrowlApplicationBridge notifyWithTitle:title
-										description:desc
-								   notificationName:key
-										   iconData:nil
-										   priority:p
-										   isSticky:NO
-									   clickContext:nil];
-		}
+//		if ([GrowlApplicationBridge isGrowlRunning]){
+//			[GrowlApplicationBridge notifyWithTitle:title
+//										description:desc
+//								   notificationName:key
+//										   iconData:nil
+//										   priority:p
+//										   isSticky:NO
+//									   clickContext:nil];
+//		}
 	}
 
 }

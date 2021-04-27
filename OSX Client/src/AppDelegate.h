@@ -12,7 +12,6 @@
 #import "MyScrollView.h"
 #import "ColoredNSWindow.h"
 #import "GitCommitNumber.h"
-#import <Growl/Growl.h>
 #import <VVMIDI/VVMIDI.h>
 #import "ExternalDevices.h"
 #import "LogWindows.h"
@@ -167,9 +166,6 @@ void clientCallback(RemoteUIClientCallBackArg a);
 -(unordered_map<string, ParamUI*>)getAllGroupSpacerParams;
 
 - (void) filesWereDropped:(NSNotification *) notification;
-
-//growl
--(void)showNotificationWithTitle:(NSString*)title description:(NSString*)desc ID:(NSString*)key priority:(int)p;
 
 //alert
 -(NSString *)showAlertWithInput: (NSString *)prompt defaultValue: (NSString *)defaultValue ;

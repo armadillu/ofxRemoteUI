@@ -294,7 +294,8 @@
 					numTicks = range;
 				}
 			}
-			[s setNumberOfTickMarks: numTicks];
+			//[s setNumberOfTickMarks: numTicks];
+			[s setNumberOfTickMarks: 0];
 		}
 	}
 }
