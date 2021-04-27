@@ -34,7 +34,7 @@ bool ofxRemoteUINeigbors::update(float dt){
 		}
 	}
 
-	for(int i = 0; i < idsToDelete.size(); i++){
+	for(int i = 0; i < (int)idsToDelete.size(); i++){
 		neigbhors.erase (idsToDelete[i]);
 	}
 

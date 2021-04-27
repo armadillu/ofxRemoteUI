@@ -66,7 +66,7 @@ public:
 	void sendUntrackedParamUpdate(RemoteUIParam p, std::string paramName);
     
     // Send message via OSC
-    void sendMessage(ofxOscMessage m);
+    void sendMessage(const ofxOscMessage & m);
 
 	//get notified when server gets back to us
 	void setCallback( void (*callb)(RemoteUIClientCallBackArg) );

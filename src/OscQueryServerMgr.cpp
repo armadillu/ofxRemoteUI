@@ -25,7 +25,7 @@ OscQueryServerMgr::~OscQueryServerMgr() {
 		try{
 			stopBonjour();
 			server->stop();
-		}catch(std::exception e){
+		}catch(std::exception & e){
 			ofLogError("OscQueryServerMgr") << "Exception trying to stop server and bonjour! - " << e.what();
 		}
 		waitForThread();
@@ -242,7 +242,7 @@ void OscQueryServerMgr::threadedFunction(){
 		phPtr = &ph;
 		try {
 			int statusCode = ph.wait();
-		} catch (exception e) {
+		} catch (std::exception & e) {
 			ofLogError("ofxRemoteUI::OscQueryServerMgr") << "Exception while process running \"dns-sd\"";
 			ofLogError("ofxRemoteUI::OscQueryServerMgr") << e.what();
 		}
@@ -260,7 +260,7 @@ void OscQueryServerMgr::stopBonjour(){
 		//ofLogWarning("ofxRemoteUI::OscQueryServerMgr") << "Trying to stop Bonjour advertising!";
 		try {
 			Poco::Process::kill(*phPtr);
-		} catch (exception e) {
+		} catch (std::exception & e) {
 			ofLogError("ofxRemoteUI::OscQueryServerMgr") << e.what();
 		}
 		//ofLogWarning("ofxRemoteUI::OscQueryServerMgr") << "Done killing process!";

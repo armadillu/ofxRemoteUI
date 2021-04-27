@@ -15,8 +15,7 @@
 #include "ofxOsc.h"
 #include "ofxXmlSettings.h"
 #include "ofxRemoteUI.h"
-#include <map>
-#include <set>
+#include <unordered_map>
 #include <vector>
 #include "ofxRemoteUIServerMacros.h"
 #if defined( OF_AVAILABLE )
@@ -73,10 +72,10 @@
 
 #define BG_COLOR_ALPHA			55
 
-// Define RUI_WEB_INTERFACE to turn ON websockets/webserver
-#ifdef RUI_WEB_INTERFACE
-    #include "ofxLibwebsockets.h"
+#ifndef NO_RUI_WEB_INTERFACE
     #include "ofxRemoteUIWebServer.h"
+	#include "Poco/Net/HTTPServer.h"
+	#include "Poco/Net/WebSocket.h"
 #endif
 
 
@@ -151,7 +150,7 @@ public:
 	void pushParamsToClient(); //pushes all param values to client, updating its UI
 	void sendLogToClient(const char* format, ...);
 	void sendLogToClient(const std::string & message);
-    void sendMessage(ofxOscMessage m);
+    void sendMessage(const ofxOscMessage & m);
 	void setClearXMLonSave(bool clear){clearXmlOnSaving = clear;} //this only affects xml v1 - not relevant nowadays
 	void setDirectoryPrefix(const std::string & _directoryPrefix); // set the optional directory prefix
 
@@ -210,6 +209,7 @@ public:
 	void setBuiltInUiScale(float s);
 	void setCustomScreenHeight(int h);
 	void setCustomScreenWidth(int w);
+	void setCustomDrawPos(int x, int y);
 
 	void setNotificationScreenTime(float t){onScreenNotifications.setNotificationScreenTime(t);}
 	void setLogNotificationScreenTime(float t){onScreenNotifications.setLogNotificationScreenTime(t);}
@@ -237,14 +237,16 @@ public:
 	void addVariableWatch(const std::string & varName, bool* varPtr, ofColor c = ofColor(0,0,0,0));
 	//void removeVariableWatch(const std::string &varName);
 
-#ifdef RUI_WEB_INTERFACE
-    // WebSocket Events
-    void    onConnect( ofxLibwebsockets::Event& args );
-    void    onOpen( ofxLibwebsockets::Event& args );
-    void    onClose( ofxLibwebsockets::Event& args );
-    void    onIdle( ofxLibwebsockets::Event& args );
-    void    onMessage( ofxLibwebsockets::Event& args );
-    void    onBroadcast( ofxLibwebsockets::Event& args );
+#ifndef NO_RUI_WEB_INTERFACE
+	struct WebSocketState{
+		int wsPort;
+		bool setup = false;
+		bool connected = false;
+		std::deque<ofxOscMessage> messages; //messages we got
+		std::mutex wsMutex;
+		Poco::Net::WebSocket * ws = nullptr;
+		std::vector<string> pendingMessages; //messages to send back through the WS
+	};
 #endif
     
 protected:
@@ -362,6 +364,7 @@ protected:
 	float													xOffsetTarget; //smooth transitions scrolling
 	int														customScreenHeight;
 	int														customScreenWidth;
+	ofVec2f													customPos;
 	int														selectedColorComp; //[0..4]
 
 	enum FontRenderer{
@@ -407,41 +410,30 @@ protected:
 	#endif
 #endif
 
-    //---WebSockets---
-    bool useWebSockets = false;
-	std::deque<ofxOscMessage> wsMessages;
-
-#ifdef RUI_WEB_INTERFACE
-    //---Web Sockets (OSC Port + 1)---
-    void    listenWebSocket(int port);
-    int     wsPort;
-    class mutex    wsDequeMut;
-    ofxOscMessage  jsonToOsc(ofJson json);
-    std::string         oscToJson(ofxOscMessage m);
-    ofxLibwebsockets::Server wsServer;
-#endif
-    
-    
-    //---Web Server (OSC Port + 2)---
-#ifdef RUI_WEB_INTERFACE
-    ofxRemoteUIWebServer webServer;
-    int  webPort;
-    void startWebServer(int port);
-#endif
-    
-
 	//keep track of params we added and then removed
-	std::unordered_map<std::string, RemoteUIParam>				params_removed;		// params to not show in the GUI, but to keep around to make sure they stay saved in the XML
+	std::unordered_map<std::string, RemoteUIParam>			params_removed;		// params to not show in the GUI, but to keep around to make sure they stay saved in the XML
 	std::unordered_map<int, std::string>						orderedKeys_removed; // used to keep the order in which the params were added
-
 	bool														sentParamsToClient = false; //keep track of a client having been connected far enough for us to send them param list
-
 	std::map<std::string, RemoteUIServerValueWatch> 			varWatches;
-
 	static ofxRemoteUIServer* 								singleton;
 
 	//handle params that are to be ignored when loading presets
 	std::vector<std::string>									paramsToIgnoreWhenLoadingPresets;
+
+
+	#ifndef NO_RUI_WEB_INTERFACE
+	// WebSockets (OSC Port + 1)
+	void    					setupWebSocket(int port);
+	//ofxOscMessage			jsonToOsc(ofJson & json);
+	std::string				oscToJson(const ofxOscMessage & m);
+	Poco::Net::HTTPServer * 	wsHttpServer = nullptr;
+	WebSocketState			wsState;
+
+	// HttpServer to host GUI (OSC Port + 2)
+	ofxRemoteUIWebServer webServer;
+	int  webPort;
+	void startWebServer(int port);
+	#endif
 
 };
 

@@ -71,12 +71,7 @@
 #define OFXREMOTEUI_PARAM_NAME_XML_KEY						"paramName"
 #define OFXREMOTEUI_UNKNOWN_PARAM_NAME_XML_KEY				"unnamedParamName"
 
-
-#ifdef OF_VERSION_MINOR
-    #define OF_AVAILABLE
-#else
-    //#error "no OF"
-#endif
+#include "ofExistsTest.h"
 
 #include "RemoteParam.h"
 
@@ -255,7 +250,7 @@ protected:
 
 	virtual void update(float dt) = 0;
 	void sendParam(std::string paramName, const RemoteUIParam & p);
-	DecodedMessage decode(const ofxOscMessage & m);
+	DecodedMessage decode(const ofxOscMessage & m) const;
 
 	std::vector<std::string> scanForUpdatedParamsAndSync();	//goes through all params, comparing * to real value
 															//reports those that are out of sync
@@ -291,7 +286,7 @@ protected:
 	void sendSETp(std::string presetName, std::string group, bool confirm = false);
 	void sendDELp(std::string presetName, std::string group, bool confirm = false);
     
-    virtual void sendMessage(ofxOscMessage m) = 0; // b/c native Client only uses an OSC sender, but server might use WS
+    virtual void sendMessage(const ofxOscMessage & m) = 0; // b/c native Client only uses an OSC sender, but server might use WS
 
 	void printAllParamsDebug();
 

@@ -18,7 +18,7 @@ common:
 	
 	# any special flag that should be passed to the compiler when using this
 	# addon
-    ADDON_CFLAGS = -DNO_RUI_WEBSOCKETS -DNO_RUI_WEBSERVER
+    #ADDON_CFLAGS = 
 	
 	# any special flag that should be passed to the linker when using this
 	# addon, also used for system libraries with -lname

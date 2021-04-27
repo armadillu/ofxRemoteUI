@@ -165,7 +165,7 @@
 #define	OFX_REMOTEUI_SERVER_SET_DESC_TO_LAST_PARAM(desc)		\
 ( ofxRemoteUIServer::instance()->setDescriptionForLastAddedParam(desc) )
 
-
+#include "ofExistsTest.h"
 
 #ifdef OF_AVAILABLE
 /*run the server on a back thread. Useful for apps with very low framerate.

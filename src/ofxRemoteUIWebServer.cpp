@@ -6,7 +6,7 @@
 //
 //
 
-#ifdef RUI_WEB_INTERFACE
+#ifndef NO_RUI_WEB_INTERFACE
 
 #include "ofxRemoteUIWebServer.h"
 
@@ -21,14 +21,14 @@ void ofxRemoteUIWebServer::setup(int port) {
 void ofxRemoteUIWebServer::start() {
     switch (state) {
         case kNotSetup:
-            ofLogError("PocoServer") << "Trying to start before setup";
+            ofLogError("ofxRemoteUIWebServer") << "Trying to start before setup";
             break;
         case kSetup:
             server->start();
-            ofLogNotice("PocoServer") << "Started server on " << server->port();
+            ofLogNotice("ofxRemoteUIWebServer") << "Started server on " << server->port();
             break;
         case kStarted:
-            ofLogError("PocoServer") << "Server already started";
+            ofLogError("ofxRemoteUIWebServer") << "Server already started";
             break;
         case kStopped:
             server->start();
@@ -40,7 +40,7 @@ void ofxRemoteUIWebServer::stop() {
     switch (state) {
         case kNotSetup:
         case kSetup:
-            ofLogError("PocoServer") << "Server not started yet";
+            ofLogError("ofxRemoteUIWebServer") << "Server not started yet";
             break;
         case kStarted:
             server->stop();

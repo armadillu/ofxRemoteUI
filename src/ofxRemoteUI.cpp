@@ -112,17 +112,17 @@ vector<std::string> ofxRemoteUI::getChangedParamsList(){
 }
 
 
-DecodedMessage ofxRemoteUI::decode(const ofxOscMessage & m){
+DecodedMessage ofxRemoteUI::decode(const ofxOscMessage & m) const{
 
 	std::string msgAddress = m.getAddress();
-	if(msgAddress.size() > 0){
+	if((int)msgAddress.size() > 0){
 
 		if(msgAddress[0] == '/'){ //if address starts with "/", drop it to match the fucked up remoteUI protocol
 			msgAddress = msgAddress.substr(1, msgAddress.size() - 1);
 		}
 		//allow address to use the standard style /SEND/FLT/paramName instead of the legacy "SEND FLT paramName"
 		//allow /bbb/jjj/ syntax, but convert to space-based to avoid changing all the internal logic
-		for(int i = 0; i < msgAddress.size(); i++){
+		for(int i = 0; i < (int)msgAddress.size(); i++){
 			if(msgAddress[i] == '/') msgAddress[i] = ' ';
 		}
 	}
@@ -251,14 +251,6 @@ std::string ofxRemoteUI::getMyIP(std::string userChosenInteface, std::string & s
 		}
 		freeifaddrs(myaddrs);
 	}
-
-	if (userSuppliedNetInterface.length() > 0){
-		if (output == RUI_LOCAL_IP_ADDRESS){
-			RLOG_ERROR << "could not find the user supplied net interface: " << userSuppliedNetInterface;
-			RLOG_ERROR << "automatic advertising will not work! ";
-		}
-	}
-
 #endif
 
 #ifdef _WIN32
@@ -284,6 +276,14 @@ std::string ofxRemoteUI::getMyIP(std::string userChosenInteface, std::string & s
 	}
 	if (pAdapterInfo) free(pAdapterInfo);
 #endif
+
+	if (userSuppliedNetInterface.length() > 0){
+		if (output == RUI_LOCAL_IP_ADDRESS){
+			RLOG_ERROR << "could not find the user supplied net interface: " << userSuppliedNetInterface;
+			RLOG_ERROR << "automatic advertising will not work! ";
+		}
+	}
+
 	return output;
 }
 
@@ -315,7 +315,7 @@ void ofxRemoteUI::updateParamFromDecodedMessage(const ofxOscMessage & m, Decoded
 	}
 
 	RemoteUIParam p = original;
-	int arg = 0;
+	size_t arg = 0;
 
 	switch (dm.argument) {
 		case FLT_ARG:
@@ -793,7 +793,7 @@ void ofxRemoteUI::sendParam(std::string paramName, const RemoteUIParam & p){
 		sendMessage(m);
 		if(verbose_) RLOG_VERBOSE << "sendParam(" << paramName << ")";
 		paramsSentOverOsc.insert(paramName);
-	}catch(exception e){
+	}catch(std::exception & e){
 		RLOG_ERROR << "exception sendParam " << paramName;
 	}
 }
@@ -904,7 +904,7 @@ void ofxRemoteUI::sendREMp(const string & paramName){
 		m.addStringArg(paramName);
 		try{
 			sendMessage(m);
-		}catch(exception e){
+		}catch(std::exception & e){
 			RLOG_ERROR << "Exception sendREMp " << e.what() ;
 		}
 	}

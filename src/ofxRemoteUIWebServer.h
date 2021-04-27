@@ -9,7 +9,7 @@
 #ifndef ofxRemoteUIWebServer_h
 #define ofxRemoteUIWebServer_h
 
-#ifdef RUI_WEB_INTERFACE
+#ifndef NO_RUI_WEB_INTERFACE
 
 #include <ofMain.h>
 #include <Poco/Net/ServerSocket.h>
