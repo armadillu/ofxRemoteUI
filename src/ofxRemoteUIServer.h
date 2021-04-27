@@ -140,6 +140,7 @@ public:
 	//			default:break;
 	//		}
 	//	}
+	
 
 	void setEnabled(bool enabled_){enabled = enabled_;};
 	bool getSaveToXMLOnExit(){ return saveToXmlOnExit; }
@@ -157,6 +158,8 @@ public:
 	void removeParamFromDB(const std::string & paramName, bool permanently = false);	//useful for params its value is kinda set and will not change,
 												//to load from xml and then remove from the list to
 												//avoid crowding the UI too much
+
+	void removeAllParams();
 
 	//param ignore list - use this if you want to load presets but want to ignore certain
 	//params that are defined in those presets (ie a "debug" or similar param)
@@ -237,6 +240,10 @@ public:
 	void addVariableWatch(const std::string & varName, bool* varPtr, ofColor c = ofColor(0,0,0,0));
 	//void removeVariableWatch(const std::string &varName);
 
+	//enumerate available presets
+	std::vector<std::string>	getAvailablePresets(bool onlyGlobal = false); //all, including group presets! group presets have group/presetName name pattern
+	std::vector<std::string>	getAvailablePresetsForGroup(std::string group);
+
 #ifndef NO_RUI_WEB_INTERFACE
 	struct WebSocketState{
 		int wsPort;
@@ -277,8 +284,6 @@ protected:
 	void			restoreAllParamsToDefaultValues();
 	void			connect(std::string address, int port);
 	void			setColorForParam(RemoteUIParam &p, ofColor c);
-	std::vector<std::string>	getAvailablePresets(bool onlyGlobal = false); //all, including group presets! group presets have group/presetName name pattern
-	std::vector<std::string>	getAvailablePresetsForGroup(std::string group);
 
 	void			deletePreset(std::string name, std::string group=""); //if group is not "", then this is a global preset. otherwise its a group preset
 	void			updateServer(float dt);
