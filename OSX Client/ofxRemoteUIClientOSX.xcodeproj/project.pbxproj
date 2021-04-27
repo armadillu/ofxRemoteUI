@@ -28,6 +28,7 @@
 		BB5CC61C177E49D500B595F8 /* tinyxmlparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC607177E49D500B595F8 /* tinyxmlparser.cpp */; };
 		BB5CC61E177E49D500B595F8 /* ofxXmlSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB5CC60A177E49D500B595F8 /* ofxXmlSettings.cpp */; };
 		BB8F8DBF1D83AE71007F650C /* MyNSView.m in Sources */ = {isa = PBXBuildFile; fileRef = BB8F8DBE1D83AE71007F650C /* MyNSView.m */; };
+		BB9840BD2638ADDB003DC451 /* RemoteParam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BB9840BC2638ADDB003DC451 /* RemoteParam.cpp */; };
 		BBB627B7191C4C2B005F95BF /* Joystick.m in Sources */ = {isa = PBXBuildFile; fileRef = BBB627B1191C4C2B005F95BF /* Joystick.m */; };
 		BBB627B8191C4C2B005F95BF /* JoystickHatswitch.m in Sources */ = {isa = PBXBuildFile; fileRef = BBB627B3191C4C2B005F95BF /* JoystickHatswitch.m */; };
 		BBB627B9191C4C2B005F95BF /* JoystickManager.m in Sources */ = {isa = PBXBuildFile; fileRef = BBB627B5191C4C2B005F95BF /* JoystickManager.m */; };
@@ -138,6 +139,7 @@
 		BB5F5EB01769462600F1FA92 /* uriencode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = uriencode.h; sourceTree = "<group>"; };
 		BB8F8DBD1D83AE71007F650C /* MyNSView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MyNSView.h; path = src/MyNSView.h; sourceTree = "<group>"; };
 		BB8F8DBE1D83AE71007F650C /* MyNSView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MyNSView.m; path = src/MyNSView.m; sourceTree = "<group>"; };
+		BB9840BC2638ADDB003DC451 /* RemoteParam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RemoteParam.cpp; sourceTree = "<group>"; };
 		BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUIClient.cpp; sourceTree = "<group>"; };
 		BBAAAFA8173BF54B00FE94C4 /* ofxRemoteUIClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUIClient.h; sourceTree = "<group>"; };
 		BBB627B0191C4C2B005F95BF /* Joystick.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Joystick.h; path = src/Joystick.h; sourceTree = "<group>"; };
@@ -542,6 +544,7 @@
 				BBB62809191C4EC9005F95BF /* ofxRemoteUI.h */,
 				BBEE7854182302FF00D93161 /* ofxRemoteUINeigbors.cpp */,
 				BBEE7855182302FF00D93161 /* ofxRemoteUINeigbors.h */,
+				BB9840BC2638ADDB003DC451 /* RemoteParam.cpp */,
 				BBFB932A17785ECC00A5E741 /* RemoteParam.h */,
 				BB09FCA8198DDB8000E04B02 /* uriencode.cpp */,
 				BB5F5EB01769462600F1FA92 /* uriencode.h */,
@@ -692,6 +695,7 @@
 				BB5CC617177E49D500B595F8 /* ofxOscMessage.cpp in Sources */,
 				BB5CC618177E49D500B595F8 /* ofxOscReceiver.cpp in Sources */,
 				BB5CC619177E49D500B595F8 /* ofxOscSender.cpp in Sources */,
+				BB9840BD2638ADDB003DC451 /* RemoteParam.cpp in Sources */,
 				BB5CC61A177E49D500B595F8 /* tinyxml.cpp in Sources */,
 				BBB6280A191C4EC9005F95BF /* ofxRemoteUI.cpp in Sources */,
 				BBB627B7191C4C2B005F95BF /* Joystick.m in Sources */,

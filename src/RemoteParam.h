@@ -19,6 +19,7 @@
 	#include "ofMain.h"
 #endif
 
+#include <vector>
 
 #ifdef OF_AVAILABLE
 	#define RLOG_NOTICE		(ofLogNotice("ofxRemoteUI"))
