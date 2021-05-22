@@ -3114,16 +3114,17 @@ public:
 				try{ //parse JSON
 					json = ofJson::parse(jsonStr);
 					//ofLogNotice("MyWebSocketHandler") << "parsed json ok!" << jsonStr;
-				}catch(exception e){
-					ofLogError("MyWebSocketHandler") << "err parsing json!" << e.what();
-				}
 
-				ofxOscMessage m = jsonToOsc(json);
-				m.setRemoteEndpoint(request.clientAddress().host().toString(), state->wsPort);
+					ofxOscMessage m = jsonToOsc(json);
+					m.setRemoteEndpoint(request.clientAddress().host().toString(), state->wsPort);
 
-				state->wsMutex.lock();
+					state->wsMutex.lock();
 					state->messages.emplace_back(m); //store what we RX
-				state->wsMutex.unlock();
+					state->wsMutex.unlock();
+
+				}catch(exception e){
+					ofLogError("MyWebSocketHandler") << "err parsing json!" << e.what() << " " << jsonStr;
+				}
 			}else{
 				ofLogWarning("MyWebSocketHandler") << "empty message!";
 			}
