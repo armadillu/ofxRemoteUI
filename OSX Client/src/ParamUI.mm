@@ -5,6 +5,7 @@
 #import <QuartzCore/QuartzCore.h>
 
 //int numParamUIs = 0;
+int maxDecimals = 6;
 
 @implementation ParamUI
 
@@ -587,9 +588,9 @@
 	switch (param.type) {
 		case REMOTEUI_PARAM_FLOAT:
 			[slider setFloatValue:param.floatVal];
-			[sliderVal setStringValue:[self formatedFloat:param.floatVal]];
-			[sliderMax setStringValue:[self formatedFloat:param.maxFloat]];
-			[sliderMin setStringValue:[self formatedFloat:param.minFloat]];
+			[sliderVal setStringValue:[self formatedFloat:param.floatVal withMaxDecimals:maxDecimals]];
+			[sliderMax setStringValue:[self formatedFloat:param.maxFloat withMaxDecimals:maxDecimals]];
+			[sliderMin setStringValue:[self formatedFloat:param.minFloat withMaxDecimals:maxDecimals]];
 			break;
 
 		case REMOTEUI_PARAM_INT:
@@ -656,14 +657,15 @@
 }
 
 
--(NSString*)formatedFloat:(float) f;{
+-(NSString*)formatedFloat:(float)f withMaxDecimals:(int)numDex;{
 	NSNumber *num = [NSNumber numberWithFloat:f];
 	NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
 	[formatter setUsesGroupingSeparator:NO];
 	[formatter setDecimalSeparator:@"."];
 	[formatter setMinimumIntegerDigits:1];
 	[formatter setGroupingSeparator:@"."];
-	[formatter setMaximumFractionDigits:10];
+	[formatter setMaximumFractionDigits:numDex];
+	[formatter setAlwaysShowsDecimalSeparator:NO];
 	NSString *formattedNumber = [formatter stringFromNumber:num];
 	[formatter release];
 	return formattedNumber;
@@ -691,7 +693,7 @@
 
 -(IBAction)updateFloat:(id)sender{
 	param.floatVal = [sender floatValue];
-	[sliderVal setStringValue:[self formatedFloat:param.floatVal]];
+	[sliderVal setStringValue:[self formatedFloat:param.floatVal withMaxDecimals:maxDecimals]];
 	if ([[NSApp delegate] respondsToSelector:@selector(userChangedParam:paramName:)]){
 		 [[NSApp delegate] userChangedParam: param paramName: paramName];  //blindly send message to App Delegate (TODO!)
 	}

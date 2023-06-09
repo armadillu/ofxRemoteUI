@@ -4,7 +4,6 @@
 #include <string>
 #import "ColorView.h"
 
-
 @interface ParamUI : NSObject <NSTextFieldDelegate>{
 
 	@public
@@ -65,7 +64,7 @@
 -(void)remapSlider;
 -(string)getParamName;
 
--(NSString*)formatedFloat:(float) f;
+-(NSString*)formatedFloat:(float)f withMaxDecimals:(int)numDex;
 
 //midi
 -(void)stopMidiAnim;

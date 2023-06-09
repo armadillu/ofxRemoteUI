@@ -66,7 +66,7 @@
                     </textFieldCell>
                 </textField>
                 <popUpButton fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wQ7-v3-wk0">
-                    <rect key="frame" x="339" y="6" width="33" height="19"/>
+                    <rect key="frame" x="338" y="5" width="35" height="21"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                     <popUpButtonCell key="cell" type="squareTextured" title="Item 1" bezelStyle="texturedSquare" alignment="center" controlSize="small" scrollable="YES" lineBreakMode="clipping" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" selectedItem="8dS-Ba-3Gf" id="ScG-qm-cQ0">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -81,7 +81,7 @@
                     </popUpButtonCell>
                 </popUpButton>
                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZH8-lh-DEk">
-                    <rect key="frame" x="299" y="6" width="18" height="19"/>
+                    <rect key="frame" x="298" y="5" width="20" height="21"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                     <buttonCell key="cell" type="squareTextured" title="+" bezelStyle="texturedSquare" alignment="center" controlSize="small" borderStyle="border" inset="2" id="pnw-YD-q6l">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -89,7 +89,7 @@
                     </buttonCell>
                 </button>
                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="346-pZ-7kr">
-                    <rect key="frame" x="319" y="6" width="18" height="19"/>
+                    <rect key="frame" x="318" y="5" width="20" height="21"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                     <buttonCell key="cell" type="squareTextured" title="-" bezelStyle="texturedSquare" alignment="center" controlSize="small" borderStyle="border" inset="2" id="Udy-Jq-M3Q">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
