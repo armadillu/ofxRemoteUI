@@ -663,7 +663,7 @@
 	[formatter setDecimalSeparator:@"."];
 	[formatter setMinimumIntegerDigits:1];
 	[formatter setGroupingSeparator:@"."];
-	[formatter setMaximumFractionDigits:2];
+	[formatter setMaximumFractionDigits:10];
 	NSString *formattedNumber = [formatter stringFromNumber:num];
 	[formatter release];
 	return formattedNumber;
