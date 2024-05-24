@@ -3122,7 +3122,7 @@ public:
 					state->messages.emplace_back(m); //store what we RX
 					state->wsMutex.unlock();
 
-				}catch(exception e){
+				}catch(std::exception e){
 					ofLogError("MyWebSocketHandler") << "err parsing json!" << e.what() << " " << jsonStr;
 				}
 			}else{
