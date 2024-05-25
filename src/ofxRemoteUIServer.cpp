@@ -26,6 +26,7 @@
 
 #include <sys/stat.h>
 #include <time.h>
+#include <cstdarg>
 
 #include "ofxRemoteUIServer.h"
 
