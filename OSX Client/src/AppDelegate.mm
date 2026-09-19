@@ -647,6 +647,7 @@ NSDate * willResign = nil;
 		}
 		[self layoutWidgetsWithConfig: [self calcLayoutParams]];
 	}
+
 	[externalDevices updateDevicesWithClientValues:FALSE resetToZero: FALSE paramName:""]; //udpate midi motors to match values
 	#if MEASURE_PERFORMANCE
 	NSDate * date2 = [NSDate date];
@@ -820,12 +821,9 @@ NSDate * willResign = nil;
 
 	//NSDisableScreenUpdates();
 	//remove all views, start over
-	NSDate * time1 = [NSDate date];
+	//NSDate * time1 = [NSDate date];
 	NSArray * subviews = [listContainer subviews];
 	for( int i = (int)[subviews count] - 1 ; i >= 0 ; i-- ){
-		if( [[subviews objectAtIndex:i] isKindOfClass:[NSBox class]]){
-			[[subviews objectAtIndex:i] release]; // release NSBox we allocated before
-		}
 		[[subviews objectAtIndex:i] removeFromSuperview];
 	}
 	[self adjustScrollView];
@@ -863,22 +861,7 @@ NSDate * willResign = nil;
 
 	[listContainer setSubviews:array];
 
-
 	int off = ((int)[scroll.contentView frame].size.height + 1) % ((int)(ROW_HEIGHT));
-
-	// draw grid ///////////////////////////////////////////
-
-	for (int i = 1; i < colIndex + 1; i++) {
-		NSBox * box = [[NSBox alloc] initWithFrame: NSMakeRect( i *  p.rowW, -ROW_HEIGHT, 1, 3 * ROW_HEIGHT + ROW_HEIGHT * numParams )];
-		[box setAutoresizingMask: NSViewHeightSizable | NSViewMinXMargin | NSViewMaxXMargin | NSViewMaxYMargin | NSViewMinYMargin ];
-		[listContainer addSubview:box];
-	}
-
-	for (int i = 0; i < p.maxPerCol ; i++) {
-		NSBox * box = [[NSBox alloc] initWithFrame: NSMakeRect( -10,(numParams - 1) * ROW_HEIGHT - ROW_HEIGHT * i, scroll.frame.size.width + 20, 1)];
-		[box setAutoresizingMask: NSViewMinYMargin | NSViewWidthSizable ];
-		[listContainer addSubview:box];
-	}
 
 	lastLayout = p;
 	int totalCols = p.maxPerCol;
@@ -888,8 +871,9 @@ NSDate * willResign = nil;
 	[listContainer setFrameSize: NSMakeSize( listContainer.frame.size.width, totalCols * ROW_HEIGHT + off - 1) ];
 	//NSEnableScreenUpdates();
 
-	float interval = [time1 timeIntervalSinceDate:[NSDate date]];
+	//float interval = [time1 timeIntervalSinceDate:[NSDate date]];
 	//NSLog(@"interval: %f ms", -interval * 1000);
+	
 }
 
 

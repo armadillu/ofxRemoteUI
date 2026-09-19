@@ -40,7 +40,7 @@
 
 - (void)drawRect:(NSRect)dirtyRect{
 	[background set];
-    NSRectFill(dirtyRect);
+    NSRectFill([self bounds]);
 }
 
 @end

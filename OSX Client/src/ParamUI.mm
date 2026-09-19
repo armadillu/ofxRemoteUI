@@ -33,6 +33,7 @@ int maxDecimals = 6;
 	AppDelegate * delegate = (AppDelegate *) [NSApp delegate];
 	RowHeightSize rowH = [delegate getRowHeight];
 	BOOL didLoad = FALSE;
+
 	switch (rowH) {
 		case LARGE_34: didLoad = [NSBundle loadNibNamed:@"View34" owner:self];
 			break;
@@ -41,6 +42,7 @@ int maxDecimals = 6;
 		case TINY_20: didLoad = [NSBundle loadNibNamed:@"View20" owner:self];
 			break;
 	}
+
 	if(!didLoad){
 		NSLog(@"can't load Nib for Parameter View!");
 		return nil;
@@ -51,7 +53,7 @@ int maxDecimals = 6;
 	[ui setLayer:viewLayer];
 	[viewLayer setOpaque:NO];
 
-	[paramLabel setButtonType:NSMomentaryChangeButton];
+	[paramLabel setButtonType:NSButtonTypeMomentaryChange];
 
 
 	CALayer * l = [CALayer layer];
@@ -353,7 +355,7 @@ int maxDecimals = 6;
 
 	[paramLabel setAction:@selector(clickOnLabel:)];
 	[paramLabel setTarget:self];
-	[paramLabel setBezelStyle:NSSmallSquareBezelStyle];
+	[paramLabel setBezelStyle:NSShadowlessSquareBezelStyle];
 
 	switch (param.type) {
 		case REMOTEUI_PARAM_FLOAT:
@@ -489,6 +491,7 @@ int maxDecimals = 6;
 		default:NSLog(@"wtf is this?");
 			break;
 	}
+
 	paramLabel.title = [self stringFromString:paramName];
 	int t = param.type;
 	if(param.description.size()){
@@ -504,8 +507,19 @@ int maxDecimals = 6;
 			[paramLabel setToolTip: [NSString stringWithFormat:@"\"%@\" Parameter\nNot bindable to a controller", paramLabel.title]];
 		}
 	}
-	[paramLabel sizeToFit];
-	
+
+	//dont let labels with long text exit the param view (ie crop to size)
+	//[paramLabel sizeToFit];
+	NSSize predictedSize = [[paramLabel cell] cellSize];
+	NSRect r = [paramLabel frame];
+	float maxW = [[paramLabel superview] bounds].size.width;
+	float xx = predictedSize.width + r.origin.x;
+	float margin = 7;
+	if (predictedSize.width > maxW - margin){
+		predictedSize.width = maxW - margin;
+	}
+	[paramLabel setFrameSize:predictedSize];
+
 	[widget setTarget:self];
 }
 
