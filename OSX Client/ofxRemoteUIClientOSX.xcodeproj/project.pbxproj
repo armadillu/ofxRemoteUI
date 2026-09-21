@@ -46,7 +46,6 @@
 		BBB627DF191C4CFB005F95BF /* offline@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB627D9191C4CFB005F95BF /* offline@2x.png */; };
 		BBB627E0191C4CFB005F95BF /* warning.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB627DA191C4CFB005F95BF /* warning.png */; };
 		BBB627E1191C4CFB005F95BF /* warning@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB627DB191C4CFB005F95BF /* warning@2x.png */; };
-		BBB627E4191C4D06005F95BF /* Growl Registration Ticket.growlRegDict in Resources */ = {isa = PBXBuildFile; fileRef = BBB627E2191C4D06005F95BF /* Growl Registration Ticket.growlRegDict */; };
 		BBB627E5191C4D06005F95BF /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = BBB627E3191C4D06005F95BF /* icon.icns */; };
 		BBB627E8191C4D0C005F95BF /* openAccessibility.scpt in Resources */ = {isa = PBXBuildFile; fileRef = BBB627E6191C4D0C005F95BF /* openAccessibility.scpt */; };
 		BBB627E9191C4D0C005F95BF /* RestartXcodeApp.scptd in Resources */ = {isa = PBXBuildFile; fileRef = BBB627E7191C4D0C005F95BF /* RestartXcodeApp.scptd */; };
@@ -56,13 +55,10 @@
 		BBB627FA191C4D1A005F95BF /* View20.xib in Resources */ = {isa = PBXBuildFile; fileRef = BBB627F1191C4D1A005F95BF /* View20.xib */; };
 		BBB627FB191C4D1A005F95BF /* View26.xib in Resources */ = {isa = PBXBuildFile; fileRef = BBB627F3191C4D1A005F95BF /* View26.xib */; };
 		BBB627FC191C4D1A005F95BF /* View34.xib in Resources */ = {isa = PBXBuildFile; fileRef = BBB627F5191C4D1A005F95BF /* View34.xib */; };
-		BBB62801191C4D3B005F95BF /* Growl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBB627FE191C4D3B005F95BF /* Growl.framework */; };
-		BBB62802191C4D3B005F95BF /* VVBasics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBB627FF191C4D3B005F95BF /* VVBasics.framework */; };
-		BBB62803191C4D3B005F95BF /* VVMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBB62800191C4D3B005F95BF /* VVMIDI.framework */; };
-		BBB62805191C4D72005F95BF /* Growl.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = BBB627FE191C4D3B005F95BF /* Growl.framework */; };
-		BBB62806191C4D73005F95BF /* VVBasics.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = BBB627FF191C4D3B005F95BF /* VVBasics.framework */; };
-		BBB62807191C4D75005F95BF /* VVMIDI.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = BBB62800191C4D3B005F95BF /* VVMIDI.framework */; };
 		BBB6280A191C4EC9005F95BF /* ofxRemoteUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBB62808191C4EC9005F95BF /* ofxRemoteUI.cpp */; };
+		BBC76AB33061B38500995FF2 /* CoreMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBC76AB23061B38500995FF2 /* CoreMIDI.framework */; };
+		BBC76AC03061C37400995FF2 /* RUMidi.m in Sources */ = {isa = PBXBuildFile; fileRef = BBC76ABD3061C37400995FF2 /* RUMidi.m */; };
+		BBC76AC13061C37400995FF2 /* RUMidiMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = BBC76ABF3061C37400995FF2 /* RUMidiMessage.m */; };
 		BBD3270F173BFFF200D59359 /* ofxRemoteUIClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BBAAAFA7173BF54B00FE94C4 /* ofxRemoteUIClient.cpp */; };
 		BBD789A61AA148700061EC66 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBD789A51AA148700061EC66 /* IOKit.framework */; };
 		BBD789AA1AA1489C0061EC66 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBD789A91AA1489C0061EC66 /* QuartzCore.framework */; };
@@ -77,9 +73,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				BBB62807191C4D75005F95BF /* VVMIDI.framework in Copy Frameworks */,
-				BBB62805191C4D72005F95BF /* Growl.framework in Copy Frameworks */,
-				BBB62806191C4D73005F95BF /* VVBasics.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -182,11 +175,13 @@
 		BBB627F4191C4D1A005F95BF /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = View26.xib; sourceTree = "<group>"; };
 		BBB627F6191C4D1A005F95BF /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = View34.xib; sourceTree = "<group>"; };
 		BBB627FD191C4D27005F95BF /* ofxRemoteUIClientOSX-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "ofxRemoteUIClientOSX-Prefix.pch"; path = "src/ofxRemoteUIClientOSX-Prefix.pch"; sourceTree = SOURCE_ROOT; };
-		BBB627FE191C4D3B005F95BF /* Growl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Growl.framework; path = Frameworks/Growl.framework; sourceTree = "<group>"; };
-		BBB627FF191C4D3B005F95BF /* VVBasics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VVBasics.framework; path = Frameworks/VVBasics.framework; sourceTree = "<group>"; };
-		BBB62800191C4D3B005F95BF /* VVMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VVMIDI.framework; path = Frameworks/VVMIDI.framework; sourceTree = "<group>"; };
 		BBB62808191C4EC9005F95BF /* ofxRemoteUI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxRemoteUI.cpp; sourceTree = "<group>"; };
 		BBB62809191C4EC9005F95BF /* ofxRemoteUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxRemoteUI.h; sourceTree = "<group>"; };
+		BBC76AB23061B38500995FF2 /* CoreMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDI.framework; path = System/Library/Frameworks/CoreMIDI.framework; sourceTree = SDKROOT; };
+		BBC76ABC3061C37400995FF2 /* RUMidi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RUMidi.h; path = src/RUMidi.h; sourceTree = "<group>"; };
+		BBC76ABD3061C37400995FF2 /* RUMidi.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RUMidi.m; path = src/RUMidi.m; sourceTree = "<group>"; };
+		BBC76ABE3061C37400995FF2 /* RUMidiMessage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RUMidiMessage.h; path = src/RUMidiMessage.h; sourceTree = "<group>"; };
+		BBC76ABF3061C37400995FF2 /* RUMidiMessage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RUMidiMessage.m; path = src/RUMidiMessage.m; sourceTree = "<group>"; };
 		BBD134211ACA50EA0005FCE4 /* constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = constants.h; sourceTree = "<group>"; };
 		BBD789A51AA148700061EC66 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		BBD789A71AA148850061EC66 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -204,12 +199,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBC76AB33061B38500995FF2 /* CoreMIDI.framework in Frameworks */,
 				BBD789AA1AA1489C0061EC66 /* QuartzCore.framework in Frameworks */,
 				BBD789A61AA148700061EC66 /* IOKit.framework in Frameworks */,
-				BBB62803191C4D3B005F95BF /* VVMIDI.framework in Frameworks */,
-				BBB62801191C4D3B005F95BF /* Growl.framework in Frameworks */,
 				73002CDB140ABCF60035299A /* Cocoa.framework in Frameworks */,
-				BBB62802191C4D3B005F95BF /* VVBasics.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -242,6 +235,7 @@
 		73002CD9140ABCF60035299A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BBC76AB23061B38500995FF2 /* CoreMIDI.framework */,
 				BBD789A91AA1489C0061EC66 /* QuartzCore.framework */,
 				BBD789A71AA148850061EC66 /* CoreGraphics.framework */,
 				BBD789A51AA148700061EC66 /* IOKit.framework */,
@@ -460,6 +454,10 @@
 		BBB627CE191C4C8F005F95BF /* ofxRemoteUIClientOSX */ = {
 			isa = PBXGroup;
 			children = (
+				BBC76ABC3061C37400995FF2 /* RUMidi.h */,
+				BBC76ABD3061C37400995FF2 /* RUMidi.m */,
+				BBC76ABE3061C37400995FF2 /* RUMidiMessage.h */,
+				BBC76ABF3061C37400995FF2 /* RUMidiMessage.m */,
 				BBB627C5191C4C69005F95BF /* AppDelegate.h */,
 				BBB627C6191C4C69005F95BF /* AppDelegate.mm */,
 				BBB627C8191C4C7B005F95BF /* ColorView.h */,
@@ -510,9 +508,6 @@
 		BBB62804191C4D42005F95BF /* 3rd Party */ = {
 			isa = PBXGroup;
 			children = (
-				BBB627FE191C4D3B005F95BF /* Growl.framework */,
-				BBB627FF191C4D3B005F95BF /* VVBasics.framework */,
-				BBB62800191C4D3B005F95BF /* VVMIDI.framework */,
 			);
 			name = "3rd Party";
 			sourceTree = "<group>";
@@ -585,6 +580,7 @@
 				LastUpgradeCheck = 0510;
 				TargetAttributes = {
 					73002CD5140ABCF60035299A = {
+						DevelopmentTeam = W2H3W29D9P;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -626,7 +622,6 @@
 				BBB627E1191C4CFB005F95BF /* warning@2x.png in Resources */,
 				BB583D412034F98A00FBFAD1 /* PresetIcon.iconset in Resources */,
 				BBB627FA191C4D1A005F95BF /* View20.xib in Resources */,
-				BBB627E4191C4D06005F95BF /* Growl Registration Ticket.growlRegDict in Resources */,
 				BBB627FB191C4D1A005F95BF /* View26.xib in Resources */,
 				BBB627E5191C4D06005F95BF /* icon.icns in Resources */,
 			);
@@ -686,6 +681,8 @@
 				BB5CC610177E49D500B595F8 /* UdpSocketWin.cpp in Sources */,
 				BB5CC611177E49D500B595F8 /* OscOutboundPacketStream.cpp in Sources */,
 				BBB627B8191C4C2B005F95BF /* JoystickHatswitch.m in Sources */,
+				BBC76AC03061C37400995FF2 /* RUMidi.m in Sources */,
+				BBC76AC13061C37400995FF2 /* RUMidiMessage.m in Sources */,
 				BB5CC612177E49D500B595F8 /* OscPrintReceivedElements.cpp in Sources */,
 				BB5CC613177E49D500B595F8 /* OscReceivedElements.cpp in Sources */,
 				BB5CC614177E49D500B595F8 /* OscTypes.cpp in Sources */,
@@ -769,6 +766,7 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -804,6 +802,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PREFIX_HEADER = "src/ofxRemoteUIClientOSX-Prefix.pch";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -836,10 +835,11 @@
 				CLANG_LINK_OBJC_RUNTIME = NO;
 				CLANG_WARN__ARC_BRIDGE_CAST_NONARC = NO;
 				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = "";
-				EXCLUDED_ARCHS = arm64;
+				DEVELOPMENT_TEAM = W2H3W29D9P;
+				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",
@@ -867,10 +867,10 @@
 				CLANG_LINK_OBJC_RUNTIME = NO;
 				CLANG_WARN__ARC_BRIDGE_CAST_NONARC = NO;
 				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = "";
-				EXCLUDED_ARCHS = arm64;
+				DEVELOPMENT_TEAM = W2H3W29D9P;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",

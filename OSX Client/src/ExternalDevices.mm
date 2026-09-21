@@ -28,15 +28,16 @@ float convertHueToMidiFigtherHue(float hue){
 
 @implementation ExternalDevices
 
-
 -(void)initWithWidgets:(unordered_map<string, ParamUI*> *) widgets_ andClient:(ofxRemoteUIClient*) client_{
 
 	widgets = widgets_;
 	client = client_;
 
 	//midi
-	midiManager = [[VVMIDIManager alloc] init];
-	[midiManager setDelegate:self];
+	midi = [[RUMidi alloc] init];
+	midi.delegate = self;
+	[midi start];
+
 	upcomingDeviceParam = nil;
 
 	//joystick
@@ -92,24 +93,33 @@ float convertHueToMidiFigtherHue(float hue){
 
 
 //midi setup delegate
-- (void) setupChanged{
+- (void) midiSetupChanged:(RUMidi *)midi{
+
 	NSLog(@"setupChanged: Midi Device connected/disconnected!");
 	[self updateDevicesWithClientValues:FALSE resetToZero:FALSE paramName:""];
+
+	for (RUMidiDevice *device in [midi devices]) {
+		NSLog(@"MIDI device: %@", [device name]);
+	}
 }
 
 
--(IBAction)updateDevicesWithClientValues:(BOOL)onlyColor resetToZero:(BOOL)reset paramName:(string)pName{
+-(IBAction)updateDevicesWithClientValues:(BOOL)onlyColor resetToZero:(BOOL)reset paramName:(const string&)pName{
 
-	VVMIDINode *midiFighter = [midiManager findDestNodeWithDeviceName:@"Midi Fighter Twister"];
+	RUMidiDevice *midiFighter = [midi deviceNamed:@"Midi Fighter Twister"];
+	static UInt8 msgBytes[6];
+
 	if(midiFighter){
 
 		//hide all colors that are not used
 		if(reset && pName == ""){
 			for(int i = 0; i < 16 * 4; i++){
-			VVMIDIMessage * msg = [VVMIDIMessage createWithType:0xB0 channel:2];
-			[msg setData1:(unsigned char)(i)]; //knob id
-			[msg setData2:(unsigned char)(17 + 5)]; //value brightness
-			[midiFighter sendMsg:msg];
+				msgBytes[0]=0xB0;
+				msgBytes[1]=(unsigned char)(i); //knob id
+				msgBytes[2]=(unsigned char)(17 + 0); //value brightness to zero
+				RUMidiMessage * msg = [RUMidiMessage messageWithBytes:msgBytes length:3 channel:2];
+				[midiFighter sendMessage:msg];
+				//[msg release];
 			}
 		}
 
@@ -121,79 +131,81 @@ float convertHueToMidiFigtherHue(float hue){
 				string devNameAndAddress = it->first; //looks like "[controlID # channel] @ deviceName]"
 
 				MidiOutCache midiOutConfig = [self cacheForControlURL:devNameAndAddress];
-				VVMIDINode *device = [midiManager findDestNodeWithDeviceName:[NSString stringWithUTF8String:midiOutConfig.deviceName.c_str()]];
 
-				if(device){
+				if(client->paramExistsForName(paramName)){
 
-					if(client->paramExistsForName(paramName)){
-
-						RemoteUIParam p = client->getParamForName(paramName);
-						unsigned char value = 0; //have to map to [0..127]
-						BOOL send = true;
-						if (onlyColor && p.type != REMOTEUI_PARAM_COLOR){
-							send = FALSE;
+					RemoteUIParam p = client->getParamForName(paramName);
+					unsigned char value = 0; //have to map to [0..127]
+					BOOL send = true;
+					if (onlyColor && p.type != REMOTEUI_PARAM_COLOR){
+						send = FALSE;
+					}
+					int channelOffset = 0;
+					if(send){
+						if(!reset){
+							switch(p.type){
+								case REMOTEUI_PARAM_BOOL:
+									if(p.boolVal) value = 127/2 + 3;
+									else value = 127/2 - 3; break;
+								case REMOTEUI_PARAM_FLOAT:
+									value = valMap(p.floatVal, p.minFloat, p.maxFloat, 0, 127);
+									break;
+								case REMOTEUI_PARAM_ENUM:
+								case REMOTEUI_PARAM_INT:
+									value = valMap(p.intVal, p.minInt, p.maxInt, 0, 127);
+									break;
+								case REMOTEUI_PARAM_COLOR:{
+									NSColor * c = [NSColor colorWithSRGBRed:p.redVal/255.0f green:p.greenVal/255.0f blue:p.blueVal/255.0f alpha:p.alphaVal/255.0f];
+									float hue = [c hueComponent];
+									//the midifigter has a weird color mapping, 0 is blue, 1 is red;
+									//usually hue is 0 is red, 1 is red. so we apply offset to the hue we get
+									//midiOutConfig.channelInt ++; //this is a hack for the MidiFighterTwister! TODO make UI to enable this!!
+									channelOffset = 1;
+									hue = convertHueToMidiFigtherHue(hue);
+									value = hue * 127;
+								}break;
+								default:
+									break;//ignore other types
+							}
 						}
-						int channelOffset = 0;
-						if(send){
-							if(!reset){
-								switch(p.type){
-									case REMOTEUI_PARAM_BOOL:
-										if(p.boolVal) value = 127/2 + 3;
-										else value = 127/2 - 3; break;
-									case REMOTEUI_PARAM_FLOAT:
-										value = valMap(p.floatVal, p.minFloat, p.maxFloat, 0, 127);
-										break;
-									case REMOTEUI_PARAM_ENUM:
-									case REMOTEUI_PARAM_INT:
-										value = valMap(p.intVal, p.minInt, p.maxInt, 0, 127);
-										break;
-									case REMOTEUI_PARAM_COLOR:{
-										NSColor * c = [NSColor colorWithSRGBRed:p.redVal/255.0f green:p.greenVal/255.0f blue:p.blueVal/255.0f alpha:p.alphaVal/255.0f];
-										float hue = [c hueComponent];
-										//the midifigter has a weird color mapping, 0 is blue, 1 is blue;
-										//usually hue is 0 is red, 1 is red. so we apply offset to the hue we get
-										//midiOutConfig.channelInt ++; //this is a hack for the MidiFighterTwister! TODO make UI to enable this!!
-										channelOffset = 1;
-										hue = convertHueToMidiFigtherHue(hue);
-										value = hue * 127;
-									}break;
-									default:
-										break;//ignore other types
-								}
-							}
-							//send out on the same channel we got the message in + 1
-							VVMIDIMessage * msg = [VVMIDIMessage createWithType:0xB0 channel: channelOffset /* + midiOutConfig.channelInt*/ ];
-							[msg setData1:(unsigned char)(midiOutConfig.controlIDInt)]; //knob id
-							[msg setData2:(unsigned char)(value)]; //value
-							[device sendMsg:msg];
+						//send out on the same channel we got the message in + 1
+						msgBytes[0]=0xB0;
+						msgBytes[1]=midiOutConfig.controlIDInt; //knob id
+						msgBytes[2]=value; //value
+						RUMidiMessage * msg = [RUMidiMessage messageWithBytes:msgBytes length:3 channel:channelOffset];
+						[midiFighter sendMessage:msg];
 
-							//NSLog(@"sending %s update", paramName.c_str());
-							//set param highlight color to match midiFigtherTwister color //TODO make UI to toggle this behavior!
-							if(p.type != REMOTEUI_PARAM_COLOR){
-								NSColor * paramColor = [NSColor colorWithSRGBRed:p.r/255.0f green:p.g/255.0f blue:p.b/255.0f alpha:1.0];
-								float hue = convertHueToMidiFigtherHue([paramColor hueComponent]);
-								//param hue
-								msg = [VVMIDIMessage createWithType:0xB0 channel:/*midiOutConfig.channelInt*/ + 1];
-								[msg setData1:(unsigned char)(midiOutConfig.controlIDInt)]; //knob id
-								[msg setData2:(unsigned char)(hue * 127)]; //value
-								[device sendMsg:msg];
+						//NSLog(@"sending %s update", paramName.c_str());
+						//set param highlight color to match midiFigtherTwister color //TODO make UI to toggle this behavior!
+						if(p.type != REMOTEUI_PARAM_COLOR){
+							NSColor * paramColor = [NSColor colorWithSRGBRed:p.r/255.0f green:p.g/255.0f blue:p.b/255.0f alpha:1.0];
 
-								//param alpha
-								float a = p.a / 96.0f; //remote ui sends (a == 96 || a = 55)
-								if (a > 1.0) a = 1.0f;
-								if (a < 0.8) a = 0.8;
-								msg = [VVMIDIMessage createWithType:0xB0 channel:/*midiOutConfig.channelInt*/ + 2];
-								[msg setData1:(unsigned char)(midiOutConfig.controlIDInt)]; //knob id
-								//[msg setData2:(unsigned char)(17 + 30 * a)]; //value
-								[msg setData2:(unsigned char)(17 + 30 * a)]; //value
-								[device sendMsg:msg];
-							}else{ //if color param, re-set the brightness
-								msg = [VVMIDIMessage createWithType:0xB0 channel:/*midiOutConfig.channelInt*/ + 2];
-								[msg setData1:(unsigned char)(midiOutConfig.controlIDInt)]; //knob id
-								[msg setData2:(unsigned char)(17 + 30)]; //value
-								[device sendMsg:msg];
+							float hue = convertHueToMidiFigtherHue([paramColor hueComponent]);
+							//param hue
+							msgBytes[0]=0xB0;
+							msgBytes[1]=midiOutConfig.controlIDInt; //knob id
+							msgBytes[2]=hue * 127; //value
+							RUMidiMessage * msg = [RUMidiMessage messageWithBytes:msgBytes length:3 channel:1];
+							[midiFighter sendMessage:msg];
 
-							}
+							//param alpha
+							float a = p.a / 96.0f; //remote ui sends (a == 96 || a = 55)
+							if (a > 1.0) a = 1.0f;
+							if (a < 0.8) a = 0.8;
+
+							msgBytes[0]=0xB0;
+							msgBytes[1]=midiOutConfig.controlIDInt; //knob id
+							msgBytes[2]=17 + 30 * a; //value
+							RUMidiMessage * msg2 = [RUMidiMessage messageWithBytes:msgBytes length:3 channel:2];
+							[midiFighter sendMessage:msg2];
+
+						}else{ //if color param, re-set the brightness
+							msgBytes[0]=0xB0;
+							msgBytes[1]=midiOutConfig.controlIDInt; //knob id
+							msgBytes[2]=17 + 30; //value
+							RUMidiMessage * msg = [RUMidiMessage messageWithBytes:msgBytes length:3 channel:2];
+							[midiFighter sendMessage:msg];
+
 						}
 					}
 				}
@@ -242,7 +254,8 @@ float convertHueToMidiFigtherHue(float hue){
 
 -(IBAction)flashBoundControllers:(id)sender{
 
-	VVMIDINode *midiFighter = [midiManager findDestNodeWithDeviceName:@"Midi Fighter Twister"];
+	RUMidiDevice *midiFighter = [midi deviceNamed:@"Midi Fighter Twister"];
+
 	if(midiFighter){
 
 		map<string, string>::iterator it = bindingsMap.begin();
@@ -251,28 +264,32 @@ float convertHueToMidiFigtherHue(float hue){
 			string devNameAndAddress = it->first; //looks like "[controlID # channel] @ deviceName]"
 			string paramName = it->second;
 			MidiOutCache midiOutConfig = [self cacheForControlURL:devNameAndAddress];
-			VVMIDINode *device = [midiManager findDestNodeWithDeviceName:[NSString stringWithUTF8String:midiOutConfig.deviceName.c_str()]];
 
-			if(device){
+			if(midiFighter){
 				if(client->paramExistsForName(paramName)){
 
 					ParamUI * item = widgets->at(paramName);
 					[item flashBackground:[NSNumber numberWithInt:NUM_BOUND_FLASH]];
 
 					RemoteUIParam p = client->getParamForName(paramName);
-					VVMIDIMessage * msg = [VVMIDIMessage createWithType:0xB0 channel:/*midiOutConfig.channelInt*/ + 2];
-					[msg setData1:(unsigned char)(midiOutConfig.controlIDInt)]; //knob id
-					[msg setData2:(unsigned char)(6)]; //value
-					[device sendMsg:msg];
+					
+					static UInt8 msgBytes[6];
+
+					msgBytes[0]=0xB0;
+					msgBytes[1]=midiOutConfig.controlIDInt; //knob id
+					msgBytes[2]=6; //value
+					RUMidiMessage * msg = [RUMidiMessage messageWithBytes:msgBytes length:3 channel:2];
+					[midiFighter sendMessage:msg];
 
 					//disable animation after 2 seconds
 					dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, 1.5 * NSEC_PER_SEC);
 					dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-						VVMIDIMessage * msg = [VVMIDIMessage createWithType:0xB0 channel:/*midiOutConfig.channelInt*/ + 2];
-						[msg setData1:(unsigned char)(midiOutConfig.controlIDInt)]; //knob id
-						[msg setData2:(unsigned char)(47)]; //value
-						[device sendMsg:msg];
 
+						msgBytes[0]=0xB0;
+						msgBytes[1]=midiOutConfig.controlIDInt; //knob id
+						msgBytes[2]=47; //value
+						RUMidiMessage * msg = [RUMidiMessage messageWithBytes:msgBytes length:3 channel:2];
+						[midiFighter sendMessage:msg];
 					});
 				}
 			}
@@ -282,164 +299,155 @@ float convertHueToMidiFigtherHue(float hue){
 }
 
 #pragma mark MIDI_RX
-- (void) receivedMIDI:(NSArray *)a fromNode:(VVMIDINode *)n	{
 
-	//NSLog(@"rx midi");
+- (void)midi:(RUMidi *)midi didReceiveMessage:(RUMidiMessage *)message fromDevice:(RUMidiDevice *)device {
 
 	if(!client->isReadyToSend()) return;
 	
-	NSEnumerator		*it = [a objectEnumerator];
-	VVMIDIMessage		*msgPtr;
 
 	vector<string> updatedParamsThisLoop;
 
-	while (msgPtr = [it nextObject]){
-		Byte b = [msgPtr type];
-		//only some msg types matter , noteOn and noteOff
-		bool slider = ( b >= 0xb0 && b <= 0xbF );
-		bool noteOff = ( b >= 0x80 && b <= 0x8F );
-		bool noteOn = ( b >= 0x90 && b <= 0x9F );
-		bool sysEx = (b == 0xF0);
-		bool isMidiFighterHighRes = false;
-		int channel;
-		int knobID;
-		float value;
+	RUMidiMessageType b = [message type];
+	//only some msg types matter , noteOn and noteOff
+	bool slider = ( b >= 0xb0 && b <= 0xbF );
+	bool noteOff = ( b >= 0x80 && b <= 0x8F );
+	bool noteOn = ( b >= 0x90 && b <= 0x9F );
+	bool isMidiFighterHighRes = false;
+	int channel;
+	int knobID;
+	float value;
 
-		if(sysEx){ //look for special midifighter twister firmware with 14bit encoded knob data through sysEx https://github.com/armadillu/Midi_Fighter_Twister_Open_Source
-			NSMutableArray * sysData = [msgPtr sysexArray];
-			if([sysData count] == 8){
-				int manufact1 = [[sysData objectAtIndex:1] intValue];
-				int manufact2 = [[sysData objectAtIndex:2] intValue];
-				if(manufact1 == 1 && manufact2 == 121){ //dj techtools
-					int command = [[sysData objectAtIndex:3] intValue];
-					if(command == 6){ //high res knob data see https://github.com/armadillu/Midi_Fighter_Twister_Open_Source
-						isMidiFighterHighRes = true;
-						channel = [[sysData objectAtIndex:4] intValue];
-						knobID = [[sysData objectAtIndex:5] intValue];
-						unsigned char knobDataMSB = [[sysData objectAtIndex:6] intValue];
-						unsigned char knobDataLSB = [[sysData objectAtIndex:7] intValue];
+	if([message isSysEx]){ //look for special midifighter twister firmware with 14bit encoded knob data through sysEx https://github.com/armadillu/Midi_Fighter_Twister_Open_Source
+		NSArray * sysData = [message sysexArray];
+		if([sysData count] == 10){
+			int manufact1 = [[sysData objectAtIndex:2] intValue];
+			int manufact2 = [[sysData objectAtIndex:3] intValue];
+			if(manufact1 == 1 && manufact2 == 121){ //dj techtools
+				int command = [[sysData objectAtIndex:4] intValue];
+				if(command == 6){ //high res knob data see https://github.com/armadillu/Midi_Fighter_Twister_Open_Source
+					isMidiFighterHighRes = true;
+					channel = [[sysData objectAtIndex:5] intValue];
+					knobID = [[sysData objectAtIndex:6] intValue];
+					unsigned char knobDataMSB = [[sysData objectAtIndex:7] intValue];
+					unsigned char knobDataLSB = [[sysData objectAtIndex:8] intValue];
 
-						//we get 2 x 7bit values in 2 x 8bit chars to represent 14bit value with a max val of 16383
-						unsigned int knobVal = ((knobDataMSB & 0x7f) << 7 ) | (knobDataLSB & 0x7f);
-						value = knobVal / float(16383);
-
-						//NSLog(@"chan:%d knobID:%d lsb:%d msb:%d val: %d", channel, knobID, knobDataMSB, knobDataLSB, knobVal);
-					}
+					//we get 2 x 7bit values in 2 x 8bit chars to represent 14bit value with a max val of 16383
+					unsigned int knobVal = ((knobDataMSB & 0x7f) << 7 ) | (knobDataLSB & 0x7f);
+					value = knobVal / float(16383);
 				}
 			}
 		}
+	}
 
-		if( slider || noteOff || noteOn || isMidiFighterHighRes ) {
+	if( slider || noteOff || noteOn || isMidiFighterHighRes ) {
 
-			NSString * dn = [n deviceName];
-			if(dn == nil){continue;} //ignore virtual devices?
+		NSString * dn = [device name];
+		//if(dn == nil){continue;} //ignore virtual devices?
 
-			//NSLog(@"%@ %f", [msgPtr description], [msgPtr doubleValue]);
-			if(!isMidiFighterHighRes){
-				channel = [msgPtr channel];
-				knobID = [msgPtr data1];
-				value = [msgPtr doubleValue];
-			}
-			//NSLog(@"_%@_ _%@_ _%@_", [n name], [n deviceName], [n fullName]);
-			string type = "??";
-			if(noteOff || noteOn) type = "note";
-			if(slider || isMidiFighterHighRes) type = "cc";
+		//NSLog(@"%@ %f", [msgPtr description], [msgPtr doubleValue]);
+		if(!isMidiFighterHighRes){
+			channel = [message channel];
+			knobID = [message data1];
+			value = [message doubleValue];
+		}
+		//NSLog(@"_%@_ _%@_ _%@_", [n name], [n deviceName], [n fullName]);
+		string type = "??";
+		if(noteOff || noteOn) type = "note";
+		if(slider || isMidiFighterHighRes) type = "cc";
 
-			string desc = [[dn stringByReplacingOccurrencesOfString:@" " withString:@"_"] UTF8String];
-			string channelStr = [[NSString stringWithFormat:@"[%s:%d#%d]", type.c_str(), knobID, channel] UTF8String];
-			string controllerUniqueAddress = channelStr + "@" + desc;
+		string desc = [[dn stringByReplacingOccurrencesOfString:@" " withString:@"_"] UTF8String];
+		string channelStr = [[NSString stringWithFormat:@"[%s:%d#%d]", type.c_str(), knobID, channel] UTF8String];
+		string controllerUniqueAddress = channelStr + "@" + desc;
 
-			//NSLog(@"## %s ###############################################", controllerUniqueAddress.c_str());
+		//NSLog(@"## %s ###############################################", controllerUniqueAddress.c_str());
 
-			if( upcomingDeviceParam == nil ){ //we are not setting a midi binding
+		if( upcomingDeviceParam == nil ){ //we are not setting a midi binding
 
-				map<string,string>::iterator ii = bindingsMap.find(controllerUniqueAddress);
-				if ( ii != bindingsMap.end() ){ //found a param linked to that controller
-					string paramName = bindingsMap[controllerUniqueAddress];
-					unordered_map<string,ParamUI*>::iterator it = widgets->find(paramName);
-					if ( it == widgets->end() ){	//not found! wtf?
-						//NSLog(@"uh? midi binding pointing to an unexisting param!");
-					}else{
-						updatedParamsThisLoop.push_back(paramName);
-						ParamUI * item = widgets->at(paramName);
-						RemoteUIParam p = client->getParamForName(paramName);
+			map<string,string>::iterator ii = bindingsMap.find(controllerUniqueAddress);
+			if ( ii != bindingsMap.end() ){ //found a param linked to that controller
+				string paramName = bindingsMap[controllerUniqueAddress];
+				unordered_map<string,ParamUI*>::iterator it = widgets->find(paramName);
+				if ( it == widgets->end() ){	//not found! wtf?
+					//NSLog(@"uh? midi binding pointing to an unexisting param!");
+				}else{
+					updatedParamsThisLoop.push_back(paramName);
+					ParamUI * item = widgets->at(paramName);
+					RemoteUIParam p = client->getParamForName(paramName);
 
-						if(slider || isMidiFighterHighRes){ //control type midi msg (slider)
-							switch(p.type){
-								case REMOTEUI_PARAM_BOOL:
-									p.boolVal = value > 0.5f;
-									break;
-								case REMOTEUI_PARAM_FLOAT:
-									p.floatVal = p.minFloat + (p.maxFloat - p.minFloat) * value;
-									break;
-								case REMOTEUI_PARAM_ENUM:
-								case REMOTEUI_PARAM_INT:{
-									p.intVal = round(p.minInt + (p.maxInt - p.minInt) * value);
-									}break;
-								case REMOTEUI_PARAM_COLOR:{
-									if(knobColorAffectsAlpha){
-										p.alphaVal = value * 255;
-
-									}else{
-										NSColor * c = [NSColor colorWithSRGBRed:p.redVal/255.0f green:p.greenVal/255.0f blue:p.blueVal/255.0f alpha:p.alphaVal/255.0f];
-										NSColor * c2 = [NSColor colorWithHue:value saturation:[c saturationComponent] brightness:[c brightnessComponent] alpha:[c alphaComponent]];
-										p.redVal = [c2 redComponent] * 255.0f;
-										p.greenVal = [c2 greenComponent] * 255.0f;
-										p.blueVal = [c2 blueComponent] * 255.0f;
-										p.alphaVal = [c2 alphaComponent] * 255.0f;
-									}
+					if(slider || isMidiFighterHighRes){ //control type midi msg (slider)
+						switch(p.type){
+							case REMOTEUI_PARAM_BOOL:
+								p.boolVal = value > 0.5f;
+								break;
+							case REMOTEUI_PARAM_FLOAT:
+								p.floatVal = p.minFloat + (p.maxFloat - p.minFloat) * value;
+								break;
+							case REMOTEUI_PARAM_ENUM:
+							case REMOTEUI_PARAM_INT:{
+								p.intVal = round(p.minInt + (p.maxInt - p.minInt) * value);
 								}break;
-								default:
-									break;//ignore other types
-							}
-						}else{ //must be noteOn or noteOff midi msg
-							if(p.type == REMOTEUI_PARAM_BOOL){
-								if(externalButtonsBehaveAsToggle){
-									if(noteOn){ //ignore onRelease (noteOff) event if we toggle
-										p.boolVal = !p.boolVal;
-									}
+							case REMOTEUI_PARAM_COLOR:{
+								if(knobColorAffectsAlpha){
+									p.alphaVal = value * 255;
+
 								}else{
-									p.boolVal = noteOn;
+									NSColor * c = [NSColor colorWithSRGBRed:p.redVal/255.0f green:p.greenVal/255.0f blue:p.blueVal/255.0f alpha:p.alphaVal/255.0f];
+									NSColor * c2 = [NSColor colorWithHue:value saturation:[c saturationComponent] brightness:[c brightnessComponent] alpha:[c alphaComponent]];
+									p.redVal = [c2 redComponent] * 255.0f;
+									p.greenVal = [c2 greenComponent] * 255.0f;
+									p.blueVal = [c2 blueComponent] * 255.0f;
+									p.alphaVal = [c2 alphaComponent] * 255.0f;
 								}
+							}break;
+							default:
+								break;//ignore other types
+						}
+					}else{ //must be noteOn or noteOff midi msg
+						if(p.type == REMOTEUI_PARAM_BOOL){
+							if(externalButtonsBehaveAsToggle){
+								if(noteOn){ //ignore onRelease (noteOff) event if we toggle
+									p.boolVal = !p.boolVal;
+								}
+							}else{
+								p.boolVal = noteOn;
 							}
 						}
-						client->sendUntrackedParamUpdate(p, paramName); //send over network
-						[item updateParam:p];
-						//this is called form second thread, we need to update UI from main thread
-						[self performSelectorOnMainThread:@selector(updateParamUIOnMainThread:) withObject:item waitUntilDone:NO];
 					}
+					client->sendUntrackedParamUpdate(p, paramName); //send over network
+					[item updateParam:p];
+					//this is called form second thread, we need to update UI from main thread
+					[self performSelectorOnMainThread:@selector(updateParamUIOnMainThread:) withObject:item waitUntilDone:NO];
 				}
-			}else{ // we are setting a midi binding
-
-				if (
-					( upcomingDeviceParam->param.type == REMOTEUI_PARAM_BOOL && (noteOn || noteOff ) ) //piano keys only for bools
-					||
-					slider//slider midi msg for any valid param
-					||
-					isMidiFighterHighRes
-					){
-					string paramN = [upcomingDeviceParam getParamName];
-					bindingsMap[controllerUniqueAddress] = paramN;
-					[midiBindingsTable reloadData];
-					[upcomingDeviceParam stopMidiAnim];
-					upcomingDeviceParam = nil;
-					//[window setTitle:@"ofxRemoteUI"];
-				}
-
-				//save to default bindings
-				NSFileManager * fm = [NSFileManager defaultManager];
-				[fm createDirectoryAtPath:DEFAULT_BINDINGS_FOLDER withIntermediateDirectories:YES attributes:Nil error:nil];
-				NSString * fullPath = [DEFAULT_BINDINGS_FOLDER stringByAppendingString:DEFAULT_BINDINGS_FILE];
-				[self saveDeviceBindingsToFile: [NSURL fileURLWithPath:fullPath]];
-				[midiBindingsTable reloadData];
 			}
+		}else{ // we are setting a midi binding
+
+			if (
+				( upcomingDeviceParam->param.type == REMOTEUI_PARAM_BOOL && (noteOn || noteOff ) ) //piano keys only for bools
+				||
+				slider//slider midi msg for any valid param
+				||
+				isMidiFighterHighRes
+				){
+				string paramN = [upcomingDeviceParam getParamName];
+				bindingsMap[controllerUniqueAddress] = paramN;
+				[midiBindingsTable reloadData];
+				[upcomingDeviceParam stopMidiAnim];
+				upcomingDeviceParam = nil;
+				//[window setTitle:@"ofxRemoteUI"];
+			}
+
+			//save to default bindings
+			NSFileManager * fm = [NSFileManager defaultManager];
+			[fm createDirectoryAtPath:DEFAULT_BINDINGS_FOLDER withIntermediateDirectories:YES attributes:Nil error:nil];
+			NSString * fullPath = [DEFAULT_BINDINGS_FOLDER stringByAppendingString:DEFAULT_BINDINGS_FILE];
+			[self saveDeviceBindingsToFile: [NSURL fileURLWithPath:fullPath]];
+			[midiBindingsTable reloadData];
 		}
 	}
 
 	for(auto & pn : updatedParamsThisLoop){
 		[self updateDevicesWithClientValues:false resetToZero:FALSE paramName:pn];
 	}
-
 }
 
 
@@ -690,5 +698,10 @@ float convertHueToMidiFigtherHue(float hue){
 	}
 }
 
+- (void)dealloc{
+	[midi stop];
+	[midi release];
+	[super dealloc];
+}
 
 @end

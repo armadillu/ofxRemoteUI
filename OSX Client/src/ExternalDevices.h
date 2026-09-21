@@ -7,13 +7,13 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <VVMIDI/VVMIDI.h>
 #import "JoystickNotificationDelegate.h"
 #include "ofxRemoteUIClient.h"
 #import "ParamUI.h"
+#import "RUMidi.h"
 #include "constants.h"
 
-@interface ExternalDevices : NSObject <VVMIDIDelegateProtocol, JoystickNotificationDelegate>{
+@interface ExternalDevices : NSObject <RUMidiDelegate, JoystickNotificationDelegate>{
 
 	IBOutlet NSTableView			*midiBindingsTable;
 	IBOutlet NSButton *				externalButtonsBehaveAsToggleCheckbox;
@@ -21,7 +21,8 @@
 
 
 	//MIDI
-	VVMIDIManager					*midiManager;
+	RUMidi *						midi;
+
 	ParamUI							*upcomingDeviceParam;
 	map<string, string>				bindingsMap; //table of bindings for midi and joystick
 
@@ -42,7 +43,7 @@
 
 }
 
--(void)updateDevicesWithClientValues:(BOOL)onlyColor resetToZero:(BOOL)reset paramName:(string)pName;
+-(void)updateDevicesWithClientValues:(BOOL)onlyColor resetToZero:(BOOL)reset paramName:(const string&)pName;
 -(IBAction)flashBoundControllers:(id)sender; //for n seconds
 
 -(void)initWithWidgets:(unordered_map<string, ParamUI*>*) widgets andClient:(ofxRemoteUIClient*) client;
@@ -62,8 +63,9 @@
 -(void)userClickedOnParamForDeviceBinding:(ParamUI*)param;
 
 //midi delegate
-- (void) setupChanged;
-- (void) receivedMIDI:(NSArray *)a fromNode:(VVMIDINode *)n;
+
+- (void) midiSetupChanged:(RUMidi *)midi;
+- (void) midi:(RUMidi *)midi didReceiveMessage:(RUMidiMessage *)message fromDevice:(RUMidiDevice *)device;
 
 //joystick delegates
 - (void)joystickAdded:(Joystick *)joystick ;
@@ -72,4 +74,5 @@
 
 - (MidiOutCache) cacheForControlURL:(string) url;
 
+- (void) dealloc;
 @end

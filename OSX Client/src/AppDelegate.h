@@ -12,7 +12,6 @@
 #import "MyScrollView.h"
 #import "ColoredNSWindow.h"
 #import "GitCommitNumber.h"
-#import <VVMIDI/VVMIDI.h>
 #import "ExternalDevices.h"
 #import "LogWindows.h"
 
