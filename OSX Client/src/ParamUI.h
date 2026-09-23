@@ -30,7 +30,7 @@
 	IBOutlet NSButton *			groupPresetAddButton;
 	IBOutlet NSButton *			groupPresetDeleteButton;
 
-	int numberID; // to handle alternating rows in table draw
+	int numberID; // to handlestringFromString alternating rows in table draw
 	bool shouldBeFlashing;
 
 	bool deleting; //we are about to dealloc this param!
@@ -44,7 +44,7 @@
 
 -(void)dealloc;
 
--(id)initWithParam: (const RemoteUIParam&)p paramName:(string)name ID:(int)n;
+-(id)initWithParam:(const RemoteUIParam&)p paramName:(const string &)name ID:(int)n rowH:(unsigned char) rowH;
 -(void)updateParam:(const RemoteUIParam &)p;
 -(void)updateUI;
 
@@ -61,8 +61,8 @@
 -(void)hideWarning;
 -(void)disableChanges;
 -(void)enableChanges;
--(void)remapSlider;
--(string)getParamName;
+-(void)remapSlider:(unsigned) rowH;
+-(const string&)getParamName;
 
 -(NSString*)formatedFloat:(float)f withMaxDecimals:(int)numDex;
 

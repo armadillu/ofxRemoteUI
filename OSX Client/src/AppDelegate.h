@@ -19,7 +19,7 @@
 
 #define MEASURE_PERFORMANCE false
 
-enum RowHeightSize{ SMALL_26 = 0, LARGE_34 = 1, TINY_20 = 2};
+enum RowHeightSize : unsigned char { SMALL_26 = 0, LARGE_34 = 1, TINY_20 = 2};
 
 struct LayoutConfig{
 	NSPoint colsRows;
@@ -139,18 +139,18 @@ void clientCallback(RemoteUIClientCallBackArg a);
 -(ExternalDevices*)getExternalDevices;
 
 -(void)connect;
--(void)autoConnectToNeighbor:(string) host port:(int)p;
+-(void)autoConnectToNeighbor:(const string &) host port:(int)p;
 -(void)update;
 
--(void)openLocalPresetFile:(string) file;
+-(void)openLocalPresetFile:(const string &) file;
 
 -(void)fullParamsUpdate;
 -(void)partialParamsUpdate;
--(void)removeParam:(string) paramName;
+-(void)removeParam:(const string &) paramName;
 
 -(void)hideAllWarnings;
 
--(void)userChangedParam:(RemoteUIParam)p paramName:(string)name; //this is a delegate method, items will call this on widgetChange
+-(void)userChangedParam:(const RemoteUIParam &)p paramName:(const string &)name; //this is a delegate method, items will call this on widgetChange
 
 -(void)updateGroupPopup;
 -(void)updatePresetsPopup;
@@ -160,9 +160,9 @@ void clientCallback(RemoteUIClientCallBackArg a);
 
 -(RowHeightSize)getRowHeight;
 
--(vector<string>)getParamsInGroup:(string)group;
--(vector<string>)getAllGroupsInParams;
--(unordered_map<string, ParamUI*>)getAllGroupSpacerParams;
+-(void) getParamsInGroup:(const string &)group result:(vector<string>&)res;
+-(void)getAllGroupsInParams:(vector<string> &) result;
+-(void)getAllGroupSpacerParams:(unordered_map<string, ParamUI*> &) result;
 
 - (void) filesWereDropped:(NSNotification *) notification;
 

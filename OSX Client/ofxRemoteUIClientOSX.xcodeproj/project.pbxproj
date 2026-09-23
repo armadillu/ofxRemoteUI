@@ -164,7 +164,6 @@
 		BBB627D9191C4CFB005F95BF /* offline@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "offline@2x.png"; sourceTree = "<group>"; };
 		BBB627DA191C4CFB005F95BF /* warning.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = warning.png; sourceTree = "<group>"; };
 		BBB627DB191C4CFB005F95BF /* warning@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "warning@2x.png"; sourceTree = "<group>"; };
-		BBB627E2191C4D06005F95BF /* Growl Registration Ticket.growlRegDict */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = "Growl Registration Ticket.growlRegDict"; path = "Resources/Growl Registration Ticket.growlRegDict"; sourceTree = "<group>"; };
 		BBB627E3191C4D06005F95BF /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = icon.icns; path = Resources/icon.icns; sourceTree = "<group>"; };
 		BBB627E6191C4D0C005F95BF /* openAccessibility.scpt */ = {isa = PBXFileReference; lastKnownFileType = file; name = openAccessibility.scpt; path = Resources/openAccessibility.scpt; sourceTree = "<group>"; };
 		BBB627E7191C4D0C005F95BF /* RestartXcodeApp.scptd */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = RestartXcodeApp.scptd; path = Resources/RestartXcodeApp.scptd; sourceTree = "<group>"; };
@@ -272,7 +271,6 @@
 			children = (
 				BB583D402034F98A00FBFAD1 /* PresetIcon.iconset */,
 				BBB627EA191C4D1A005F95BF /* en.lproj */,
-				BBB627E2191C4D06005F95BF /* Growl Registration Ticket.growlRegDict */,
 				BBB627E3191C4D06005F95BF /* icon.icns */,
 				BBB627E6191C4D0C005F95BF /* openAccessibility.scpt */,
 				BBB627E7191C4D0C005F95BF /* RestartXcodeApp.scptd */,
@@ -849,7 +847,7 @@
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				PRODUCT_NAME = ofxRemoteUIClientOSX;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -881,7 +879,7 @@
 				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				PRODUCT_NAME = ofxRemoteUIClientOSX;
 				PROVISIONING_PROFILE_SPECIFIER = "";

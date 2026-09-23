@@ -72,7 +72,7 @@
 - (void)joystickAxisChanged:(Joystick *)joystick atAxisIndex:(int)axis;
 - (void)joystickButton:(int)buttonIndex state:(BOOL)pressed onJoystick:(Joystick*)joystick;
 
-- (MidiOutCache) cacheForControlURL:(string) url;
+- (MidiOutCache) cacheForControlURL:(const string &) url;
 
 - (void) dealloc;
 @end

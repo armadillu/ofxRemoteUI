@@ -1,24 +1,5 @@
 #import "RUMidi.h"
 
-@interface RUMidi ()
-
-- (BOOL)sendBytes:(const UInt8 *)bytes length:(NSUInteger)length toEndpoint:(MIDIEndpointRef)endpoint;
-
-- (BOOL)sendSysExBytes:(const UInt8 *)bytes length:(NSUInteger)length toEndpoint:(MIDIEndpointRef)endpoint;
-
-- (void)connectAllSources;
-- (void)connectSource:(MIDIEndpointRef)source;
-- (void)handlePacketList:(const MIDIPacketList *)list fromSource:(MIDIEndpointRef)source;
-
-- (void)handleSysExBytes:(const UInt8 *)bytes length:(NSUInteger)length source:(MIDIEndpointRef)source;
-
-- (RUMidiDevice *)deviceForSource:(MIDIEndpointRef)source;
-- (void)rebuildDevices;
-
-@end
-
-static void RUMidiNotifyProc(const MIDINotification *, void *);
-static void RUMidiReadProc(const MIDIPacketList *, void *, void *);
 
 typedef struct {
 	UInt8 *bytes;
@@ -34,6 +15,46 @@ static void RUMidiSysExCompleteProc(MIDISysexSendRequest *r) {
 	}
 	free(r);
 }
+
+
+static void RUMidiNotifyProc(const MIDINotification *m, void *ref) {
+	if (!m || !ref)
+		return;
+	RUMidi *x = (RUMidi *)ref;
+	switch (m->messageID) {
+	case kMIDIMsgSetupChanged:
+		[x rebuildDevices];
+		[x connectAllSources];
+		break;
+	case kMIDIMsgObjectAdded: {
+		const MIDIObjectAddRemoveNotification *n =
+				(const MIDIObjectAddRemoveNotification *)m;
+		if (n->childType == kMIDIObjectType_Source)
+			[x connectSource:(MIDIEndpointRef)n->child];
+		else
+			[x rebuildDevices];
+		break;
+	}
+	case kMIDIMsgObjectRemoved:
+		[x rebuildDevices];
+		break;
+	default:
+		break;
+	}
+	id<RUMidiDelegate> d = x.delegate;
+	if (d && [d respondsToSelector:@selector(midiSetupChanged:)])
+		[d midiSetupChanged:x];
+}
+
+
+static void RUMidiReadProc(const MIDIPacketList *l, void *ref, void *ctx) {
+	if (!ref || !l)
+		return;
+	[(RUMidi *)ref handlePacketList:l fromSource:(MIDIEndpointRef)(uintptr_t)ctx];
+}
+
+#pragma mark -
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
 @implementation RUMidi
 @synthesize delegate = _delegate;
@@ -123,8 +144,7 @@ static void RUMidiSysExCompleteProc(MIDISysexSendRequest *r) {
 			continue;
 		CFStringRef r = NULL;
 		NSString *name = nil;
-		if (MIDIObjectGetStringProperty(e, kMIDIPropertyDisplayName, &r) == noErr &&
-				r) {
+		if (MIDIObjectGetStringProperty(e, kMIDIPropertyDisplayName, &r) == noErr && r) {
 			name = [NSString stringWithString:(NSString *)r];
 			CFRelease(r);
 		}
@@ -284,51 +304,13 @@ static void RUMidiSysExCompleteProc(MIDISysexSendRequest *r) {
 
 @end
 
-
-static void RUMidiNotifyProc(const MIDINotification *m, void *ref) {
-	if (!m || !ref)
-		return;
-	RUMidi *x = (RUMidi *)ref;
-	switch (m->messageID) {
-	case kMIDIMsgSetupChanged:
-		[x rebuildDevices];
-		[x connectAllSources];
-		break;
-	case kMIDIMsgObjectAdded: {
-		const MIDIObjectAddRemoveNotification *n =
-				(const MIDIObjectAddRemoveNotification *)m;
-		if (n->childType == kMIDIObjectType_Source)
-			[x connectSource:(MIDIEndpointRef)n->child];
-		else
-			[x rebuildDevices];
-		break;
-	}
-	case kMIDIMsgObjectRemoved:
-		[x rebuildDevices];
-		break;
-	default:
-		break;
-	}
-	id<RUMidiDelegate> d = x.delegate;
-	if (d && [d respondsToSelector:@selector(midiSetupChanged:)])
-		[d midiSetupChanged:x];
-}
-
-
-static void RUMidiReadProc(const MIDIPacketList *l, void *ref, void *ctx) {
-	if (!ref || !l)
-		return;
-	[(RUMidi *)ref handlePacketList:l fromSource:(MIDIEndpointRef)(uintptr_t)ctx];
-}
-
+#pragma mark -
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
 @implementation RUMidiDevice
-
 @synthesize name = _name, endpoint = _endpoint;
 
-- (id)initWithName:(NSString *)name
-					endpoint:(MIDIEndpointRef)e
-							midi:(RUMidi *)m {
+- (id)initWithName:(NSString *)name endpoint:(MIDIEndpointRef)e midi:(RUMidi *)m {
 	if ((self = [super init])) {
 		_name = [name copy];
 		_endpoint = e;
@@ -358,10 +340,7 @@ static void RUMidiReadProc(const MIDIPacketList *l, void *ref, void *ctx) {
 						 status:(RUMidiMessageType)t
 							data1:(UInt8)d1
 							data2:(UInt8)d2 {
-	return [self sendMessage:[RUMidiMessage messageWithType:t
-																									channel:c
-																										data1:d1
-																										data2:d2]];
+	return [self sendMessage:[RUMidiMessage messageWithType:t channel:c data1:d1 data2:d2]];
 }
 
 - (BOOL)sendChannel:(UInt8)c status:(RUMidiMessageType)t data1:(UInt8)d1 {

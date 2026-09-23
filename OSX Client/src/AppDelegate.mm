@@ -22,33 +22,33 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	switch (a.action) {
 
 		case SERVER_CONNECTED:{
-			[me showNotificationWithTitle:@"Connected to Server" description:remoteIP ID:@"ConnectedToServer" priority:-1];
+			//[me showNotificationWithTitle:@"Connected to Server" description:remoteIP ID:@"ConnectedToServer" priority:-1];
 		}break;
 
 		case SERVER_DELETED_PRESET:{
-			[me showNotificationWithTitle:@"Server Deleted Preset OK" description:[NSString stringWithFormat:@"%@ deleted preset named '%s'", remoteIP, a.msg.c_str()] ID:@"ServerDeletedPreset" priority:1];
+			//[me showNotificationWithTitle:@"Server Deleted Preset OK" description:[NSString stringWithFormat:@"%s deleted preset named '%s'", a.host.c_str(), a.msg.c_str()] ID:@"ServerDeletedPreset" priority:1];
 		}break;
 
 		case SERVER_SAVED_PRESET:{
-			[me showNotificationWithTitle:@"Server Saved Preset OK" description:[NSString stringWithFormat:@"%@ saved preset named '%s'", remoteIP, a.msg.c_str()] ID:@"ServerSavedPreset" priority:1];
+			//[me showNotificationWithTitle:@"Server Saved Preset OK" description:[NSString stringWithFormat:@"%s saved preset named '%s'", a.host.c_str(), a.msg.c_str()] ID:@"ServerSavedPreset" priority:1];
 		}break;
 
 		case SERVER_DID_SET_PRESET:{
 			[me hideAllWarnings];
-			[me showNotificationWithTitle:@"Server Did Set Preset OK" description:[NSString stringWithFormat:@"%@ did set preset named '%s'", remoteIP, a.msg.c_str()] ID:@"ServerDidSetPreset" priority:-1];
+			//[me showNotificationWithTitle:@"Server Did Set Preset OK" description:[NSString stringWithFormat:@"%s did set preset named '%s'", a.host.c_str(), a.msg.c_str()] ID:@"ServerDidSetPreset" priority:-1];
 		}break;
 
 		case SERVER_SAVED_GROUP_PRESET:{
-			[me showNotificationWithTitle:@"Server Saved Group Preset OK" description:[NSString stringWithFormat:@"%@ saved group preset named '%s'", remoteIP, a.msg.c_str()] ID:@"ServerSavedPreset" priority:1];
+			//[me showNotificationWithTitle:@"Server Saved Group Preset OK" description:[NSString stringWithFormat:@"%s saved group preset named '%s'", a.host.c_str(), a.msg.c_str()] ID:@"ServerSavedPreset" priority:1];
 		}break;
 
 		case SERVER_DID_SET_GROUP_PRESET:{
 			[me hideAllWarnings];
-			[me showNotificationWithTitle:@"Server Did Set Group Preset OK" description:[NSString stringWithFormat:@"%@ did set group preset named '%s'", remoteIP, a.msg.c_str()] ID:@"ServerDidSetPreset" priority:-1];
+			//[me showNotificationWithTitle:@"Server Did Set Group Preset OK" description:[NSString stringWithFormat:@"%s did set group preset named '%s'", a.host.c_str(), a.msg.c_str()] ID:@"ServerDidSetPreset" priority:-1];
 		}break;
 
 		case SERVER_DELETED_GROUP_PRESET:{
-			[me showNotificationWithTitle:@"Server Deleted Group Preset OK" description:[NSString stringWithFormat:@"%@ deleted group preset named '%s'", remoteIP, a.msg.c_str()] ID:@"ServerDeletedPreset" priority:1];
+			//[me showNotificationWithTitle:@"Server Deleted Group Preset OK" description:[NSString stringWithFormat:@"%s deleted group preset named '%s'", a.host.c_str(), a.msg.c_str()] ID:@"ServerDeletedPreset" priority:1];
 		}break;
 
 		case SERVER_SENT_FULL_PARAMS_UPDATE:{
@@ -93,8 +93,8 @@ void clientCallback(RemoteUIClientCallBackArg a){
 							//NSLog(@"param diff: %s", it.first.c_str());
 							std::stringstream ss;
 							if(me->userPresetSelectionHistory.size() >= 2){
-								string oldPresetName = me->userPresetSelectionHistory[0];
-								string newPresetName = me->userPresetSelectionHistory[1];
+								const string & oldPresetName = me->userPresetSelectionHistory[0];
+								const string & newPresetName = me->userPresetSelectionHistory[1];
 
 								NSMutableAttributedString *mutableAttString = [[NSMutableAttributedString alloc] init] ;
 								[mutableAttString appendAttributedString:[[[NSAttributedString alloc] initWithString: @"\t"  attributes:normalAtts] autorelease]];
@@ -147,7 +147,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 			//NSLog(@"## Callback: SERVER_DISCONNECTED");
 			[me connect];
 			me->client->disconnect();
-			[me showNotificationWithTitle:@"Server Exited, Disconnected!" description:remoteIP ID:@"ServerDisconnected" priority:-1];
+			//[me showNotificationWithTitle:@"Server Exited, Disconnected!" description:remoteIP ID:@"ServerDisconnected" priority:-1];
 			[me updateGroupPopup];
 			[me updatePresetsPopup];
 			[me updateGroupPresetMenus];
@@ -155,17 +155,17 @@ void clientCallback(RemoteUIClientCallBackArg a){
 
 		case SERVER_CONFIRMED_SAVE:{
 			NSString * s = [NSString stringWithFormat:@"%@ - Default XML now holds the current param values", remoteIP];
-			[me showNotificationWithTitle:@"Server Saved OK" description:s ID:@"CurrentParamsSavedToDefaultXML" priority:1];
+			//[me showNotificationWithTitle:@"Server Saved OK" description:s ID:@"CurrentParamsSavedToDefaultXML" priority:1];
 		}break;
 
 		case SERVER_DID_RESET_TO_XML:{
 			NSString * s = [NSString stringWithFormat:@"%@ - Params are reset to Server-Launch XML values", remoteIP];
-			[me showNotificationWithTitle:@"Server Did Reset To XML OK" description:s ID:@"ServerDidResetToXML" priority:0];
+			//[me showNotificationWithTitle:@"Server Did Reset To XML OK" description:s ID:@"ServerDidResetToXML" priority:0];
 		}break;
 
 		case SERVER_DID_RESET_TO_DEFAULTS:{
 			NSString * s = [NSString stringWithFormat:@"%@ - Params are reset to its Share-Time values (Source Code Defaults)", remoteIP];
-			[me showNotificationWithTitle:@"Server Did Reset To Default OK" description:s ID:@"ServerDidResetToDefault" priority:0];
+			//[me showNotificationWithTitle:@"Server Did Reset To Default OK" description:s ID:@"ServerDidResetToDefault" priority:0];
 		}break;
 
 		case SERVER_REPORTS_MISSING_PARAMS_IN_PRESET:{
@@ -249,7 +249,7 @@ void clientCallback(RemoteUIClientCallBackArg a){
 	}
 }
 
--(void)openLocalPresetFile:(string) file{
+-(void)openLocalPresetFile:(const string &) file{
 
 	string valuesToPaste;
 	ofxXmlSettings data;
@@ -590,7 +590,7 @@ NSDate * willResign = nil;
 	for( unordered_map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
 		string key = (*ii).first;
 		ParamUI* t = widgets[key];
-		[t remapSlider];
+		[t remapSlider:rowHeight];
 	}
 }
 
@@ -639,7 +639,7 @@ NSDate * willResign = nil;
 
 			unordered_map<string,ParamUI*>::iterator it = widgets.find(paramName);
 			if ( it == widgets.end() ){	//not found, this is a new param... lets make an UI item for it
-				ParamUI * row = [[ParamUI alloc] initWithParam: p paramName: paramName ID: c];
+				ParamUI * row = [[ParamUI alloc] initWithParam: p paramName: paramName ID: c rowH:(unsigned char)rowHeight];
 				c++;
 				orderedKeys.push_back(paramName);
 				widgets[paramName] = row;
@@ -684,7 +684,7 @@ NSDate * willResign = nil;
 
 }
 
--(void)removeParam:(string) paramName{
+-(void)removeParam:(const string &) paramName{
 	auto it = widgets.find(paramName);
 	if(it != widgets.end()){
 		[it->second release];
@@ -709,7 +709,8 @@ NSDate * willResign = nil;
 
 -(void)adjustScrollView{
 
-	vector<string> paramsInGroup = [self getParamsInGroup:currentGroup];
+	vector<string> paramsInGroup;
+	[self getParamsInGroup:currentGroup result: paramsInGroup];
 	int totalH = ROW_HEIGHT * ((int)paramsInGroup.size() );
 	[listContainer setFrameSize: NSMakeSize( [scroll documentVisibleRect].size.width , totalH)];
 
@@ -722,10 +723,12 @@ NSDate * willResign = nil;
 	float scrollW = [scroll documentVisibleRect].size.width;
 	float scrollH = scroll.frame.size.height;
 
-	vector<string> paramsInGroup = [self getParamsInGroup:currentGroup];
+	vector<string> paramsInGroup;
+	[self getParamsInGroup:currentGroup result:paramsInGroup];
+
 
 	int numParams = (int)paramsInGroup.size();
-	//NSLog(@"numParams: %d", numParams);
+	NSLog(@"numParams: %d", numParams);
 	//NSLog(@"scrollH: %f / %f)", scrollH, (scrollH + 1)/ ROW_HEIGHT);
 	int howManyPerCol = ( (scrollH + 1)/ ROW_HEIGHT );
 	//NSLog(@"howManyPerCol: %d", howManyPerCol);
@@ -778,42 +781,40 @@ NSDate * willResign = nil;
 	return p;
 }
 
--(vector<string>)getParamsInGroup:(string)group{
+-(void) getParamsInGroup:(const string &)group result:(vector<string>&)result{
 
-	if ( group.length() == 0){
-		return orderedKeys;
+	result.clear();
+
+	if (group.length() == 0){
+		result = orderedKeys;
+		return;
 	}
-	vector<string>paramsInGroup;
 
 	int numParams = (int)orderedKeys.size();
-
 	for(int i = 0; i < numParams; i++){
 		string key = orderedKeys[i];
 		ParamUI * item = widgets[key];
 		RemoteUIParam p = item->param;
 		if (p.group == group){
-			paramsInGroup.push_back(key);
+			result.push_back(key);
 		}
 	}
-	return paramsInGroup;
 }
 
 
--(vector<string>)getAllGroupsInParams{
+-(void)getAllGroupsInParams: (vector<string>&) result{
 
-	vector<string> v; //all groups
-
+	result.clear();
 	int numParams = (int)orderedKeys.size();
 
 	for(int i = 0; i < numParams; i++){
 		string key = orderedKeys[i];
 		ParamUI * item = widgets[key];
 		RemoteUIParam p = item->param;
-		if (std::find(v.begin(), v.end(), p.group) == v.end()){
-			v.push_back(p.group);
+		if (std::find(result.begin(), result.end(), p.group) == result.end()){
+			result.push_back(p.group);
 		}
 	}
-	return v;
 }
 
 
@@ -828,7 +829,9 @@ NSDate * willResign = nil;
 	}
 	[self adjustScrollView];
 
-	vector<string> paramsInGroup = [self getParamsInGroup:currentGroup];
+	vector<string> paramsInGroup;
+	[self getParamsInGroup:currentGroup result:paramsInGroup];
+
 	int numParams = (int)paramsInGroup.size();
 
 	int h = 0;
@@ -836,15 +839,15 @@ NSDate * willResign = nil;
 	int colIndex = 0;
 	int maxInACol = 0;
 
-	NSMutableArray * array = [NSMutableArray arrayWithCapacity:10];
-	
-	for(int i = 0; i < numParams; i++){
-		string key = paramsInGroup[i];
-		ParamUI * item = widgets[key];
-		NSRect r = item->ui.frame;
+	NSMutableArray * array = [NSMutableArray arrayWithCapacity:80];
 
-		item->ui.frame = NSMakeRect( colIndex * p.rowW, (numParams - 1) * ROW_HEIGHT - h , p.rowW, r.size.height);
-		h += r.size.height;
+	for(int i = 0; i < numParams; i++){
+		string & key = paramsInGroup[i];
+		ParamUI * item = widgets[key];
+		float itemH = item->ui.frame.size.height;
+
+		item->ui.frame = NSMakeRect( colIndex * p.rowW, (numParams - 1) * ROW_HEIGHT - h , p.rowW, itemH);
+		h += itemH;
 
 		howManyThisCol++;
 		if (howManyThisCol >= p.howManyPerCol ){ // next column
@@ -853,7 +856,7 @@ NSDate * willResign = nil;
 			h = 0;
 		}
 		[item updateUI];
-		[item remapSlider];
+		[item remapSlider:rowHeight];
 		[array addObject:item->ui];
 		//[listContainer addSubview: item->ui];
 		if(howManyThisCol > maxInACol) maxInACol = howManyThisCol;
@@ -1022,7 +1025,10 @@ NSDate * willResign = nil;
 	
 	NSMutableArray *menuItemNameArray = [NSMutableArray arrayWithCapacity:4];
 	[menuItemNameArray addObject: ALL_PARAMS_GROUP ];
-	vector<string> allGroupNames = [self getAllGroupsInParams];
+
+	vector<string> allGroupNames;
+	[self getAllGroupsInParams:allGroupNames];
+
 	if (allGroupNames.size() == 1 ) allGroupNames.clear(); //if only default group found, dont show it
 	for(int i = 0 ; i < allGroupNames.size(); i++){
 		[menuItemNameArray addObject: [NSString stringWithUTF8String: allGroupNames[i].c_str()] ];
@@ -1087,21 +1093,20 @@ NSDate * willResign = nil;
 }
 
 
--(unordered_map<string, ParamUI*>)getAllGroupSpacerParams{
-	unordered_map<string, ParamUI*> groups;
+-(void)getAllGroupSpacerParams:(unordered_map<string, ParamUI*> &) result{
+	result.clear();
 	for(int i = 0; i < orderedKeys.size(); i++){
 		ParamUI* t = widgets[ orderedKeys[i] ];
 		if(t->param.type == REMOTEUI_PARAM_SPACER){
-			groups[t->param.stringVal] = t;
+			result[t->param.stringVal] = t;
 		}
 	}
-	return groups;
 }
 
 
 -(void)updateGroupPresetMenus{
 
-	spacerGroups = [self getAllGroupSpacerParams];
+	[self getAllGroupSpacerParams: spacerGroups];
 
 	//walk all group spacer ParamUIs, empty and add dirty option to its menu
 	for( unordered_map<string,ParamUI*>::iterator ii = spacerGroups.begin(); ii != spacerGroups.end(); ++ii ){
@@ -1175,7 +1180,7 @@ NSDate * willResign = nil;
 }
 
 
--(void) autoConnectToNeighbor:(string)host_ port:(int)port_{
+-(void) autoConnectToNeighbor:(const string &)host_ port:(int)port_{
 	if(autoConnectToggle){
 		string subnet;
 		string localIP = client->getMyIP("", subnet);
@@ -1448,7 +1453,7 @@ bool resizeWindowUpDown = false; //if you keep changing paramUI size, with this 
 
 
 //UI callback, we will get notified with this when user changes something in UI
--(void)userChangedParam:(RemoteUIParam)p paramName:(string)name{
+-(void)userChangedParam:(const RemoteUIParam &)p paramName:(const string &)name{
 	//NSLog(@"usr changed param! %s", name.c_str());
 	if( connectButton.state == 1 ){
 		[presetsMenu selectItemAtIndex:0]; //when user thouches anything, leave the current preset

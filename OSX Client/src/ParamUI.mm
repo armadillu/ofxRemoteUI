@@ -19,7 +19,7 @@ int maxDecimals = 6;
 	//NSLog(@"dealloc: there are %d paramUI objs", numParamUIs);
 }
 
--(id)initWithParam: (const RemoteUIParam&)p paramName:(string)name ID:(int)n{
+-(id)initWithParam: (const RemoteUIParam&)p paramName:(const string &)name ID:(int)n rowH:(RowHeightSize) rowH{
 	//numParamUIs++;
 	//NSLog(@"init: there are %d paramUI objs", numParamUIs);
 	waitingForMidiTimer = nil;
@@ -31,7 +31,6 @@ int maxDecimals = 6;
 	deleting = false;
 	paramName = name;
 	AppDelegate * delegate = (AppDelegate *) [NSApp delegate];
-	RowHeightSize rowH = [delegate getRowHeight];
 	BOOL didLoad = FALSE;
 
 	switch (rowH) {
@@ -278,18 +277,17 @@ int maxDecimals = 6;
 	[widget setEnabled:true];
 }
 
--(string)getParamName{
+-(const string&)getParamName{
 	return paramName;
 }
 
 
--(void)remapSlider;{
+-(void)remapSlider:(RowHeightSize) rowH;{
 	if ([widget isKindOfClass: [NSSlider class]]){
 		NSSlider * s = (NSSlider*)widget;
 		float w = [s frame].size.width;
 		int numTicks = w / 7;
 
-		RowHeightSize rowH = [(AppDelegate *)[NSApp delegate] getRowHeight];
 		if(rowH == LARGE_34){
 			if ([s allowsTickMarkValuesOnly]){ // for int sliders, lets make sure there arent more marks than possible values
 				int range = 1 + [s maxValue] - [s minValue];
@@ -746,7 +744,7 @@ int maxDecimals = 6;
 	}
 }
 
--(NSString*)stringFromString:(string) s{
+-(NSString*)stringFromString:(const string &) s{
 	return  [NSString stringWithCString:s.c_str() encoding:[NSString defaultCStringEncoding]];
 }
 

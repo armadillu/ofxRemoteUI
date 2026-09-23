@@ -200,12 +200,27 @@
     double min = IOHIDElementGetLogicalMin(theElement);
     double max = IOHIDElementGetLogicalMax(theElement);
 
-	//NSLog(@"%f %f", min, max);
+	//FALLBACK: If logical range is zero, try Physical bounds
+	if (fabs(min) < 0.001 && fabs(max) < 0.001) {
+		min = (double)IOHIDElementGetPhysicalMin(theElement);
+		max = (double)IOHIDElementGetPhysicalMax(theElement);
+	 }
+
+	if (fabs(min) < 0.001 && fabs(max) < 0.001) {
+		min = 0.0;
+		max = 255.0;
+	}
+
+	// Safety check to completely prevent division by zero / infinity
+	if (max <= min) {
+		return 0.5; // Return center default
+	}
     IOHIDValueRef pValue;
     IOHIDDeviceGetValue(device, theElement, &pValue);
-    
-    value = ((double)IOHIDValueGetIntegerValue(pValue)-min) * (1/(max-min));
-    
+	double rawIntVal = IOHIDValueGetIntegerValue(pValue);
+	//NSLog(@"%f %f", min, max);
+    value = ((double)rawIntVal - min) * (1/(max-min));
+
     return value;
 }
 

@@ -215,7 +215,7 @@ float convertHueToMidiFigtherHue(float hue){
 	}
 }
 
-- (MidiOutCache) cacheForControlURL:(string) devNameAndAddress{
+- (MidiOutCache) cacheForControlURL:(const string &) devNameAndAddress{
 
 	MidiOutCache midiOutConfig;
 	map<string,MidiOutCache>::iterator cacheIt = midiDevCache.find(devNameAndAddress);
@@ -271,8 +271,6 @@ float convertHueToMidiFigtherHue(float hue){
 					ParamUI * item = widgets->at(paramName);
 					[item flashBackground:[NSNumber numberWithInt:NUM_BOUND_FLASH]];
 
-					RemoteUIParam p = client->getParamForName(paramName);
-					
 					static UInt8 msgBytes[6];
 
 					msgBytes[0]=0xB0;
@@ -428,9 +426,9 @@ float convertHueToMidiFigtherHue(float hue){
 				||
 				isMidiFighterHighRes
 				){
-				string paramN = [upcomingDeviceParam getParamName];
+				const string & paramN = [upcomingDeviceParam getParamName];
 				bindingsMap[controllerUniqueAddress] = paramN;
-				[midiBindingsTable reloadData];
+				[midiBindingsTable performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
 				[upcomingDeviceParam stopMidiAnim];
 				upcomingDeviceParam = nil;
 				//[window setTitle:@"ofxRemoteUI"];
@@ -441,7 +439,7 @@ float convertHueToMidiFigtherHue(float hue){
 			[fm createDirectoryAtPath:DEFAULT_BINDINGS_FOLDER withIntermediateDirectories:YES attributes:Nil error:nil];
 			NSString * fullPath = [DEFAULT_BINDINGS_FOLDER stringByAppendingString:DEFAULT_BINDINGS_FILE];
 			[self saveDeviceBindingsToFile: [NSURL fileURLWithPath:fullPath]];
-			[midiBindingsTable reloadData];
+			[midiBindingsTable performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
 		}
 	}
 
@@ -596,7 +594,7 @@ float convertHueToMidiFigtherHue(float hue){
 		if ( ii != bindingsMap.end() ){ //found a param linked to that controller
 
 			float value = [joystick getRelativeValueOfAxesIndex:axisIndex];
-			string paramName = bindingsMap[controllerAddress];
+			const string & paramName = bindingsMap[controllerAddress];
 			unordered_map<string,ParamUI*>::iterator it = widgets->find(paramName);
 			if ( it == widgets->end() ){	//not found! wtf?
 				NSLog(@"uh? joystick binding pointing to an unexisting param!");
@@ -640,9 +638,10 @@ float convertHueToMidiFigtherHue(float hue){
 			float value = [joystick getRelativeValueOfAxesIndex:axisIndex];
 
 			if(value > 0.9 || value < 0.1){ //only accept values where the user is really pushing
-				string paramN = [upcomingDeviceParam getParamName];
+				const string & paramN = [upcomingDeviceParam getParamName];
 				bindingsMap[controllerAddress] = paramN;
-				[midiBindingsTable reloadData];
+				//[midiBindingsTable reloadData];
+				[midiBindingsTable performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
 				[upcomingDeviceParam stopMidiAnim];
 				upcomingDeviceParam = nil;
 				//[window setTitle:@"ofxRemoteUI"];
@@ -663,7 +662,7 @@ float convertHueToMidiFigtherHue(float hue){
 		map<string,string>::iterator ii = bindingsMap.find(controllerAddress);
 		if ( ii != bindingsMap.end() ){ //found a param linked to that controller
 
-			string paramName = bindingsMap[controllerAddress];
+			const string & paramName = bindingsMap[controllerAddress];
 			unordered_map<string,ParamUI*>::iterator it = widgets->find(paramName);
 			if ( it == widgets->end() ){	//not found! wtf?
 				NSLog(@"uh? joystick binding pointing to an unexisting param!");
@@ -688,9 +687,10 @@ float convertHueToMidiFigtherHue(float hue){
 
 	}else{
 		if (upcomingDeviceParam->param.type == REMOTEUI_PARAM_BOOL){
-			string paramN = [upcomingDeviceParam getParamName];
+			const string & paramN = [upcomingDeviceParam getParamName];
 			bindingsMap[controllerAddress] = paramN;
-			[midiBindingsTable reloadData];
+			//[midiBindingsTable reloadData];
+			[midiBindingsTable performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
 			[upcomingDeviceParam stopMidiAnim];
 			upcomingDeviceParam = nil;
 			//[window setTitle:@"ofxRemoteUI"];

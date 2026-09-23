@@ -3,11 +3,46 @@
 #import <Foundation/Foundation.h>
 
 @class RUMidi, RUMidiDevice;
+
 @protocol RUMidiDelegate <NSObject>
 @optional
 - (void)midi:(RUMidi *)midi didReceiveMessage:(RUMidiMessage *)message fromDevice:(RUMidiDevice *)device;
 - (void)midiSetupChanged:(RUMidi *)midi;
 @end
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+@interface RUMidi : NSObject {
+	MIDIClientRef _client;
+	MIDIPortRef _inputPort;
+	MIDIPortRef _outputPort;
+	NSMutableArray *_devices;
+	NSMutableDictionary *_devicesByEndpoint;
+	NSMutableDictionary *_sysexBuffers;
+	id<RUMidiDelegate> _delegate;
+}
+
+- (BOOL)sendBytes:(const UInt8 *)bytes length:(NSUInteger)length toEndpoint:(MIDIEndpointRef)endpoint;
+- (BOOL)sendSysExBytes:(const UInt8 *)bytes length:(NSUInteger)length toEndpoint:(MIDIEndpointRef)endpoint;
+
+- (void)connectAllSources;
+- (void)connectSource:(MIDIEndpointRef)source;
+
+- (void)handlePacketList:(const MIDIPacketList *)list fromSource:(MIDIEndpointRef)source;
+- (void)handleSysExBytes:(const UInt8 *)bytes length:(NSUInteger)length source:(MIDIEndpointRef)source;
+- (RUMidiDevice *)deviceForSource:(MIDIEndpointRef)source;
+
+- (void)rebuildDevices;
+
+
+@property(nonatomic, assign) id<RUMidiDelegate> delegate;
+- (BOOL)start;
+- (void)stop;
+- (NSArray *)devices;
+- (RUMidiDevice *)deviceNamed:(NSString *)name;
+@end
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
 @interface RUMidiDevice : NSObject {
 	NSString *_name;
@@ -28,20 +63,3 @@
 			  data1:(UInt8)data1;
 @end
 
-
-@interface RUMidi : NSObject {
-	MIDIClientRef _client;
-	MIDIPortRef _inputPort;
-	MIDIPortRef _outputPort;
-	NSMutableArray *_devices;
-	NSMutableDictionary *_devicesByEndpoint;
-	NSMutableDictionary *_sysexBuffers;
-	id<RUMidiDelegate> _delegate;
-}
-
-@property(nonatomic, assign) id<RUMidiDelegate> delegate;
-- (BOOL)start;
-- (void)stop;
-- (NSArray *)devices;
-- (RUMidiDevice *)deviceNamed:(NSString *)name;
-@end
