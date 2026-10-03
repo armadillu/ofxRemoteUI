@@ -355,6 +355,8 @@ int maxDecimals = 6;
 	[paramLabel setTarget:self];
 	[paramLabel setBezelStyle:NSShadowlessSquareBezelStyle];
 
+	CFAbsoluteTime t_pu = CFAbsoluteTimeGetCurrent();
+
 	switch (param.type) {
 		case REMOTEUI_PARAM_FLOAT:
 			widget = slider;
@@ -506,17 +508,22 @@ int maxDecimals = 6;
 		}
 	}
 
+
 	//dont let labels with long text exit the param view (ie crop to size)
 	//[paramLabel sizeToFit];
+	//[[paramLabel cell] setAlignment:NSTextAlignmentLeft];
 	NSSize predictedSize = [[paramLabel cell] cellSize];
-	NSRect r = [paramLabel frame];
+	//NSRect r = [paramLabel frame];
 	float maxW = [[paramLabel superview] bounds].size.width;
-	float xx = predictedSize.width + r.origin.x;
+	//float xx = predictedSize.width + r.origin.x;
 	float margin = 7;
 	if (predictedSize.width > maxW - margin){
 		predictedSize.width = maxW - margin;
 	}
 	[paramLabel setFrameSize:predictedSize];
+	#if MEASURE_PERFORMANCE
+	NSLog(@"PERF ParamUI label sizing: %.3f ms", (CFAbsoluteTimeGetCurrent()-t_pu)*1000.0);
+	#endif
 
 	[widget setTarget:self];
 }

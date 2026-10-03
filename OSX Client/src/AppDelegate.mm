@@ -573,6 +573,9 @@ NSDate * willResign = nil;
 
 
 - (void)windowResized:(NSNotification *)notification;{
+	#if MEASURE_PERFORMANCE
+	CFAbsoluteTime t_wr = CFAbsoluteTimeGetCurrent();
+	#endif
 
 	LayoutConfig p = [self calcLayoutParams];
 
@@ -592,6 +595,9 @@ NSDate * willResign = nil;
 		ParamUI* t = widgets[key];
 		[t remapSlider:rowHeight];
 	}
+		#if MEASURE_PERFORMANCE
+	NSLog(@"PERF windowResized: %.3f ms", (CFAbsoluteTimeGetCurrent()-t_wr)*1000.0);
+		#endif
 }
 
 -(IBAction)pasteSpecial:(id)sender{
@@ -708,16 +714,25 @@ NSDate * willResign = nil;
 
 
 -(void)adjustScrollView{
+	#if MEASURE_PERFORMANCE
+	CFAbsoluteTime t_as = CFAbsoluteTimeGetCurrent();
+	#endif
 
 	vector<string> paramsInGroup;
 	[self getParamsInGroup:currentGroup result: paramsInGroup];
 	int totalH = ROW_HEIGHT * ((int)paramsInGroup.size() );
 	[listContainer setFrameSize: NSMakeSize( [scroll documentVisibleRect].size.width , totalH)];
 
+	#if MEASURE_PERFORMANCE
+	NSLog(@"PERF adjustScrollView: %.3f ms", (CFAbsoluteTimeGetCurrent()-t_as)*1000.0);
+	#endif
 }
 
 
 -(LayoutConfig)calcLayoutParams{
+	#if MEASURE_PERFORMANCE
+	CFAbsoluteTime t_calc = CFAbsoluteTimeGetCurrent();
+	#endif
 
 	LayoutConfig p;
 	float scrollW = [scroll documentVisibleRect].size.width;
@@ -778,6 +793,9 @@ NSDate * willResign = nil;
 //	NSLog(@"#######################");
 //	NSLog(@" ");
 
+	#if MEASURE_PERFORMANCE
+	NSLog(@"PERF calcLayoutParams: %.3f ms", (CFAbsoluteTimeGetCurrent()-t_calc)*1000.0);
+	#endif
 	return p;
 }
 
@@ -819,28 +837,22 @@ NSDate * willResign = nil;
 
 
 -(void)layoutWidgetsWithConfig:(LayoutConfig) p{
+	#if MEASURE_PERFORMANCE
+	CFAbsoluteTime t_lw = CFAbsoluteTimeGetCurrent();
+	#endif
 
-	//NSDisableScreenUpdates();
-	//remove all views, start over
-	//NSDate * time1 = [NSDate date];
+	vector<string> paramsInGroup;
+	[self getParamsInGroup:currentGroup result:paramsInGroup];
+	int numParams = (int)paramsInGroup.size();
+	NSDisableScreenUpdates();
 	NSArray * subviews = [listContainer subviews];
-	for( int i = (int)[subviews count] - 1 ; i >= 0 ; i-- ){
+	for (int i = (int)[subviews count] - 1; i >= 0; i--) {
 		[[subviews objectAtIndex:i] removeFromSuperview];
 	}
 	[self adjustScrollView];
 
-	vector<string> paramsInGroup;
-	[self getParamsInGroup:currentGroup result:paramsInGroup];
-
-	int numParams = (int)paramsInGroup.size();
-
-	int h = 0;
-	int howManyThisCol = 0;
-	int colIndex = 0;
-	int maxInACol = 0;
-
 	NSMutableArray * array = [NSMutableArray arrayWithCapacity:80];
-
+	int h = 0, howManyThisCol = 0, colIndex = 0, maxInACol = 0;
 	for(int i = 0; i < numParams; i++){
 		string & key = paramsInGroup[i];
 		ParamUI * item = widgets[key];
@@ -876,9 +888,11 @@ NSDate * willResign = nil;
 
 	//float interval = [time1 timeIntervalSinceDate:[NSDate date]];
 	//NSLog(@"interval: %f ms", -interval * 1000);
-	
+	NSEnableScreenUpdates();
+	#if MEASURE_PERFORMANCE
+	NSLog(@"PERF layoutWidgetsWithConfig (rebuild %d): %.3f ms", numParams, (CFAbsoluteTimeGetCurrent()-t_lw)*1000.0);
+	#endif
 }
-
 
 -(void)disableAllWidgets{
 	for( unordered_map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
