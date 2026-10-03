@@ -41,6 +41,12 @@
 	bool needsUIUpdate;
 	bool needsRemapSlider;
 
+	// cached formatter for float values
+	NSNumberFormatter *	_floatFormatter;
+
+	// cached color string for color well optimization
+	NSString *		_lastColorString;
+
 	//for that group
 	string currentPreset;
 }

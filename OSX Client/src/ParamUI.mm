@@ -1,4 +1,3 @@
-
 #import "ParamUI.h"
 #include "ofxRemoteUI.h"
 #include "AppDelegate.h"
@@ -7,21 +6,44 @@
 //int numParamUIs = 0;
 int maxDecimals = 6;
 
+// Shared layer actions dictionary (configured once per row height)
+static NSMutableDictionary *sharedLayerActions34 = nil;
+static NSMutableDictionary *sharedLayerActions26 = nil;
+static NSMutableDictionary *sharedLayerActions20 = nil;
+
+static NSMutableDictionary *sharedLayerActionsForRowHeight(RowHeightSize rowH) {
+    NSMutableDictionary **actionsPtr = nil;
+    switch (rowH) {
+        case LARGE_34: actionsPtr = &sharedLayerActions34; break;
+        case SMALL_26: actionsPtr = &sharedLayerActions26; break;
+        case TINY_20: actionsPtr = &sharedLayerActions20; break;
+    }
+    if (*actionsPtr) return *actionsPtr;
+    
+    *actionsPtr = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                   [NSNull null], kCAOnOrderIn,
+                   [NSNull null], kCAOnOrderOut,
+                   [NSNull null], @"sublayers",
+                   [NSNull null], @"contents",
+                   [NSNull null], @"bounds",
+                   nil];
+    return *actionsPtr;
+}
+
 @implementation ParamUI
 
--(void)dealloc{
+- (void)dealloc{
 	deleting = true;
 	[widget setTarget:nil];
 	[ui removeFromSuperviewWithoutNeedingDisplay];
 	[ui release];
+	[_floatFormatter release];
 	[super dealloc];
 	//numParamUIs--;
 	//NSLog(@"dealloc: there are %d paramUI objs", numParamUIs);
 }
 
--(id)initWithParam: (const RemoteUIParam&)p paramName:(const string &)name ID:(int)n rowH:(RowHeightSize) rowH{
-	//numParamUIs++;
-	//NSLog(@"init: there are %d paramUI objs", numParamUIs);
+- (id)initWithParam: (const RemoteUIParam&)p paramName:(const string &)name ID:(int)n rowH:(RowHeightSize) rowH{
 	waitingForMidiTimer = nil;
 	midiHighlightAnim = false;
 	self = [super init];
@@ -32,6 +54,8 @@ int maxDecimals = 6;
 	paramName = name;
 	needsUIUpdate = YES;
 	needsRemapSlider = YES;
+	_floatFormatter = nil;
+	_lastColorString = nil;
 	BOOL didLoad = FALSE;
 
 	switch (rowH) {
@@ -45,32 +69,22 @@ int maxDecimals = 6;
 		return nil;
 	}
 
-	[ui setWantsLayer:YES];
-	CALayer *viewLayer = [CALayer layer];
-	[ui setLayer:viewLayer];
-	[viewLayer setOpaque:NO];
-
-	[paramLabel setButtonType:NSButtonTypeMomentaryChange];
-
-
+	// Use shared layer actions (configured once per row height)
+	NSMutableDictionary *sharedActions = sharedLayerActionsForRowHeight(rowH);
+	[ui.layer setActions:sharedActions];
+	[paramLabel.layer setActions:sharedActions];
+	[warningSign.layer setActions:sharedActions];
+	
+	// Configure warning sign image
 	CALayer * l = [CALayer layer];
 	[l setContents: (id)[[NSImage imageNamed:@"warning@2x"] CGImageForProposedRect:Nil context:[NSGraphicsContext currentContext] hints:nil]];
 	[warningSign setLayer:l];
 	[warningSign setWantsLayer:YES];
 	[warningSign layer].opacity = 0.0f;
-
-	//disable implicit caAnims
-	NSMutableDictionary *newActions = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-									   [NSNull null], kCAOnOrderIn,
-									   [NSNull null], kCAOnOrderOut,
-									   [NSNull null], @"sublayers",
-									   [NSNull null], @"contents",
-									   [NSNull null], @"bounds",
-									   nil];
-	viewLayer.actions = newActions;
-	l.actions = newActions;
-	[paramLabel layer].actions = newActions;
-	[newActions release];
+	[warningSign layer].actions = sharedActions;
+	
+	[paramLabel setButtonType:NSButtonTypeMomentaryChange];
+	
 	return self;
 }
 
@@ -196,7 +210,6 @@ int maxDecimals = 6;
 	}];
 	[CATransaction commit];
 }
-
 
 -(void)flashDiff:(NSNumber *) times{
 
@@ -624,12 +637,14 @@ int maxDecimals = 6;
 			break;
 
 		case REMOTEUI_PARAM_COLOR:{
-			NSColor * col = [NSColor colorWithSRGBRed:param.redVal/255.0f green:param.greenVal/255.0f blue:param.blueVal/255.0f alpha:param.alphaVal/255.0f];
-			//col = [col colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
-			//CGFloat comp[] = {param.redVal/255., param.greenVal/255., param.blueVal/255., param.alphaVal/255. };
-			//NSColor * col = [NSColor colorWithColorSpace:[NSColorSpace sRGBColorSpace] components:comp count:4];
-			col = [col colorUsingColorSpaceName:NSDeviceRGBColorSpace device:[[NSApp mainWindow] deviceDescription]];
-			[colorWell setColor:col];
+			// Create a color string for comparison to avoid unnecessary NSColor creation
+			NSString *colorString = [NSString stringWithFormat:@"%d,%d,%d,%d", param.redVal, param.greenVal, param.blueVal, param.alphaVal];
+			if (![_lastColorString isEqualToString:colorString]) {
+				_lastColorString = colorString;
+				NSColor * col = [NSColor colorWithSRGBRed:param.redVal/255.0f green:param.greenVal/255.0f blue:param.blueVal/255.0f alpha:param.alphaVal/255.0f];
+				col = [col colorUsingColorSpaceName:NSDeviceRGBColorSpace device:[[NSApp mainWindow] deviceDescription]];
+				[colorWell setColor:col];
+			}
 			}break;
 
 		case REMOTEUI_PARAM_ENUM:{
@@ -648,10 +663,11 @@ int maxDecimals = 6;
 
 		case REMOTEUI_PARAM_STRING:
 			[textView setStringValue: [self stringFromString: param.stringVal]];
-			//[textView setStringValue: [NSString stringWithFormat:@"%@", [NSDate date]]];
 			break;
+
 		case REMOTEUI_PARAM_SPACER:
 			break;
+
 		default:
 			NSLog(@"updateUI wtf");
 			break;
@@ -682,16 +698,16 @@ int maxDecimals = 6;
 
 -(NSString*)formatedFloat:(float)f withMaxDecimals:(int)numDex;{
 	NSNumber *num = [NSNumber numberWithFloat:f];
-	NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
-	[formatter setUsesGroupingSeparator:NO];
-	[formatter setDecimalSeparator:@"."];
-	[formatter setMinimumIntegerDigits:1];
-	[formatter setGroupingSeparator:@"."];
-	[formatter setMaximumFractionDigits:numDex];
-	[formatter setAlwaysShowsDecimalSeparator:NO];
-	NSString *formattedNumber = [formatter stringFromNumber:num];
-	[formatter release];
-	return formattedNumber;
+	if (!_floatFormatter) {
+		_floatFormatter = [[NSNumberFormatter alloc] init];
+		[_floatFormatter setUsesGroupingSeparator:NO];
+		[_floatFormatter setDecimalSeparator:@"."];
+		[_floatFormatter setMinimumIntegerDigits:1];
+		[_floatFormatter setGroupingSeparator:@"."];
+		[_floatFormatter setAlwaysShowsDecimalSeparator:NO];
+	}
+	[_floatFormatter setMaximumFractionDigits:numDex];
+	return [_floatFormatter stringFromNumber:num];
 }
 
 -(IBAction)updateIntManually:(id)sender{
