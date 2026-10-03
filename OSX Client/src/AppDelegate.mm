@@ -837,22 +837,28 @@ NSDate * willResign = nil;
 
 
 -(void)layoutWidgetsWithConfig:(LayoutConfig) p{
+
 	#if MEASURE_PERFORMANCE
 	CFAbsoluteTime t_lw = CFAbsoluteTimeGetCurrent();
 	#endif
 
-	vector<string> paramsInGroup;
-	[self getParamsInGroup:currentGroup result:paramsInGroup];
-	int numParams = (int)paramsInGroup.size();
-	NSDisableScreenUpdates();
-	NSArray * subviews = [listContainer subviews];
-	for (int i = (int)[subviews count] - 1; i >= 0; i--) {
-		[[subviews objectAtIndex:i] removeFromSuperview];
-	}
+	//NSDisableScreenUpdates();
+	//reuse existing subviews instead of deleting and recreating them
+	//NSDate * time1 = [NSDate date];
 	[self adjustScrollView];
 
-	NSMutableArray * array = [NSMutableArray arrayWithCapacity:80];
-	int h = 0, howManyThisCol = 0, colIndex = 0, maxInACol = 0;
+	vector<string> paramsInGroup;
+	[self getParamsInGroup:currentGroup result:paramsInGroup];
+
+	int numParams = (int)paramsInGroup.size();
+
+	int h = 0;
+	int howManyThisCol = 0;
+	int colIndex = 0;
+	int maxInACol = 0;
+
+	NSMutableArray * paramsArray = [NSMutableArray arrayWithCapacity:80];
+
 	for(int i = 0; i < numParams; i++){
 		string & key = paramsInGroup[i];
 		ParamUI * item = widgets[key];
@@ -869,13 +875,32 @@ NSDate * willResign = nil;
 		}
 		[item updateUI];
 		[item remapSlider:rowHeight];
-		[array addObject:item->ui];
+		[paramsArray addObject:item->ui];
 		//[listContainer addSubview: item->ui];
 		if(howManyThisCol > maxInACol) maxInACol = howManyThisCol;
 	}
 
-	[listContainer setSubviews:array];
-
+	//reuse existing subviews: remove extras first, then add missing
+	NSArray * current = [listContainer subviews];
+	UInt16 numRemoved = 0;
+	for(int i = (int)[current count] - 1; i >= 0; i--){
+		NSView * v = [current objectAtIndex:i];
+		BOOL stillNeeded = NO;
+		for(int j = 0; j < [paramsArray count]; j++){
+			if([paramsArray objectAtIndex:j] == v){ stillNeeded = YES; break; }
+		}
+		if(!stillNeeded){
+			numRemoved ++;
+			[v removeFromSuperview];
+		}
+	}
+	//NSLog(@"numRemoved: %d", numRemoved);
+	for(int i = 0; i < [paramsArray count]; i++){
+		NSView * v = [paramsArray objectAtIndex:i];
+		if([v superview] != listContainer){
+			[listContainer addSubview:v];
+		}
+	}
 	int off = ((int)[scroll.contentView frame].size.height + 1) % ((int)(ROW_HEIGHT));
 
 	lastLayout = p;
@@ -888,11 +913,12 @@ NSDate * willResign = nil;
 
 	//float interval = [time1 timeIntervalSinceDate:[NSDate date]];
 	//NSLog(@"interval: %f ms", -interval * 1000);
-	NSEnableScreenUpdates();
+
 	#if MEASURE_PERFORMANCE
 	NSLog(@"PERF layoutWidgetsWithConfig (rebuild %d): %.3f ms", numParams, (CFAbsoluteTimeGetCurrent()-t_lw)*1000.0);
 	#endif
 }
+
 
 -(void)disableAllWidgets{
 	for( unordered_map<string,ParamUI*>::iterator ii = widgets.begin(); ii != widgets.end(); ++ii ){
