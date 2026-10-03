@@ -30,16 +30,14 @@ int maxDecimals = 6;
 	param = p;
 	deleting = false;
 	paramName = name;
-	AppDelegate * delegate = (AppDelegate *) [NSApp delegate];
+	needsUIUpdate = YES;
+	needsRemapSlider = YES;
 	BOOL didLoad = FALSE;
 
 	switch (rowH) {
-		case LARGE_34: didLoad = [NSBundle loadNibNamed:@"View34" owner:self];
-			break;
-		case SMALL_26: didLoad = [NSBundle loadNibNamed:@"View26" owner:self];
-			break;
-		case TINY_20: didLoad = [NSBundle loadNibNamed:@"View20" owner:self];
-			break;
+		case LARGE_34: didLoad = [NSBundle loadNibNamed:@"View34" owner:self]; break;
+		case SMALL_26: didLoad = [NSBundle loadNibNamed:@"View26" owner:self]; break;
+		case TINY_20: didLoad = [NSBundle loadNibNamed:@"View20" owner:self]; break;
 	}
 
 	if(!didLoad){
@@ -530,7 +528,13 @@ int maxDecimals = 6;
 
 
 -(void)updateParam:(const RemoteUIParam &)p;{
-	param = p;
+	if (!param.isEqualTo(p)) {
+		param = p;
+		needsUIUpdate = YES;
+		if (p.type == REMOTEUI_PARAM_FLOAT || p.type == REMOTEUI_PARAM_INT) {
+			needsRemapSlider = YES;
+		}
+	}
 }
 
 

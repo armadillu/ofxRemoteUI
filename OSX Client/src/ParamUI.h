@@ -29,7 +29,6 @@
 	IBOutlet NSPopUpButton *	groupPresetMenu;
 	IBOutlet NSButton *			groupPresetAddButton;
 	IBOutlet NSButton *			groupPresetDeleteButton;
-
 	int numberID; // to handlestringFromString alternating rows in table draw
 	bool shouldBeFlashing;
 
@@ -37,6 +36,10 @@
 	//midi
 	bool midiHighlightAnim;
 	NSTimer * waitingForMidiTimer;
+
+	// dirty flags for layout optimization
+	bool needsUIUpdate;
+	bool needsRemapSlider;
 
 	//for that group
 	string currentPreset;

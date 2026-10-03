@@ -8,7 +8,7 @@
 
 #import "ParamUI.h"
 #import "AppDelegate.h"
-#import "NSColorStringExtension.h"
+#import <QuartzCore/QuartzCore.h>
 #include "ofxXmlSettings.h"
 
 //ofxRemoteUIClient callback entry point
@@ -840,11 +840,9 @@ NSDate * willResign = nil;
 
 	#if MEASURE_PERFORMANCE
 	CFAbsoluteTime t_lw = CFAbsoluteTimeGetCurrent();
+	CFAbsoluteTime t_frame = 0, t_ui = 0, t_diff = 0;
 	#endif
 
-	//NSDisableScreenUpdates();
-	//reuse existing subviews instead of deleting and recreating them
-	//NSDate * time1 = [NSDate date];
 	[self adjustScrollView];
 
 	vector<string> paramsInGroup;
@@ -857,7 +855,16 @@ NSDate * willResign = nil;
 	int colIndex = 0;
 	int maxInACol = 0;
 
-	NSMutableArray * paramsArray = [NSMutableArray arrayWithCapacity:80];
+	NSMutableArray * paramsArray = [NSMutableArray arrayWithCapacity:numParams];
+
+	// --- Frame computation phase (batched) ---
+	#if MEASURE_PERFORMANCE
+	t_frame = CFAbsoluteTimeGetCurrent();
+	#endif
+	[CATransaction begin];
+	[CATransaction setDisableActions:YES];
+	[listContainer setPostsFrameChangedNotifications:NO];
+	[listContainer setPostsBoundsChangedNotifications:NO];
 
 	for(int i = 0; i < numParams; i++){
 		string & key = paramsInGroup[i];
@@ -873,49 +880,66 @@ NSDate * willResign = nil;
 			howManyThisCol = 0;
 			h = 0;
 		}
-		[item updateUI];
-		[item remapSlider:rowHeight];
 		[paramsArray addObject:item->ui];
-		//[listContainer addSubview: item->ui];
 		if(howManyThisCol > maxInACol) maxInACol = howManyThisCol;
 	}
 
-	//reuse existing subviews: remove extras first, then add missing
-	NSArray * current = [listContainer subviews];
-	UInt16 numRemoved = 0;
-	for(int i = (int)[current count] - 1; i >= 0; i--){
-		NSView * v = [current objectAtIndex:i];
-		BOOL stillNeeded = NO;
-		for(int j = 0; j < [paramsArray count]; j++){
-			if([paramsArray objectAtIndex:j] == v){ stillNeeded = YES; break; }
+	[listContainer setPostsFrameChangedNotifications:YES];
+	[listContainer setPostsBoundsChangedNotifications:YES];
+	[CATransaction commit];
+	#if MEASURE_PERFORMANCE
+	NSLog(@"PERF layoutWidgetsWithConfig frameSetting (%d): %.3f ms", numParams, (CFAbsoluteTimeGetCurrent()-t_frame)*1000.0);
+	#endif
+
+	// --- UI update phase (conditional on dirty flags) ---
+	#if MEASURE_PERFORMANCE
+	t_ui = CFAbsoluteTimeGetCurrent();
+	#endif
+	for(int i = 0; i < numParams; i++){
+		string & key = paramsInGroup[i];
+		ParamUI * item = widgets[key];
+		if (item->needsUIUpdate) {
+			[item updateUI];
+			item->needsUIUpdate = NO;
 		}
-		if(!stillNeeded){
-			numRemoved ++;
+		if (item->needsRemapSlider) {
+			[item remapSlider:rowHeight];
+			item->needsRemapSlider = NO;
+		}
+	}
+	#if MEASURE_PERFORMANCE
+	NSLog(@"PERF layoutWidgetsWithConfig updateUI (%d): %.3f ms", numParams, (CFAbsoluteTimeGetCurrent()-t_ui)*1000.0);
+	#endif
+
+	// --- Subview diff phase (O(n) using set) ---
+	#if MEASURE_PERFORMANCE
+	t_diff = CFAbsoluteTimeGetCurrent();
+	#endif
+	NSMutableSet *neededViews = [NSMutableSet setWithArray:paramsArray];
+	NSArray *current = [listContainer subviews];
+	for (NSView *v in current) {
+		if (![neededViews containsObject:v]) {
 			[v removeFromSuperview];
 		}
 	}
-	//NSLog(@"numRemoved: %d", numRemoved);
-	for(int i = 0; i < [paramsArray count]; i++){
-		NSView * v = [paramsArray objectAtIndex:i];
-		if([v superview] != listContainer){
+	for (NSView *v in paramsArray) {
+		if ([v superview] != listContainer) {
 			[listContainer addSubview:v];
 		}
 	}
+	#if MEASURE_PERFORMANCE
+	NSLog(@"PERF layoutWidgetsWithConfig subviewDiff (%d): %.3f ms", numParams, (CFAbsoluteTimeGetCurrent()-t_diff)*1000.0);
+	#endif
+
 	int off = ((int)[scroll.contentView frame].size.height + 1) % ((int)(ROW_HEIGHT));
 
 	lastLayout = p;
 	int totalCols = p.maxPerCol;
 	if (totalCols < p.howManyPerCol) totalCols = p.howManyPerCol;
-	//NSLog(@"colIndex %d", colIndex);
-	//NSLog(@"totalCols %d", totalCols);
 	[listContainer setFrameSize: NSMakeSize( listContainer.frame.size.width, totalCols * ROW_HEIGHT + off - 1) ];
-	//NSEnableScreenUpdates();
-
-	//float interval = [time1 timeIntervalSinceDate:[NSDate date]];
-	//NSLog(@"interval: %f ms", -interval * 1000);
 
 	#if MEASURE_PERFORMANCE
-	NSLog(@"PERF layoutWidgetsWithConfig (rebuild %d): %.3f ms", numParams, (CFAbsoluteTimeGetCurrent()-t_lw)*1000.0);
+	NSLog(@"PERF layoutWidgetsWithConfig TOTAL (rebuild %d): %.3f ms", numParams, (CFAbsoluteTimeGetCurrent()-t_lw)*1000.0);
 	#endif
 }
 
