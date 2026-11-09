@@ -33,8 +33,8 @@ bool ofxRemoteUIClient::setup(string address, int port_){
 	orderedKeys.clear();
 	presetNames.clear();
 
-	if (port_ < 1000){
-		RLOG_ERROR << "cant use such low port";
+	if (port_ < 1000 || port_ >= 65535){
+		RLOG_ERROR << "port must be between 1000 and 65534";
 		OSCsetup = false;
 		return OSCsetup;
 	}
@@ -46,9 +46,22 @@ bool ofxRemoteUIClient::setup(string address, int port_){
 	RLOG_NOTICE << "listening at port " << port + 1 << " ... " ;
 	clearOscReceiverMsgQueue();
 	try{
+		#ifdef OF_AVAILABLE
+		ofxOscReceiverSettings receiverSettings;
+		receiverSettings.port = port + 1;
+		receiverSettings.reuse = false;
+		if (!oscReceiver.setup(receiverSettings)) {
+			RLOG_ERROR << "could not listen for OSC replies on port " << port + 1;
+			OSCsetup = false;
+			return false;
+		}
+		#else
 		oscReceiver.setup(port + 1);
+		#endif
 	}catch(...){
 		RLOG_ERROR << "exception setting up OSC RX";
+		OSCsetup = false;
+		return false;
 	}
 
 	if(verbose_) RLOG_NOTICE << "connecting to " << address;

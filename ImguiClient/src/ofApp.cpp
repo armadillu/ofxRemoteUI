@@ -1,0 +1,959 @@
+#include "ofApp.h"
+#include "imgui.h"
+#include "ofxXmlSettings.h"
+#include "NativeMacMenu.h"
+#include "NativeMacFileOpen.h"
+
+#include <GLFW/glfw3.h>
+
+#include <algorithm>
+#include <cctype>
+#include <cstring>
+#include <fstream>
+#include <sstream>
+
+namespace {
+ofApp *activeApp = nullptr;
+
+float parameterFontScale(float rowHeight) {
+	// Keep the row-size control relative to the client's 17px reference font.
+	return rowHeight > 0.f ? std::max(10.f, rowHeight - 2.f) / 17.f : 1.f;
+}
+
+const char *paramTypeName(RemoteUIParamType type) {
+	switch (type) {
+		case REMOTEUI_PARAM_FLOAT: return "Float";
+		case REMOTEUI_PARAM_INT: return "Int";
+		case REMOTEUI_PARAM_BOOL: return "Bool";
+		case REMOTEUI_PARAM_STRING: return "String";
+		case REMOTEUI_PARAM_ENUM: return "Enum";
+		case REMOTEUI_PARAM_COLOR: return "Color";
+		case REMOTEUI_PARAM_SPACER: return "Group";
+		default: return "Unknown";
+	}
+}
+
+bool containsCaseInsensitive(const std::string &text, const std::string &query) {
+	if (query.empty()) return true;
+	std::string a = text, b = query;
+	std::transform(a.begin(), a.end(), a.begin(), [](unsigned char c) { return (char)std::tolower(c); });
+	std::transform(b.begin(), b.end(), b.begin(), [](unsigned char c) { return (char)std::tolower(c); });
+	return a.find(b) != std::string::npos;
+}
+}
+
+void ofApp::setup() {
+	ofSetFrameRate(60);
+	ofSetVerticalSync(true);
+	ofSetBackgroundColor(27, 29, 34);
+	activeApp = this;
+	client.setVerbose(false);
+	client.setCallback(&ofApp::clientCallback);
+	loadPreferences();
+	if (!gui.setup()) {
+		status = "ImGui GLFW/OpenGL initialization failed";
+		ofLogError("ofApp") << status;
+		return;
+	}
+	setAlwaysOnTop(alwaysOnTop);
+	controllers.setup();
+	#ifdef TARGET_OSX
+	NativeMacMenu::setup([this](NativeMacMenu::Command command) {
+		switch (command) {
+			case NativeMacMenu::Connect: connectTo(host, port); break;
+			case NativeMacMenu::Disconnect: disconnectFromServer(); break;
+			case NativeMacMenu::Refresh: client.requestCompleteUpdate(); break;
+			case NativeMacMenu::Save: client.saveCurrentStateToDefaultXML(); break;
+			case NativeMacMenu::RestoreLaunch: client.restoreAllParamsToInitialXML(); break;
+			case NativeMacMenu::RestoreDefaults: client.restoreAllParamsToDefaultValues(); break;
+			case NativeMacMenu::OpenLocal: choosePresetFile(); break;
+			case NativeMacMenu::ConnectionPanel: showConnectionPanel = !showConnectionPanel; break;
+			case NativeMacMenu::ParametersPanel: showParameterPanel = !showParameterPanel; break;
+			case NativeMacMenu::PresetsPanel: showPresetPanel = !showPresetPanel; break;
+			case NativeMacMenu::ActivityPanel: showLogPanel = !showLogPanel; break;
+			case NativeMacMenu::PreferencesPanel: showSettings = !showSettings; break;
+			case NativeMacMenu::BindingsPanel: showBindings = true; showAllBindings = true; focusBindings = true; break;
+		}
+	});
+	#endif
+	connectTo(host, port);
+}
+
+void ofApp::update() {
+	const float dt = ofGetLastFrameTime();
+	const bool wasConnected = client.isReadyToSend();
+	client.update(dt);
+	#ifdef TARGET_OSX
+	for (const auto &path : NativeMacFileOpen::takePending()) queuePresetFile(path);
+	#endif
+	if (receivedFullSync && client.isReadyToSend() && !pendingPresetFiles.empty()) {
+		auto files = std::move(pendingPresetFiles);
+		pendingPresetFiles.clear();
+		for (const auto &path : files) importPresetFile(path);
+	}
+	if (wasConnected && !client.isReadyToSend()) {
+		clearConnectionView();
+		if (status != "Disconnected") {
+			status = "Disconnected";
+			appendLog("Connection lost");
+		}
+	}
+	if (autoDiscovery) {
+		client.updateAutoDiscovery(dt);
+		if (autoConnectToNewServers) {
+			for (const auto &neighbor : client.getNeighbors()) {
+				if ((!onlyAutoConnectToLocalHost || isLocalHost(neighbor.IP)) &&
+					(neighbor.IP != host || neighbor.port != port) && status != "Connecting…") {
+					selectNeighbor(neighbor);
+					break;
+				}
+			}
+		}
+	}
+	if (continuousRefresh && client.ready()) {
+		continuousRefreshTimer += dt;
+		if (continuousRefreshTimer >= 1.0f) {
+			client.requestCompleteUpdate();
+			continuousRefreshTimer = 0.0f;
+		}
+	}
+	if (diffHighlightUntil > 0.0f && ofGetElapsedTimef() >= diffHighlightUntil) { diffParams.clear(); diffHighlightUntil = 0.0f; }
+	controllers.update(dt, bindingServer(), [this](const std::string &name, const ControllerBindings::Input &event) { applyControllerInput(name, event); }, [this](const std::string &name, const ControllerBindings::Input &event) {
+		return client.isReadyToSend() && client.paramExistsForName(name) && (!event.button || client.getParamForName(name).type == REMOTEUI_PARAM_BOOL);
+	});
+	#ifdef TARGET_OSX
+	NativeMacMenu::update(client.isReadyToSend(), showConnectionPanel, showParameterPanel, showPresetPanel, showLogPanel, showSettings, showBindings);
+	#endif
+}
+
+void ofApp::draw() {
+	if (!gui.isSetup()) return;
+	gui.begin();
+	ImGui::GetStyle().Colors[ImGuiCol_WindowBg] = ImVec4(windowColor[0], windowColor[1], windowColor[2], windowColor[3]);
+	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DockingEnable) ImGui::DockSpaceOverViewport();
+	#ifndef TARGET_OSX
+	if (ImGui::BeginMainMenuBar()) {
+		if (ImGui::BeginMenu("RemoteUI")) {
+			if (ImGui::MenuItem("Connect")) connectTo(host, port);
+			if (ImGui::MenuItem("Disconnect", nullptr, false, client.isReadyToSend())) disconnectFromServer();
+			ImGui::Separator();
+			if (ImGui::MenuItem("Refresh parameters", nullptr, false, client.isReadyToSend())) client.requestCompleteUpdate();
+			if (ImGui::MenuItem("Save current values to server", nullptr, false, client.isReadyToSend())) client.saveCurrentStateToDefaultXML();
+			if (ImGui::MenuItem("Restore launch values", nullptr, false, client.isReadyToSend())) client.restoreAllParamsToInitialXML();
+			if (ImGui::MenuItem("Restore code defaults", nullptr, false, client.isReadyToSend())) client.restoreAllParamsToDefaultValues();
+			ImGui::Separator();
+			if (ImGui::MenuItem("Open local preset...")) choosePresetFile();
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Windows")) {
+			ImGui::MenuItem("Connection & Discovery", nullptr, &showConnectionPanel);
+			ImGui::MenuItem("Parameters", nullptr, &showParameterPanel);
+			ImGui::MenuItem("Presets & State", nullptr, &showPresetPanel);
+			ImGui::MenuItem("Remote activity", nullptr, &showLogPanel);
+			ImGui::MenuItem("Preferences", nullptr, &showSettings);
+			if (ImGui::MenuItem("Controller bindings")) { showBindings = true; showAllBindings = true; focusBindings = true; }
+			ImGui::EndMenu();
+		}
+		ImGui::TextDisabled("%s  ·  %zu parameters", status.c_str(), client.getAllParamNamesList().size());
+		ImGui::EndMainMenuBar();
+	}
+	#endif
+	if (showConnectionPanel) drawConnectionPanel();
+	if (showParameterPanel) drawParameterPanel();
+	if (showPresetPanel) drawPresetPanel();
+	if (showLogPanel) drawLogPanel();
+	if (showSettings) drawSettingsPanel();
+	if (showStyleEditor) {
+		ImGui::SetNextWindowSize(ImVec2(500, 600), ImGuiCond_FirstUseEver);
+		if (ImGui::Begin("ImGui Style Editor", &showStyleEditor)) {
+			const ImVec4 before = ImGui::GetStyle().Colors[ImGuiCol_WindowBg];
+			ImGui::ShowStyleEditor();
+			const ImVec4 after = ImGui::GetStyle().Colors[ImGuiCol_WindowBg];
+			if (before.x != after.x || before.y != after.y || before.z != after.z || before.w != after.w) {
+				windowColor[0] = after.x; windowColor[1] = after.y; windowColor[2] = after.z; windowColor[3] = after.w;
+			}
+		}
+		ImGui::End();
+	}
+	if (showBindings) drawBindingsPanel();
+	gui.end();
+}
+
+void ofApp::exit() {
+	controllers.shutdown();
+	#ifdef TARGET_OSX
+	NativeMacFileOpen::shutdown();
+	NativeMacMenu::shutdown();
+	#endif
+	client.disconnect();
+	gui.shutdown();
+	savePreferences();
+	if (activeApp == this) activeApp = nullptr;
+}
+
+void ofApp::clientCallback(RemoteUIClientCallBackArg arg) {
+	if (activeApp) activeApp->onClientEvent(arg);
+}
+
+void ofApp::onClientEvent(const RemoteUIClientCallBackArg &arg) {
+	std::ostringstream line;
+	line << (arg.host.empty() ? host : arg.host) << ":" << port << " ";
+	switch (arg.action) {
+		case SERVER_CONNECTED: status = "Connected"; line << "Connected"; break;
+		case SERVER_DISCONNECTED: clearConnectionView(); status = "Disconnected"; line << "Disconnected"; break;
+		case SERVER_SENT_FULL_PARAMS_UPDATE:
+			receivedFullSync = true;
+			lastSyncCount = client.getAllParamNamesList().size();
+			lastSyncTime = ofGetElapsedTimef();
+			line << "Parameter list synchronized (" << lastSyncCount << " parameters)";
+			ofLogNotice("RemoteUIImGui") << "Full sync from " << host << ":" << port << ": " << lastSyncCount << " entries";
+			status = lastSyncCount == 0 ? "Connected · sync completed with zero parameters" : "Connected";
+			if (presetReplyPending) {
+				diffParams.clear();
+				if (highlightPresetDiff) for (const auto &kv : previousParams) if (client.paramExistsForName(kv.first) && !client.getParamForName(kv.first).isEqualTo(kv.second)) diffParams.insert(kv.first);
+				diffHighlightUntil = ofGetElapsedTimef() + 5.f;
+				presetReplyPending = false;
+			}
+			break;
+		case SERVER_PRESETS_LIST_UPDATED: line << "Preset list updated"; break;
+		case SERVER_SENT_LOG_LINE: line << arg.msg; break;
+		case SERVER_REPORTS_MISSING_PARAMS_IN_PRESET:
+			lastPresetWarning = arg.msg + " is missing " + ofToString(arg.paramList.size()) + " parameter(s)";
+			line << lastPresetWarning;
+			break;
+		case SERVER_SAVED_PRESET: selectedPreset = arg.msg; line << "Saved preset: " << arg.msg; break;
+		case SERVER_DELETED_PRESET: if (selectedPreset == arg.msg) selectedPreset.clear(); line << "Deleted preset: " << arg.msg; break;
+		case SERVER_DID_SET_PRESET: line << "Loaded preset: " << arg.msg; break;
+		case SERVER_SAVED_GROUP_PRESET: groupPresetSelection[arg.group] = arg.msg; line << "Saved " << arg.group << " preset: " << arg.msg; break;
+		case SERVER_DELETED_GROUP_PRESET:
+			if (groupPresetSelection[arg.group] == arg.msg) groupPresetSelection[arg.group].clear();
+			line << "Deleted " << arg.group << " preset: " << arg.msg; break;
+		case SERVER_DID_SET_GROUP_PRESET: line << "Loaded " << arg.group << " preset: " << arg.msg; break;
+		case SERVER_CONFIRMED_SAVE: line << "Saved current values to server"; break;
+		case SERVER_DID_RESET_TO_XML: line << "Restored launch values"; break;
+		case SERVER_DID_RESET_TO_DEFAULTS: line << "Restored code defaults"; break;
+		case NEIGHBORS_UPDATED: line << "Server discovery updated"; break;
+		case NEIGHBOR_JUST_LAUNCHED_SERVER:
+			line << "Server announced: " << arg.msg;
+			if (autoConnectToNewServers) {
+				for (const auto &neighbor : client.getNeighbors()) if (neighbor.IP == arg.host && (!onlyAutoConnectToLocalHost || isLocalHost(neighbor.IP))) { selectNeighbor(neighbor); break; }
+			}
+			break;
+		case SERVER_ASKED_TO_REMOVE_PARAM: line << "Parameter removed: " << arg.msg; break;
+		default: line << "RemoteUI event " << (int)arg.action; break;
+	}
+	appendLog(line.str());
+}
+
+void ofApp::appendLog(const std::string &line) {
+	logLines.push_back(ofGetTimestampString("%H:%M:%S") + "  " + line);
+	if (logLines.size() > 300) logLines.erase(logLines.begin(), logLines.begin() + 50);
+	if (autoSavePreferences) savePreferences();
+}
+
+void ofApp::connectTo(const std::string &newHost, int newPort) {
+	client.disconnect();
+	host = newHost;
+	port = ofClamp(newPort, 1000, 65534);
+	clearConnectionView();
+	status = "Connecting…";
+	std::strncpy(hostBuffer, host.c_str(), sizeof(hostBuffer) - 1);
+	hostBuffer[sizeof(hostBuffer) - 1] = '\0';
+	if (!client.setup(host, port)) {
+		status = "Could not open OSC client; check reply port " + ofToString(port + 1);
+		appendLog(status);
+		return;
+	}
+	client.connect();
+	savePreferences();
+	appendLog("Connecting to " + host + ":" + ofToString(port));
+}
+
+void ofApp::disconnectFromServer() {
+	client.disconnect();
+	status = "Disconnected";
+	clearConnectionView();
+}
+
+void ofApp::clearConnectionView() {
+	controllers.learning.clear();
+	receivedFullSync = false;
+	lastSyncCount = 0;
+	lastSyncTime = -1.0f;
+	selectedGroup.clear();
+	selectedPreset.clear();
+	groupPresetSelection.clear();
+	previousParams.clear();
+	diffParams.clear();
+	diffHighlightUntil = 0.0f;
+	presetReplyPending = false;
+}
+
+void ofApp::drawConnectionPanel() {
+	ImGui::SetNextWindowSize(ImVec2(360, 240), ImGuiCond_FirstUseEver);
+	if (!ImGui::Begin("Connection & Discovery", &showConnectionPanel)) { ImGui::End(); return; }
+	ImGui::Text("Status: %s", status.c_str());
+	ImGui::TextDisabled("Server port %d · reply port %d", port, port + 1);
+	if (receivedFullSync) ImGui::TextDisabled("Last sync: %zu parameters, %.1f seconds ago", lastSyncCount, ofGetElapsedTimef() - lastSyncTime);
+	else if (client.isReadyToSend()) ImGui::TextDisabled("Waiting for server handshake and full sync");
+	if (client.isSetup() && client.ready()) ImGui::SameLine(), ImGui::TextDisabled("lag %.1f ms", client.connectionLag() * 1000.0f);
+	ImGui::InputText("Host / IP", hostBuffer, sizeof(hostBuffer));
+	ImGui::InputInt("OSC port", &port);
+	if (ImGui::Button("Connect")) connectTo(hostBuffer, port);
+	ImGui::SameLine();
+	if (ImGui::Button("Disconnect")) disconnectFromServer();
+	ImGui::Checkbox("Discover servers on the network", &autoDiscovery);
+	ImGui::SameLine();
+	if (ImGui::Button("Settings")) showSettings = !showSettings;
+	if (ImGui::CollapsingHeader("Discovered servers")) {
+		const auto neighbors = client.getNeighbors();
+		if (neighbors.empty()) ImGui::TextDisabled("No servers discovered yet");
+		for (const auto &neighbor : neighbors) {
+			std::string label = neighbor.name + " @ " + neighbor.IP + ":" + ofToString(neighbor.port);
+			if (ImGui::Selectable(label.c_str())) selectNeighbor(neighbor);
+		}
+	}
+	ImGui::End();
+}
+
+void ofApp::drawParameterPanel() {
+	const ImGuiViewport *viewport = ImGui::GetMainViewport();
+	ImGui::SetNextWindowPos(viewport->WorkPos);
+	ImGui::SetNextWindowSize(viewport->WorkSize);
+	if (!ImGui::Begin("Parameters", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); return; }
+	auto names = client.isReadyToSend() ? client.getAllParamNamesList() : std::vector<std::string>{};
+	std::vector<std::string> groups{"All groups"};
+	for (const auto &name : names) {
+		const auto p = client.getParamForName(name);
+		const std::string group = p.type == REMOTEUI_PARAM_SPACER ? p.stringVal : p.group;
+		if (!group.empty() && std::find(groups.begin(), groups.end(), group) == groups.end()) groups.push_back(group);
+	}
+	// Presets, group selection and filtering occupy the top bar, as in the Cocoa client.
+	const float topSectionGap = 10.f;
+	const float topSectionWidth = std::max(1.f, (ImGui::GetContentRegionAvail().x - topSectionGap) * .5f);
+	const float topSectionHeight = ImGui::GetTextLineHeight() + ImGui::GetFrameHeight() + ImGui::GetStyle().ItemSpacing.y + ImGui::GetStyle().WindowPadding.y * 2.f;
+	ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.f, 0.f, 0.f, .16f));
+	ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.f);
+	ImGui::BeginChild("preset-controls", ImVec2(topSectionWidth, topSectionHeight), ImGuiChildFlags_AlwaysUseWindowPadding);
+	ImGui::TextUnformatted("Presets");
+	const float presetButtonWidths = ImGui::CalcTextSize("+").x + ImGui::CalcTextSize("-").x + 4.f * ImGui::GetStyle().FramePadding.x;
+	ImGui::SetNextItemWidth(std::max(1.f, ImGui::GetContentRegionAvail().x - presetButtonWidths - 2.f * ImGui::GetStyle().ItemSpacing.x));
+	if (ImGui::BeginCombo("##preset", selectedPreset.empty() ? "No preset" : selectedPreset.c_str())) {
+		for (const auto &preset : client.getPresetsList()) if (preset != OFXREMOTEUI_NO_PRESETS && preset.find('/') == std::string::npos && ImGui::Selectable(preset.c_str(), selectedPreset == preset)) applyPreset(preset);
+		ImGui::EndCombo();
+	}
+	ImGui::SameLine();
+	if (!client.isReadyToSend()) ImGui::BeginDisabled();
+	if (ImGui::Button("+##global")) { presetNameBuffer[0] = '\0'; ImGui::OpenPopup("save-global-preset"); }
+	if (ImGui::BeginPopup("save-global-preset")) {
+		ImGui::TextUnformatted("Save global preset");
+		ImGui::SetNextItemWidth(200.f);
+		const bool submit = ImGui::InputText("##global-preset-name", presetNameBuffer, sizeof(presetNameBuffer), ImGuiInputTextFlags_EnterReturnsTrue);
+		if ((ImGui::Button("Save") || submit) && presetNameBuffer[0]) { client.savePresetWithName(presetNameBuffer); ImGui::CloseCurrentPopup(); }
+		ImGui::SameLine(); if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
+		ImGui::EndPopup();
+	}
+	ImGui::SameLine();
+	if (selectedPreset.empty()) ImGui::BeginDisabled();
+	if (ImGui::Button("-##global")) client.deletePreset(selectedPreset);
+	if (selectedPreset.empty()) ImGui::EndDisabled();
+	if (!client.isReadyToSend()) ImGui::EndDisabled();
+	ImGui::EndChild();
+	ImGui::SameLine(0.f, topSectionGap);
+	ImGui::BeginChild("group-filter-controls", ImVec2(0, topSectionHeight), ImGuiChildFlags_AlwaysUseWindowPadding);
+	ImGui::TextUnformatted("Groups and Filtering");
+	const float groupFilterGap = 8.f;
+	ImGui::SetNextItemWidth(std::max(1.f, (ImGui::GetContentRegionAvail().x - groupFilterGap) * .45f));
+	if (ImGui::BeginCombo("##group", selectedGroup.empty() ? "All groups" : selectedGroup.c_str())) {
+		for (const auto &g : groups) if (ImGui::Selectable(g.c_str(), (g == "All groups" && selectedGroup.empty()) || g == selectedGroup)) selectedGroup = g == "All groups" ? "" : g;
+		ImGui::EndCombo();
+	}
+	ImGui::SameLine(0.f, groupFilterGap); ImGui::SetNextItemWidth(std::max(1.f, ImGui::GetContentRegionAvail().x));
+	ImGui::InputTextWithHint("##filter", "Filter parameters...", filterBuffer, sizeof(filterBuffer));
+	ImGui::EndChild();
+	ImGui::PopStyleVar();
+	ImGui::PopStyleColor();
+	const auto changed = client.getChangedParamsList();
+	std::vector<std::string> visible;
+	for (const auto &name : names) {
+		const auto p = client.getParamForName(name);
+		if (p.type == REMOTEUI_PARAM_SPACER) {
+			bool matches = containsCaseInsensitive(p.stringVal, filterBuffer);
+			if (!matches) for (const auto &candidate : names) {
+				const auto item = client.getParamForName(candidate);
+				if (item.type != REMOTEUI_PARAM_SPACER && item.group == p.group && (containsCaseInsensitive(candidate, filterBuffer) || containsCaseInsensitive(item.description, filterBuffer))) { matches = true; break; }
+			}
+			if (matches && (selectedGroup.empty() || selectedGroup == p.group || selectedGroup == p.stringVal)) visible.push_back(name);
+		} else if (!collapsedGroups[p.group] && (selectedGroup.empty() || p.group == selectedGroup) && (containsCaseInsensitive(name, filterBuffer) || containsCaseInsensitive(p.description, filterBuffer)) && (!showOnlyChanged || std::find(changed.begin(), changed.end(), name) != changed.end())) visible.push_back(name);
+	}
+	const float footerHeight = ImGui::GetFrameHeight() * 3.f + ImGui::GetStyle().ItemSpacing.y * 2.f + ImGui::GetStyle().WindowPadding.y * 2.f;
+	const float parameterListGap = 6.f;
+	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + parameterListGap);
+	ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImVec4(0.f, 0.f, 0.f, 0.f));
+	if (ImGui::BeginChild("param-list", ImVec2(0, -footerHeight - ImGui::GetStyle().ItemSpacing.y - parameterListGap), false)) {
+		if (!client.isReadyToSend()) ImGui::TextDisabled("Connect to a server to see its parameters.");
+		else if (!receivedFullSync) ImGui::TextDisabled("Waiting for server parameter data...");
+		else if (names.empty()) ImGui::TextDisabled("Sync completed with no parameters. Check the server and try Sync.");
+		std::vector<std::vector<std::string>> blocks;
+		for (const auto &name : visible) {
+			const auto param = client.getParamForName(name);
+			if (blocks.empty() || param.type == REMOTEUI_PARAM_SPACER) blocks.emplace_back();
+			blocks.back().push_back(name);
+		}
+		// Keep each group intact and give its header, preset controls and slider
+		// enough room before adding another column. Larger parameter text needs
+		// proportionally more space, while the fixed group controls set a minimum.
+		const float defaultRowHeight = ImGui::GetFontSize() / .8f + 2.f;
+		const float effectiveRowHeight = rowHeight > 0.f ? rowHeight : defaultRowHeight;
+		const float minimumColumnWidth = std::max(220.f, 300.f * effectiveRowHeight / defaultRowHeight);
+		const int columnCount = std::max(1, std::min(static_cast<int>(blocks.size()), static_cast<int>(ImGui::GetContentRegionAvail().x / minimumColumnWidth)));
+		if (columnCount > 1) ImGui::Columns(columnCount, "parameter-columns", false);
+		std::vector<size_t> columnStarts;
+		size_t remainingRows = visible.size() + blocks.size(), rowsInColumn = 0;
+		int columnsRemaining = columnCount;
+		for (size_t i = 0; i < blocks.size(); ++i) {
+			const size_t blockRows = blocks[i].size() + 1; // Include spacing between groups.
+			if (rowsInColumn && columnsRemaining > 1) {
+				const double target = static_cast<double>(remainingRows) / columnsRemaining;
+				const bool mustAdvance = blocks.size() - i == static_cast<size_t>(columnsRemaining - 1);
+				if (mustAdvance || std::abs(static_cast<double>(rowsInColumn) - target) <= std::abs(static_cast<double>(rowsInColumn + blockRows) - target)) {
+					columnStarts.push_back(i);
+					remainingRows -= rowsInColumn;
+					rowsInColumn = 0;
+					--columnsRemaining;
+				}
+			}
+			rowsInColumn += blockRows;
+		}
+		ImDrawList *drawList = ImGui::GetWindowDrawList();
+		size_t nextColumn = 0;
+		for (size_t i = 0; i < blocks.size(); ++i) {
+			if (nextColumn < columnStarts.size() && i == columnStarts[nextColumn]) { ImGui::NextColumn(); ++nextColumn; }
+			ImDrawListSplitter background;
+			background.Split(drawList, 2);
+			background.SetCurrentChannel(drawList, 1);
+			ImGui::BeginGroup();
+			ImGui::PushID(static_cast<int>(i));
+			bool contentStarted = false;
+			for (size_t row = 0; row < blocks[i].size(); ++row) {
+				const auto &name = blocks[i][row];
+				ImGui::PushID(static_cast<int>(row));
+				const auto p = client.getParamForName(name);
+				if (p.type == REMOTEUI_PARAM_SPACER) drawGroupHeader(name, p);
+				else {
+					if (!contentStarted) {
+						ImGui::Dummy(ImVec2(0.f, 4.f));
+						ImGui::Indent(6.f);
+						contentStarted = true;
+					}
+					if (continuousRefresh) ImGui::BeginDisabled();
+					drawParameter(name);
+					if (continuousRefresh) ImGui::EndDisabled();
+				}
+				ImGui::PopID();
+			}
+			if (contentStarted) {
+				ImGui::Unindent(6.f);
+				ImGui::Dummy(ImVec2(0.f, 4.f));
+			}
+			ImGui::PopID();
+			ImGui::EndGroup();
+			const ImVec2 min = ImGui::GetItemRectMin(), max = ImGui::GetItemRectMax();
+			const auto groupColor = client.getParamForName(blocks[i].front());
+			background.SetCurrentChannel(drawList, 0);
+			if (groupColor.a) {
+				// Keep the box darker than the controls while retaining the header's hue.
+				drawList->AddRectFilled(min, max, IM_COL32(25 + groupColor.r * 18 / 100, 25 + groupColor.g * 18 / 100, 25 + groupColor.b * 18 / 100, 235), 5.f);
+			} else {
+				drawList->AddRectFilled(min, max, IM_COL32(0, 0, 0, 35), 5.f);
+			}
+			background.Merge(drawList);
+			ImGui::Spacing();
+		}
+		if (columnCount > 1) ImGui::Columns(1);
+	}
+	ImGui::EndChild();
+	ImGui::PopStyleColor();
+	if (bindingPopupRequested) {
+		ImGui::OpenPopup("learn-control");
+		bindingPopupRequested = false;
+		bindingPopupActive = true;
+	}
+	if (bindingPopupActive) {
+		ImGui::SetNextWindowPos(ImVec2(bindingPopupX, bindingPopupY), ImGuiCond_Appearing);
+		if (ImGui::BeginPopup("learn-control")) {
+			if (controllers.learning.empty()) {
+				ImGui::CloseCurrentPopup();
+				bindingPopupActive = false;
+			} else {
+				ImGui::TextUnformatted(controllers.learning.c_str());
+				ImGui::TextUnformatted("Move a MIDI or joystick control to bind it.");
+				if (ImGui::Button("Cancel")) {
+					controllers.learning.clear();
+					bindingPopupActive = false;
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			ImGui::EndPopup();
+		} else {
+			controllers.learning.clear();
+			bindingPopupActive = false;
+		}
+	}
+	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + parameterListGap);
+	ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.f, 0.f, 0.f, .16f));
+	ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.f);
+	ImGui::BeginChild("bottom-controls", ImVec2(0, footerHeight), ImGuiChildFlags_AlwaysUseWindowPadding, ImGuiWindowFlags_NoScrollbar);
+	ImGui::TextUnformatted("Host:"); ImGui::SameLine(); ImGui::SetNextItemWidth(170); ImGui::InputTextWithHint("##host", "Host / IP", hostBuffer, sizeof(hostBuffer));
+	ImGui::SameLine(); ImGui::TextUnformatted("Port:"); ImGui::SameLine(); ImGui::SetNextItemWidth(90); ImGui::InputInt("##port", &port, 0, 0);
+	ImGui::SameLine(); if (ImGui::Button("Sync") && client.isReadyToSend()) client.requestCompleteUpdate();
+	ImGui::SameLine(); ImGui::TextDisabled("%s", status.c_str());
+	if (!pendingPresetFiles.empty()) { ImGui::SameLine(); ImGui::TextDisabled("%zu preset file(s) waiting for sync", pendingPresetFiles.size()); }
+	if (ImGui::Button("Servers")) ImGui::OpenPopup("servers-popup");
+	if (ImGui::BeginPopup("servers-popup")) {
+		ImGui::Checkbox("Discover servers", &autoDiscovery);
+		const auto neighbors = client.getNeighbors(); if (neighbors.empty()) ImGui::TextDisabled("No servers discovered yet");
+		for (const auto &neighbor : neighbors) { const auto label = neighbor.name + " @ " + neighbor.IP + ":" + ofToString(neighbor.port); if (ImGui::Selectable(label.c_str())) selectNeighbor(neighbor); }
+		ImGui::EndPopup();
+	}
+	ImGui::SameLine(); if (client.isReadyToSend()) { if (ImGui::Button("Disconnect")) disconnectFromServer(); } else if (ImGui::Button("Connect")) connectTo(hostBuffer, port);
+	ImGui::SameLine(); ImGui::Checkbox("Continuous", &continuousRefresh);
+	ImGui::SameLine(); if (ImGui::Button("Bindings")) { showBindings = true; showAllBindings = true; focusBindings = true; }
+	ImGui::SameLine(); if (ImGui::Button("Activity")) showLogPanel = !showLogPanel;
+	ImGui::SameLine(); if (ImGui::Button("Settings")) showSettings = !showSettings;
+	ImGui::SameLine(); if (ImGui::Button("Options")) ImGui::OpenPopup("parameter-options");
+	if (ImGui::BeginPopup("parameter-options")) {
+		ImGui::Checkbox("Changed only", &showOnlyChanged);
+		if (ImGui::MenuItem("Preset manager...")) showPresetPanel = true;
+		if (ImGui::MenuItem("Open local preset...")) choosePresetFile();
+		if (ImGui::MenuItem("Copy values")) glfwSetClipboardString(glfwGetCurrentContext(), client.getValuesAsString().c_str());
+		if (ImGui::MenuItem("Paste values")) { const char *v = glfwGetClipboardString(glfwGetCurrentContext()); if (v) applyClipboardValues(v); }
+		ImGui::EndPopup();
+	}
+	ImGui::TextUnformatted("Parameter row height:");
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(std::min(200.f, ImGui::GetContentRegionAvail().x));
+	const float minimumRowHeight = 12.f;
+	float displayedRowHeight = rowHeight > 0.f ? std::max(rowHeight, minimumRowHeight) : ImGui::GetFontSize() / .8f + 2.f;
+	if (ImGui::SliderFloat("##parameter-size", &displayedRowHeight, minimumRowHeight, 48.f, "%.0f px")) rowHeight = displayedRowHeight;
+	ImGui::EndChild();
+	ImGui::PopStyleVar();
+	ImGui::PopStyleColor();
+	ImGui::End();
+}
+
+void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param) {
+	ImGui::PushID(name.c_str());
+	ImGui::PushFont(gui.getGroupHeaderFont(), ImGui::GetStyle().FontSizeBase * parameterFontScale(rowHeight));
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(3.f, 1.f + ImGui::GetFontSize() * .125f));
+	const ImVec2 pos = ImGui::GetCursorScreenPos();
+	const float width = ImGui::GetContentRegionAvail().x;
+	const float height = ImGui::GetFrameHeight();
+	if (param.a) ImGui::GetWindowDrawList()->AddRectFilled(pos, ImVec2(pos.x + width, pos.y + height), IM_COL32(param.r * 3 / 4, param.g * 3 / 4, param.b * 3 / 4, param.a), 5.f);
+	const std::string &group = param.group;
+	const float controlsWidth = std::min(185.f, std::max(100.f, width * .52f));
+	const float titleWidth = std::max(1.f, width - controlsWidth - ImGui::GetStyle().ItemSpacing.x);
+	const std::string toggleLabel = std::string(collapsedGroups[group] ? ">  " : "v  ") + param.stringVal;
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.f, 1.f, 1.f, .16f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.f, 1.f, 1.f, .24f));
+	ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.f, .5f));
+	if (ImGui::Button(toggleLabel.c_str(), ImVec2(titleWidth, height))) collapsedGroups[group] = !collapsedGroups[group];
+	ImGui::PopStyleVar();
+	ImGui::PopStyleColor(3);
+	ImGui::PopFont();
+	ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * parameterFontScale(rowHeight));
+	ImGui::SameLine();
+	ImGui::SetCursorScreenPos(ImVec2(pos.x + titleWidth + ImGui::GetStyle().ItemSpacing.x, ImGui::GetCursorScreenPos().y));
+	const bool canUseGroup = client.isReadyToSend() && !group.empty();
+	if (!canUseGroup) ImGui::BeginDisabled();
+	if (ImGui::SmallButton("+")) { groupPresetNameBuffer[0] = '\0'; ImGui::OpenPopup("save-group-preset"); }
+	if (ImGui::IsItemHovered()) ImGui::SetTooltip("Save a preset for %s", group.c_str());
+	if (ImGui::BeginPopup("save-group-preset")) {
+		ImGui::Text("Save preset for %s", group.c_str());
+		ImGui::SetNextItemWidth(200.f);
+		const bool submit = ImGui::InputText("##preset-name", groupPresetNameBuffer, sizeof(groupPresetNameBuffer), ImGuiInputTextFlags_EnterReturnsTrue);
+		if ((ImGui::Button("Save") || submit) && groupPresetNameBuffer[0]) {
+			client.saveGroupPresetWithName(groupPresetNameBuffer, group);
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SameLine(); if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
+		ImGui::EndPopup();
+	}
+	ImGui::SameLine();
+	auto &selected = groupPresetSelection[group];
+	if (selected.empty()) ImGui::BeginDisabled();
+	if (ImGui::SmallButton("-")) client.deleteGroupPreset(selected, group);
+	if (selected.empty()) ImGui::EndDisabled();
+	if (ImGui::IsItemHovered()) ImGui::SetTooltip("Delete selected group preset");
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(std::max(40.f, ImGui::GetContentRegionAvail().x));
+	const float r = param.r / 255.f, g = param.g / 255.f, b = param.b / 255.f;
+	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(.12f + r * .32f, .12f + g * .32f, .12f + b * .32f, 1.f));
+	ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(.16f + r * .38f, .16f + g * .38f, .16f + b * .38f, 1.f));
+	ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(.20f + r * .42f, .20f + g * .42f, .20f + b * .42f, 1.f));
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(.16f + r * .40f, .16f + g * .40f, .16f + b * .40f, 1.f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.20f + r * .48f, .20f + g * .48f, .20f + b * .48f, 1.f));
+	if (ImGui::BeginCombo("##group-preset", selected.empty() ? "No preset" : selected.c_str())) {
+		const std::string prefix = group + "/";
+		for (const auto &preset : client.getPresetsList()) {
+			if (preset.compare(0, prefix.size(), prefix) != 0) continue;
+			const std::string presetName = preset.substr(prefix.size());
+			if (ImGui::Selectable(presetName.c_str(), presetName == selected)) applyGroupPreset(presetName, group);
+		}
+		ImGui::EndCombo();
+	}
+	ImGui::PopStyleColor(5);
+	if (!canUseGroup) ImGui::EndDisabled();
+	ImGui::PopStyleVar();
+	ImGui::PopFont();
+	ImGui::PopID();
+}
+
+void ofApp::drawParameter(const std::string &name) {
+	RemoteUIParam p = client.getParamForName(name);
+	ImGui::PushID(name.c_str());
+	const float defaultFontSize = ImGui::GetFontSize() / .8f;
+	const float targetRowHeight = rowHeight > 0.f ? rowHeight : defaultFontSize + 2.f;
+	ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * parameterFontScale(rowHeight));
+	bool edited = false;
+	const float contentWidth = std::max(1.f, ImGui::GetContentRegionAvail().x - 6.f);
+	const float labelWidth = std::min(180.f, std::max(90.f, contentWidth * .35f));
+	ImGui::SetNextItemWidth(std::max(1.f, contentWidth - labelWidth - ImGui::GetStyle().ItemSpacing.x));
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4.f, std::max(1.f, (targetRowHeight - ImGui::GetFontSize()) * .5f)));
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5.f);
+	ImGui::PushStyleVar(ImGuiStyleVar_GrabRounding, 5.f);
+	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(.08f, .08f, .08f, .25f));
+	ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(.08f, .08f, .08f, .38f));
+	ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(.08f, .08f, .08f, .48f));
+	const bool coloredCheckbox = p.a && p.type == REMOTEUI_PARAM_BOOL;
+	if (coloredCheckbox) {
+		const float r = p.r / 255.f, g = p.g / 255.f, b = p.b / 255.f;
+		ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(.10f + .35f * r, .10f + .35f * g, .10f + .35f * b, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(.15f + .42f * r, .15f + .42f * g, .15f + .42f * b, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(.19f + .45f * r, .19f + .45f * g, .19f + .45f * b, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(.35f + .60f * r, .35f + .60f * g, .35f + .60f * b, 1.f));
+	}
+	const bool coloredSlider = p.a && ((p.type == REMOTEUI_PARAM_FLOAT && p.minFloat < p.maxFloat) ||
+		(p.type == REMOTEUI_PARAM_INT && p.minInt < p.maxInt));
+	if (coloredSlider) {
+		const float r = p.r / 255.f, g = p.g / 255.f, b = p.b / 255.f;
+		ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(.10f + .35f * r, .10f + .35f * g, .10f + .35f * b, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(.15f + .42f * r, .15f + .42f * g, .15f + .42f * b, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(.19f + .45f * r, .19f + .45f * g, .19f + .45f * b, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(.35f + .60f * r, .35f + .60f * g, .35f + .60f * b, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImVec4(.5f + .5f * r, .5f + .5f * g, .5f + .5f * b, 1.f));
+	}
+	switch (p.type) {
+		case REMOTEUI_PARAM_BOOL: edited = ImGui::Checkbox("##value", &p.boolVal); break;
+		case REMOTEUI_PARAM_FLOAT: {
+			float value = p.floatVal;
+			if (p.minFloat < p.maxFloat) edited = ImGui::SliderFloat("##value", &value, p.minFloat, p.maxFloat, "%.4g");
+			else edited = ImGui::DragFloat("##value", &value, 0.01f, 0, 0, "%.4g");
+			p.floatVal = value; break;
+		}
+		case REMOTEUI_PARAM_INT: {
+			int value = p.intVal;
+			if (p.minInt < p.maxInt) edited = ImGui::SliderInt("##value", &value, p.minInt, p.maxInt);
+			else edited = ImGui::InputInt("##value", &value);
+			p.intVal = value; break;
+		}
+		case REMOTEUI_PARAM_ENUM: {
+			int index = p.intVal - p.minInt;
+			const char *preview = index >= 0 && index < (int)p.enumList.size() ? p.enumList[index].c_str() : "(invalid)";
+			if (ImGui::BeginCombo("##value", preview)) {
+				for (int i = 0; i < (int)p.enumList.size(); ++i) {
+					ImGui::PushID(i);
+					if (ImGui::Selectable(p.enumList[i].c_str(), i == index)) { p.intVal = p.minInt + i; edited = true; }
+					ImGui::PopID();
+				}
+				ImGui::EndCombo();
+			}
+			break;
+		}
+		case REMOTEUI_PARAM_STRING: {
+			char value[4096]{};
+			std::strncpy(value, p.stringVal.c_str(), sizeof(value) - 1);
+			if (ImGui::InputText("##value", value, sizeof(value), ImGuiInputTextFlags_EnterReturnsTrue)) { p.stringVal = value; edited = true; }
+			break;
+		}
+		case REMOTEUI_PARAM_COLOR: {
+			float color[4] = {p.redVal / 255.f, p.greenVal / 255.f, p.blueVal / 255.f, p.alphaVal / 255.f};
+			if (ImGui::ColorEdit4("##value", color, ImGuiColorEditFlags_AlphaBar)) {
+				p.redVal = (unsigned char)(ofClamp(color[0], 0.f, 1.f) * 255.f + .5f);
+				p.greenVal = (unsigned char)(ofClamp(color[1], 0.f, 1.f) * 255.f + .5f);
+				p.blueVal = (unsigned char)(ofClamp(color[2], 0.f, 1.f) * 255.f + .5f);
+				p.alphaVal = (unsigned char)(ofClamp(color[3], 0.f, 1.f) * 255.f + .5f); edited = true;
+			}
+			break;
+		}
+		default: ImGui::TextDisabled("%s", paramTypeName(p.type)); break;
+	}
+	if (coloredSlider) ImGui::PopStyleColor(5);
+	if (coloredCheckbox) ImGui::PopStyleColor(4);
+	ImGui::PopStyleColor(3);
+	ImGui::PopStyleVar(3);
+	ImGui::SameLine(); ImGui::AlignTextToFramePadding();
+	if (diffParams.count(name)) {
+		// A slow white-to-amber pulse keeps the label readable throughout.
+		const float pulse = .5f + .5f * std::sin(ofGetElapsedTimef() * 3.14159265f);
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, .78f + .22f * pulse, .4f + .6f * pulse, 1.f));
+	}
+	const ImVec2 labelPos = ImGui::GetCursorScreenPos();
+	const float halfSpacing = ImGui::GetStyle().ItemSpacing.x * .5f;
+	const float clippedLabelWidth = std::max(1.f, std::min(labelWidth, ImGui::GetContentRegionAvail().x - 6.f - ImGui::GetStyle().ItemSpacing.x));
+	const ImVec2 windowPos = ImGui::GetWindowPos(), windowSize = ImGui::GetWindowSize();
+	const float r = p.a ? p.r / 255.f : .5f, g = p.a ? p.g / 255.f : .5f, b = p.a ? p.b / 255.f : .5f;
+	ImGui::PushStyleVar(ImGuiStyleVar_SelectableRounding, 5.f);
+	ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(.12f + .35f * r, .12f + .35f * g, .12f + .35f * b, 1.f));
+	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(.16f + .42f * r, .16f + .42f * g, .16f + .42f * b, 1.f));
+	ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(.20f + .48f * r, .20f + .48f * g, .20f + .48f * b, 1.f));
+	ImGui::PushClipRect(ImVec2(labelPos.x - halfSpacing, windowPos.y), ImVec2(labelPos.x + clippedLabelWidth + halfSpacing, windowPos.y + windowSize.y), true);
+	const bool labelClicked = ImGui::Selectable(name.c_str(), controllers.learning == name, 0, ImVec2(clippedLabelWidth, 0));
+	ImGui::PopClipRect();
+	ImGui::PopStyleColor(3);
+	ImGui::PopStyleVar();
+	if (labelClicked) {
+		if (p.type == REMOTEUI_PARAM_BOOL || p.type == REMOTEUI_PARAM_FLOAT || p.type == REMOTEUI_PARAM_INT || p.type == REMOTEUI_PARAM_ENUM || p.type == REMOTEUI_PARAM_COLOR) {
+			controllers.beginLearn(name);
+			bindingParam = name;
+			bindingPopupX = labelPos.x;
+			bindingPopupY = labelPos.y + ImGui::GetTextLineHeightWithSpacing();
+			bindingPopupRequested = true;
+		}
+	}
+	if (diffParams.count(name)) ImGui::PopStyleColor();
+	ImGui::PopFont();
+	if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s\nClick to bind a MIDI or joystick control%s%s", name.c_str(), p.description.empty() ? "" : "\n", p.description.c_str());
+	if (edited) sendEditedParam(name, p);
+	ImGui::PopID();
+}
+
+void ofApp::sendEditedParam(const std::string &name, RemoteUIParam param) {
+	if (client.paramExistsForName(name) && !param.isEqualTo(client.getParamForName(name))) {
+		groupPresetSelection[param.group].clear();
+		selectedPreset.clear();
+	}
+	client.sendUntrackedParamUpdate(param, name);
+}
+
+void ofApp::drawPresetPanel() {
+	ImGui::SetNextWindowSize(ImVec2(420, 410), ImGuiCond_FirstUseEver);
+	if (!ImGui::Begin("Presets & State", &showPresetPanel)) { ImGui::End(); return; }
+	ImGui::Text("Global presets");
+	const auto presets = client.getPresetsList();
+	std::vector<std::string> globalPresets;
+	for (const auto &preset : presets) if (preset != OFXREMOTEUI_NO_PRESETS && preset.find('/') == std::string::npos) globalPresets.push_back(preset);
+	if (!globalPresets.empty()) {
+		auto current = std::find(globalPresets.begin(), globalPresets.end(), selectedPreset);
+		int index = current == globalPresets.end() ? -1 : (int)std::distance(globalPresets.begin(), current);
+		if (ImGui::SmallButton("Previous") && index >= 0) applyPreset(globalPresets[(index + (int)globalPresets.size() - 1) % (int)globalPresets.size()]);
+		ImGui::SameLine();
+		if (ImGui::SmallButton("Next") && index >= 0) applyPreset(globalPresets[(index + 1) % (int)globalPresets.size()]);
+		ImGui::SameLine(); ImGui::TextDisabled("%s", selectedPreset.empty() ? "No preset selected" : selectedPreset.c_str());
+	}
+	if (ImGui::BeginListBox("##presets", ImVec2(-1, 130))) {
+		for (const auto &preset : globalPresets) {
+			if (ImGui::Selectable(preset.c_str(), selectedPreset == preset)) applyPreset(preset);
+		}
+		ImGui::EndListBox();
+	}
+	ImGui::InputText("New preset", presetNameBuffer, sizeof(presetNameBuffer));
+	if (ImGui::Button("Save global preset") && presetNameBuffer[0]) client.savePresetWithName(presetNameBuffer);
+	if (ImGui::Button("Delete selected preset") && !selectedPreset.empty()) client.deletePreset(selectedPreset);
+	ImGui::Separator();
+	if (!selectedGroup.empty()) {
+		ImGui::Text("Group preset: %s", selectedGroup.c_str());
+		auto &selected = groupPresetSelection[selectedGroup];
+		std::vector<std::string> groupPresets;
+		for (const auto &preset : presets) {
+			const auto slash = preset.find('/');
+			if (slash != std::string::npos && preset.substr(0, slash) == selectedGroup) groupPresets.push_back(preset.substr(slash + 1));
+		}
+		if (ImGui::BeginCombo("Group preset", selected.empty() ? "Choose…" : selected.c_str())) {
+			for (const auto &preset : groupPresets) if (ImGui::Selectable(preset.c_str(), selected == preset)) { selected = preset; applyGroupPreset(selected, selectedGroup); }
+			ImGui::EndCombo();
+		}
+		ImGui::InputText("New group preset", groupPresetNameBuffer, sizeof(groupPresetNameBuffer));
+		if (ImGui::Button("Save group preset") && groupPresetNameBuffer[0]) client.saveGroupPresetWithName(groupPresetNameBuffer, selectedGroup);
+		ImGui::SameLine();
+		if (ImGui::Button("Delete group preset") && !selected.empty()) client.deleteGroupPreset(selected, selectedGroup);
+	}
+	if (!lastPresetWarning.empty()) ImGui::TextWrapped("Warning: %s", lastPresetWarning.c_str());
+	ImGui::End();
+}
+
+void ofApp::drawLogPanel() {
+	ImGui::SetNextWindowSize(ImVec2(650, 190), ImGuiCond_FirstUseEver);
+	if (!ImGui::Begin("Remote activity", &showLogPanel)) { ImGui::End(); return; }
+	if (ImGui::SmallButton("Clear")) logLines.clear();
+	ImGui::SameLine(); ImGui::TextDisabled("%zu events", logLines.size());
+	ImGui::BeginChild("log-scroll", ImVec2(0, 0), true);
+	for (const auto &line : logLines) ImGui::TextUnformatted(line.c_str());
+	if (autoScrollLog && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) ImGui::SetScrollHereY(1.f);
+	ImGui::EndChild();
+	ImGui::End();
+}
+
+void ofApp::drawSettingsPanel() {
+	ImGui::SetNextWindowSize(ImVec2(360, 260), ImGuiCond_FirstUseEver);
+	if (!ImGui::Begin("Preferences", &showSettings)) { ImGui::End(); return; }
+	ImGui::Checkbox("Auto-connect to new servers", &autoConnectToNewServers);
+	ImGui::Checkbox("Only auto-connect to localhost", &onlyAutoConnectToLocalHost);
+	if (ImGui::Checkbox("Always on top", &alwaysOnTop)) setAlwaysOnTop(alwaysOnTop);
+	ImGui::Checkbox("External buttons toggle", &controllers.toggleButtons);
+	ImGui::Checkbox("Color knobs control alpha", &controllers.colorControlsAlpha);
+	ImGui::Checkbox("Highlight changes after loading presets", &highlightPresetDiff);
+	ImGui::Checkbox("Auto-scroll activity log", &autoScrollLog);
+	ImGui::ColorEdit3("Window color", windowColor);
+	if (ImGui::Button("Open ImGui style editor")) showStyleEditor = true;
+	if (ImGui::Button("Save preferences")) savePreferences();
+	ImGui::End();
+}
+
+std::string ofApp::bindingServer() const { return host + ":" + ofToString(port); }
+
+void ofApp::drawBindingsPanel() {
+	ImGui::SetNextWindowSize(ImVec2(720, 300), ImGuiCond_FirstUseEver);
+	if (focusBindings) { ImGui::SetNextWindowFocus(); focusBindings = false; }
+	if (!ImGui::Begin("Controller bindings", &showBindings)) { ImGui::End(); return; }
+	if (!controllers.learning.empty()) {
+		ImGui::TextWrapped("Move a MIDI control or joystick axis, or press a button, to bind %s.", controllers.learning.c_str());
+		if (ImGui::Button("Cancel learning")) controllers.learning.clear();
+	} else ImGui::TextDisabled("Click a parameter name to learn a control.");
+	if (!bindingParam.empty()) ImGui::Checkbox("Show bindings for all parameters and servers", &showAllBindings);
+	ImGui::Separator();
+	bool any = false;
+	ImGui::BeginChild("bindings-list", ImVec2(0, 0));
+	if (ImGui::BeginTable("bindings-table", 4, ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingStretchProp)) {
+	ImGui::TableSetupColumn("Parameter", ImGuiTableColumnFlags_WidthStretch, 1.2f);
+	ImGui::TableSetupColumn("Controller", ImGuiTableColumnFlags_WidthStretch, 2.0f);
+	ImGui::TableSetupColumn("Server", ImGuiTableColumnFlags_WidthStretch, 1.0f);
+	ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, 60.f);
+	ImGui::TableHeadersRow();
+	for (size_t i = 0; i < controllers.bindings.size();) {
+		const auto &b = controllers.bindings[i];
+		if (!showAllBindings && (b.server != bindingServer() || b.param != bindingParam)) { ++i; continue; }
+		any = true; ImGui::PushID((int)i);
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn(); ImGui::TextWrapped("%s", b.param.c_str());
+		ImGui::TableNextColumn(); ImGui::TextWrapped("%s", ControllerBindings::label(b).c_str());
+		ImGui::TableNextColumn(); ImGui::TextWrapped("%s", b.server.c_str());
+		ImGui::TableNextColumn(); bool remove = ImGui::SmallButton("Remove");
+		ImGui::PopID();
+		if (remove) controllers.remove(i); else ++i;
+	}
+	ImGui::EndTable();
+	}
+	if (!any) ImGui::TextDisabled(showAllBindings ? "No controls are bound yet." : "No controls bound to this parameter.");
+	ImGui::EndChild();
+	ImGui::End();
+}
+
+void ofApp::applyControllerInput(const std::string &name, const ControllerBindings::Input &event) {
+	if (!client.isReadyToSend() || !client.paramExistsForName(name)) return;
+	RemoteUIParam p = client.getParamForName(name);
+	const float value = ofClamp(event.value, 0.f, 1.f);
+	if (event.button) {
+		if (p.type != REMOTEUI_PARAM_BOOL) return;
+		if (controllers.toggleButtons) { if (value == 0) return; p.boolVal = !p.boolVal; }
+		else p.boolVal = value > 0.5f;
+	} else {
+		switch (p.type) {
+			case REMOTEUI_PARAM_BOOL: p.boolVal = value > 0.5f; break;
+			case REMOTEUI_PARAM_FLOAT: p.floatVal = p.minFloat + (p.maxFloat - p.minFloat) * value; break;
+			case REMOTEUI_PARAM_INT: case REMOTEUI_PARAM_ENUM: p.intVal = (int)std::round(p.minInt + (p.maxInt - p.minInt) * value); break;
+			case REMOTEUI_PARAM_COLOR: {
+				if (controllers.colorControlsAlpha) p.alphaVal = (unsigned char)std::round(value * 255.f);
+				else { float h, s, v, r, g, b; ImGui::ColorConvertRGBtoHSV(p.redVal / 255.f, p.greenVal / 255.f, p.blueVal / 255.f, h, s, v); ImGui::ColorConvertHSVtoRGB(value, s, v, r, g, b); p.redVal = (unsigned char)(r * 255); p.greenVal = (unsigned char)(g * 255); p.blueVal = (unsigned char)(b * 255); }
+				break;
+			}
+			default: return;
+		}
+	}
+	sendEditedParam(name, p);
+}
+
+void ofApp::rememberCurrentValuesForDiff() {
+	previousParams.clear();
+	for (const auto &n : client.getAllParamNamesList()) previousParams.emplace(n, client.getParamForName(n));
+	diffParams.clear();
+}
+
+void ofApp::applyPreset(const std::string &name) { rememberCurrentValuesForDiff(); selectedPreset = name; presetReplyPending = true; client.setPreset(name); }
+void ofApp::applyGroupPreset(const std::string &name, const std::string &group) { rememberCurrentValuesForDiff(); selectedPreset.clear(); groupPresetSelection[group] = name; presetReplyPending = true; client.setGroupPreset(name, group); }
+void ofApp::applyClipboardValues(const std::string &values, bool highlightChanges) {
+	std::unordered_map<std::string, RemoteUIParam> before;
+	for (const auto &name : client.getAllParamNamesList()) before.emplace(name, client.getParamForName(name));
+	client.setValuesFromString(values);
+	if (highlightChanges) diffParams.clear();
+	for (const auto &entry : before) if (entry.second.type != REMOTEUI_PARAM_SPACER && client.paramExistsForName(entry.first)) {
+		const auto current = client.getParamForName(entry.first);
+		if (!current.isEqualTo(entry.second)) {
+			groupPresetSelection[current.group].clear(); selectedPreset.clear();
+			if (highlightChanges && highlightPresetDiff) diffParams.insert(entry.first);
+		}
+	}
+	if (highlightChanges) diffHighlightUntil = diffParams.empty() ? 0.f : ofGetElapsedTimef() + 5.f;
+	else appendLog("Applied values from clipboard");
+}
+void ofApp::selectNeighbor(const Neighbor &n) { host = n.IP; port = n.port; connectTo(host, port); }
+bool ofApp::isLocalHost(const std::string &ip) const { return ip == "127.0.0.1" || ip == "localhost" || ip == "::1" || ip.rfind("192.168.", 0) == 0 || ip.rfind("10.", 0) == 0 || ip.rfind("172.16.", 0) == 0; }
+void ofApp::setAlwaysOnTop(bool enabled) {
+	gui.setFloating(enabled);
+}
+void ofApp::queuePresetFile(const std::string &path) {
+	if (receivedFullSync && client.isReadyToSend()) importPresetFile(path);
+	else { pendingPresetFiles.push_back(path); appendLog("Preset waiting for server sync: " + path); }
+}
+void ofApp::choosePresetFile() {
+	auto result = ofSystemLoadDialog("Load RemoteUI preset", false, ofToDataPath("", true));
+	if (result.bSuccess) queuePresetFile(result.getPath());
+}
+void ofApp::importPresetFile(const std::string &path) {
+	ofxXmlSettings xml;
+	if (!xml.load(path)) { appendLog("Could not open preset " + path); return; }
+	std::string values;
+	if (xml.pushTag("OFX_REMOTE_UI")) {
+		const int version = xml.getValue("OFX_REMOTE_UI_V", -1);
+		if (version == 2 && xml.pushTag("OFX_REMOTE_UI_PARAMS")) {
+			for (int i = 0; i < xml.getNumTags("P"); ++i) {
+				const std::string type = xml.getAttribute("P", "type", "", i);
+				const std::string name = xml.getAttribute("P", "name", "", i);
+				const bool disabled = xml.getAttribute("P", "disabled", 0, i) != 0;
+				if (name.empty() || disabled) continue;
+				if (type == "bool") values += name + "=" + (xml.getValue("P", 0, i) ? "1\n" : "0\n");
+				else if (type == "float") values += name + "=" + ofToString(xml.getValue("P", 0.0f, i)) + "\n";
+				else if (type == "int" || type == "enum") values += name + "=" + ofToString(xml.getValue("P", 0, i)) + "\n";
+				else if (type == "string") values += name + "=" + xml.getValue("P", std::string(), i) + "\n";
+				else if (type == "color") {
+					values += name + "=" + ofToString(xml.getAttribute("P", "c0.red", 0, i)) + " " + ofToString(xml.getAttribute("P", "c1.green", 0, i)) + " " + ofToString(xml.getAttribute("P", "c2.blue", 0, i)) + " " + ofToString(xml.getAttribute("P", "c3.alpha", 255, i)) + "\n";
+				}
+			}
+			xml.popTag();
+		}
+		xml.popTag();
+	}
+	if (values.empty()) { appendLog("Preset has no compatible v2 parameter values: " + path); return; }
+	applyClipboardValues(values, true);
+	appendLog("Loaded preset " + ofFilePath::getFileName(path));
+}
+void ofApp::savePreferences() const {
+	std::ofstream out(ofToDataPath("remoteui-imgui-client.ini", true));
+	if (!out) return;
+	out << host << '\n' << port << '\n' << autoDiscovery << '\n' << autoConnectToNewServers << '\n' << onlyAutoConnectToLocalHost << '\n' << continuousRefresh << '\n' << showOnlyChanged << '\n' << alwaysOnTop << '\n' << autoScrollLog << '\n' << controllers.toggleButtons << '\n' << controllers.colorControlsAlpha << '\n' << highlightPresetDiff << '\n' << rowHeight << '\n' << windowColor[0] << ' ' << windowColor[1] << ' ' << windowColor[2] << '\n';
+}
+void ofApp::loadPreferences() {
+	std::ifstream in(ofToDataPath("remoteui-imgui-client.ini", true));
+	if (!in) return;
+	std::getline(in, host);
+	in >> port >> autoDiscovery >> autoConnectToNewServers >> onlyAutoConnectToLocalHost >> continuousRefresh >> showOnlyChanged >> alwaysOnTop >> autoScrollLog;
+	in >> controllers.toggleButtons >> controllers.colorControlsAlpha >> highlightPresetDiff >> rowHeight >> windowColor[0] >> windowColor[1] >> windowColor[2];
+	if (host.empty()) host = "127.0.0.1";
+	std::strncpy(hostBuffer, host.c_str(), sizeof(hostBuffer) - 1);
+	setAlwaysOnTop(alwaysOnTop);
+}
+
+void ofApp::dragEvent(ofDragInfo dragInfo) {
+	for (const auto &path : dragInfo.files) queuePresetFile(path);
+}

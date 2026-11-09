@@ -10,6 +10,10 @@ common:
 	# dependencies with other addons, a list of them separated by spaces 
 	# or use += in several lines
 	ADDON_DEPENDENCIES = ofxXmlSettings ofxOsc ofxPoco 
+	# The standalone ImGui client opts into these sources itself. Other apps
+	# must be free to use their own ImGui version (for example via ofxImGui).
+	ADDON_SOURCES_EXCLUDE = libs/imgui/%
+	ADDON_INCLUDES_EXCLUDE = libs/imgui libs/imgui/%
 	
 	# include search paths, this will be usually parsed from the file system
 	# but if the addon or addon libraries need special search paths they can be
