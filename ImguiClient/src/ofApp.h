@@ -101,4 +101,5 @@ private:
 	bool presetReplyPending = false;
 	bool autoSavePreferences = true;
 	float rowHeight = 0.0f;
+	float columnBaseWidth = 300.0f;
 };

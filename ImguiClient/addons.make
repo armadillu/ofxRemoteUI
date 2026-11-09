@@ -1,3 +1,2 @@
-..
-
-../../ExternalAddons/ofxMidi
+ofxRemoteUI
+ofxMidi

@@ -405,7 +405,7 @@ void ofApp::drawParameterPanel() {
 		// proportionally more space, while the fixed group controls set a minimum.
 		const float defaultRowHeight = ImGui::GetFontSize() / .8f + 2.f;
 		const float effectiveRowHeight = rowHeight > 0.f ? rowHeight : defaultRowHeight;
-		const float minimumColumnWidth = std::max(220.f, 300.f * effectiveRowHeight / defaultRowHeight);
+		const float minimumColumnWidth = 160.f + (columnBaseWidth - 160.f) * effectiveRowHeight / defaultRowHeight;
 		const int columnCount = std::max(1, std::min(static_cast<int>(blocks.size()), static_cast<int>(ImGui::GetContentRegionAvail().x / minimumColumnWidth)));
 		if (columnCount > 1) ImGui::Columns(columnCount, "parameter-columns", false);
 		std::vector<size_t> columnStarts;
@@ -805,6 +805,8 @@ void ofApp::drawSettingsPanel() {
 	ImGui::Checkbox("Color knobs control alpha", &controllers.colorControlsAlpha);
 	ImGui::Checkbox("Highlight changes after loading presets", &highlightPresetDiff);
 	ImGui::Checkbox("Auto-scroll activity log", &autoScrollLog);
+	ImGui::SliderFloat("Column width", &columnBaseWidth, 220.f, 500.f, "%.0f px");
+	if (ImGui::IsItemHovered()) ImGui::SetTooltip("Smaller values allow more columns. The threshold also follows parameter row height.");
 	ImGui::ColorEdit3("Window color", windowColor);
 	if (ImGui::Button("Open ImGui style editor")) showStyleEditor = true;
 	if (ImGui::Button("Save preferences")) savePreferences();
@@ -942,6 +944,7 @@ void ofApp::savePreferences() const {
 	std::ofstream out(ofToDataPath("remoteui-imgui-client.ini", true));
 	if (!out) return;
 	out << host << '\n' << port << '\n' << autoDiscovery << '\n' << autoConnectToNewServers << '\n' << onlyAutoConnectToLocalHost << '\n' << continuousRefresh << '\n' << showOnlyChanged << '\n' << alwaysOnTop << '\n' << autoScrollLog << '\n' << controllers.toggleButtons << '\n' << controllers.colorControlsAlpha << '\n' << highlightPresetDiff << '\n' << rowHeight << '\n' << windowColor[0] << ' ' << windowColor[1] << ' ' << windowColor[2] << '\n';
+	out << columnBaseWidth << '\n';
 }
 void ofApp::loadPreferences() {
 	std::ifstream in(ofToDataPath("remoteui-imgui-client.ini", true));
@@ -949,6 +952,8 @@ void ofApp::loadPreferences() {
 	std::getline(in, host);
 	in >> port >> autoDiscovery >> autoConnectToNewServers >> onlyAutoConnectToLocalHost >> continuousRefresh >> showOnlyChanged >> alwaysOnTop >> autoScrollLog;
 	in >> controllers.toggleButtons >> controllers.colorControlsAlpha >> highlightPresetDiff >> rowHeight >> windowColor[0] >> windowColor[1] >> windowColor[2];
+	float savedColumnWidth;
+	if (in >> savedColumnWidth) columnBaseWidth = ofClamp(savedColumnWidth, 220.f, 500.f);
 	if (host.empty()) host = "127.0.0.1";
 	std::strncpy(hostBuffer, host.c_str(), sizeof(hostBuffer) - 1);
 	setAlwaysOnTop(alwaysOnTop);

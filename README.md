@@ -1,8 +1,5 @@
 # ofxRemoteUI
 
-
-[![Build Status](https://travis-ci.org/armadillu/ofxRemoteUI.svg?branch=master)](https://travis-ci.org/armadillu/ofxRemoteUI) [![Build status](https://ci.appveyor.com/api/projects/status/0cne779u0mdp8mvp/branch/master?svg=true)](https://ci.appveyor.com/project/armadillu/ofxremoteui/branch/master)
-
 OpenFrameworks addon that allows you to serve c++ variables/parameters (bool, float, int, enum, string, ofColor) on the network, so that you can modify them remotely. It uses server client architecture, where your app is the server. It communicates both ways; you can modify your project's variables from the client, but you can also pull your app's variable values from the client; this way you can track values that evolve programatically. It runs on OSC.
 
 You can save and then load "presets", which allow you to quickly change values for a lot of your parameters quickly. You can also make "group presets" to change only the values of a subset of your parameters.
@@ -15,8 +12,8 @@ with "OF_0.9.8". It requires ofxPoco in OF versions >0.9.8__
 Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 
 ![Clients](screenshots/clientList.png "List of Clients")  
-In order of appearance in the screenshot above, Mac OS X native Client, Built In Client (inside your OpenFrameworks app), Web Client (served from your OpenFrameworks app), iOS Client (not quite flushed out).
 
+In order of appearance in the screenshot above, Mac OS X native Client, ImGui Client (multiplatform), Built In Client (inside your OpenFrameworks app, keyboard operated only), Web Client (served from your OpenFrameworks app).
 
 ---
 
@@ -40,6 +37,7 @@ In order of appearance in the screenshot above, Mac OS X native Client, Built In
 * Easy to use C++ Macros hide complexity away, very easy to plug into any existing project.
 * Support for native ofParameters of compatible types (int, float, bool, string ofColor, ofVec). Allows you to edit native OF ofParameter types from RemoteUI. See "example-ofParameter". *outdated!
 * Control parameters from any web browser through its web gui.
+* Proper multiplatform client based on the awesome [Dear ImGui](https://github.com/ocornut/imgui) (thanks to chatGPT).
 
 ## Dependencies
 
@@ -49,10 +47,10 @@ In order of appearance in the screenshot above, Mac OS X native Client, Built In
 
 ## Available Clients
 
-* Native OSX client, feature complete (this should be your first choice)
+* Native OSX client, feature complete (this should be your first choice on OSX)
+* ImGui client (`ImguiClient`): a standalone client with all the features of the original OSX client. The macOS build has been tested; Windows and Linux builds still need verification.
 * Built in client (inside the OF app) for basic edits, saving, resetting, and global and group preset loading and saving.
 * WebClient based on [dat.GUI](https://github.com/dataarts/dat.gui). Connect to OpenFrameworks through websockets (thx to [@jackosx](http://github.com/jackosx)).
-* Native iOS client (WIP - OSC is not very reliable over WIFI and only basic features implemented - deprecated).
 
 
 ## Compatibility
@@ -125,6 +123,20 @@ Bools can also be bound to "piano keys"; params being set to true for as long as
 
 Bindings are saved when the app is quit. You can also save any particular device binding configuration into a ".midiBind" file. You can also double-click any .midiBind file form the finder to load your previously saved bindings. There is a "bindings" window that allows you to delete particular bindings. You can see what parameters are currently bound by choosing "File->Blink Bound Midi Controls".
 
+## ImGui client
+
+This tries to mirror the original OSX client 1:1.  
+  
+To build it:
+
+1. Install this addon as `openFrameworks/addons/ofxRemoteUI` and install [ofxMidi](https://github.com/danomatika/ofxMidi) as `openFrameworks/addons/ofxMidi`. 
+2. Open Project Generator and select the addon's `ImguiClient` directory as the project. The included `addons.make` selects `ofxRemoteUI` and `ofxMidi`; the addon's dependencies include `ofxOsc`, `ofxPoco` and `ofxXmlSettings`. The included `config.make` points Project Generator at the client-only Dear ImGui sources in `../libs/imgui`.
+3. Generate the project for your platform, then open and build the generated project. Keep `ImguiClient/bin/data/fonts` with the application so it can load its fonts.
+4. On macOS, retain the provided `openFrameworks-Info.plist` when generating the Xcode project (or restore it afterward) for Retina support and Finder's `.rui` Open With entry. 
+
+The generated build should compile the Dear ImGui core, `imgui_demo.cpp` (used by the style editor), and the GLFW and OpenGL3 backends from `libs/imgui`. These sources are excluded from ordinary `ofxRemoteUI` addon builds to avoid conflicts with an application's own ImGui version. A standalone macOS distribution must also include the data folder; Project Generator's default app build does not bundle it automatically.
+
+
 ## Web-based Interface
 
 The web client allows you to control the parameters of your OpenFrameworks app from a web browser. It does so by connecting your web browser to your OF app through websockets; it uses ofxPoco to handle the connection.
@@ -137,7 +149,7 @@ The web interface is developed in a separate repository [ofxRemoteUI-Web](https:
 
 The web client has completely been developed by [@jackosx](http://github.com/jackosx), with some quality-of-life tweaks by [@armadillu](http://github.com/armadillu).
 
-Note that this interface is not very tested. Don't use several clients at the same time, only one will be alloewd to connect. Web client connection/disconnection doesnt seem very realiable at the moment, but should be ok for a quick edit. You can completely disable the web interface by defining the preprocessor macro "NO_RUI_WEB_INTERFACE" in your project. 
+Note that this interface is not very tested. Don't use several clients at the same time, only one will be allowed to connect. Web client connection/disconnection doesnt seem very realiable at the moment, but should be ok for a quick edit. You can completely disable the web interface by defining the preprocessor macro "NO_RUI_WEB_INTERFACE" in your project. 
 
 ## Random Notes
 
