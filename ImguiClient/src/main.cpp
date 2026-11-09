@@ -5,6 +5,8 @@
 
 int main() {
 	#ifdef TARGET_OSX
+	const auto bundledData = ofFilePath::getCurrentExeDirFS() / "../Resources/data";
+	if (ofDirectory::doesDirectoryExist(bundledData.string(), false)) ofSetDataPathRoot(bundledData);
 	NativeMacFileOpen::setup();
 	#endif
 	ofGLWindowSettings settings;

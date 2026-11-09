@@ -27,7 +27,7 @@ private:
 	void drawBindingsPanel();
 	void applyControllerInput(const std::string &name, const ControllerBindings::Input &event);
 	std::string bindingServer() const;
-	void drawParameter(const std::string &name);
+	void drawParameter(const std::string &name, float groupLabelWidth);
 	void drawGroupHeader(const std::string &name, const RemoteUIParam &param);
 	void connectTo(const std::string &host, int port);
 	void disconnectFromServer();

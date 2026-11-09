@@ -4,6 +4,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "ClientPaths.h"
 #include <cstring>
 
 #ifndef GLFW_INCLUDE_NONE
@@ -21,6 +22,10 @@ bool ofxRemoteUIImGui::setup(GLFWwindow *window, bool docking, bool multiViewpor
 	contextCreated = true;
 
 	ImGuiIO &io = ImGui::GetIO();
+	#ifdef TARGET_OSX
+	static const std::string imguiSettingsPath = ClientPaths::settingsFile("imgui.ini");
+	io.IniFilename = imguiSettingsPath.c_str();
+	#endif
 	// Use the same Rubik font and crisp rasterizer settings as ParticlesLife.
 	// The renderer bakes the font at each viewport's framebuffer density.
 	const ofBuffer fontData = ofBufferFromFile("fonts/Rubik-Regular.ttf", true);

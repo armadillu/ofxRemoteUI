@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "ofxMidi.h"
 #include "MidiFighterHighRes.h"
+#include "ClientPaths.h"
 #include <GLFW/glfw3.h>
 #include <algorithm>
 #include <cmath>
@@ -110,10 +111,10 @@ private:
     void save() const {
         ofJson json = ofJson::array();
         for (const auto &b : bindings) json.push_back({{"server", b.server}, {"param", b.param}, {"device", b.device}, {"kind", b.kind}, {"channel", b.channel}, {"control", b.control}});
-        ofSavePrettyJson(ofToDataPath("controller-bindings.json", true), json);
+        ofSavePrettyJson(ClientPaths::settingsFile("controller-bindings.json"), json);
     }
     void load() {
-        const auto path = ofToDataPath("controller-bindings.json", true);
+        const auto path = ClientPaths::existingSettingsFile("controller-bindings.json");
         if (!ofFile::doesFileExist(path)) return;
         try {
             auto json = ofLoadJson(path);

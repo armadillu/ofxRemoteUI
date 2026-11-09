@@ -3,6 +3,7 @@
 #include "ofxXmlSettings.h"
 #include "NativeMacMenu.h"
 #include "NativeMacFileOpen.h"
+#include "ClientPaths.h"
 
 #include <GLFW/glfw3.h>
 
@@ -335,7 +336,7 @@ void ofApp::drawParameterPanel() {
 	ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.f, 0.f, 0.f, .16f));
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.f);
 	ImGui::BeginChild("preset-controls", ImVec2(topSectionWidth, topSectionHeight), ImGuiChildFlags_AlwaysUseWindowPadding);
-	ImGui::TextUnformatted("Presets");
+	ImGui::TextUnformatted("Global Presets");
 	const float presetButtonWidths = ImGui::CalcTextSize("+").x + ImGui::CalcTextSize("-").x + 4.f * ImGui::GetStyle().FramePadding.x;
 	ImGui::SetNextItemWidth(std::max(1.f, ImGui::GetContentRegionAvail().x - presetButtonWidths - 2.f * ImGui::GetStyle().ItemSpacing.x));
 	if (ImGui::BeginCombo("##preset", selectedPreset.empty() ? "No preset" : selectedPreset.c_str())) {
@@ -434,6 +435,15 @@ void ofApp::drawParameterPanel() {
 			background.SetCurrentChannel(drawList, 1);
 			ImGui::BeginGroup();
 			ImGui::PushID(static_cast<int>(i));
+			const float groupContentWidth = std::max(1.f, ImGui::GetContentRegionAvail().x - 12.f);
+			float longestLabelWidth = 0.f;
+			ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * parameterFontScale(rowHeight));
+			for (const auto &name : blocks[i]) {
+				if (client.getParamForName(name).type != REMOTEUI_PARAM_SPACER)
+					longestLabelWidth = std::max(longestLabelWidth, ImGui::CalcTextSize(name.c_str(), nullptr, true).x);
+			}
+			ImGui::PopFont();
+			const float groupLabelWidth = std::min(groupContentWidth * .55f, std::max(groupContentWidth * .35f, longestLabelWidth + 4.f));
 			bool contentStarted = false;
 			for (size_t row = 0; row < blocks[i].size(); ++row) {
 				const auto &name = blocks[i][row];
@@ -447,7 +457,7 @@ void ofApp::drawParameterPanel() {
 						contentStarted = true;
 					}
 					if (continuousRefresh) ImGui::BeginDisabled();
-					drawParameter(name);
+					drawParameter(name, groupLabelWidth);
 					if (continuousRefresh) ImGui::EndDisabled();
 				}
 				ImGui::PopID();
@@ -610,7 +620,7 @@ void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param)
 	ImGui::PopID();
 }
 
-void ofApp::drawParameter(const std::string &name) {
+void ofApp::drawParameter(const std::string &name, float groupLabelWidth) {
 	RemoteUIParam p = client.getParamForName(name);
 	ImGui::PushID(name.c_str());
 	const float defaultFontSize = ImGui::GetFontSize() / .8f;
@@ -618,11 +628,11 @@ void ofApp::drawParameter(const std::string &name) {
 	ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * parameterFontScale(rowHeight));
 	bool edited = false;
 	const float contentWidth = std::max(1.f, ImGui::GetContentRegionAvail().x - 6.f);
-	const float labelWidth = std::min(180.f, std::max(90.f, contentWidth * .35f));
-	ImGui::SetNextItemWidth(std::max(1.f, contentWidth - labelWidth - ImGui::GetStyle().ItemSpacing.x));
+	const float labelWidth = std::min(groupLabelWidth, contentWidth);
+	const float controlWidth = std::max(1.f, contentWidth - labelWidth - ImGui::GetStyle().ItemSpacing.x);
+	const float controlStartX = ImGui::GetCursorScreenPos().x;
+	ImGui::SetNextItemWidth(controlWidth);
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4.f, std::max(1.f, (targetRowHeight - ImGui::GetFontSize()) * .5f)));
-	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5.f);
-	ImGui::PushStyleVar(ImGuiStyleVar_GrabRounding, 5.f);
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(.08f, .08f, .08f, .25f));
 	ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(.08f, .08f, .08f, .38f));
 	ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(.08f, .08f, .08f, .48f));
@@ -645,7 +655,12 @@ void ofApp::drawParameter(const std::string &name) {
 		ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImVec4(.5f + .5f * r, .5f + .5f * g, .5f + .5f * b, 1.f));
 	}
 	switch (p.type) {
-		case REMOTEUI_PARAM_BOOL: edited = ImGui::Checkbox("##value", &p.boolVal); break;
+		case REMOTEUI_PARAM_BOOL: {
+			const ImVec2 pos = ImGui::GetCursorScreenPos();
+			ImGui::SetCursorScreenPos(ImVec2(pos.x + std::max(0.f, (controlWidth - ImGui::GetFrameHeight()) * .5f), pos.y));
+			edited = ImGui::Checkbox("##value", &p.boolVal);
+			break;
+		}
 		case REMOTEUI_PARAM_FLOAT: {
 			float value = p.floatVal;
 			if (p.minFloat < p.maxFloat) edited = ImGui::SliderFloat("##value", &value, p.minFloat, p.maxFloat, "%.4g");
@@ -692,8 +707,13 @@ void ofApp::drawParameter(const std::string &name) {
 	if (coloredSlider) ImGui::PopStyleColor(5);
 	if (coloredCheckbox) ImGui::PopStyleColor(4);
 	ImGui::PopStyleColor(3);
-	ImGui::PopStyleVar(3);
-	ImGui::SameLine(); ImGui::AlignTextToFramePadding();
+	ImGui::PopStyleVar();
+	ImGui::SameLine();
+	if (p.type == REMOTEUI_PARAM_BOOL) {
+		const ImVec2 pos = ImGui::GetCursorScreenPos();
+		ImGui::SetCursorScreenPos(ImVec2(std::max(pos.x, controlStartX + controlWidth + ImGui::GetStyle().ItemSpacing.x), pos.y));
+	}
+	ImGui::AlignTextToFramePadding();
 	if (diffParams.count(name)) {
 		// A slow white-to-amber pulse keeps the label readable throughout.
 		const float pulse = .5f + .5f * std::sin(ofGetElapsedTimef() * 3.14159265f);
@@ -941,13 +961,13 @@ void ofApp::importPresetFile(const std::string &path) {
 	appendLog("Loaded preset " + ofFilePath::getFileName(path));
 }
 void ofApp::savePreferences() const {
-	std::ofstream out(ofToDataPath("remoteui-imgui-client.ini", true));
+	std::ofstream out(ClientPaths::settingsFile("remoteui-imgui-client.ini"));
 	if (!out) return;
 	out << host << '\n' << port << '\n' << autoDiscovery << '\n' << autoConnectToNewServers << '\n' << onlyAutoConnectToLocalHost << '\n' << continuousRefresh << '\n' << showOnlyChanged << '\n' << alwaysOnTop << '\n' << autoScrollLog << '\n' << controllers.toggleButtons << '\n' << controllers.colorControlsAlpha << '\n' << highlightPresetDiff << '\n' << rowHeight << '\n' << windowColor[0] << ' ' << windowColor[1] << ' ' << windowColor[2] << '\n';
 	out << columnBaseWidth << '\n';
 }
 void ofApp::loadPreferences() {
-	std::ifstream in(ofToDataPath("remoteui-imgui-client.ini", true));
+	std::ifstream in(ClientPaths::existingSettingsFile("remoteui-imgui-client.ini"));
 	if (!in) return;
 	std::getline(in, host);
 	in >> port >> autoDiscovery >> autoConnectToNewServers >> onlyAutoConnectToLocalHost >> continuousRefresh >> showOnlyChanged >> alwaysOnTop >> autoScrollLog;
