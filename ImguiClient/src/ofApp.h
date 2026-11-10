@@ -23,6 +23,7 @@ private:
 	void drawParameterPanel();
 	void drawPresetPanel();
 	void drawLogPanel();
+	void drawServerLogPanel();
 	void drawSettingsPanel();
 	void drawBindingsPanel();
 	void applyControllerInput(const std::string &name, const ControllerBindings::Input &event);
@@ -81,6 +82,7 @@ private:
 	bool showParameterPanel = true;
 	bool showPresetPanel = false;
 	bool showLogPanel = false;
+	bool showServerLogPanel = false;
 	bool autoScrollLog = true;
 	bool receivedFullSync = false;
 	std::size_t lastSyncCount = 0;
@@ -90,6 +92,7 @@ private:
 	std::string status = "Disconnected";
 	std::string lastPresetWarning;
 	std::vector<std::string> logLines;
+	std::vector<std::string> serverLogLines;
 	std::vector<std::string> pendingPresetFiles;
 	std::unordered_map<std::string, std::string> groupPresetSelection;
 	std::unordered_map<std::string, bool> collapsedGroups;

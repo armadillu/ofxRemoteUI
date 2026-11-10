@@ -72,6 +72,7 @@ void ofApp::setup() {
 			case NativeMacMenu::ParametersPanel: showParameterPanel = !showParameterPanel; break;
 			case NativeMacMenu::PresetsPanel: showPresetPanel = !showPresetPanel; break;
 			case NativeMacMenu::ActivityPanel: showLogPanel = !showLogPanel; break;
+			case NativeMacMenu::ServerLogPanel: showServerLogPanel = !showServerLogPanel; break;
 			case NativeMacMenu::PreferencesPanel: showSettings = !showSettings; break;
 			case NativeMacMenu::BindingsPanel: showBindings = true; showAllBindings = true; focusBindings = true; break;
 		}
@@ -123,7 +124,7 @@ void ofApp::update() {
 		return client.isReadyToSend() && client.paramExistsForName(name) && (!event.button || client.getParamForName(name).type == REMOTEUI_PARAM_BOOL);
 	});
 	#ifdef TARGET_OSX
-	NativeMacMenu::update(client.isReadyToSend(), showConnectionPanel, showParameterPanel, showPresetPanel, showLogPanel, showSettings, showBindings);
+	NativeMacMenu::update(client.isReadyToSend(), showConnectionPanel, showParameterPanel, showPresetPanel, showLogPanel, showServerLogPanel, showSettings, showBindings);
 	#endif
 }
 
@@ -150,7 +151,8 @@ void ofApp::draw() {
 			ImGui::MenuItem("Connection & Discovery", nullptr, &showConnectionPanel);
 			ImGui::MenuItem("Parameters", nullptr, &showParameterPanel);
 			ImGui::MenuItem("Presets & State", nullptr, &showPresetPanel);
-			ImGui::MenuItem("Remote activity", nullptr, &showLogPanel);
+			ImGui::MenuItem("Action log", nullptr, &showLogPanel);
+			ImGui::MenuItem("Server log", nullptr, &showServerLogPanel);
 			ImGui::MenuItem("Preferences", nullptr, &showSettings);
 			if (ImGui::MenuItem("Controller bindings")) { showBindings = true; showAllBindings = true; focusBindings = true; }
 			ImGui::EndMenu();
@@ -163,6 +165,7 @@ void ofApp::draw() {
 	if (showParameterPanel) drawParameterPanel();
 	if (showPresetPanel) drawPresetPanel();
 	if (showLogPanel) drawLogPanel();
+	if (showServerLogPanel) drawServerLogPanel();
 	if (showSettings) drawSettingsPanel();
 	if (showStyleEditor) {
 		ImGui::SetNextWindowSize(ImVec2(500, 600), ImGuiCond_FirstUseEver);
@@ -197,6 +200,11 @@ void ofApp::clientCallback(RemoteUIClientCallBackArg arg) {
 }
 
 void ofApp::onClientEvent(const RemoteUIClientCallBackArg &arg) {
+	if (arg.action == SERVER_SENT_LOG_LINE) {
+		serverLogLines.push_back(ofGetTimestampString("%H:%M:%S") + " >> " + arg.msg);
+		if (serverLogLines.size() > 300) serverLogLines.erase(serverLogLines.begin(), serverLogLines.begin() + 50);
+		return;
+	}
 	std::ostringstream line;
 	line << (arg.host.empty() ? host : arg.host) << ":" << port << " ";
 	switch (arg.action) {
@@ -217,7 +225,6 @@ void ofApp::onClientEvent(const RemoteUIClientCallBackArg &arg) {
 			}
 			break;
 		case SERVER_PRESETS_LIST_UPDATED: line << "Preset list updated"; break;
-		case SERVER_SENT_LOG_LINE: line << arg.msg; break;
 		case SERVER_REPORTS_MISSING_PARAMS_IN_PRESET:
 			lastPresetWarning = arg.msg + " is missing " + ofToString(arg.paramList.size()) + " parameter(s)";
 			line << lastPresetWarning;
@@ -243,7 +250,9 @@ void ofApp::onClientEvent(const RemoteUIClientCallBackArg &arg) {
 		case SERVER_ASKED_TO_REMOVE_PARAM: line << "Parameter removed: " << arg.msg; break;
 		default: line << "RemoteUI event " << (int)arg.action; break;
 	}
-	appendLog(line.str());
+	if (arg.action != SERVER_SENT_FULL_PARAMS_UPDATE && arg.action != SERVER_PRESETS_LIST_UPDATED &&
+		arg.action != NEIGHBORS_UPDATED && arg.action != NEIGHBOR_JUST_LAUNCHED_SERVER)
+		appendLog(line.str());
 }
 
 void ofApp::appendLog(const std::string &line) {
@@ -254,6 +263,7 @@ void ofApp::appendLog(const std::string &line) {
 
 void ofApp::connectTo(const std::string &newHost, int newPort) {
 	client.disconnect();
+	serverLogLines.push_back(ofGetTimestampString("%H:%M:%S") + " >> ## CLIENT CONNECTING ###################");
 	host = newHost;
 	port = ofClamp(newPort, 1000, 65534);
 	clearConnectionView();
@@ -272,6 +282,7 @@ void ofApp::connectTo(const std::string &newHost, int newPort) {
 
 void ofApp::disconnectFromServer() {
 	client.disconnect();
+	serverLogLines.push_back(ofGetTimestampString("%H:%M:%S") + " >> ## CLIENT DISCONNECTED ###################");
 	status = "Disconnected";
 	clearConnectionView();
 }
@@ -529,7 +540,8 @@ void ofApp::drawParameterPanel() {
 	ImGui::SameLine(); if (client.isReadyToSend()) { if (ImGui::Button("Disconnect")) disconnectFromServer(); } else if (ImGui::Button("Connect")) connectTo(hostBuffer, port);
 	ImGui::SameLine(); ImGui::Checkbox("Continuous", &continuousRefresh);
 	ImGui::SameLine(); if (ImGui::Button("Bindings")) { showBindings = true; showAllBindings = true; focusBindings = true; }
-	ImGui::SameLine(); if (ImGui::Button("Activity")) showLogPanel = !showLogPanel;
+	ImGui::SameLine(); if (ImGui::Button("Action log")) showLogPanel = !showLogPanel;
+	ImGui::SameLine(); if (ImGui::Button("Server log")) showServerLogPanel = !showServerLogPanel;
 	ImGui::SameLine(); if (ImGui::Button("Settings")) showSettings = !showSettings;
 	ImGui::SameLine(); if (ImGui::Button("Options")) ImGui::OpenPopup("parameter-options");
 	if (ImGui::BeginPopup("parameter-options")) {
@@ -805,11 +817,23 @@ void ofApp::drawPresetPanel() {
 
 void ofApp::drawLogPanel() {
 	ImGui::SetNextWindowSize(ImVec2(650, 190), ImGuiCond_FirstUseEver);
-	if (!ImGui::Begin("Remote activity", &showLogPanel)) { ImGui::End(); return; }
+	if (!ImGui::Begin("Action log", &showLogPanel)) { ImGui::End(); return; }
 	if (ImGui::SmallButton("Clear")) logLines.clear();
 	ImGui::SameLine(); ImGui::TextDisabled("%zu events", logLines.size());
 	ImGui::BeginChild("log-scroll", ImVec2(0, 0), true);
 	for (const auto &line : logLines) ImGui::TextUnformatted(line.c_str());
+	if (autoScrollLog && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) ImGui::SetScrollHereY(1.f);
+	ImGui::EndChild();
+	ImGui::End();
+}
+
+void ofApp::drawServerLogPanel() {
+	ImGui::SetNextWindowSize(ImVec2(650, 190), ImGuiCond_FirstUseEver);
+	if (!ImGui::Begin("Server log", &showServerLogPanel)) { ImGui::End(); return; }
+	if (ImGui::SmallButton("Clear")) serverLogLines.clear();
+	ImGui::SameLine(); ImGui::TextDisabled("%zu lines", serverLogLines.size());
+	ImGui::BeginChild("server-log-scroll", ImVec2(0, 0), true);
+	for (const auto &line : serverLogLines) ImGui::TextUnformatted(line.c_str());
 	if (autoScrollLog && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) ImGui::SetScrollHereY(1.f);
 	ImGui::EndChild();
 	ImGui::End();
@@ -824,7 +848,7 @@ void ofApp::drawSettingsPanel() {
 	ImGui::Checkbox("External buttons toggle", &controllers.toggleButtons);
 	ImGui::Checkbox("Color knobs control alpha", &controllers.colorControlsAlpha);
 	ImGui::Checkbox("Highlight changes after loading presets", &highlightPresetDiff);
-	ImGui::Checkbox("Auto-scroll activity log", &autoScrollLog);
+	ImGui::Checkbox("Auto-scroll logs", &autoScrollLog);
 	ImGui::SliderFloat("Column width", &columnBaseWidth, 220.f, 500.f, "%.0f px");
 	if (ImGui::IsItemHovered()) ImGui::SetTooltip("Smaller values allow more columns. The threshold also follows parameter row height.");
 	ImGui::ColorEdit3("Window color", windowColor);

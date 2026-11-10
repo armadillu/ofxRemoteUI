@@ -7,7 +7,7 @@
 
 namespace NativeMacMenu {
 enum Command { Connect = 1, Disconnect, Refresh, Save, RestoreLaunch, RestoreDefaults, OpenLocal,
-               ConnectionPanel, ParametersPanel, PresetsPanel, ActivityPanel, PreferencesPanel, BindingsPanel };
+               ConnectionPanel, ParametersPanel, PresetsPanel, ActivityPanel, ServerLogPanel, PreferencesPanel, BindingsPanel };
 using Action = std::function<void(Command)>;
 static Action action;
 static id target = nil;
@@ -66,16 +66,17 @@ static bool setup(Action handler) {
     add(windows, "Connection & Discovery", ConnectionPanel, "1");
     add(windows, "Parameters", ParametersPanel, "2");
     add(windows, "Presets & State", PresetsPanel, "3");
-    add(windows, "Remote Activity", ActivityPanel, "4");
+    add(windows, "Action Log", ActivityPanel, "4");
+    add(windows, "Server Log", ServerLogPanel, "6");
     add(windows, "Controller Bindings", BindingsPanel, "5");
     add(windows, "Preferences", PreferencesPanel, ",");
     return true;
 }
-static void update(bool connected, bool connection, bool parameters, bool presets, bool activity, bool preferences, bool bindings) {
+static void update(bool connected, bool connection, bool parameters, bool presets, bool activity, bool serverLog, bool preferences, bool bindings) {
     if (!target) return;
     for (int i = Disconnect; i <= RestoreDefaults; ++i) send<void>(items[i], "setEnabled:", connected);
-    const bool states[] = {connection, parameters, presets, activity, preferences, bindings};
-    for (int i = 0; i < 6; ++i) send<void>(items[ConnectionPanel + i], "setState:", (long)(states[i] ? 1 : 0));
+    const bool states[] = {connection, parameters, presets, activity, serverLog, preferences, bindings};
+    for (int i = 0; i < 7; ++i) send<void>(items[ConnectionPanel + i], "setState:", (long)(states[i] ? 1 : 0));
 }
 static void shutdown() {
     if (!target) return;
