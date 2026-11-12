@@ -7,6 +7,7 @@
 
 #include <unordered_map>
 #include <unordered_set>
+#include <chrono>
 
 class ofApp : public ofBaseApp {
 public:
@@ -28,6 +29,7 @@ private:
 	void blinkBoundParameters(bool midi);
 	void toggleAllGroups();
 	void captureChangeBaseline();
+	void updateChangedParameter(const std::string &name);
 	std::string bindingServer() const;
 	void drawParameter(const std::string &name, float groupLabelWidth);
 	void drawGroupHeader(const std::string &name, const RemoteUIParam &param);
@@ -103,8 +105,14 @@ private:
 	std::unordered_set<std::string> diffParams;
 	std::unordered_set<std::string> blinkingBoundParams;
 	float boundBlinkUntil = 0.0f;
+	float changedHighlightPulse = 0.0f;
 	float diffHighlightUntil = 0.0f;
 	float continuousRefreshTimer = 0.0f;
+	float monitorRefreshPoll = 1.f;
+	int monitorFrameRate = 60;
+	std::chrono::steady_clock::time_point frameDeadline{};
+	std::chrono::steady_clock::time_point lastActivity{};
+	int pacedFrameRate = 0;
 	float lastLag = -1.0f;
 	bool presetReplyPending = false;
 	bool autoSavePreferences = true;

@@ -10,12 +10,39 @@
 #include <algorithm>
 #include <cctype>
 #include <cstring>
+#include <cstdint>
 #include <fstream>
 #include <sstream>
+#include <thread>
 
 namespace {
 ofApp *activeApp = nullptr;
-constexpr float groupAnimationDuration = .5f;
+constexpr float groupAnimationDuration = .15f;
+
+int refreshRateForWindow(GLFWwindow *window) {
+	if (!window) return 0;
+	int x = 0, y = 0, width = 0, height = 0;
+	glfwGetWindowPos(window, &x, &y);
+	glfwGetWindowSize(window, &width, &height);
+	if (width <= 0 || height <= 0) return 0;
+	int count = 0;
+	GLFWmonitor **monitors = glfwGetMonitors(&count);
+	std::int64_t bestArea = 0;
+	int rate = 0;
+	for (int i = 0; i < count; ++i) {
+		const GLFWvidmode *mode = glfwGetVideoMode(monitors[i]);
+		if (!mode || mode->width <= 0 || mode->height <= 0 || mode->refreshRate <= 0) continue;
+		int monitorX = 0, monitorY = 0;
+		glfwGetMonitorPos(monitors[i], &monitorX, &monitorY);
+		const std::int64_t left = std::max<std::int64_t>(x, monitorX);
+		const std::int64_t top = std::max<std::int64_t>(y, monitorY);
+		const std::int64_t right = std::min<std::int64_t>(std::int64_t(x) + width, std::int64_t(monitorX) + mode->width);
+		const std::int64_t bottom = std::min<std::int64_t>(std::int64_t(y) + height, std::int64_t(monitorY) + mode->height);
+		const std::int64_t area = std::max<std::int64_t>(0, right - left) * std::max<std::int64_t>(0, bottom - top);
+		if (area > bestArea) { bestArea = area; rate = mode->refreshRate; }
+	}
+	return rate;
+}
 
 bool sameParameterValue(const RemoteUIParam &a, const RemoteUIParam &b) {
 	if (a.type != b.type) return false;
@@ -155,7 +182,8 @@ bool containsCaseInsensitive(const std::string &text, const std::string &query) 
 }
 
 void ofApp::setup() {
-	ofSetFrameRate(60);
+	ofSetFrameRate(0); // The client paces frames without openFrameworks' busy-waiting limiter.
+	lastActivity = std::chrono::steady_clock::now();
 	ofSetEscapeQuitsApp(false);
 	ofSetVerticalSync(true);
 	ofSetBackgroundColor(27, 29, 34);
@@ -200,9 +228,19 @@ void ofApp::setup() {
 
 void ofApp::update() {
 	const float dt = ofGetLastFrameTime();
+	monitorRefreshPoll += dt;
+	if (monitorRefreshPoll >= .5f) {
+		monitorRefreshPoll = 0.f;
+		auto *window = static_cast<GLFWwindow *>(ofGetWindowPtr()->getWindowContext());
+		const int reportedRate = refreshRateForWindow(window);
+		const int rate = reportedRate > 0 ? reportedRate : 60;
+		monitorFrameRate = rate;
+	}
 	const bool wasConnected = client.isReadyToSend();
 	client.update(dt);
-	client.getChangedParamsList(); // Drain the addon's transient update queue; highlighting uses its own baseline.
+	const auto changedParams = client.getChangedParamsList();
+	if (!changedParams.empty()) lastActivity = std::chrono::steady_clock::now();
+	for (const auto &name : changedParams) updateChangedParameter(name);
 	#ifdef TARGET_OSX
 	for (const auto &path : NativeMacFileOpen::takePending()) queuePresetFile(path);
 	#endif
@@ -236,11 +274,27 @@ void ofApp::update() {
 	#ifdef TARGET_OSX
 	NativeMacMenu::update(client.isReadyToSend(), showLogPanel, showServerLogPanel, showSettings, showBindings, highlightChangesSinceLoad);
 	#endif
+	using Clock = std::chrono::steady_clock;
+	const auto now = Clock::now();
+	const bool idle = controllers.bindings.empty() && controllers.learning.empty() && now - lastActivity >= std::chrono::seconds(1);
+	const int targetRate = idle ? std::min(monitorFrameRate, 30) : monitorFrameRate;
+	const auto interval = std::chrono::duration_cast<Clock::duration>(std::chrono::duration<double>(1.0 / targetRate));
+	if (targetRate != pacedFrameRate || frameDeadline.time_since_epoch().count() == 0 || now > frameDeadline + interval) {
+		pacedFrameRate = targetRate;
+		frameDeadline = now;
+	}
+	std::this_thread::sleep_until(frameDeadline);
+	frameDeadline += interval;
 }
 
 void ofApp::draw() {
 	if (!gui.isSetup()) return;
 	gui.begin();
+	const ImGuiIO &input = ImGui::GetIO();
+	bool interacting = input.MouseDelta.x != 0.f || input.MouseDelta.y != 0.f || input.MouseWheel != 0.f || input.MouseWheelH != 0.f || ImGui::IsAnyItemActive();
+	for (bool down : input.MouseDown) interacting |= down;
+	for (int key = ImGuiKey_Tab; !interacting && key < ImGuiKey_MouseLeft; ++key) interacting = ImGui::IsKeyDown(static_cast<ImGuiKey>(key));
+	if (interacting) lastActivity = std::chrono::steady_clock::now();
 	#ifndef TARGET_OSX
 	if (client.isReadyToSend() && ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiMod_Shift | ImGuiKey_G, ImGuiInputFlags_RouteGlobal)) toggleAllGroups();
 	#endif
@@ -369,7 +423,7 @@ void ofApp::onClientEvent(const RemoteUIClientCallBackArg &arg) {
 				for (const auto &neighbor : client.getNeighbors()) if (neighbor.IP == arg.host && neighbor.port == arg.port && (!onlyAutoConnectToLocalHost || isLocalHost(neighbor.IP))) { selectNeighbor(neighbor); break; }
 			}
 			break;
-		case SERVER_ASKED_TO_REMOVE_PARAM: line << "Parameter removed: " << arg.msg; break;
+		case SERVER_ASKED_TO_REMOVE_PARAM: changedSinceLoad.erase(arg.msg); line << "Parameter removed: " << arg.msg; break;
 		default: line << "RemoteUI event " << (int)arg.action; break;
 	}
 	if (arg.action != SERVER_SENT_FULL_PARAMS_UPDATE && arg.action != SERVER_PRESETS_LIST_UPDATED &&
@@ -485,12 +539,8 @@ void ofApp::drawParameterPanel() {
 	ImGui::PopStyleColor();
 	ImGui::PopStyleVar(2);
 	ImGui::PopFont();
-	changedSinceLoad.clear();
-	if (highlightChangesSinceLoad && client.isReadyToSend()) {
-		for (const auto &entry : changeBaseline) {
-			if (client.paramExistsForName(entry.first) && !sameParameterValue(client.getParamForName(entry.first), entry.second)) changedSinceLoad.insert(entry.first);
-		}
-	}
+	if (highlightChangesSinceLoad && !changedSinceLoad.empty())
+		changedHighlightPulse = .5f + .5f * std::sin(ofGetElapsedTimef() * 2.f * 3.14159265f);
 	const auto &collapsedGroups = collapsedGroupsByServer[bindingServer()];
 	const float groupAnimationNow = ofGetElapsedTimef();
 	for (auto it = groupToggleTimes.begin(); it != groupToggleTimes.end();) {
@@ -1012,7 +1062,7 @@ void ofApp::drawParameter(const std::string &name, float groupLabelWidth) {
 	ImGui::AlignTextToFramePadding();
 	const bool blinkBinding = blinkingBoundParams.count(name) != 0;
 	const bool temporaryHighlight = blinkBinding || diffParams.count(name);
-	const bool highlightLabel = temporaryHighlight || changedSinceLoad.count(name);
+	const bool highlightLabel = temporaryHighlight || (highlightChangesSinceLoad && changedSinceLoad.count(name));
 	float highlightPulse = 0.f;
 	if (blinkBinding) {
 		highlightPulse = .5f + .5f * std::cos((boundBlinkUntil - ofGetElapsedTimef()) * 3.14159265f * 2.f);
@@ -1022,8 +1072,7 @@ void ofApp::drawParameter(const std::string &name, float groupLabelWidth) {
 		highlightPulse = .5f + .5f * std::sin(ofGetElapsedTimef() * 3.14159265f);
 		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f - .22f * highlightPulse, 1.f - .6f * highlightPulse, 1.f));
 	} else if (highlightLabel) {
-		const float pulse = .5f + .5f * std::sin(ofGetElapsedTimef() * 2.f * 3.14159265f);
-		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f - .5f * pulse, 1.f - .5f * pulse, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f - .5f * changedHighlightPulse, 1.f - .5f * changedHighlightPulse, 1.f));
 	}
 	const ImVec2 labelPos = ImGui::GetCursorScreenPos();
 	const float halfSpacing = ImGui::GetStyle().ItemSpacing.x * .5f;
@@ -1108,6 +1157,7 @@ void ofApp::sendEditedParam(const std::string &name, RemoteUIParam param) {
 		selectedPreset.clear();
 	}
 	client.sendUntrackedParamUpdate(param, name);
+	updateChangedParameter(name);
 }
 
 void ofApp::drawLogPanel() {
@@ -1278,6 +1328,13 @@ void ofApp::captureChangeBaseline() {
 		if (param.type != REMOTEUI_PARAM_SPACER) changeBaseline.emplace(name, param);
 	}
 	changedSinceLoad.clear();
+}
+
+void ofApp::updateChangedParameter(const std::string &name) {
+	const auto baseline = changeBaseline.find(name);
+	if (baseline != changeBaseline.end() && client.paramExistsForName(name) &&
+		!sameParameterValue(client.getParamForName(name), baseline->second)) changedSinceLoad.insert(name);
+	else changedSinceLoad.erase(name);
 }
 
 void ofApp::applyPreset(const std::string &name) { rememberCurrentValuesForDiff(); selectedPreset = name; presetReplyPending = true; client.setPreset(name); }
