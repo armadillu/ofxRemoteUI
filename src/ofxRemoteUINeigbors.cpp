@@ -51,7 +51,7 @@ void ofxRemoteUINeigbors::print(){
 	RLOG_NOTICE << "###########################################";
 }
 
-bool ofxRemoteUINeigbors::gotPing(string ip, int port, string name, string binaryName){
+bool ofxRemoteUINeigbors::gotPing(const string &ip, int port, const string &name, const string &binaryName){
 
 	bool updated = false;
 	std::ostringstream oss;
@@ -64,6 +64,8 @@ bool ofxRemoteUINeigbors::gotPing(string ip, int port, string name, string binar
 		neigbhors[myID] = n;
 	}else{ //found!
 		neigbhors[myID].timeLastSeen = time; //update time last seen for this dude
+		neigbhors[myID].name = name;
+		neigbhors[myID].binary = binaryName;
 	}
 
 	return updated;

@@ -45,7 +45,7 @@ protected:
 	map<string, int> uniqueWords;
 	vector<string>	ofParamRuiList;
 
-	void updateOfParamFromRuiParam(string ruiParamName);
+	void updateOfParamFromRuiParam(const string &ruiParamName);
 	string getShortVersionForGroupPath(const string & groupPath);
 	string getFullGroupPathForShortVersion(const string & shortV);
 

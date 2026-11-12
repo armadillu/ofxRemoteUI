@@ -18,7 +18,7 @@
 
 struct Neighbor{
 	Neighbor(){};
-	Neighbor(std::string ip, int p, float t, std::string n, std::string bin){IP = ip; port = p; timeLastSeen = t; name = n; binary = bin;}
+	Neighbor(const std::string &ip, int p, float t, const std::string &n, const std::string &bin){IP = ip; port = p; timeLastSeen = t; name = n; binary = bin;}
 	std::string IP, name, binary;
 	int port;
 	float timeLastSeen;
@@ -30,7 +30,7 @@ public:
 
 	ofxRemoteUINeigbors();
 	bool update(float dt); //return false if no update, true if theres an update
-	bool gotPing(std::string ip, int port, std::string name, std::string binaryName); //idem
+	bool gotPing(const std::string &ip, int port, const std::string &name, const std::string &binaryName); //idem
 	void print();
 	std::vector<Neighbor> getNeighbors();
 

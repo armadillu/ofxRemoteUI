@@ -88,7 +88,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	showUI = false;
 	loadedFromXML = false;
 	clearXmlOnSaving = false;
-	//add random colors to table
+	// Initialize the group-color table.
 	colorTableIndex = 0;
 	broadcastCount = 0;
 	newColorInGroupCounter = 1;
@@ -106,39 +106,28 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	//ofSeedRandom(1979);
 	headlessMode = false;
 
-	int numHues = 9;
-	for(int i = 0; i < numHues; i++){
-		float hue = fmod( i * ( 255.0f / numHues), 255.0f );
-		ofColor c = ofColor::fromHsb(hue, 255.0f, 230.0f, BG_COLOR_ALPHA);
-		colorTables.emplace_back( c );
+	const int numHues = 9;
+	for (int i = 0; i < numHues; ++i) {
+		const float hue = fmod(i * (255.0f / numHues), 255.0f);
+		colorTables.emplace_back(ofColor::fromHsb(hue, 255.0f, 230.0f, BG_COLOR_ALPHA));
 	}
-//	colorTables.emplace_back(ofColor(254,19,41,BG_COLOR_ALPHA) );
-//	colorTables.emplace_back(ofColor(255,82,0,BG_COLOR_ALPHA) );
-//	colorTables.emplace_back(ofColor(255,234,0,BG_COLOR_ALPHA) );
-//	colorTables.emplace_back(ofColor(86,203,0,BG_COLOR_ALPHA) );
-//	colorTables.emplace_back(ofColor(0,136,58,BG_COLOR_ALPHA) );
-//	colorTables.emplace_back(ofColor(23,234,237,BG_COLOR_ALPHA) );
-//	colorTables.emplace_back(ofColor(0,150,255,BG_COLOR_ALPHA) );
-//	colorTables.emplace_back(ofColor(11,51,255,BG_COLOR_ALPHA) );
-//	colorTables.emplace_back(ofColor(139,2,190,BG_COLOR_ALPHA) );
-//	colorTables.emplace_back(ofColor(255,20,214,BG_COLOR_ALPHA) );
 
 	uiLines.setMode(OF_PRIMITIVE_LINES);
 	ofAddListener(eventShowParamUpdateNotification, this, &ofxRemoteUIServer::onShowParamUpdateNotification);
 #else
-	int a = 44;
-	colorTables.emplace_back(ofColor(194,144,221,a) );
-	colorTables.emplace_back(ofColor(202,246,70,a)  );
-	colorTables.emplace_back(ofColor(74,236,173,a)  );
-	colorTables.emplace_back(ofColor(253,144,150,a) );
-	colorTables.emplace_back(ofColor(41,176,238,a)  );
-	colorTables.emplace_back(ofColor(180,155,45,a)  );
-	colorTables.emplace_back(ofColor(63,216,92,a)   );
-	colorTables.emplace_back(ofColor(226,246,139,a) );
-	colorTables.emplace_back(ofColor(239,209,46,a)  );
-	colorTables.emplace_back(ofColor(234,127,169,a) );
-	colorTables.emplace_back(ofColor(227,184,233,a) );
-	colorTables.emplace_back(ofColor(165,154,206,a) );
+	const int a = 44;
+	colorTables.emplace_back(ofColor(194,144,221,a));
+	colorTables.emplace_back(ofColor(202,246,70,a));
+	colorTables.emplace_back(ofColor(74,236,173,a));
+	colorTables.emplace_back(ofColor(253,144,150,a));
+	colorTables.emplace_back(ofColor(41,176,238,a));
+	colorTables.emplace_back(ofColor(180,155,45,a));
+	colorTables.emplace_back(ofColor(63,216,92,a));
+	colorTables.emplace_back(ofColor(226,246,139,a));
+	colorTables.emplace_back(ofColor(239,209,46,a));
+	colorTables.emplace_back(ofColor(234,127,169,a));
+	colorTables.emplace_back(ofColor(227,184,233,a));
+	colorTables.emplace_back(ofColor(165,154,206,a));
 #endif
 
 }
@@ -301,7 +290,7 @@ void ofxRemoteUIServer::setDirectoryPrefix(const string & _directoryPrefix){
 }
 
 
-void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, string key, ofxXmlSettings & s, XmlCounter & c){
+void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, const string &key, ofxXmlSettings & s, XmlCounter & c){
 
 	switch (t.type) {
 
@@ -449,7 +438,7 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, const str
 
 #endif
 
-void ofxRemoteUIServer::saveGroupToXML(string fileName, string groupName, bool oldFormat){
+void ofxRemoteUIServer::saveGroupToXML(string fileName, const string &groupName, bool oldFormat){
 	#ifdef OF_AVAILABLE
 	fileName = getFinalPath(fileName);
 	ofDirectory d;
@@ -478,7 +467,7 @@ void ofxRemoteUIServer::saveGroupToXML(string fileName, string groupName, bool o
 }
 
 
-void ofxRemoteUIServer::saveToXML(string fileName, bool oldFormat){
+void ofxRemoteUIServer::saveToXML(const string &fileName, bool oldFormat){
 
 	#ifdef OF_AVAILABLE
 	if(oldFormat){
@@ -493,7 +482,7 @@ void ofxRemoteUIServer::saveToXML(string fileName, bool oldFormat){
 
 
 #ifdef OF_AVAILABLE
-void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
+void ofxRemoteUIServer::saveToXMLv2(string fileName, const string &groupName){
 
 	bool savingGroupOnly = groupName.size() != 0;
 	if(!savingGroupOnly){
@@ -592,7 +581,7 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, string groupName){
 }
 #endif
 
-void ofxRemoteUIServer::loadPresetNamed(std::string presetName){
+void ofxRemoteUIServer::loadPresetNamed(const std::string &presetName){
 	bool ok = false;
 	string path = getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + presetName;
 	string ext = ofFilePath::getFileExt(path);
@@ -656,7 +645,7 @@ vector<string> ofxRemoteUIServer::loadFromXML(string fileName){
 }
 
 #ifdef OF_AVAILABLE
-vector<string> ofxRemoteUIServer::loadFromXMLv2(string fileName){
+vector<string> ofxRemoteUIServer::loadFromXMLv2(const string &fileName){
 
 	vector<string> loadedParams;
 	unordered_map<string, bool> readKeys; //to keep track of duplicated keys;
@@ -1515,7 +1504,7 @@ void ofxRemoteUIServer::update(float dt){
 #ifdef OF_AVAILABLE
 
 #ifdef USE_OFX_FONTSTASH
-void ofxRemoteUIServer::drawUiWithFontStash(string fontPath, float fontSize_){
+void ofxRemoteUIServer::drawUiWithFontStash(const string &fontPath, float fontSize_){
 
 	if(!ofIsGLProgrammableRenderer()){
 		fontRenderer = RENDER_WITH_OFXFONTSTASH;
@@ -1535,7 +1524,7 @@ void ofxRemoteUIServer::drawUiWithFontStash(string fontPath, float fontSize_){
 #endif
 
 #ifdef USE_OFX_FONTSTASH2
-void ofxRemoteUIServer::drawUiWithFontStash2(string fontPath, float fontSize_){
+void ofxRemoteUIServer::drawUiWithFontStash2(const string &fontPath, float fontSize_){
 	fontRenderer = RENDER_WITH_OFXFONTSTASH2; fontSize2 = fontSize_; fontStashFile2 = fontPath;
 	font2 = ofxFontStash2::Fonts();
 	font2.setup();
@@ -2259,7 +2248,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 }
 
 
-void ofxRemoteUIServer::deletePreset(string name, string group){
+void ofxRemoteUIServer::deletePreset(const string &name, const string &group){
 	#ifdef OF_AVAILABLE
 	if (group == ""){ //global preset
 		string path = getFinalPath(OFXREMOTEUI_PRESET_DIR) + "/" + name + "." + OFXREMOTEUI_PRESET_FILE_EXTENSION;
@@ -2324,7 +2313,7 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(bool onlyGlobal){
 	return presets;
 }
 
-vector<string>	ofxRemoteUIServer::getAvailablePresetsForGroup(string group){
+vector<string>	ofxRemoteUIServer::getAvailablePresetsForGroup(const string &group){
 
 	vector<string> presets;
 
@@ -2484,7 +2473,7 @@ void ofxRemoteUIServer::setDescriptionForLastAddedParam(const string & descripti
 }
 
 
-void ofxRemoteUIServer::addSpacer(string title){
+void ofxRemoteUIServer::addSpacer(const string &title){
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_SPACER;
 	p.stringVal = title;
@@ -2499,7 +2488,7 @@ void ofxRemoteUIServer::addSpacer(string title){
 }
 
 
-void ofxRemoteUIServer::shareParam(string paramName, float* param, float min, float max, ofColor c){
+void ofxRemoteUIServer::shareParam(const string &paramName, float* param, float min, float max, ofColor c){
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_FLOAT;
 	p.floatValAddr = param;
@@ -2515,7 +2504,7 @@ void ofxRemoteUIServer::shareParam(string paramName, float* param, float min, fl
 }
 
 
-void ofxRemoteUIServer::shareParam(string paramName, bool* param, ofColor c, int nothingUseful ){
+void ofxRemoteUIServer::shareParam(const string &paramName, bool* param, ofColor c, int nothingUseful ){
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_BOOL;
 	p.boolValAddr = param;
@@ -2528,7 +2517,7 @@ void ofxRemoteUIServer::shareParam(string paramName, bool* param, ofColor c, int
 }
 
 
-void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int max, ofColor c ){
+void ofxRemoteUIServer::shareParam(const string &paramName, int* param, int min, int max, ofColor c ){
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_INT;
 	p.intValAddr = param;
@@ -2542,7 +2531,7 @@ void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int ma
 	lastAddedParam = paramName;
 }
 
-void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int max, vector<string> names, ofColor c ){
+void ofxRemoteUIServer::shareParam(const string &paramName, int* param, int min, int max, vector<string> names, ofColor c ){
 	if (names.size() != max - min + 1){
 		RLOG_ERROR << "Error sharing enum param '" << paramName << "': Number of supplied strings doesnt match enum range!";
 	}
@@ -2560,7 +2549,7 @@ void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int ma
 	lastAddedParam = paramName;
 }
 
-void ofxRemoteUIServer::shareParam(string paramName, int* param, int min, int max, string* names, ofColor c ){
+void ofxRemoteUIServer::shareParam(const string &paramName, int* param, int min, int max, string* names, ofColor c ){
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_ENUM;
 	p.intValAddr = param;
@@ -2593,7 +2582,7 @@ void ofxRemoteUIServer::shareParam(string paramName, string* param, ofColor c, i
 	lastAddedParam = paramName;
 }
 
-void ofxRemoteUIServer::shareParam(string paramName, unsigned char* param, ofColor bgColor, int nothingUseful){
+void ofxRemoteUIServer::shareParam(const string &paramName, unsigned char* param, ofColor bgColor, int nothingUseful){
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_COLOR;
 	p.redValAddr = param;
@@ -2609,7 +2598,7 @@ void ofxRemoteUIServer::shareParam(string paramName, unsigned char* param, ofCol
 }
 
 
-void ofxRemoteUIServer::connect(string ipAddress, int port){
+void ofxRemoteUIServer::connect(const string &ipAddress, int port){
 	avgTimeSinceLastReply = timeSinceLastReply = timeCounter = 0.0f;
 	waitingForReply = false;
 	//params.clear();
@@ -2685,7 +2674,7 @@ void ofxRemoteUIServer::saveToXMLv1(string fileName){
 	dataMutex.unlock();
 }
 
-vector<string> ofxRemoteUIServer::loadFromXMLv1(string fileName){
+vector<string> ofxRemoteUIServer::loadFromXMLv1(const string &fileName){
 
 	RLOG_WARNING << "Loading XML " << fileName << " with older format. Be aware that it will be saved with the new format!";
 	vector<string> loadedParams;
@@ -2912,7 +2901,7 @@ string ofxRemoteUIServer::cleanCharsForFileSystem(const string & s){
 	return r;
 }
 
-void ofxRemoteUIServer::saveGroupToXMLv1(string filePath, string groupName){
+void ofxRemoteUIServer::saveGroupToXMLv1(const string &filePath, const string &groupName){
 
 	RLOG_NOTICE << "saving group to xml '" << filePath << "'" ;
 	ofxXmlSettings s;

@@ -55,10 +55,10 @@ public:
     
 public:
     ~ofxRemoteUIVars();
-    VarType* getParam(string name);
+    VarType* getParam(const string &name);
 
-    VarType* defineParam(string name);
-    VarType* defineParam(string name, VarType value);
+    VarType* defineParam(const std::string & name);
+    VarType* defineParam(const std::string & name, VarType value);
 
 
 protected:
@@ -69,7 +69,7 @@ protected:
 
 
 template <typename VarType>
-VarType* ofxRemoteUIVars<VarType>::getParam(string name){
+VarType* ofxRemoteUIVars<VarType>::getParam(const std::string &name){
     // Find existing named pointer and return its address
     try {
         return &namedPointers[name];
@@ -99,7 +99,7 @@ ofxRemoteUIVars<VarType>::~ofxRemoteUIVars(){
 }
 
 template <typename VarType>
-VarType* ofxRemoteUIVars<VarType>::defineParam(string name){
+VarType* ofxRemoteUIVars<VarType>::defineParam(const std::string & name){
     // just need a temp var to push into the vector
     // VarType tmp;
     // store address with name
@@ -109,7 +109,7 @@ VarType* ofxRemoteUIVars<VarType>::defineParam(string name){
 }
 
 template <typename VarType>
-VarType* ofxRemoteUIVars<VarType>::defineParam(string name, VarType value){
+VarType* ofxRemoteUIVars<VarType>::defineParam(const std::string & name, VarType value){
     VarType* p = defineParam(name);
     (*p) = value;
     return p;

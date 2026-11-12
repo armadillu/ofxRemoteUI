@@ -186,7 +186,7 @@ DecodedMessage ofxRemoteUI::decode(const ofxOscMessage & m) const{
 }
 
 
-std::string ofxRemoteUI::getMyIP(std::string userChosenInteface, std::string & subnetMask){
+std::string ofxRemoteUI::getMyIP(const std::string &userChosenInteface, std::string & subnetMask){
 
 	//from https://github.com/jvcleave/LocalAddressGrabber/blob/master/src/LocalAddressGrabber.h
 	//and http://stackoverflow.com/questions/17288908/get-network-interface-name-from-ipv4-address
@@ -767,7 +767,7 @@ void ofxRemoteUI::setValuesFromString( const std::string & values ){
 }
 
 
-void ofxRemoteUI::sendParam(std::string paramName, const RemoteUIParam & p){
+void ofxRemoteUI::sendParam(const std::string &paramName, const RemoteUIParam & p){
 	ofxOscMessage m;
 	//if(verbose_){ ofLogVerbose("sending >> %s ", paramName.c_str()); p.print(); }
 	m.setAddress("/SEND " + stringForParamType(p.type) + " " + paramName);
@@ -861,7 +861,7 @@ void ofxRemoteUI::sendPREL( vector<std::string> presetNames_ ){
 
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
-void ofxRemoteUI::sendSAVP(std::string presetName, bool confirm){
+void ofxRemoteUI::sendSAVP(const std::string &presetName, bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendSAVP()";
 	ofxOscMessage m;
 	m.setAddress("/SAVP");
@@ -874,7 +874,7 @@ void ofxRemoteUI::sendSAVP(std::string presetName, bool confirm){
 
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
-void ofxRemoteUI::sendSETP(std::string presetName, bool confirm){
+void ofxRemoteUI::sendSETP(const std::string &presetName, bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendSETP()";
 	ofxOscMessage m;
 	m.setAddress("/SETP");
@@ -910,7 +910,7 @@ void ofxRemoteUI::sendREMp(const string & paramName){
 	}
 }
 
-void ofxRemoteUI::sendDELP(std::string presetName, bool confirm){
+void ofxRemoteUI::sendDELP(const std::string &presetName, bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendDELP()";
 	ofxOscMessage m;
 	m.setAddress("/DELP");
@@ -935,7 +935,7 @@ void ofxRemoteUI::sendCIAO(){
 
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
-void ofxRemoteUI::sendSETp(std::string presetName, std::string group, bool confirm){
+void ofxRemoteUI::sendSETp(const std::string &presetName, const std::string &group, bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendSETp()";
 	ofxOscMessage m;
 	m.setAddress("/SETp");
@@ -949,7 +949,7 @@ void ofxRemoteUI::sendSETp(std::string presetName, std::string group, bool confi
 
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
-void ofxRemoteUI::sendSAVp(std::string presetName, std::string group, bool confirm){
+void ofxRemoteUI::sendSAVp(const std::string &presetName, const std::string &group, bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendSAVp()";
 	ofxOscMessage m;
 	m.setAddress("/SAVp");
@@ -963,7 +963,7 @@ void ofxRemoteUI::sendSAVp(std::string presetName, std::string group, bool confi
 
 //on client call, presetName should be the new preset name
 //on server call, presetName should be empty string (so it will send "OK"
-void ofxRemoteUI::sendDELp(std::string presetName, std::string group, bool confirm){
+void ofxRemoteUI::sendDELp(const std::string &presetName, const std::string &group, bool confirm){
 	if(verbose_) RLOG_VERBOSE << "sendDELp()";
 	ofxOscMessage m;
 	m.setAddress("/DELp");

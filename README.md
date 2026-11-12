@@ -193,6 +193,10 @@ The new file format is proper XML with a root node, it's more human readable, it
 
 ofxRemoteUI is made available under the [MIT](http://opensource.org/licenses/MIT) license.
 
+The ImGui client includes [Dear ImGui](https://github.com/ocornut/imgui), created by Omar Cornut and contributors. Thank you to Omar and everyone who contributes to Dear ImGui! It is distributed under the MIT license; its copyright and permission notice is included in [libs/imgui/LICENSE.txt](libs/imgui/LICENSE.txt). When distributing the client, include that notice with the distribution.
+
+The ImGui client uses the [Rubik font](https://github.com/googlefonts/rubik), by the Rubik Project Authors, under the SIL Open Font License 1.1. The font license is included in [ImguiClient/bin/data/fonts/OFL-Rubik.txt](ImguiClient/bin/data/fonts/OFL-Rubik.txt).
+
 The OSX Client's HID capabilities come mostly from [@jotapeh](https://github.com/jotapeh/MacJoystickHIDTest).
 
 ofxRemoteUI bundles ofxXmlSettings and ofxOSC from [OpenFrameworks](http://openframeworks.cc) to allow non-OF C++ projects to use ofxRemoteUI.

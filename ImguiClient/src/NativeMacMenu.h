@@ -6,7 +6,8 @@
 #include <functional>
 
 namespace NativeMacMenu {
-enum Command { Connect = 1, Disconnect, Refresh, Save, RestoreLaunch, RestoreDefaults, OpenLocal, CopyValues, PasteValues, ShowChanged,
+enum Command { Connect = 1, Disconnect, Refresh, Save, RestoreLaunch, RestoreDefaults, OpenLocal, CopyValues, PasteValues,
+               BlinkMidi, BlinkUsb, ToggleAllGroups, HighlightChanged,
                ActivityPanel, ServerLogPanel, PreferencesPanel, BindingsPanel };
 using Action = std::function<void(Command)>;
 static Action action;
@@ -65,7 +66,11 @@ static bool setup(Action handler) {
     separator(remote);
     add(remote, "Copy Parameter Values", CopyValues, "c", true);
     add(remote, "Paste Parameter Values", PasteValues, "v", true);
-    add(remote, "Show Changed Parameters Only", ShowChanged);
+    add(remote, "Highlight Changes Since Connection", HighlightChanged);
+    add(remote, "Collapse / Expand All Groups", ToggleAllGroups, "g", true);
+    separator(remote);
+    add(remote, "Blink MIDI-Bound Parameters", BlinkMidi);
+    add(remote, "Blink USB Controller-Bound Parameters", BlinkUsb);
     id windows = makeMenu("Windows", 1, mainMenu);
     add(windows, "Action Log", ActivityPanel, "1");
     add(windows, "Server Log", ServerLogPanel, "2");
@@ -73,12 +78,16 @@ static bool setup(Action handler) {
     add(windows, "Settings", PreferencesPanel, ",");
     return true;
 }
-static void update(bool connected, bool activity, bool serverLog, bool preferences, bool bindings, bool changedOnly) {
+static void update(bool connected, bool activity, bool serverLog, bool preferences, bool bindings, bool highlightChanged) {
     if (!target) return;
     for (int i = Disconnect; i <= RestoreDefaults; ++i) send<void>(items[i], "setEnabled:", connected);
     send<void>(items[CopyValues], "setEnabled:", connected);
     send<void>(items[PasteValues], "setEnabled:", connected);
-    send<void>(items[ShowChanged], "setState:", (long)(changedOnly ? 1 : 0));
+    send<void>(items[BlinkMidi], "setEnabled:", connected);
+    send<void>(items[BlinkUsb], "setEnabled:", connected);
+    send<void>(items[ToggleAllGroups], "setEnabled:", connected);
+    send<void>(items[HighlightChanged], "setEnabled:", connected);
+    send<void>(items[HighlightChanged], "setState:", (long)(highlightChanged ? 1 : 0));
     const bool states[] = {activity, serverLog, preferences, bindings};
     for (int i = 0; i < 4; ++i) send<void>(items[ActivityPanel + i], "setState:", (long)(states[i] ? 1 : 0));
 }

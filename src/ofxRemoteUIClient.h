@@ -39,31 +39,31 @@ public:
 	void saveCurrentStateToDefaultXML();
 
 	//work with presets
-	void setPreset(std::string preset); //tell server to choose a preset
-	void savePresetWithName(std::string presetName); //take current params and make a preset with them
-	void deletePreset(std::string presetName); //delete preset with this name
+	void setPreset(const std::string &preset); //tell server to choose a preset
+	void savePresetWithName(const std::string &presetName); //take current params and make a preset with them
+	void deletePreset(const std::string &presetName); //delete preset with this name
 
 	//work with group presets
-	void setGroupPreset(std::string preset, std::string group); //tell server to choose a preset
-	void saveGroupPresetWithName(std::string presetName, std::string group); //take current params and make a preset with them
-	void deleteGroupPreset(std::string presetName, std::string group); //delete preset with this name
+	void setGroupPreset(const std::string &preset, const std::string &group); //tell server to choose a preset
+	void saveGroupPresetWithName(const std::string &presetName, const std::string &group); //take current params and make a preset with them
+	void deleteGroupPreset(const std::string &presetName, const std::string &group); //delete preset with this name
 
 
 	//by doing this you allow ofxRemoteUIClient to modify your params
 	//you can find out which params got changed by calling getChangedParamsList()
-	void trackParam(std::string paramName, float* param);
-	void trackParam(std::string paramName, bool* param);
-	void trackParam(std::string paramName, int* param);
-	void trackParam(std::string paramName, std::string* param);
-	void trackParam(std::string paramName, unsigned char* param); //color! 4 components!
-	void trackParam(std::string paramName, int* param, std::vector<std::string> list);
+	void trackParam(const std::string &paramName, float* param);
+	void trackParam(const std::string &paramName, bool* param);
+	void trackParam(const std::string &paramName, int* param);
+	void trackParam(const std::string &paramName, std::string* param);
+	void trackParam(const std::string &paramName, unsigned char* param); //color! 4 components!
+	void trackParam(const std::string &paramName, int* param, std::vector<std::string> list);
 
 	//this makes the ofxRemoteUIClient fetch the current values of your param
 	//and send it to the server (will take actual value from the supplied pointer in trackParam())
-	void sendTrackedParamUpdate(std::string paramName);
+	void sendTrackedParamUpdate(const std::string &paramName);
 
 	//send an "untracked" param, manually
-	void sendUntrackedParamUpdate(RemoteUIParam p, std::string paramName);
+	void sendUntrackedParamUpdate(RemoteUIParam p, const std::string &paramName);
     
     // Send message via OSC
     void sendMessage(const ofxOscMessage & m);

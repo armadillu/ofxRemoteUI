@@ -104,18 +104,18 @@ public:
 
 	vector<std::string> loadFromXML(std::string fileName); //returns list of param names in current setup but not set in XML
 
-	void saveToXML(std::string fileName, bool oldFormat = false); //save the whole list of params to an xml
-	void saveGroupToXML(std::string fileName, std::string groupName, bool oldFormat = false); //save only a subset of params into xml
+	void saveToXML(const std::string &fileName, bool oldFormat = false); //save the whole list of params to an xml
+	void saveGroupToXML(std::string fileName, const std::string &groupName, bool oldFormat = false); //save only a subset of params into xml
 
-	void shareParam(std::string paramName, float* param, float min, float max, ofColor bgColor = ofColor(0,0,0,0) );
-	void shareParam(std::string paramName, bool* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
-	void shareParam(std::string paramName, int* param, int min, int max, ofColor bgColor = ofColor(0,0,0,0) );
+	void shareParam(const std::string &paramName, float* param, float min, float max, ofColor bgColor = ofColor(0,0,0,0) );
+	void shareParam(const std::string &paramName, bool* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
+	void shareParam(const std::string &paramName, int* param, int min, int max, ofColor bgColor = ofColor(0,0,0,0) );
 	void shareParam(std::string paramName, std::string* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
-	void shareParam(std::string paramName, int* param, int min, int max, vector<std::string> names, ofColor c = ofColor(0,0,0,0)); //enum!
-	void shareParam(std::string paramName, int* param, int min, int max, std::string* names, ofColor c = ofColor(0,0,0,0)); //enum with old school string array
-	void shareParam(std::string paramName, unsigned char* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 );	//ofColor
+	void shareParam(const std::string &paramName, int* param, int min, int max, vector<std::string> names, ofColor c = ofColor(0,0,0,0)); //enum!
+	void shareParam(const std::string &paramName, int* param, int min, int max, std::string* names, ofColor c = ofColor(0,0,0,0)); //enum with old school string array
+	void shareParam(const std::string &paramName, unsigned char* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 );	//ofColor
 
-	void addSpacer(std::string name);
+	void addSpacer(const std::string &name);
 
 	void setParamGroup(std::string g);		//set for all the upcoming params
 
@@ -186,12 +186,12 @@ public:
 
 	void drawUiWithBitmapFont();
 	#ifdef USE_OFX_FONTSTASH
-	void drawUiWithFontStash(std::string fontPath, float fontSize = 15 /*good with veraMono*/ );
+	void drawUiWithFontStash(const std::string &fontPath, float fontSize = 15 /*good with veraMono*/ );
 	ofxFontStash & getFont(){return font;}
 	#endif
 
 	#if defined(USE_OFX_FONTSTASH2)
-	void drawUiWithFontStash2(std::string fontPath, float fontSize = 15.0f /*good with VeraMonoBold*/);
+	void drawUiWithFontStash2(const std::string &fontPath, float fontSize = 15.0f /*good with VeraMonoBold*/);
 	ofxFontStash2::Fonts & getFont2(){return font2;}
 	#endif
 
@@ -204,7 +204,7 @@ public:
 
 	///to load a preset from disk, supply a string "myPresetName" - not the missing file extension
 	///if you want to load a local preset, supply a string like "MyGroup/myLocalPreset"
-	void loadPresetNamed(std::string presetName);
+	void loadPresetNamed(const std::string &presetName);
     
 #ifdef OF_AVAILABLE
 	void toggleBuiltInClientUI(); //show hide the "built in client" GUI screen
@@ -242,7 +242,7 @@ public:
 
 	//enumerate available presets
 	std::vector<std::string>	getAvailablePresets(bool onlyGlobal = false); //all, including group presets! group presets have group/presetName name pattern
-	std::vector<std::string>	getAvailablePresetsForGroup(std::string group);
+	std::vector<std::string>	getAvailablePresetsForGroup(const std::string &group);
 
 #ifndef NO_RUI_WEB_INTERFACE
 	struct WebSocketState{
@@ -266,32 +266,32 @@ protected:
 		int numFloats, numInts, numStrings, numBools, numEnums, numColors;
 	};
 
-	std::vector<std::string> loadFromXMLv1(std::string fileName); //returns list of param names in current setup but not set in XML
+	std::vector<std::string> loadFromXMLv1(const std::string &fileName); //returns list of param names in current setup but not set in XML
 	#ifdef OF_AVAILABLE
-	std::vector<std::string> loadFromXMLv2(std::string fileName); //returns list of param names in current setup but not set in XML
+	std::vector<std::string> loadFromXMLv2(const std::string &fileName); //returns list of param names in current setup but not set in XML
 	#endif
 
 	void			saveToXMLv1(std::string fileName); //save the whole list of params to an xml
 	#ifdef OF_AVAILABLE
-	void			saveToXMLv2(std::string fileName, std::string group); //save the whole list of params to an xml
+	void			saveToXMLv2(std::string fileName, const std::string &group); //save the whole list of params to an xml
 	#endif
 
-	void			saveGroupToXMLv1(std::string fileName, std::string groupName); //save only a subset of params into xml
+	void			saveGroupToXMLv1(const std::string &fileName, const std::string &groupName); //save only a subset of params into xml
 
 	void			onShowParamUpdateNotification(ScreenNotifArg& a);
 
 	void			restoreAllParamsToInitialXML();
 	void			restoreAllParamsToDefaultValues();
-	void			connect(std::string address, int port);
+	void			connect(const std::string &address, int port);
 	void			setColorForParam(RemoteUIParam &p, ofColor c);
 
-	void			deletePreset(std::string name, std::string group=""); //if group is not "", then this is a global preset. otherwise its a group preset
+	void			deletePreset(const std::string &name, const std::string &group=""); //if group is not "", then this is a global preset. otherwise its a group preset
 	void			updateServer(float dt);
 	void			handleBroadcast();
 	void			(*callBack)(RemoteUIServerCallBackArg);
 	void			threadedFunction();
 
-	void			saveParamToXmlSettings(const RemoteUIParam & p, std::string key, ofxXmlSettings & s, XmlCounter & counter);
+	void			saveParamToXmlSettings(const RemoteUIParam & p, const std::string &key, ofxXmlSettings & s, XmlCounter & counter);
 	#ifdef OF_AVAILABLE
 	void			saveParamToXmlSettings(const RemoteUIParam & p, const std::string & key, pugi::xml_node & s, int index, bool active);
 	#endif

@@ -428,27 +428,27 @@ void ofxRemoteUIClient::removeParamFromDB(const string & paramName){
 }
 
 
-void ofxRemoteUIClient::setPreset(string preset){
+void ofxRemoteUIClient::setPreset(const string &preset){
 	sendSETP(preset);
 }
 
-void ofxRemoteUIClient::savePresetWithName(string presetName){
+void ofxRemoteUIClient::savePresetWithName(const string &presetName){
 	sendSAVP(presetName);
 }
 
-void ofxRemoteUIClient::deletePreset(string presetName){
+void ofxRemoteUIClient::deletePreset(const string &presetName){
 	sendDELP(presetName);
 }
 
-void ofxRemoteUIClient::setGroupPreset(string preset, string group){
+void ofxRemoteUIClient::setGroupPreset(const string &preset, const string &group){
 	sendSETp(preset, group);
 }
 
-void ofxRemoteUIClient::saveGroupPresetWithName(string presetName, string group){
+void ofxRemoteUIClient::saveGroupPresetWithName(const string &presetName, const string &group){
 	sendSAVp(presetName, group);
 }
 
-void ofxRemoteUIClient::deleteGroupPreset(string presetName, string group){
+void ofxRemoteUIClient::deleteGroupPreset(const string &presetName, const string &group){
 	sendDELp(presetName, group);
 }
 
@@ -471,7 +471,7 @@ void ofxRemoteUIClient::fillPresetListFromMessage(ofxOscMessage m){
 }
 
 
-void ofxRemoteUIClient::trackParam(string paramName, float* param){
+void ofxRemoteUIClient::trackParam(const string &paramName, float* param){
 	RemoteUIParam p;
 	auto it = params.find(paramName);
 	if ( it == params.end() ){	//not found! we add it
@@ -487,7 +487,7 @@ void ofxRemoteUIClient::trackParam(string paramName, float* param){
 }
 
 
-void ofxRemoteUIClient::trackParam(string paramName, int* param){
+void ofxRemoteUIClient::trackParam(const string &paramName, int* param){
 	RemoteUIParam p;
 	auto it = params.find(paramName);
 	if ( it == params.end() ){	//not found! we add it
@@ -503,7 +503,7 @@ void ofxRemoteUIClient::trackParam(string paramName, int* param){
 }
 
 
-void ofxRemoteUIClient::trackParam(string paramName, int* param, vector<string> list){ //FIXME: trackParam
+void ofxRemoteUIClient::trackParam(const string &paramName, int* param, vector<string> list){ //FIXME: trackParam
 	RemoteUIParam p;
 	auto it = params.find(paramName);
 	if ( it == params.end() ){	//not found! we add it
@@ -519,7 +519,7 @@ void ofxRemoteUIClient::trackParam(string paramName, int* param, vector<string> 
 }
 
 
-void ofxRemoteUIClient::trackParam(string paramName, string* param){
+void ofxRemoteUIClient::trackParam(const string &paramName, string* param){
 	RemoteUIParam p;
 	auto it = params.find(paramName);
 	if ( it == params.end() ){	//not found! we add it
@@ -535,7 +535,7 @@ void ofxRemoteUIClient::trackParam(string paramName, string* param){
 }
 
 
-void ofxRemoteUIClient::trackParam(string paramName, bool* param){
+void ofxRemoteUIClient::trackParam(const string &paramName, bool* param){
 	RemoteUIParam p;
 	auto it = params.find(paramName);
 	if ( it == params.end() ){	//not found! we add it
@@ -551,7 +551,7 @@ void ofxRemoteUIClient::trackParam(string paramName, bool* param){
 }
 
 
-void ofxRemoteUIClient::trackParam(string paramName, unsigned char* param){
+void ofxRemoteUIClient::trackParam(const string &paramName, unsigned char* param){
 	RemoteUIParam p;
 	auto it = params.find(paramName);
 	if ( it == params.end() ){	//not found! we add it
@@ -567,7 +567,7 @@ void ofxRemoteUIClient::trackParam(string paramName, unsigned char* param){
 }
 
 
-void ofxRemoteUIClient::sendUntrackedParamUpdate(RemoteUIParam p, string paramName){
+void ofxRemoteUIClient::sendUntrackedParamUpdate(RemoteUIParam p, const string &paramName){
 	//p.print();
 	params[paramName] = p; //FIXME: error check!
 	vector<string>list;
@@ -575,7 +575,7 @@ void ofxRemoteUIClient::sendUntrackedParamUpdate(RemoteUIParam p, string paramNa
 	sendUpdateForParamsInList(list);
 }
 
-void ofxRemoteUIClient::sendTrackedParamUpdate(string paramName){
+void ofxRemoteUIClient::sendTrackedParamUpdate(const string &paramName){
 
 	auto it = params.find(paramName);
 	if ( it != params.end() ){

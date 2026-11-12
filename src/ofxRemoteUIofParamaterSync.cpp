@@ -255,7 +255,7 @@ void ofxRemoteUIofParamaterSync::onRemoteUINotification(RemoteUIServerCallBackAr
 }
 
 
-void ofxRemoteUIofParamaterSync::updateOfParamFromRuiParam(string ruiParamName){
+void ofxRemoteUIofParamaterSync::updateOfParamFromRuiParam(const string &ruiParamName){
 
 	RemoteUIParam ruiP = RUI_GET_PARAM(ruiParamName);
 

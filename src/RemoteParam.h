@@ -103,7 +103,8 @@ enum ActionType{
 	SAVE_GROUP_PRESET_ACTION,
 	DELETE_GROUP_PRESET_ACTION,
 	SEND_LOG_LINE_ACTION,
-	REMOVE_PARAM
+	REMOVE_PARAM,
+	UNKNOWN_ACTION
 };
 
 enum ArgType{
@@ -111,8 +112,8 @@ enum ArgType{
 };
 
 struct DecodedMessage{
-	ActionType action;
-	ArgType argument;
+	ActionType action = UNKNOWN_ACTION;
+	ArgType argument = NULL_ARG;
 	std::string paramName;
 };
 

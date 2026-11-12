@@ -15,10 +15,47 @@
 
 namespace {
 ofApp *activeApp = nullptr;
+constexpr float groupAnimationDuration = .5f;
+
+bool sameParameterValue(const RemoteUIParam &a, const RemoteUIParam &b) {
+	if (a.type != b.type) return false;
+	switch (a.type) {
+		case REMOTEUI_PARAM_FLOAT: return a.floatVal == b.floatVal;
+		case REMOTEUI_PARAM_INT:
+		case REMOTEUI_PARAM_ENUM: return a.intVal == b.intVal;
+		case REMOTEUI_PARAM_BOOL: return a.boolVal == b.boolVal;
+		case REMOTEUI_PARAM_STRING: return a.stringVal == b.stringVal;
+		case REMOTEUI_PARAM_COLOR: return a.redVal == b.redVal && a.greenVal == b.greenVal && a.blueVal == b.blueVal && a.alphaVal == b.alphaVal;
+		default: return true;
+	}
+}
+
+bool copyParameterValue(RemoteUIParam &target, const RemoteUIParam &source) {
+	if (target.type != source.type) return false;
+	switch (target.type) {
+		case REMOTEUI_PARAM_FLOAT: target.floatVal = source.floatVal; break;
+		case REMOTEUI_PARAM_INT:
+		case REMOTEUI_PARAM_ENUM: target.intVal = source.intVal; break;
+		case REMOTEUI_PARAM_BOOL: target.boolVal = source.boolVal; break;
+		case REMOTEUI_PARAM_STRING: target.stringVal = source.stringVal; break;
+		case REMOTEUI_PARAM_COLOR:
+			target.redVal = source.redVal; target.greenVal = source.greenVal;
+			target.blueVal = source.blueVal; target.alphaVal = source.alphaVal; break;
+		default: return false;
+	}
+	return true;
+}
 
 float parameterFontScale(float rowHeight) {
 	// Keep the row-size control relative to the client's 17px reference font.
 	return rowHeight > 0.f ? std::max(10.f, rowHeight - 2.f) / 17.f : 1.f;
+}
+
+bool framedCheckbox(const char *label, bool *value) {
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.f);
+	const bool changed = ImGui::Checkbox(label, value);
+	ImGui::PopStyleVar();
+	return changed;
 }
 
 void prepareSecondaryWindow() {
@@ -41,7 +78,6 @@ void applyWindowColor(const float color[4]) {
 	};
 	style.Colors[ImGuiCol_WindowBg] = ImVec4(color[0], color[1], color[2], color[3]);
 	style.Colors[ImGuiCol_PopupBg] = tone(.16f, .98f);
-	style.Colors[ImGuiCol_Border] = tone(.45f, .55f);
 	style.Colors[ImGuiCol_FrameBg] = tone(.23f);
 	style.Colors[ImGuiCol_FrameBgHovered] = tone(.34f);
 	style.Colors[ImGuiCol_FrameBgActive] = tone(.40f);
@@ -55,8 +91,8 @@ void applyWindowColor(const float color[4]) {
 	style.Colors[ImGuiCol_ScrollbarGrabActive] = tone(.62f);
 	style.Colors[ImGuiCol_CheckMark] = tone(.98f);
 	style.Colors[ImGuiCol_CheckboxSelectedBg] = tone(.32f);
-	style.Colors[ImGuiCol_SliderGrab] = tone(.75f);
-	style.Colors[ImGuiCol_SliderGrabActive] = tone(.95f);
+	style.Colors[ImGuiCol_SliderGrab] = tone(.55f);
+	style.Colors[ImGuiCol_SliderGrabActive] = tone(.72f);
 	style.Colors[ImGuiCol_Button] = tone(.29f);
 	style.Colors[ImGuiCol_ButtonHovered] = tone(.40f);
 	style.Colors[ImGuiCol_ButtonActive] = tone(.48f);
@@ -148,7 +184,10 @@ void ofApp::setup() {
 			case NativeMacMenu::OpenLocal: choosePresetFile(); break;
 			case NativeMacMenu::CopyValues: glfwSetClipboardString(glfwGetCurrentContext(), client.getValuesAsString().c_str()); break;
 			case NativeMacMenu::PasteValues: { const char *v = glfwGetClipboardString(glfwGetCurrentContext()); if (v) applyClipboardValues(v); break; }
-			case NativeMacMenu::ShowChanged: showOnlyChanged = !showOnlyChanged; break;
+			case NativeMacMenu::BlinkMidi: blinkBoundParameters(true); break;
+			case NativeMacMenu::BlinkUsb: blinkBoundParameters(false); break;
+			case NativeMacMenu::ToggleAllGroups: toggleAllGroups(); break;
+			case NativeMacMenu::HighlightChanged: highlightChangesSinceLoad = !highlightChangesSinceLoad; savePreferences(); break;
 			case NativeMacMenu::ActivityPanel: showLogPanel = !showLogPanel; break;
 			case NativeMacMenu::ServerLogPanel: showServerLogPanel = !showServerLogPanel; break;
 			case NativeMacMenu::PreferencesPanel: showSettings = !showSettings; break;
@@ -163,6 +202,7 @@ void ofApp::update() {
 	const float dt = ofGetLastFrameTime();
 	const bool wasConnected = client.isReadyToSend();
 	client.update(dt);
+	client.getChangedParamsList(); // Drain the addon's transient update queue; highlighting uses its own baseline.
 	#ifdef TARGET_OSX
 	for (const auto &path : NativeMacFileOpen::takePending()) queuePresetFile(path);
 	#endif
@@ -189,17 +229,25 @@ void ofApp::update() {
 		}
 	}
 	if (diffHighlightUntil > 0.0f && ofGetElapsedTimef() >= diffHighlightUntil) { diffParams.clear(); diffHighlightUntil = 0.0f; }
+	if (boundBlinkUntil > 0.0f && ofGetElapsedTimef() >= boundBlinkUntil) { blinkingBoundParams.clear(); boundBlinkUntil = 0.0f; }
 	controllers.update(dt, bindingServer(), [this](const std::string &name, const ControllerBindings::Input &event) { applyControllerInput(name, event); }, [this](const std::string &name, const ControllerBindings::Input &event) {
 		return client.isReadyToSend() && client.paramExistsForName(name) && (!event.button || client.getParamForName(name).type == REMOTEUI_PARAM_BOOL);
 	});
 	#ifdef TARGET_OSX
-	NativeMacMenu::update(client.isReadyToSend(), showLogPanel, showServerLogPanel, showSettings, showBindings, showOnlyChanged);
+	NativeMacMenu::update(client.isReadyToSend(), showLogPanel, showServerLogPanel, showSettings, showBindings, highlightChangesSinceLoad);
 	#endif
 }
 
 void ofApp::draw() {
 	if (!gui.isSetup()) return;
 	gui.begin();
+	#ifndef TARGET_OSX
+	if (client.isReadyToSend() && ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiMod_Shift | ImGuiKey_G, ImGuiInputFlags_RouteGlobal)) toggleAllGroups();
+	#endif
+	if (!ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+		activeMouseSlider.clear();
+		fineSliderTracking = false;
+	}
 	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DockingEnable) ImGui::DockSpaceOverViewport();
 	#ifndef TARGET_OSX
 	if (ImGui::BeginMainMenuBar()) {
@@ -216,7 +264,11 @@ void ofApp::draw() {
 			ImGui::Separator();
 			if (ImGui::MenuItem("Copy parameter values", nullptr, false, client.isReadyToSend())) glfwSetClipboardString(glfwGetCurrentContext(), client.getValuesAsString().c_str());
 			if (ImGui::MenuItem("Paste parameter values", nullptr, false, client.isReadyToSend())) { const char *v = glfwGetClipboardString(glfwGetCurrentContext()); if (v) applyClipboardValues(v); }
-			ImGui::MenuItem("Show changed parameters only", nullptr, &showOnlyChanged);
+			if (ImGui::MenuItem("Highlight changes since connection", nullptr, &highlightChangesSinceLoad, client.isReadyToSend())) savePreferences();
+			if (ImGui::MenuItem("Collapse / expand all groups", "Ctrl+Shift+G", false, client.isReadyToSend())) toggleAllGroups();
+			ImGui::Separator();
+			if (ImGui::MenuItem("Blink MIDI-bound parameters", nullptr, false, client.isReadyToSend())) blinkBoundParameters(true);
+			if (ImGui::MenuItem("Blink USB controller-bound parameters", nullptr, false, client.isReadyToSend())) blinkBoundParameters(false);
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Windows")) {
@@ -234,14 +286,6 @@ void ofApp::draw() {
 	if (showLogPanel) drawLogPanel();
 	if (showServerLogPanel) drawServerLogPanel();
 	if (showSettings) drawSettingsPanel();
-	if (showImGuiDemo) {
-		// The demo appends to this window; the first Begin supplies our window flags.
-		ImGui::SetNextWindowSize(ImVec2(550, 680), ImGuiCond_FirstUseEver);
-		prepareSecondaryWindow();
-		ImGui::Begin("Dear ImGui Demo", &showImGuiDemo, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_MenuBar);
-		ImGui::End();
-		ImGui::ShowDemoWindow(&showImGuiDemo);
-	}
 	if (showStyleEditor) {
 		ImGui::SetNextWindowSize(ImVec2(500, 600), ImGuiCond_FirstUseEver);
 		prepareSecondaryWindow();
@@ -288,6 +332,7 @@ void ofApp::onClientEvent(const RemoteUIClientCallBackArg &arg) {
 		case SERVER_CONNECTED: status = "Connected"; line << "Connected"; break;
 		case SERVER_DISCONNECTED: clearConnectionView(); status = "Disconnected"; line << "Disconnected"; break;
 		case SERVER_SENT_FULL_PARAMS_UPDATE:
+			if (!receivedFullSync) captureChangeBaseline();
 			receivedFullSync = true;
 			lastSyncCount = client.getAllParamNamesList().size();
 			lastSyncTime = ofGetElapsedTimef();
@@ -372,8 +417,14 @@ void ofApp::clearConnectionView() {
 	selectedPreset.clear();
 	groupPresetSelection.clear();
 	previousParams.clear();
+	changeBaseline.clear();
+	changedSinceLoad.clear();
 	diffParams.clear();
 	diffHighlightUntil = 0.0f;
+	blinkingBoundParams.clear();
+	boundBlinkUntil = 0.0f;
+	groupToggleTimes.clear();
+	groupContentHeights.clear();
 	presetReplyPending = false;
 }
 
@@ -424,15 +475,28 @@ void ofApp::drawParameterPanel() {
 	ImGui::SameLine(0.f, topSectionGap);
 	ImGui::BeginChild("group-filter-controls", ImVec2(0, topSectionHeight), ImGuiChildFlags_AlwaysUseWindowPadding);
 	ImGui::TextUnformatted("Filter Parameters");
-	ImGui::SetNextItemWidth(std::max(1.f, ImGui::GetContentRegionAvail().x));
+	const float clearWidth = ImGui::CalcTextSize("Clear").x + ImGui::GetStyle().FramePadding.x * 2.f;
+	ImGui::SetNextItemWidth(std::max(1.f, ImGui::GetContentRegionAvail().x - clearWidth - ImGui::GetStyle().ItemSpacing.x));
 	ImGui::InputTextWithHint("##filter", "Filter parameters...", filterBuffer, sizeof(filterBuffer));
+	ImGui::SameLine();
+	if (ImGui::Button("Clear")) filterBuffer[0] = '\0';
 	ImGui::EndChild();
 	ImGui::PopStyleVar();
 	ImGui::PopStyleColor();
 	ImGui::PopStyleVar(2);
 	ImGui::PopFont();
-	const auto changed = client.getChangedParamsList();
+	changedSinceLoad.clear();
+	if (highlightChangesSinceLoad && client.isReadyToSend()) {
+		for (const auto &entry : changeBaseline) {
+			if (client.paramExistsForName(entry.first) && !sameParameterValue(client.getParamForName(entry.first), entry.second)) changedSinceLoad.insert(entry.first);
+		}
+	}
 	const auto &collapsedGroups = collapsedGroupsByServer[bindingServer()];
+	const float groupAnimationNow = ofGetElapsedTimef();
+	for (auto it = groupToggleTimes.begin(); it != groupToggleTimes.end();) {
+		if (groupAnimationNow - it->second >= groupAnimationDuration) it = groupToggleTimes.erase(it);
+		else ++it;
+	}
 	std::vector<std::string> visible;
 	for (const auto &name : names) {
 		const auto p = client.getParamForName(name);
@@ -443,7 +507,7 @@ void ofApp::drawParameterPanel() {
 				if (item.type != REMOTEUI_PARAM_SPACER && item.group == p.group && (containsCaseInsensitive(candidate, filterBuffer) || containsCaseInsensitive(item.description, filterBuffer))) { matches = true; break; }
 			}
 			if (matches) visible.push_back(name);
-		} else if (!collapsedGroups.count(p.group) && (containsCaseInsensitive(name, filterBuffer) || containsCaseInsensitive(p.description, filterBuffer)) && (!showOnlyChanged || std::find(changed.begin(), changed.end(), name) != changed.end())) visible.push_back(name);
+		} else if ((!collapsedGroups.count(p.group) || groupToggleTimes.count(p.group)) && (containsCaseInsensitive(name, filterBuffer) || containsCaseInsensitive(p.description, filterBuffer))) visible.push_back(name);
 	}
 	const float footerScale = topScale;
 	ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * footerScale);
@@ -452,16 +516,20 @@ void ofApp::drawParameterPanel() {
 	const float footerWidth = std::max(1.f, ImGui::GetContentRegionAvail().x - ImGui::GetStyle().WindowPadding.x * 2.f);
 	const float footerSpacing = ImGui::GetStyle().ItemSpacing.x * 2;
 	auto footerButtonWidth = [](const char *label) { return ImGui::CalcTextSize(label).x + ImGui::GetStyle().FramePadding.x * 2.f; };
-	const float hostWidth = std::max(1.f, std::min(100.f * footerScale, footerWidth - ImGui::CalcTextSize("Host:").x - footerSpacing));
-	const float portWidth = std::max(1.f, std::min(50.f * footerScale, footerWidth - ImGui::CalcTextSize("Port:").x - footerSpacing));
+	const float hostWidth = std::max(1.f, std::min(110.f * footerScale, footerWidth - ImGui::CalcTextSize("Host:").x - footerSpacing));
+	const float portWidth = std::max(1.f, std::min(55.f * footerScale, footerWidth - ImGui::CalcTextSize("Port:").x - footerSpacing));
 	const float hostPortGap = 10.f * footerScale;
 	const std::string pendingText = pendingPresetFiles.empty() ? "" : ofToString(pendingPresetFiles.size()) + " preset file(s) waiting for sync";
 	const auto neighbors = client.getNeighbors();
-	std::string serverPreview = "Servers: " + ofToString(neighbors.size());
+	std::string serverPreview = "Servers: (" + ofToString(neighbors.size()) + ")";
 	if (client.isReadyToSend()) {
 		std::string connectedServer = host + ":" + ofToString(port);
 		for (const auto &neighbor : neighbors) {
-			if (neighbor.IP == host && neighbor.port == port && !neighbor.name.empty()) { connectedServer = neighbor.name; break; }
+			if (neighbor.IP == host && neighbor.port == port) {
+				if (!neighbor.binary.empty()) connectedServer = neighbor.binary;
+				else if (!neighbor.name.empty()) connectedServer = neighbor.name;
+				break;
+			}
 		}
 		serverPreview += "  \xC2\xB7  " + connectedServer;
 	}
@@ -504,8 +572,7 @@ void ofApp::drawParameterPanel() {
 	ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.f, 0.f, 0.f, .16f));
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.f);
 	if (ImGui::BeginChild("param-list", ImVec2(0, -footerHeight - ImGui::GetStyle().ItemSpacing.y - parameterListGap), ImGuiChildFlags_AlwaysUseWindowPadding)) {
-		if (!client.isReadyToSend()) ImGui::TextDisabled("Connect to a server to see its parameters.");
-		else if (!receivedFullSync) ImGui::TextDisabled("Waiting for server parameter data...");
+		if (client.isReadyToSend() && !receivedFullSync) ImGui::TextDisabled("Waiting for server parameter data...");
 		else if (names.empty()) ImGui::TextDisabled("Sync completed with no parameters. Check the server and try Sync.");
 		std::vector<std::vector<std::string>> blocks;
 		for (const auto &name : visible) {
@@ -556,29 +623,50 @@ void ofApp::drawParameterPanel() {
 					longestLabelWidth = std::max(longestLabelWidth, ImGui::CalcTextSize(name.c_str(), nullptr, true).x);
 			}
 			ImGui::PopFont();
-			const float groupLabelWidth = std::min(groupContentWidth * .55f, std::max(groupContentWidth * .35f, longestLabelWidth + 4.f));
-			bool contentStarted = false;
-			for (size_t row = 0; row < blocks[i].size(); ++row) {
-				const auto &name = blocks[i][row];
-				ImGui::PushID(static_cast<int>(row));
-				const auto p = client.getParamForName(name);
-				if (p.type == REMOTEUI_PARAM_SPACER) drawGroupHeader(name, p);
-				else {
-					if (!contentStarted) {
-						ImGui::Dummy(ImVec2(0.f, 4.f));
-						ImGui::Indent(6.f);
-						contentStarted = true;
-					}
-					if (continuousRefresh) ImGui::BeginDisabled();
-					drawParameter(name, groupLabelWidth);
-					if (continuousRefresh) ImGui::EndDisabled();
-				}
+			const float groupLabelWidth = std::min(groupContentWidth * .55f, std::max(groupContentWidth * .35f, longestLabelWidth + 6.f * parameterFontScale(rowHeight)));
+			const auto firstParam = client.getParamForName(blocks[i].front());
+			const bool hasHeader = firstParam.type == REMOTEUI_PARAM_SPACER;
+			if (hasHeader) {
+				ImGui::PushID(0);
+				drawGroupHeader(blocks[i].front(), firstParam);
 				ImGui::PopID();
 			}
-			if (contentStarted) {
+			const size_t firstRow = hasHeader ? 1 : 0;
+			const bool hasContent = firstRow < blocks[i].size();
+			const std::string &group = firstParam.group;
+			const bool collapsing = collapsedGroups.count(group) != 0;
+			const auto animation = groupToggleTimes.find(group);
+			const bool animating = hasContent && animation != groupToggleTimes.end();
+			if (animating) {
+				const float progress = ofClamp((ofGetElapsedTimef() - animation->second) / groupAnimationDuration, 0.f, 1.f);
+				const float eased = .5f + .5f * std::tanh((progress * 2.f - 1.f) * 3.f) / std::tanh(3.f);
+				const float fraction = collapsing ? 1.f - eased : eased;
+				const auto height = groupContentHeights.find(group);
+				const float fullHeight = height != groupContentHeights.end() ? height->second : 8.f + (blocks[i].size() - firstRow) * (effectiveRowHeight + ImGui::GetStyle().ItemSpacing.y);
+				ImGui::BeginChild("group-animation", ImVec2(0.f, std::max(1.f, fullHeight * fraction)), ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+			}
+			const float contentStartY = ImGui::GetCursorPosY();
+			if (hasContent) {
+				ImGui::Dummy(ImVec2(0.f, 4.f));
+				ImGui::Indent(6.f);
+			}
+			for (size_t row = firstRow; row < blocks[i].size(); ++row) {
+				const auto &name = blocks[i][row];
+				ImGui::PushID(static_cast<int>(row));
+				if (continuousRefresh) ImGui::BeginDisabled();
+				if (animating) ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+				drawParameter(name, groupLabelWidth);
+				if (animating) ImGui::PopItemFlag();
+				if (continuousRefresh) ImGui::EndDisabled();
+				ImGui::PopID();
+			}
+			if (hasContent) {
 				ImGui::Unindent(6.f);
 				ImGui::Dummy(ImVec2(0.f, 4.f));
+				const float measuredHeight = ImGui::GetCursorPosY() - contentStartY;
+				if (measuredHeight > 8.f) groupContentHeights[group] = measuredHeight;
 			}
+			if (animating) ImGui::EndChild();
 			ImGui::PopID();
 			ImGui::EndGroup();
 			const ImVec2 min = ImGui::GetItemRectMin(), measuredMax = ImGui::GetItemRectMax();
@@ -665,11 +753,13 @@ void ofApp::drawParameterPanel() {
 	const bool serverDropdownOpen = ImGui::BeginCombo("##servers", serverPreview.c_str());
 	if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", serverPreview.c_str());
 	if (serverDropdownOpen) {
-		ImGui::Checkbox("Discover servers", &autoDiscovery);
+		framedCheckbox("Discover servers", &autoDiscovery);
 		if (neighbors.empty()) ImGui::TextDisabled("No servers discovered yet");
 		for (size_t i = 0; i < neighbors.size(); ++i) {
 			const auto &neighbor = neighbors[i];
-			const auto label = neighbor.name + " @ " + neighbor.IP + ":" + ofToString(neighbor.port);
+			std::string label = neighbor.binary.empty() ? "Server" : neighbor.binary;
+			if (!neighbor.name.empty()) label += " on " + neighbor.name;
+			label += " @ " + neighbor.IP + ":" + ofToString(neighbor.port);
 			const bool selected = client.isReadyToSend() && neighbor.IP == host && neighbor.port == port;
 			ImGui::PushID(static_cast<int>(i));
 			if (ImGui::Selectable(label.c_str(), selected) && !selected) selectNeighbor(neighbor);
@@ -685,7 +775,7 @@ void ofApp::drawParameterPanel() {
 		ImVec2(dividerX, dividerMax.y - ImGui::GetFrameHeight() * .1f), ImGui::GetColorU32(ImGuiCol_Separator));
 	ImGui::SameLine(); if (ImGui::Button("Sync") && client.isReadyToSend()) client.requestCompleteUpdate();
 	if (ImGui::IsItemHovered()) ImGui::SetTooltip("Pulls the Current Param values from the server");
-	ImGui::SameLine(0.f, syncContinuousGap); ImGui::Checkbox("Non-Stop", &continuousRefresh);
+	ImGui::SameLine(0.f, syncContinuousGap); framedCheckbox("Non-Stop", &continuousRefresh);
 	ImGui::EndChild();
 	ImGui::PopStyleVar();
 	ImGui::PopStyleColor();
@@ -711,6 +801,7 @@ void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param)
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.f, 1.f, 1.f, .24f));
 	if (ImGui::Button("##toggle-group", ImVec2(titleWidth, height))) {
 		if (collapsedGroups.count(group)) collapsedGroups.erase(group); else collapsedGroups.insert(group);
+		groupToggleTimes[group] = ofGetElapsedTimef();
 		saveCollapsedGroups();
 	}
 	const float fontSize = ImGui::GetFontSize();
@@ -774,7 +865,7 @@ void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param)
 	ImGui::SameLine();
 	ImGui::SetCursorScreenPos(ImVec2(ImGui::GetCursorScreenPos().x, pos.y + (height - presetButtonHeight) * .5f));
 	ImGui::SetNextItemWidth(std::max(1.f, ImGui::GetContentRegionAvail().x - 1.5f * parameterFontScale(rowHeight)));
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetStyle().FramePadding.x, std::max(0.f, (presetButtonHeight - ImGui::GetFontSize()) * .5f)));
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetStyle().FramePadding.x + 2.f * parameterFontScale(rowHeight), std::max(0.f, (presetButtonHeight - ImGui::GetFontSize()) * .5f)));
 	const float r = param.r / 255.f, g = param.g / 255.f, b = param.b / 255.f;
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(.12f + r * .32f, .12f + g * .32f, .12f + b * .32f, 1.f));
 	ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(.16f + r * .38f, .16f + g * .38f, .16f + b * .38f, 1.f));
@@ -807,22 +898,14 @@ void ofApp::drawParameter(const std::string &name, float groupLabelWidth) {
 	bool edited = false;
 	const float contentWidth = std::max(1.f, ImGui::GetContentRegionAvail().x - 6.f);
 	const float labelWidth = std::min(groupLabelWidth, contentWidth);
-	const float controlWidth = std::max(1.f, contentWidth - labelWidth - ImGui::GetStyle().ItemSpacing.x);
+	const float controlLabelGap = ImGui::GetStyle().ItemSpacing.x + 4.f * parameterFontScale(rowHeight);
+	const float controlWidth = std::max(1.f, contentWidth - labelWidth - controlLabelGap);
 	const float controlStartX = ImGui::GetCursorScreenPos().x;
 	ImGui::SetNextItemWidth(controlWidth);
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4.f, std::max(1.f, (targetRowHeight - ImGui::GetFontSize()) * .5f)));
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(.08f, .08f, .08f, .25f));
 	ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(.08f, .08f, .08f, .38f));
 	ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(.08f, .08f, .08f, .48f));
-	const bool coloredCheckbox = p.a && p.type == REMOTEUI_PARAM_BOOL;
-	if (coloredCheckbox) {
-		const float r = p.r / 255.f, g = p.g / 255.f, b = p.b / 255.f;
-		ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(.10f + .35f * r, .10f + .35f * g, .10f + .35f * b, 1.f));
-		ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(.15f + .42f * r, .15f + .42f * g, .15f + .42f * b, 1.f));
-		ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(.19f + .45f * r, .19f + .45f * g, .19f + .45f * b, 1.f));
-		ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4(.35f + .60f * r, .35f + .60f * g, .35f + .60f * b, 1.f));
-		ImGui::PushStyleColor(ImGuiCol_CheckboxSelectedBg, ImVec4(.10f + .35f * r, .10f + .35f * g, .10f + .35f * b, 1.f));
-	}
 	const bool coloredSlider = p.a && ((p.type == REMOTEUI_PARAM_FLOAT && p.minFloat < p.maxFloat) ||
 		(p.type == REMOTEUI_PARAM_INT && p.minInt < p.maxInt));
 	if (coloredSlider) {
@@ -830,25 +913,60 @@ void ofApp::drawParameter(const std::string &name, float groupLabelWidth) {
 		ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(.10f + .35f * r, .10f + .35f * g, .10f + .35f * b, 1.f));
 		ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(.15f + .42f * r, .15f + .42f * g, .15f + .42f * b, 1.f));
 		ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(.19f + .45f * r, .19f + .45f * g, .19f + .45f * b, 1.f));
-		ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(.35f + .60f * r, .35f + .60f * g, .35f + .60f * b, 1.f));
-		ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImVec4(.5f + .5f * r, .5f + .5f * g, .5f + .5f * b, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(.22f + .48f * r, .22f + .48f * g, .22f + .48f * b, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImVec4(.35f + .42f * r, .35f + .42f * g, .35f + .42f * b, 1.f));
 	}
+	auto drawFineSlider = [&](auto drawSlider) {
+		ImGuiIO &io = ImGui::GetIO();
+		const float realMouseX = io.MousePos.x;
+		const bool tracking = activeMouseSlider == name && ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsMousePosValid();
+		if (tracking) {
+			if (io.KeyAlt || fineSliderTracking) {
+				fineSliderTracking = true;
+				virtualSliderMouseX = ofClamp(virtualSliderMouseX + io.MouseDelta.x * (io.KeyAlt ? .1f : 1.f), controlStartX, controlStartX + controlWidth);
+				io.MousePos.x = virtualSliderMouseX;
+			} else {
+				virtualSliderMouseX = realMouseX;
+			}
+		}
+		const bool changed = drawSlider();
+		io.MousePos.x = realMouseX;
+		if (ImGui::IsItemActivated() && ImGui::IsMouseDown(ImGuiMouseButton_Left) && !io.KeyCtrl) {
+			activeMouseSlider = name;
+			virtualSliderMouseX = realMouseX;
+			fineSliderTracking = false;
+		}
+		if (ImGui::IsItemDeactivated() && activeMouseSlider == name) {
+			activeMouseSlider.clear();
+			fineSliderTracking = false;
+		}
+		if (ImGui::IsItemHovered()) ImGui::SetTooltip("Hold Option / Alt while dragging for fine adjustment");
+		return changed;
+	};
 	switch (p.type) {
 		case REMOTEUI_PARAM_BOOL: {
 			const ImVec2 pos = ImGui::GetCursorScreenPos();
-			ImGui::SetCursorScreenPos(ImVec2(pos.x + std::max(0.f, (controlWidth - ImGui::GetFrameHeight()) * .5f), pos.y));
-			edited = ImGui::Checkbox("##value", &p.boolVal);
+			const float buttonWidth = std::min(controlWidth, std::max(ImGui::GetFrameHeight() * 2.f, ImGui::CalcTextSize("OFF").x + ImGui::GetStyle().FramePadding.x * 2.f));
+			ImGui::SetCursorScreenPos(ImVec2(pos.x + std::max(0.f, (controlWidth - buttonWidth) * .5f), pos.y));
+			const float r = p.a ? p.r / 255.f : .5f, g = p.a ? p.g / 255.f : .5f, b = p.a ? p.b / 255.f : .5f;
+			const float tint = p.boolVal ? .45f : .10f;
+			const float base = p.boolVal ? .16f : .18f;
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(base + tint * r, base + tint * g, base + tint * b, 1.f));
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(base + .08f + tint * r, base + .08f + tint * g, base + .08f + tint * b, 1.f));
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(base + .14f + tint * r, base + .14f + tint * g, base + .14f + tint * b, 1.f));
+			if (ImGui::Button(p.boolVal ? "ON###value" : "OFF###value", ImVec2(buttonWidth, 0))) { p.boolVal = !p.boolVal; edited = true; }
+			ImGui::PopStyleColor(3);
 			break;
 		}
 		case REMOTEUI_PARAM_FLOAT: {
 			float value = p.floatVal;
-			if (p.minFloat < p.maxFloat) edited = ImGui::SliderFloat("##value", &value, p.minFloat, p.maxFloat, "%.4g");
+			if (p.minFloat < p.maxFloat) edited = drawFineSlider([&] { return ImGui::SliderFloat("##value", &value, p.minFloat, p.maxFloat, "%.4g"); });
 			else edited = ImGui::DragFloat("##value", &value, 0.01f, 0, 0, "%.4g");
 			p.floatVal = value; break;
 		}
 		case REMOTEUI_PARAM_INT: {
 			int value = p.intVal;
-			if (p.minInt < p.maxInt) edited = ImGui::SliderInt("##value", &value, p.minInt, p.maxInt);
+			if (p.minInt < p.maxInt) edited = drawFineSlider([&] { return ImGui::SliderInt("##value", &value, p.minInt, p.maxInt); });
 			else edited = ImGui::InputInt("##value", &value);
 			p.intVal = value; break;
 		}
@@ -884,31 +1002,51 @@ void ofApp::drawParameter(const std::string &name, float groupLabelWidth) {
 		default: ImGui::TextDisabled("%s", paramTypeName(p.type)); break;
 	}
 	if (coloredSlider) ImGui::PopStyleColor(5);
-	if (coloredCheckbox) ImGui::PopStyleColor(5);
 	ImGui::PopStyleColor(3);
 	ImGui::PopStyleVar();
-	ImGui::SameLine();
+	ImGui::SameLine(0.f, controlLabelGap);
 	if (p.type == REMOTEUI_PARAM_BOOL) {
 		const ImVec2 pos = ImGui::GetCursorScreenPos();
-		ImGui::SetCursorScreenPos(ImVec2(std::max(pos.x, controlStartX + controlWidth + ImGui::GetStyle().ItemSpacing.x), pos.y));
+		ImGui::SetCursorScreenPos(ImVec2(std::max(pos.x, controlStartX + controlWidth + controlLabelGap), pos.y));
 	}
 	ImGui::AlignTextToFramePadding();
-	if (diffParams.count(name)) {
+	const bool blinkBinding = blinkingBoundParams.count(name) != 0;
+	const bool temporaryHighlight = blinkBinding || diffParams.count(name);
+	const bool highlightLabel = temporaryHighlight || changedSinceLoad.count(name);
+	float highlightPulse = 0.f;
+	if (blinkBinding) {
+		highlightPulse = .5f + .5f * std::cos((boundBlinkUntil - ofGetElapsedTimef()) * 3.14159265f * 2.f);
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));
+	} else if (temporaryHighlight) {
 		// A slow white-to-amber pulse keeps the label readable throughout.
-		const float pulse = .5f + .5f * std::sin(ofGetElapsedTimef() * 3.14159265f);
-		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, .78f + .22f * pulse, .4f + .6f * pulse, 1.f));
+		highlightPulse = .5f + .5f * std::sin(ofGetElapsedTimef() * 3.14159265f);
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f - .22f * highlightPulse, 1.f - .6f * highlightPulse, 1.f));
+	} else if (highlightLabel) {
+		const float pulse = .5f + .5f * std::sin(ofGetElapsedTimef() * 2.f * 3.14159265f);
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f - .5f * pulse, 1.f - .5f * pulse, 1.f));
 	}
 	const ImVec2 labelPos = ImGui::GetCursorScreenPos();
 	const float halfSpacing = ImGui::GetStyle().ItemSpacing.x * .5f;
+	const float labelPadding = 3.f * parameterFontScale(rowHeight);
 	const float clippedLabelWidth = std::max(1.f, std::min(labelWidth, ImGui::GetContentRegionAvail().x - 6.f - ImGui::GetStyle().ItemSpacing.x));
 	const ImVec2 windowPos = ImGui::GetWindowPos(), windowSize = ImGui::GetWindowSize();
 	const float r = p.a ? p.r / 255.f : .5f, g = p.a ? p.g / 255.f : .5f, b = p.a ? p.b / 255.f : .5f;
 	ImGui::PushStyleVar(ImGuiStyleVar_SelectableRounding, 5.f);
-	ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(.12f + .35f * r, .12f + .35f * g, .12f + .35f * b, 1.f));
-	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(.16f + .42f * r, .16f + .42f * g, .16f + .42f * b, 1.f));
-	ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(.20f + .48f * r, .20f + .48f * g, .20f + .48f * b, 1.f));
+	const float glow = temporaryHighlight ? .32f * highlightPulse : 0.f;
+	ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(.12f + .35f * r + glow, .12f + .35f * g + glow * .30f, .12f + .35f * b, 1.f));
+	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(.16f + .42f * r + glow, .16f + .42f * g + glow * .30f, .16f + .42f * b, 1.f));
+	ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(.20f + .48f * r + glow, .20f + .48f * g + glow * .30f, .20f + .48f * b, 1.f));
 	ImGui::PushClipRect(ImVec2(labelPos.x - halfSpacing, windowPos.y), ImVec2(labelPos.x + clippedLabelWidth + halfSpacing, windowPos.y + windowSize.y), true);
-	const bool labelClicked = ImGui::Selectable(name.c_str(), controllers.learning == name, 0, ImVec2(clippedLabelWidth, 0));
+	const bool labelClicked = ImGui::Selectable("##parameter-label", controllers.learning == name || temporaryHighlight, 0, ImVec2(clippedLabelWidth, ImGui::GetTextLineHeight()));
+	const bool labelHovered = ImGui::IsItemHovered();
+	if (labelHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) ImGui::OpenPopup("parameter-context");
+	const ImVec2 itemMin = ImGui::GetItemRectMin();
+	const float textY = itemMin.y + std::floor(ImGui::GetStyle().ItemSpacing.y * .5f);
+	const float textLeft = labelPos.x + labelPadding;
+	const float textRight = std::max(textLeft, labelPos.x + clippedLabelWidth - labelPadding);
+	ImGui::PushClipRect(ImVec2(textLeft, windowPos.y), ImVec2(textRight, windowPos.y + windowSize.y), true);
+	ImGui::GetWindowDrawList()->AddText(ImVec2(textLeft, textY), ImGui::GetColorU32(ImGuiCol_Text), name.c_str(), name.c_str() + name.size());
+	ImGui::PopClipRect();
 	ImGui::PopClipRect();
 	ImGui::PopStyleColor(3);
 	ImGui::PopStyleVar();
@@ -921,16 +1059,44 @@ void ofApp::drawParameter(const std::string &name, float groupLabelWidth) {
 			bindingPopupRequested = true;
 		}
 	}
-	if (diffParams.count(name)) ImGui::PopStyleColor();
+	if (highlightLabel) ImGui::PopStyleColor();
 	ImGui::PopFont();
-	if (ImGui::IsItemHovered() && ImGui::BeginTooltip()) {
-		ImGui::TextUnformatted(name.c_str());
-		ImGui::TextUnformatted("Click to bind a MIDI or joystick control");
-		if (!p.description.empty()) {
-			ImGui::Separator();
-			ImGui::TextUnformatted(p.description.c_str());
+	if (labelHovered && !ImGui::IsPopupOpen("parameter-context")) {
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, ImGui::GetStyle().PopupRounding);
+		if (ImGui::BeginTooltip()) {
+			ImGui::Text("\"%s\": (%s)",name.c_str(), paramTypeName(p.type));
+			if (p.type == REMOTEUI_PARAM_FLOAT && p.minFloat < p.maxFloat)
+				ImGui::Text("Range: %.6g to %.6g", p.minFloat, p.maxFloat);
+			else if (p.type == REMOTEUI_PARAM_INT && p.minInt < p.maxInt)
+				ImGui::Text("Range: %d to %d", p.minInt, p.maxInt);
+			ImGui::TextUnformatted("Click to bind a MIDI or joystick control");
+			if (!p.description.empty()) {
+				ImGui::Separator();
+				ImGui::TextUnformatted(p.description.c_str());
+			}
+			ImGui::EndTooltip();
 		}
-		ImGui::EndTooltip();
+		ImGui::PopStyleVar();
+	}
+	if (ImGui::BeginPopup("parameter-context")) {
+		const auto baseline = changeBaseline.find(name);
+		const bool changed = baseline != changeBaseline.end() && p.type == baseline->second.type && !sameParameterValue(p, baseline->second);
+		const float restoreWidth = ImGui::CalcTextSize("Restore Parameter Value").x + ImGui::GetStyle().FramePadding.x * 2.f;
+		const ImGuiSelectableFlags restoreFlags = client.isReadyToSend() && changed ? ImGuiSelectableFlags_None : ImGuiSelectableFlags_Disabled;
+		if (ImGui::Selectable("Restore Parameter Value", false, restoreFlags, ImVec2(restoreWidth, 0.f))) {
+			RemoteUIParam restored = p;
+			if (copyParameterValue(restored, baseline->second)) {
+				sendEditedParam(name, restored);
+				appendLog("Restored connection value for " + name);
+			}
+		}
+		ImGui::SameLine();
+		ImGui::TextDisabled("(?)");
+		if (ImGui::IsItemHovered()) {
+			if (!changed) ImGui::SetTooltip("Restores the value this client received from the server on its most recent connection.\n\nThis parameter has not changed since then.");
+			else ImGui::SetTooltip("Restores the value this client received from the server on its most recent connection.");
+		}
+		ImGui::EndPopup();
 	}
 	if (edited) sendEditedParam(name, p);
 	ImGui::PopID();
@@ -974,27 +1140,57 @@ void ofApp::drawSettingsPanel() {
 	ImGui::SetNextWindowSize(ImVec2(360, 260), ImGuiCond_FirstUseEver);
 	prepareSecondaryWindow();
 	if (!ImGui::Begin("Settings", &showSettings, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); return; }
-	ImGui::Checkbox("Auto-connect to new servers", &autoConnectToNewServers);
+	framedCheckbox("Auto-connect to new servers", &autoConnectToNewServers);
 	ImGui::Indent();
-	ImGui::Checkbox("Only auto-connect to localhost servers", &onlyAutoConnectToLocalHost);
+	framedCheckbox("Only auto-connect to localhost servers", &onlyAutoConnectToLocalHost);
 	ImGui::Unindent();
-	if (ImGui::Checkbox("Always on top", &alwaysOnTop)) setAlwaysOnTop(alwaysOnTop);
-	ImGui::Checkbox("External buttons toggle", &controllers.toggleButtons);
-	ImGui::Checkbox("Color knobs control alpha", &controllers.colorControlsAlpha);
-	ImGui::Checkbox("Highlight changes after loading presets", &highlightPresetDiff);
-	ImGui::Checkbox("Auto-scroll logs", &autoScrollLog);
+	if (framedCheckbox("Always on top", &alwaysOnTop)) setAlwaysOnTop(alwaysOnTop);
+	framedCheckbox("External buttons toggle", &controllers.toggleButtons);
+	framedCheckbox("Color knobs control alpha", &controllers.colorControlsAlpha);
+	framedCheckbox("Highlight changes after loading presets", &highlightPresetDiff);
+	framedCheckbox("Auto-scroll logs", &autoScrollLog);
 	float uiScalePercent = parameterFontScale(rowHeight) * 100.f;
 	if (ImGui::SliderFloat("Parameter GUI size", &uiScalePercent, 100.f * 10.f / 17.f, 100.f * 46.f / 17.f, "%.0f%%")) rowHeight = 2.f + 17.f * uiScalePercent / 100.f;
 	ImGui::SliderFloat("Column width", &columnBaseWidth, 220.f, 500.f, "%.0f px");
 	if (ImGui::IsItemHovered()) ImGui::SetTooltip("Smaller values allow more columns. The threshold also follows parameter row height.");
 	if (ImGui::ColorEdit3("Window color", windowColor)) applyWindowColor(windowColor);
 	if (ImGui::Button("Open ImGui style editor")) showStyleEditor = true;
-	if (ImGui::Button("Open ImGui demo")) showImGuiDemo = true;
+	ImGui::Spacing();
+	ImGui::Spacing();
 	if (ImGui::Button("Save preferences")) savePreferences();
 	ImGui::End();
 }
 
 std::string ofApp::bindingServer() const { return host + ":" + ofToString(port); }
+
+void ofApp::toggleAllGroups() {
+	if (!client.isReadyToSend()) return;
+	auto &collapsed = collapsedGroupsByServer[bindingServer()];
+	std::unordered_set<std::string> groups;
+	for (const auto &name : client.getAllParamNamesList()) {
+		const auto param = client.getParamForName(name);
+		if (param.type == REMOTEUI_PARAM_SPACER) groups.insert(param.group);
+	}
+	if (groups.empty()) return;
+	const bool collapse = std::any_of(groups.begin(), groups.end(), [&](const std::string &group) { return collapsed.count(group) == 0; });
+	const float now = ofGetElapsedTimef();
+	for (const auto &group : groups) {
+		const bool wasCollapsed = collapsed.count(group) != 0;
+		if (wasCollapsed == collapse) continue;
+		if (collapse) collapsed.insert(group); else collapsed.erase(group);
+		groupToggleTimes[group] = now;
+	}
+	saveCollapsedGroups();
+}
+
+void ofApp::blinkBoundParameters(bool midi) {
+	blinkingBoundParams.clear();
+	for (const auto &binding : controllers.bindings) {
+		const bool matchesKind = midi ? binding.kind.compare(0, 5, "MIDI ") == 0 : binding.kind.compare(0, 9, "Joystick ") == 0;
+		if (matchesKind && binding.server == bindingServer() && client.paramExistsForName(binding.param)) blinkingBoundParams.insert(binding.param);
+	}
+	boundBlinkUntil = blinkingBoundParams.empty() ? 0.f : ofGetElapsedTimef() + 4.f;
+}
 
 void ofApp::drawBindingsPanel() {
 	ImGui::SetNextWindowSize(ImVec2(720, 300), ImGuiCond_FirstUseEver);
@@ -1005,7 +1201,7 @@ void ofApp::drawBindingsPanel() {
 		ImGui::TextWrapped("Move a MIDI control or joystick axis, or press a button, to bind %s.", controllers.learning.c_str());
 		if (ImGui::Button("Cancel learning")) controllers.learning.clear();
 	} else ImGui::TextDisabled("Click a parameter name to learn a control.");
-	if (!bindingParam.empty()) ImGui::Checkbox("Show bindings for all parameters and servers", &showAllBindings);
+	if (!bindingParam.empty()) framedCheckbox("Show bindings for all parameters and servers", &showAllBindings);
 	ImGui::Separator();
 	bool any = false;
 	ImGui::BeginChild("bindings-list", ImVec2(0, 0));
@@ -1022,7 +1218,12 @@ void ofApp::drawBindingsPanel() {
 		if (!showAllBindings && (b.server != bindingServer() || b.param != bindingParam)) { ++i; continue; }
 		any = true; ImGui::PushID((int)i);
 		ImGui::TableNextRow();
-		ImGui::TableNextColumn(); ImGui::TextWrapped("%s", b.param.c_str());
+		ImGui::TableNextColumn();
+		if (client.isReadyToSend() && b.server == bindingServer() && client.paramExistsForName(b.param)) {
+			const auto param = client.getParamForName(b.param);
+			if (param.a) ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, IM_COL32(25 + param.r * 35 / 100, 25 + param.g * 35 / 100, 25 + param.b * 35 / 100, 255));
+		}
+		ImGui::TextWrapped("%s", b.param.c_str());
 		ImGui::TableNextColumn(); ImGui::TextWrapped("%s", ControllerBindings::label(b).c_str());
 		ImGui::TableNextColumn(); ImGui::TextWrapped("%s", b.server.c_str());
 		ImGui::TableNextColumn(); bool remove = ImGui::SmallButton("Remove");
@@ -1068,6 +1269,15 @@ void ofApp::rememberCurrentValuesForDiff() {
 	previousParams.clear();
 	for (const auto &n : client.getAllParamNamesList()) previousParams.emplace(n, client.getParamForName(n));
 	diffParams.clear();
+}
+
+void ofApp::captureChangeBaseline() {
+	changeBaseline.clear();
+	for (const auto &name : client.getAllParamNamesList()) {
+		const auto param = client.getParamForName(name);
+		if (param.type != REMOTEUI_PARAM_SPACER) changeBaseline.emplace(name, param);
+	}
+	changedSinceLoad.clear();
 }
 
 void ofApp::applyPreset(const std::string &name) { rememberCurrentValuesForDiff(); selectedPreset = name; presetReplyPending = true; client.setPreset(name); }
@@ -1158,17 +1368,25 @@ void ofApp::loadCollapsedGroups() {
 void ofApp::savePreferences() const {
 	std::ofstream out(ClientPaths::settingsFile("remoteui-imgui-client.ini"));
 	if (!out) return;
-	out << host << '\n' << port << '\n' << autoDiscovery << '\n' << autoConnectToNewServers << '\n' << onlyAutoConnectToLocalHost << '\n' << continuousRefresh << '\n' << showOnlyChanged << '\n' << alwaysOnTop << '\n' << autoScrollLog << '\n' << controllers.toggleButtons << '\n' << controllers.colorControlsAlpha << '\n' << highlightPresetDiff << '\n' << rowHeight << '\n' << windowColor[0] << ' ' << windowColor[1] << ' ' << windowColor[2] << '\n';
+	// Keep the retired filter's slot for compatibility with existing settings.
+	out << host << '\n' << port << '\n' << autoDiscovery << '\n' << autoConnectToNewServers << '\n' << onlyAutoConnectToLocalHost << '\n' << continuousRefresh << '\n' << false << '\n' << alwaysOnTop << '\n' << autoScrollLog << '\n' << controllers.toggleButtons << '\n' << controllers.colorControlsAlpha << '\n' << highlightPresetDiff << '\n' << rowHeight << '\n' << windowColor[0] << ' ' << windowColor[1] << ' ' << windowColor[2] << '\n';
 	out << columnBaseWidth << '\n';
+	out << "highlightChangesSinceLoad=" << (highlightChangesSinceLoad ? 1 : 0) << '\n';
 }
 void ofApp::loadPreferences() {
 	std::ifstream in(ClientPaths::existingSettingsFile("remoteui-imgui-client.ini"));
 	if (!in) return;
 	std::getline(in, host);
-	in >> port >> autoDiscovery >> autoConnectToNewServers >> onlyAutoConnectToLocalHost >> continuousRefresh >> showOnlyChanged >> alwaysOnTop >> autoScrollLog;
+	bool retiredChangedFilter = false;
+	in >> port >> autoDiscovery >> autoConnectToNewServers >> onlyAutoConnectToLocalHost >> continuousRefresh >> retiredChangedFilter >> alwaysOnTop >> autoScrollLog;
 	in >> controllers.toggleButtons >> controllers.colorControlsAlpha >> highlightPresetDiff >> rowHeight >> windowColor[0] >> windowColor[1] >> windowColor[2];
 	float savedColumnWidth;
 	if (in >> savedColumnWidth) columnBaseWidth = ofClamp(savedColumnWidth, 220.f, 500.f);
+	std::string option;
+	while (std::getline(in, option)) {
+		if (option == "highlightChangesSinceLoad=1") highlightChangesSinceLoad = true;
+		else if (option == "highlightChangesSinceLoad=0") highlightChangesSinceLoad = false;
+	}
 	if (host.empty()) host = "127.0.0.1";
 	std::strncpy(hostBuffer, host.c_str(), sizeof(hostBuffer) - 1);
 	setAlwaysOnTop(alwaysOnTop);

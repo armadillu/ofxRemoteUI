@@ -25,6 +25,9 @@ private:
 	void drawSettingsPanel();
 	void drawBindingsPanel();
 	void applyControllerInput(const std::string &name, const ControllerBindings::Input &event);
+	void blinkBoundParameters(bool midi);
+	void toggleAllGroups();
+	void captureChangeBaseline();
 	std::string bindingServer() const;
 	void drawParameter(const std::string &name, float groupLabelWidth);
 	void drawGroupHeader(const std::string &name, const RemoteUIParam &param);
@@ -64,11 +67,10 @@ private:
 	bool autoConnectToNewServers = false;
 	bool onlyAutoConnectToLocalHost = true;
 	bool continuousRefresh = false;
-	bool showOnlyChanged = false;
+	bool highlightChangesSinceLoad = false;
 	bool alwaysOnTop = false;
 	bool showSettings = false;
 	bool showStyleEditor = false;
-	bool showImGuiDemo = false;
 	bool showBindings = false;
 	bool focusBindings = false;
 	bool showAllBindings = true;
@@ -93,8 +95,14 @@ private:
 	std::vector<std::string> pendingPresetFiles;
 	std::unordered_map<std::string, std::string> groupPresetSelection;
 	std::unordered_map<std::string, std::unordered_set<std::string>> collapsedGroupsByServer;
+	std::unordered_map<std::string, float> groupToggleTimes;
+	std::unordered_map<std::string, float> groupContentHeights;
 	std::unordered_map<std::string, RemoteUIParam> previousParams;
+	std::unordered_map<std::string, RemoteUIParam> changeBaseline;
+	std::unordered_set<std::string> changedSinceLoad;
 	std::unordered_set<std::string> diffParams;
+	std::unordered_set<std::string> blinkingBoundParams;
+	float boundBlinkUntil = 0.0f;
 	float diffHighlightUntil = 0.0f;
 	float continuousRefreshTimer = 0.0f;
 	float lastLag = -1.0f;
@@ -102,4 +110,7 @@ private:
 	bool autoSavePreferences = true;
 	float rowHeight = 0.0f;
 	float columnBaseWidth = 300.0f;
+	std::string activeMouseSlider;
+	float virtualSliderMouseX = 0.0f;
+	bool fineSliderTracking = false;
 };

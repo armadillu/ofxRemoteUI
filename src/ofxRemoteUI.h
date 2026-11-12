@@ -240,16 +240,16 @@ public:
 	float connectionLag();
 	void setVerbose(bool b);
 
-	virtual void sendUntrackedParamUpdate(RemoteUIParam p, std::string paramName){};
+	virtual void sendUntrackedParamUpdate(RemoteUIParam p, const std::string &paramName){};
 
-	std::string getMyIP(std::string userChosenInteface, std::string & subnetMask);
+	std::string getMyIP(const std::string &userChosenInteface, std::string & subnetMask);
 
 	std::recursive_mutex & getDataMutex(){return dataMutex;}
 
 protected:
 
 	virtual void update(float dt) = 0;
-	void sendParam(std::string paramName, const RemoteUIParam & p);
+	void sendParam(const std::string &paramName, const RemoteUIParam & p);
 	DecodedMessage decode(const ofxOscMessage & m) const;
 
 	std::vector<std::string> scanForUpdatedParamsAndSync();	//goes through all params, comparing * to real value
@@ -272,9 +272,9 @@ protected:
 	void sendCIAO();
 	void sendTEST();
 	void sendPREL(std::vector<std::string> presetNames);
-	void sendSAVP(std::string presetName, bool confirm = false);
-	void sendSETP(std::string presetName, bool confirm = false);
-	void sendDELP(std::string presetName, bool confirm = false);
+	void sendSAVP(const std::string &presetName, bool confirm = false);
+	void sendSETP(const std::string &presetName, bool confirm = false);
+	void sendDELP(const std::string &presetName, bool confirm = false);
 	void sendRESX(bool confirm = false); //send a "restore fom first loaded XML" msg
 	void sendRESD(bool confirm = false); //send a "restore fom code defaults" msg
 	void sendSAVE(bool confirm = false);
@@ -282,9 +282,9 @@ protected:
 	void sendREMp(const std::string & paramName); //server sends client a msg about removing a param from the GUI
 
 	//group preset methods (note lowercase p, l)
-	void sendSAVp(std::string presetName, std::string group, bool confirm = false);
-	void sendSETp(std::string presetName, std::string group, bool confirm = false);
-	void sendDELp(std::string presetName, std::string group, bool confirm = false);
+	void sendSAVp(const std::string &presetName, const std::string &group, bool confirm = false);
+	void sendSETp(const std::string &presetName, const std::string &group, bool confirm = false);
+	void sendDELp(const std::string &presetName, const std::string &group, bool confirm = false);
     
     virtual void sendMessage(const ofxOscMessage & m) = 0; // b/c native Client only uses an OSC sender, but server might use WS
 
