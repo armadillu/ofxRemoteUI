@@ -21,6 +21,15 @@ float parameterFontScale(float rowHeight) {
 	return rowHeight > 0.f ? std::max(10.f, rowHeight - 2.f) / 17.f : 1.f;
 }
 
+void prepareSecondaryWindow() {
+	static const ImGuiWindowClass windowClass = [] {
+		ImGuiWindowClass result;
+		result.ViewportFlagsOverrideSet = ImGuiViewportFlags_NoAutoMerge;
+		return result;
+	}();
+	ImGui::SetNextWindowClass(&windowClass);
+}
+
 void applyWindowColor(const float color[4]) {
 	ImGuiStyle &style = ImGui::GetStyle();
 	float hue, saturation, value;
@@ -111,12 +120,14 @@ bool containsCaseInsensitive(const std::string &text, const std::string &query) 
 
 void ofApp::setup() {
 	ofSetFrameRate(60);
+	ofSetEscapeQuitsApp(false);
 	ofSetVerticalSync(true);
 	ofSetBackgroundColor(27, 29, 34);
 	activeApp = this;
 	client.setVerbose(false);
 	client.setCallback(&ofApp::clientCallback);
 	loadPreferences();
+	loadCollapsedGroups();
 	if (!gui.setup()) {
 		status = "ImGui GLFW/OpenGL initialization failed";
 		ofLogError("ofApp") << status;
@@ -223,10 +234,18 @@ void ofApp::draw() {
 	if (showLogPanel) drawLogPanel();
 	if (showServerLogPanel) drawServerLogPanel();
 	if (showSettings) drawSettingsPanel();
-	if (showImGuiDemo) ImGui::ShowDemoWindow(&showImGuiDemo);
+	if (showImGuiDemo) {
+		// The demo appends to this window; the first Begin supplies our window flags.
+		ImGui::SetNextWindowSize(ImVec2(550, 680), ImGuiCond_FirstUseEver);
+		prepareSecondaryWindow();
+		ImGui::Begin("Dear ImGui Demo", &showImGuiDemo, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_MenuBar);
+		ImGui::End();
+		ImGui::ShowDemoWindow(&showImGuiDemo);
+	}
 	if (showStyleEditor) {
 		ImGui::SetNextWindowSize(ImVec2(500, 600), ImGuiCond_FirstUseEver);
-		if (ImGui::Begin("ImGui Style Editor", &showStyleEditor)) {
+		prepareSecondaryWindow();
+		if (ImGui::Begin("ImGui Style Editor", &showStyleEditor, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) {
 			const ImVec4 before = ImGui::GetStyle().Colors[ImGuiCol_WindowBg];
 			ImGui::ShowStyleEditor();
 			const ImVec4 after = ImGui::GetStyle().Colors[ImGuiCol_WindowBg];
@@ -350,7 +369,6 @@ void ofApp::clearConnectionView() {
 	receivedFullSync = false;
 	lastSyncCount = 0;
 	lastSyncTime = -1.0f;
-	selectedGroup.clear();
 	selectedPreset.clear();
 	groupPresetSelection.clear();
 	previousParams.clear();
@@ -365,13 +383,7 @@ void ofApp::drawParameterPanel() {
 	ImGui::SetNextWindowSize(viewport->WorkSize);
 	if (!ImGui::Begin("Parameters", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); return; }
 	auto names = client.isReadyToSend() ? client.getAllParamNamesList() : std::vector<std::string>{};
-	std::vector<std::string> groups{"All groups"};
-	for (const auto &name : names) {
-		const auto p = client.getParamForName(name);
-		const std::string group = p.type == REMOTEUI_PARAM_SPACER ? p.stringVal : p.group;
-		if (!group.empty() && std::find(groups.begin(), groups.end(), group) == groups.end()) groups.push_back(group);
-	}
-	// Presets, group selection and filtering occupy the top bar, as in the Cocoa client.
+	// Presets and parameter filtering occupy the top bar.
 	const float topScale = parameterFontScale(rowHeight);
 	ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * topScale);
 	const ImVec2 windowPadding = ImGui::GetStyle().WindowPadding;
@@ -411,14 +423,8 @@ void ofApp::drawParameterPanel() {
 	ImGui::EndChild();
 	ImGui::SameLine(0.f, topSectionGap);
 	ImGui::BeginChild("group-filter-controls", ImVec2(0, topSectionHeight), ImGuiChildFlags_AlwaysUseWindowPadding);
-	ImGui::TextUnformatted("Groups and Filtering");
-	const float groupFilterGap = 8.f * topScale;
-	ImGui::SetNextItemWidth(std::max(1.f, (ImGui::GetContentRegionAvail().x - groupFilterGap) * .45f));
-	if (ImGui::BeginCombo("##group", selectedGroup.empty() ? "All groups" : selectedGroup.c_str())) {
-		for (const auto &g : groups) if (ImGui::Selectable(g.c_str(), (g == "All groups" && selectedGroup.empty()) || g == selectedGroup)) selectedGroup = g == "All groups" ? "" : g;
-		ImGui::EndCombo();
-	}
-	ImGui::SameLine(0.f, groupFilterGap); ImGui::SetNextItemWidth(std::max(1.f, ImGui::GetContentRegionAvail().x));
+	ImGui::TextUnformatted("Filter Parameters");
+	ImGui::SetNextItemWidth(std::max(1.f, ImGui::GetContentRegionAvail().x));
 	ImGui::InputTextWithHint("##filter", "Filter parameters...", filterBuffer, sizeof(filterBuffer));
 	ImGui::EndChild();
 	ImGui::PopStyleVar();
@@ -426,6 +432,7 @@ void ofApp::drawParameterPanel() {
 	ImGui::PopStyleVar(2);
 	ImGui::PopFont();
 	const auto changed = client.getChangedParamsList();
+	const auto &collapsedGroups = collapsedGroupsByServer[bindingServer()];
 	std::vector<std::string> visible;
 	for (const auto &name : names) {
 		const auto p = client.getParamForName(name);
@@ -435,8 +442,8 @@ void ofApp::drawParameterPanel() {
 				const auto item = client.getParamForName(candidate);
 				if (item.type != REMOTEUI_PARAM_SPACER && item.group == p.group && (containsCaseInsensitive(candidate, filterBuffer) || containsCaseInsensitive(item.description, filterBuffer))) { matches = true; break; }
 			}
-			if (matches && (selectedGroup.empty() || selectedGroup == p.group || selectedGroup == p.stringVal)) visible.push_back(name);
-		} else if (!collapsedGroups[p.group] && (selectedGroup.empty() || p.group == selectedGroup) && (containsCaseInsensitive(name, filterBuffer) || containsCaseInsensitive(p.description, filterBuffer)) && (!showOnlyChanged || std::find(changed.begin(), changed.end(), name) != changed.end())) visible.push_back(name);
+			if (matches) visible.push_back(name);
+		} else if (!collapsedGroups.count(p.group) && (containsCaseInsensitive(name, filterBuffer) || containsCaseInsensitive(p.description, filterBuffer)) && (!showOnlyChanged || std::find(changed.begin(), changed.end(), name) != changed.end())) visible.push_back(name);
 	}
 	const float footerScale = topScale;
 	ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * footerScale);
@@ -494,7 +501,9 @@ void ofApp::drawParameterPanel() {
 	const float parameterListGap = 6.f;
 	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + parameterListGap);
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImVec4(0.f, 0.f, 0.f, 0.f));
-	if (ImGui::BeginChild("param-list", ImVec2(0, -footerHeight - ImGui::GetStyle().ItemSpacing.y - parameterListGap), false)) {
+	ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.f, 0.f, 0.f, .16f));
+	ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.f);
+	if (ImGui::BeginChild("param-list", ImVec2(0, -footerHeight - ImGui::GetStyle().ItemSpacing.y - parameterListGap), ImGuiChildFlags_AlwaysUseWindowPadding)) {
 		if (!client.isReadyToSend()) ImGui::TextDisabled("Connect to a server to see its parameters.");
 		else if (!receivedFullSync) ImGui::TextDisabled("Waiting for server parameter data...");
 		else if (names.empty()) ImGui::TextDisabled("Sync completed with no parameters. Check the server and try Sync.");
@@ -588,7 +597,8 @@ void ofApp::drawParameterPanel() {
 		if (columnCount > 1) ImGui::Columns(1);
 	}
 	ImGui::EndChild();
-	ImGui::PopStyleColor();
+	ImGui::PopStyleVar();
+	ImGui::PopStyleColor(2);
 	if (bindingPopupRequested) {
 		ImGui::OpenPopup("learn-control");
 		bindingPopupRequested = false;
@@ -695,10 +705,14 @@ void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param)
 	const std::string &group = param.group;
 	const float controlsWidth = std::min(185.f, std::max(100.f, width * .52f));
 	const float titleWidth = std::max(1.f, width - controlsWidth - ImGui::GetStyle().ItemSpacing.x);
+	auto &collapsedGroups = collapsedGroupsByServer[bindingServer()];
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.f, 1.f, 1.f, .16f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.f, 1.f, 1.f, .24f));
-	if (ImGui::Button("##toggle-group", ImVec2(titleWidth, height))) collapsedGroups[group] = !collapsedGroups[group];
+	if (ImGui::Button("##toggle-group", ImVec2(titleWidth, height))) {
+		if (collapsedGroups.count(group)) collapsedGroups.erase(group); else collapsedGroups.insert(group);
+		saveCollapsedGroups();
+	}
 	const float fontSize = ImGui::GetFontSize();
 	const float inset = std::max(4.f, fontSize * .35f);
 	const float arrowSize = fontSize * .44f;
@@ -706,7 +720,7 @@ void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param)
 	ImDrawList *headerDrawList = ImGui::GetWindowDrawList();
 	headerDrawList->PushClipRect(pos, ImVec2(pos.x + titleWidth, pos.y + height), true);
 	const ImU32 textColor = ImGui::GetColorU32(ImGuiCol_Text);
-	if (collapsedGroups[group]) {
+	if (collapsedGroups.count(group)) {
 		headerDrawList->AddTriangleFilled(ImVec2(arrowX, arrowY), ImVec2(arrowX, arrowY + arrowSize), ImVec2(arrowX + arrowSize, arrowY + arrowSize * .5f), textColor);
 	} else {
 		headerDrawList->AddTriangleFilled(ImVec2(arrowX, arrowY), ImVec2(arrowX + arrowSize, arrowY), ImVec2(arrowX + arrowSize * .5f, arrowY + arrowSize), textColor);
@@ -932,7 +946,8 @@ void ofApp::sendEditedParam(const std::string &name, RemoteUIParam param) {
 
 void ofApp::drawLogPanel() {
 	ImGui::SetNextWindowSize(ImVec2(650, 190), ImGuiCond_FirstUseEver);
-	if (!ImGui::Begin("Action log", &showLogPanel)) { ImGui::End(); return; }
+	prepareSecondaryWindow();
+	if (!ImGui::Begin("Action log", &showLogPanel, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); return; }
 	if (ImGui::SmallButton("Clear")) logLines.clear();
 	ImGui::SameLine(); ImGui::TextDisabled("%zu events", logLines.size());
 	ImGui::BeginChild("log-scroll", ImVec2(0, 0), true);
@@ -944,7 +959,8 @@ void ofApp::drawLogPanel() {
 
 void ofApp::drawServerLogPanel() {
 	ImGui::SetNextWindowSize(ImVec2(650, 190), ImGuiCond_FirstUseEver);
-	if (!ImGui::Begin("Server log", &showServerLogPanel)) { ImGui::End(); return; }
+	prepareSecondaryWindow();
+	if (!ImGui::Begin("Server log", &showServerLogPanel, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); return; }
 	if (ImGui::SmallButton("Clear")) serverLogLines.clear();
 	ImGui::SameLine(); ImGui::TextDisabled("%zu lines", serverLogLines.size());
 	ImGui::BeginChild("server-log-scroll", ImVec2(0, 0), true);
@@ -956,7 +972,8 @@ void ofApp::drawServerLogPanel() {
 
 void ofApp::drawSettingsPanel() {
 	ImGui::SetNextWindowSize(ImVec2(360, 260), ImGuiCond_FirstUseEver);
-	if (!ImGui::Begin("Settings", &showSettings)) { ImGui::End(); return; }
+	prepareSecondaryWindow();
+	if (!ImGui::Begin("Settings", &showSettings, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); return; }
 	ImGui::Checkbox("Auto-connect to new servers", &autoConnectToNewServers);
 	ImGui::Indent();
 	ImGui::Checkbox("Only auto-connect to localhost servers", &onlyAutoConnectToLocalHost);
@@ -982,7 +999,8 @@ std::string ofApp::bindingServer() const { return host + ":" + ofToString(port);
 void ofApp::drawBindingsPanel() {
 	ImGui::SetNextWindowSize(ImVec2(720, 300), ImGuiCond_FirstUseEver);
 	if (focusBindings) { ImGui::SetNextWindowFocus(); focusBindings = false; }
-	if (!ImGui::Begin("Controller bindings", &showBindings)) { ImGui::End(); return; }
+	prepareSecondaryWindow();
+	if (!ImGui::Begin("Controller bindings", &showBindings, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); return; }
 	if (!controllers.learning.empty()) {
 		ImGui::TextWrapped("Move a MIDI control or joystick axis, or press a button, to bind %s.", controllers.learning.c_str());
 		if (ImGui::Button("Cancel learning")) controllers.learning.clear();
@@ -1110,6 +1128,33 @@ void ofApp::importPresetFile(const std::string &path) {
 	applyClipboardValues(values, true);
 	appendLog("Loaded preset " + ofFilePath::getFileName(path));
 }
+void ofApp::saveCollapsedGroups() const {
+	ofJson saved = ofJson::object();
+	for (const auto &entry : collapsedGroupsByServer) {
+		if (entry.second.empty()) continue;
+		std::vector<std::string> groups(entry.second.begin(), entry.second.end());
+		std::sort(groups.begin(), groups.end());
+		saved[entry.first] = groups;
+	}
+	if (!ofSavePrettyJson(ClientPaths::settingsFile("collapsed-groups.json"), saved))
+		ofLogWarning("RemoteUIImGui") << "Could not save collapsed groups";
+}
+
+void ofApp::loadCollapsedGroups() {
+	const auto path = ClientPaths::existingSettingsFile("collapsed-groups.json");
+	if (!ofFile::doesFileExist(path, false)) return;
+	try {
+		const auto saved = ofLoadJson(path);
+		if (!saved.is_object()) throw std::runtime_error("expected an object");
+		for (auto it = saved.begin(); it != saved.end(); ++it) {
+			if (!it.value().is_array()) continue;
+			for (const auto &group : it.value()) if (group.is_string()) collapsedGroupsByServer[it.key()].insert(group.get<std::string>());
+		}
+	} catch (const std::exception &e) {
+		ofLogWarning("RemoteUIImGui") << "Could not load collapsed groups: " << e.what();
+	}
+}
+
 void ofApp::savePreferences() const {
 	std::ofstream out(ClientPaths::settingsFile("remoteui-imgui-client.ini"));
 	if (!out) return;

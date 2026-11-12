@@ -35,6 +35,8 @@ private:
 	void appendLog(const std::string &line);
 	void savePreferences() const;
 	void loadPreferences();
+	void saveCollapsedGroups() const;
+	void loadCollapsedGroups();
 	void importPresetFile(const std::string &path);
 	void queuePresetFile(const std::string &path);
 	void choosePresetFile();
@@ -83,7 +85,6 @@ private:
 	bool receivedFullSync = false;
 	std::size_t lastSyncCount = 0;
 	float lastSyncTime = -1.0f;
-	std::string selectedGroup;
 	std::string selectedPreset;
 	std::string status = "Disconnected";
 	std::string lastPresetWarning;
@@ -91,7 +92,7 @@ private:
 	std::vector<std::string> serverLogLines;
 	std::vector<std::string> pendingPresetFiles;
 	std::unordered_map<std::string, std::string> groupPresetSelection;
-	std::unordered_map<std::string, bool> collapsedGroups;
+	std::unordered_map<std::string, std::unordered_set<std::string>> collapsedGroupsByServer;
 	std::unordered_map<std::string, RemoteUIParam> previousParams;
 	std::unordered_set<std::string> diffParams;
 	float diffHighlightUntil = 0.0f;
