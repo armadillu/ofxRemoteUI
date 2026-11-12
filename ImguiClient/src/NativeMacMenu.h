@@ -6,8 +6,8 @@
 #include <functional>
 
 namespace NativeMacMenu {
-enum Command { Connect = 1, Disconnect, Refresh, Save, RestoreLaunch, RestoreDefaults, OpenLocal,
-               ConnectionPanel, ParametersPanel, PresetsPanel, ActivityPanel, ServerLogPanel, PreferencesPanel, BindingsPanel };
+enum Command { Connect = 1, Disconnect, Refresh, Save, RestoreLaunch, RestoreDefaults, OpenLocal, CopyValues, PasteValues, ShowChanged,
+               ActivityPanel, ServerLogPanel, PreferencesPanel, BindingsPanel };
 using Action = std::function<void(Command)>;
 static Action action;
 static id target = nil;
@@ -62,21 +62,25 @@ static bool setup(Action handler) {
     add(remote, "Restore Launch Values", RestoreLaunch, "r");
     add(remote, "Restore Code Defaults", RestoreDefaults, "r", true);
     separator(remote); add(remote, "Open Local Preset...", OpenLocal, "o");
+    separator(remote);
+    add(remote, "Copy Parameter Values", CopyValues, "c", true);
+    add(remote, "Paste Parameter Values", PasteValues, "v", true);
+    add(remote, "Show Changed Parameters Only", ShowChanged);
     id windows = makeMenu("Windows", 1, mainMenu);
-    add(windows, "Connection & Discovery", ConnectionPanel, "1");
-    add(windows, "Parameters", ParametersPanel, "2");
-    add(windows, "Presets & State", PresetsPanel, "3");
-    add(windows, "Action Log", ActivityPanel, "4");
-    add(windows, "Server Log", ServerLogPanel, "6");
-    add(windows, "Controller Bindings", BindingsPanel, "5");
-    add(windows, "Preferences", PreferencesPanel, ",");
+    add(windows, "Action Log", ActivityPanel, "1");
+    add(windows, "Server Log", ServerLogPanel, "2");
+    add(windows, "Controller Bindings", BindingsPanel, "3");
+    add(windows, "Settings", PreferencesPanel, ",");
     return true;
 }
-static void update(bool connected, bool connection, bool parameters, bool presets, bool activity, bool serverLog, bool preferences, bool bindings) {
+static void update(bool connected, bool activity, bool serverLog, bool preferences, bool bindings, bool changedOnly) {
     if (!target) return;
     for (int i = Disconnect; i <= RestoreDefaults; ++i) send<void>(items[i], "setEnabled:", connected);
-    const bool states[] = {connection, parameters, presets, activity, serverLog, preferences, bindings};
-    for (int i = 0; i < 7; ++i) send<void>(items[ConnectionPanel + i], "setState:", (long)(states[i] ? 1 : 0));
+    send<void>(items[CopyValues], "setEnabled:", connected);
+    send<void>(items[PasteValues], "setEnabled:", connected);
+    send<void>(items[ShowChanged], "setState:", (long)(changedOnly ? 1 : 0));
+    const bool states[] = {activity, serverLog, preferences, bindings};
+    for (int i = 0; i < 4; ++i) send<void>(items[ActivityPanel + i], "setState:", (long)(states[i] ? 1 : 0));
 }
 static void shutdown() {
     if (!target) return;

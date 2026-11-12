@@ -19,9 +19,7 @@ public:
 private:
 	static void clientCallback(RemoteUIClientCallBackArg arg);
 	void onClientEvent(const RemoteUIClientCallBackArg &arg);
-	void drawConnectionPanel();
 	void drawParameterPanel();
-	void drawPresetPanel();
 	void drawLogPanel();
 	void drawServerLogPanel();
 	void drawSettingsPanel();
@@ -68,6 +66,7 @@ private:
 	bool alwaysOnTop = false;
 	bool showSettings = false;
 	bool showStyleEditor = false;
+	bool showImGuiDemo = false;
 	bool showBindings = false;
 	bool focusBindings = false;
 	bool showAllBindings = true;
@@ -78,9 +77,6 @@ private:
 	std::string bindingParam;
 	bool highlightPresetDiff = true;
 	float windowColor[4] = {0.06f, 0.06f, 0.06f, 1.f};
-	bool showConnectionPanel = false;
-	bool showParameterPanel = true;
-	bool showPresetPanel = false;
 	bool showLogPanel = false;
 	bool showServerLogPanel = false;
 	bool autoScrollLog = true;
