@@ -2531,7 +2531,7 @@ void ofxRemoteUIServer::shareParam(const string &paramName, int* param, int min,
 	lastAddedParam = paramName;
 }
 
-void ofxRemoteUIServer::shareParam(const string &paramName, int* param, int min, int max, vector<string> names, ofColor c ){
+void ofxRemoteUIServer::shareParam(const string &paramName, int* param, int min, int max, const vector<string> &names, ofColor c ){
 	if (names.size() != max - min + 1){
 		RLOG_ERROR << "Error sharing enum param '" << paramName << "': Number of supplied strings doesnt match enum range!";
 	}

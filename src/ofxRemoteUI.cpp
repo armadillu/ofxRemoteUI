@@ -468,7 +468,7 @@ vector<std::string> ofxRemoteUI::scanForUpdatedParamsAndSync(){
 }
 
 
-void ofxRemoteUI::sendUpdateForParamsInList(vector<std::string>list){
+void ofxRemoteUI::sendUpdateForParamsInList(const vector<std::string> &list){
 
 	dataMutex.lock();
 	for(size_t i = 0; i < list.size(); i++){
@@ -845,7 +845,7 @@ void ofxRemoteUI::sendTEST(){
 
 //on client call, presetNames should be empty vector (request ing the list)
 //on server call, presetNames should have all the presetNames
-void ofxRemoteUI::sendPREL( vector<std::string> presetNames_ ){
+void ofxRemoteUI::sendPREL(const vector<std::string> &presetNames_){
 	if(verbose_) RLOG_VERBOSE << "sendPREL()";
 	ofxOscMessage m;
 	m.setAddress("/PREL");
@@ -885,7 +885,7 @@ void ofxRemoteUI::sendSETP(const std::string &presetName, bool confirm){
 	sendMessage(m);
 }
 
-void ofxRemoteUI::sendMISP(vector<std::string> missingParamsInPreset){
+void ofxRemoteUI::sendMISP(const vector<std::string> &missingParamsInPreset){
 	if (missingParamsInPreset.size() == 0) return; //do nothing if no params are missing
 	if(verbose_) RLOG_VERBOSE << "sendMISP()";
 	ofxOscMessage m;

@@ -111,7 +111,7 @@ public:
 	void shareParam(const std::string &paramName, bool* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
 	void shareParam(const std::string &paramName, int* param, int min, int max, ofColor bgColor = ofColor(0,0,0,0) );
 	void shareParam(std::string paramName, std::string* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
-	void shareParam(const std::string &paramName, int* param, int min, int max, vector<std::string> names, ofColor c = ofColor(0,0,0,0)); //enum!
+	void shareParam(const std::string &paramName, int* param, int min, int max, const vector<std::string> &names, ofColor c = ofColor(0,0,0,0)); //enum!
 	void shareParam(const std::string &paramName, int* param, int min, int max, std::string* names, ofColor c = ofColor(0,0,0,0)); //enum with old school string array
 	void shareParam(const std::string &paramName, unsigned char* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 );	//ofColor
 

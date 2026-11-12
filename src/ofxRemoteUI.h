@@ -240,7 +240,7 @@ public:
 	float connectionLag();
 	void setVerbose(bool b);
 
-	virtual void sendUntrackedParamUpdate(RemoteUIParam p, const std::string &paramName){};
+	virtual void sendUntrackedParamUpdate(const RemoteUIParam &p, const std::string &paramName){};
 
 	std::string getMyIP(const std::string &userChosenInteface, std::string & subnetMask);
 
@@ -255,7 +255,7 @@ protected:
 	std::vector<std::string> scanForUpdatedParamsAndSync();	//goes through all params, comparing * to real value
 															//reports those that are out of sync
 
-	void sendUpdateForParamsInList(std::vector<std::string>paramsPendingUpdate);
+	void sendUpdateForParamsInList(const std::vector<std::string> &paramsPendingUpdate);
 	bool hasParamChanged(const RemoteUIParam & p);
 
 	void updateParamFromDecodedMessage(const ofxOscMessage & m, DecodedMessage dm);
@@ -271,14 +271,14 @@ protected:
 	void sendHELLO();
 	void sendCIAO();
 	void sendTEST();
-	void sendPREL(std::vector<std::string> presetNames);
+	void sendPREL(const std::vector<std::string> &presetNames);
 	void sendSAVP(const std::string &presetName, bool confirm = false);
 	void sendSETP(const std::string &presetName, bool confirm = false);
 	void sendDELP(const std::string &presetName, bool confirm = false);
 	void sendRESX(bool confirm = false); //send a "restore fom first loaded XML" msg
 	void sendRESD(bool confirm = false); //send a "restore fom code defaults" msg
 	void sendSAVE(bool confirm = false);
-	void sendMISP(std::vector<std::string> missingParamsInPreset);
+	void sendMISP(const std::vector<std::string> &missingParamsInPreset);
 	void sendREMp(const std::string & paramName); //server sends client a msg about removing a param from the GUI
 
 	//group preset methods (note lowercase p, l)

@@ -56,14 +56,14 @@ public:
 	void trackParam(const std::string &paramName, int* param);
 	void trackParam(const std::string &paramName, std::string* param);
 	void trackParam(const std::string &paramName, unsigned char* param); //color! 4 components!
-	void trackParam(const std::string &paramName, int* param, std::vector<std::string> list);
+	void trackParam(const std::string &paramName, int* param, const std::vector<std::string> &list);
 
 	//this makes the ofxRemoteUIClient fetch the current values of your param
 	//and send it to the server (will take actual value from the supplied pointer in trackParam())
 	void sendTrackedParamUpdate(const std::string &paramName);
 
 	//send an "untracked" param, manually
-	void sendUntrackedParamUpdate(RemoteUIParam p, const std::string &paramName);
+	void sendUntrackedParamUpdate(const RemoteUIParam &p, const std::string &paramName) override;
     
     // Send message via OSC
     void sendMessage(const ofxOscMessage & m);
@@ -89,7 +89,7 @@ private:
 
 	void 				removeParamFromDB(const std::string & paramName);
 
-	void					fillPresetListFromMessage(ofxOscMessage m);
+	void					fillPresetListFromMessage(const ofxOscMessage &m);
 
 	bool					OSCsetup;
 	std::string				host;
