@@ -728,6 +728,15 @@ void ofApp::drawParameterPanel() {
 			rowsInColumn += blockRows;
 		}
 		ImDrawList *drawList = ImGui::GetWindowDrawList();
+		float longestLabelWidth = 0.f;
+		ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * parameterFontScale(rowHeight));
+		for (const auto &block : blocks) {
+			for (const auto &name : block) {
+				if (client.getParamForName(name).type != REMOTEUI_PARAM_SPACER)
+					longestLabelWidth = std::max(longestLabelWidth, ImGui::CalcTextSize(name.c_str(), nullptr, true).x);
+			}
+		}
+		ImGui::PopFont();
 		size_t nextColumn = 0;
 		for (size_t i = 0; i < blocks.size(); ++i) {
 			if (nextColumn < columnStarts.size() && i == columnStarts[nextColumn]) { ImGui::NextColumn(); ++nextColumn; }
@@ -739,14 +748,7 @@ void ofApp::drawParameterPanel() {
 			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));
 			ImGui::PushID(static_cast<int>(i));
 			const float groupContentWidth = std::max(1.f, ImGui::GetContentRegionAvail().x - 12.f);
-			float longestLabelWidth = 0.f;
-			ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * parameterFontScale(rowHeight));
-			for (const auto &name : blocks[i]) {
-				if (client.getParamForName(name).type != REMOTEUI_PARAM_SPACER)
-					longestLabelWidth = std::max(longestLabelWidth, ImGui::CalcTextSize(name.c_str(), nullptr, true).x);
-			}
-			ImGui::PopFont();
-			const float groupLabelWidth = std::min(groupContentWidth * .55f, std::max(groupContentWidth * .35f, longestLabelWidth + 6.f * parameterFontScale(rowHeight)));
+			const float groupLabelWidth = std::min(groupContentWidth * .4f, std::max(groupContentWidth * .25f, longestLabelWidth + 6.f * parameterFontScale(rowHeight)));
 			const auto firstParam = client.getParamForName(blocks[i].front());
 			const bool hasHeader = firstParam.type == REMOTEUI_PARAM_SPACER;
 			if (hasHeader) {
@@ -976,7 +978,10 @@ void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param)
 	};
 	if (!canUseGroup) ImGui::BeginDisabled();
 	if (presetButton("+")) { groupPresetNameBuffer[0] = '\0'; ImGui::OpenPopup("save-group-preset"); }
-	if (ImGui::IsItemHovered()) ImGui::SetTooltip("Save a preset for %s", group.c_str());
+	if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip)) {
+		ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
+		ImGui::SetTooltip("Save a preset for %s", group.c_str());
+	}
 	if (ImGui::BeginPopup("save-group-preset")) {
 		ImGui::Text("Save preset for %s", group.c_str());
 		ImGui::SetNextItemWidth(200.f);
@@ -994,7 +999,10 @@ void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param)
 	if (selected.empty()) ImGui::BeginDisabled();
 	if (presetButton("-")) client.deleteGroupPreset(selected, group);
 	if (selected.empty()) ImGui::EndDisabled();
-	if (ImGui::IsItemHovered()) ImGui::SetTooltip("Delete selected group preset");
+	if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip)) {
+		ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
+		ImGui::SetTooltip("Delete selected group preset");
+	}
 	ImGui::SameLine();
 	ImGui::SetCursorScreenPos(ImVec2(ImGui::GetCursorScreenPos().x, pos.y + (height - presetButtonHeight) * .5f));
 	ImGui::SetNextItemWidth(std::max(1.f, ImGui::GetContentRegionAvail().x - 1.5f * parameterFontScale(rowHeight)));
@@ -1056,7 +1064,7 @@ void ofApp::drawParameter(const std::string &name, float groupLabelWidth) {
 		if (tracking) {
 			if (io.KeyAlt || fineSliderTracking) {
 				fineSliderTracking = true;
-				virtualSliderMouseX = ofClamp(virtualSliderMouseX + io.MouseDelta.x * (io.KeyAlt ? .1f : 1.f), controlStartX, controlStartX + controlWidth);
+				virtualSliderMouseX = ofClamp(virtualSliderMouseX + io.MouseDelta.x * (io.KeyAlt ? .05f : 1.f), controlStartX, controlStartX + controlWidth);
 				io.MousePos.x = virtualSliderMouseX;
 			} else {
 				virtualSliderMouseX = realMouseX;
@@ -1073,7 +1081,10 @@ void ofApp::drawParameter(const std::string &name, float groupLabelWidth) {
 			activeMouseSlider.clear();
 			fineSliderTracking = false;
 		}
-		if (ImGui::IsItemHovered()) ImGui::SetTooltip("Hold Option / Alt while dragging for fine adjustment");
+		if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip)) {
+			ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
+			ImGui::SetTooltip("Hold Option / Alt while dragging for fine adjustment");
+		}
 		return changed;
 	};
 	switch (p.type) {
@@ -1513,6 +1524,16 @@ void ofApp::savePreferences() const {
 	out << host << '\n' << port << '\n' << autoDiscovery << '\n' << autoConnectToNewServers << '\n' << onlyAutoConnectToLocalHost << '\n' << continuousRefresh << '\n' << false << '\n' << alwaysOnTop << '\n' << autoScrollLog << '\n' << controllers.toggleButtons << '\n' << controllers.colorControlsAlpha << '\n' << highlightPresetDiff << '\n' << rowHeight << '\n' << windowColor[0] << ' ' << windowColor[1] << ' ' << windowColor[2] << '\n';
 	out << columnBaseWidth << '\n';
 	out << "highlightChangesSinceLoad=" << (highlightChangesSinceLoad ? 1 : 0) << '\n';
+	if (auto window = ofGetWindowPtr()) {
+		int x = 0, y = 0, width = 0, height = 0;
+		auto *glfwWindow = static_cast<GLFWwindow *>(window->getWindowContext());
+		if (glfwWindow) {
+			glfwGetWindowPos(glfwWindow, &x, &y);
+			glfwGetWindowSize(glfwWindow, &width, &height);
+			out << "windowWidth=" << width << '\n' << "windowHeight=" << height << '\n'
+				<< "windowX=" << x << '\n' << "windowY=" << y << '\n';
+		}
+	}
 }
 void ofApp::loadPreferences() {
 	std::ifstream in(ClientPaths::existingSettingsFile("remoteui-imgui-client.ini"));
