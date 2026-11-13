@@ -96,9 +96,9 @@ bool ofxRemoteUIImGui::setup(GLFWwindow *window, bool docking, bool multiViewpor
 	style.ChildBorderSize = 0.f;
 	style.PopupBorderSize = 0.f;
 	style.PopupRounding = 6.f;
+	style.WindowRounding = style.PopupRounding;
 	style.FrameBorderSize = 0.f;
 	style.Colors[ImGuiCol_Border] = ImVec4(0.f, 0.f, 0.f, .433f);
-	style.WindowRounding = multiViewport ? 0.0f : 4.0f;
 	style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 	style.FrameRounding = 3.0f;
 	style.GrabRounding = 3.0f;

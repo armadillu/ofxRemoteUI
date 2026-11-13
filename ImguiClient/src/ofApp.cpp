@@ -1206,7 +1206,6 @@ void ofApp::drawParameter(const std::string &name, float groupLabelWidth) {
 	ImGui::PopFont();
 	if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip) && !ImGui::IsPopupOpen("parameter-context")) {
 		ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, ImGui::GetStyle().PopupRounding);
 		if (ImGui::BeginTooltip()) {
 			ImGui::Text("\"%s\": (%s)",name.c_str(), paramTypeName(p.type));
 			if (p.type == REMOTEUI_PARAM_FLOAT && p.minFloat < p.maxFloat)
@@ -1220,7 +1219,6 @@ void ofApp::drawParameter(const std::string &name, float groupLabelWidth) {
 			}
 			ImGui::EndTooltip();
 		}
-		ImGui::PopStyleVar();
 	}
 	if (ImGui::BeginPopup("parameter-context")) {
 		const auto baseline = changeBaseline.find(name);
@@ -1432,7 +1430,7 @@ void ofApp::updateChangedParameter(const std::string &name) {
 	else changedSinceLoad.erase(name);
 }
 
-void ofApp::applyPreset(const std::string &name) { rememberCurrentValuesForDiff(); selectedPreset = name; presetReplyPending = true; client.setPreset(name); }
+void ofApp::applyPreset(const std::string &name) { rememberCurrentValuesForDiff(); selectedPreset = name; groupPresetSelection.clear(); presetReplyPending = true; client.setPreset(name); }
 void ofApp::applyGroupPreset(const std::string &name, const std::string &group) { rememberCurrentValuesForDiff(); selectedPreset.clear(); groupPresetSelection[group] = name; presetReplyPending = true; client.setGroupPreset(name, group); }
 void ofApp::applyClipboardValues(const std::string &values, bool highlightChanges) {
 	std::unordered_map<std::string, RemoteUIParam> before;
