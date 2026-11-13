@@ -477,7 +477,10 @@ void ofApp::onClientEvent(const RemoteUIClientCallBackArg &arg) {
 			if (groupPresetSelection[arg.group] == arg.msg) groupPresetSelection[arg.group].clear();
 			line << "Deleted " << arg.group << " preset: " << arg.msg; break;
 		case SERVER_DID_SET_GROUP_PRESET: line << "Loaded " << arg.group << " preset: " << arg.msg; break;
-		case SERVER_CONFIRMED_SAVE: line << "Saved current values to server"; break;
+		case SERVER_CONFIRMED_SAVE:
+			captureChangeBaseline();
+			line << "Saved current values to server";
+			break;
 		case SERVER_DID_RESET_TO_XML: line << "Restored launch values"; break;
 		case SERVER_DID_RESET_TO_DEFAULTS: line << "Restored code defaults"; break;
 		case NEIGHBORS_UPDATED: line << "Server discovery updated"; break;
@@ -872,7 +875,10 @@ void ofApp::drawParameterPanel() {
 	footerNext(actionWidths[0]);
 	ImGui::SetNextItemWidth(serverDropdownWidth);
 	const bool serverDropdownOpen = ImGui::BeginCombo("##servers", serverPreview.c_str());
-	if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", serverPreview.c_str());
+		if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip)) {
+			ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
+			ImGui::SetTooltip("%s", serverPreview.c_str());
+		}
 	if (serverDropdownOpen) {
 		framedCheckbox("Discover servers", &autoDiscovery);
 		if (neighbors.empty()) ImGui::TextDisabled("No servers discovered yet");
@@ -895,7 +901,10 @@ void ofApp::drawParameterPanel() {
 	ImGui::GetWindowDrawList()->AddLine(ImVec2(dividerX, dividerMin.y + ImGui::GetFrameHeight() * .1f),
 		ImVec2(dividerX, dividerMax.y - ImGui::GetFrameHeight() * .1f), ImGui::GetColorU32(ImGuiCol_Separator));
 	ImGui::SameLine(); if (ImGui::Button("Sync") && client.isReadyToSend()) client.requestCompleteUpdate();
-	if (ImGui::IsItemHovered()) ImGui::SetTooltip("Pulls the Current Param values from the server");
+	if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip)) {
+		ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
+		ImGui::SetTooltip("Pulls the Current Param values from the server");
+	}
 	ImGui::SameLine(0.f, syncContinuousGap); framedCheckbox("Non-Stop", &continuousRefresh);
 	ImGui::EndChild();
 	ImGui::PopStyleVar();
@@ -940,7 +949,10 @@ void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param)
 	headerDrawList->AddText(ImVec2(arrowX + arrowSize + inset, pos.y + (height - fontSize) * .5f), textColor, param.stringVal.c_str());
 	headerDrawList->PopClipRect();
 	const float titleTextWidth = std::max(0.f, pos.x + titleWidth - (arrowX + arrowSize + inset));
-	if (ImGui::IsItemHovered() && ImGui::CalcTextSize(param.stringVal.c_str()).x > titleTextWidth) ImGui::SetTooltip("%s", param.stringVal.c_str());
+	if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip) && ImGui::CalcTextSize(param.stringVal.c_str()).x > titleTextWidth) {
+		ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
+		ImGui::SetTooltip("%s", param.stringVal.c_str());
+	}
 	ImGui::PopStyleColor(3);
 	ImGui::PopFont();
 	ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * parameterFontScale(rowHeight));
@@ -1181,7 +1193,8 @@ void ofApp::drawParameter(const std::string &name, float groupLabelWidth) {
 	}
 	if (highlightLabel) ImGui::PopStyleColor();
 	ImGui::PopFont();
-	if (labelHovered && !ImGui::IsPopupOpen("parameter-context")) {
+	if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip) && !ImGui::IsPopupOpen("parameter-context")) {
+		ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, ImGui::GetStyle().PopupRounding);
 		if (ImGui::BeginTooltip()) {
 			ImGui::Text("\"%s\": (%s)",name.c_str(), paramTypeName(p.type));
