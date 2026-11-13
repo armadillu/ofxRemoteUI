@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cmath>
 #include <cstring>
 #include <cstdint>
 #include <fstream>
@@ -96,14 +97,23 @@ void prepareSecondaryWindow() {
 
 void applyWindowColor(const float color[4]) {
 	ImGuiStyle &style = ImGui::GetStyle();
+	const auto linearChannel = [](float channel) {
+		channel = std::clamp(channel, 0.f, 1.f);
+		return channel <= .04045f ? channel / 12.92f : std::pow((channel + .055f) / 1.055f, 2.4f);
+	};
+	const float luminance = .2126f * linearChannel(color[0]) + .7152f * linearChannel(color[1]) + .0722f * linearChannel(color[2]);
+	const bool lightWindow = luminance > .179f;
 	float hue, saturation, value;
 	ImGui::ColorConvertRGBtoHSV(color[0], color[1], color[2], hue, saturation, value);
 	const auto tone = [&](float brightness, float alpha = 1.f) {
+		if (lightWindow) brightness = 1.f - brightness;
 		float r, g, b;
 		ImGui::ColorConvertHSVtoRGB(hue, saturation * .8f, brightness, r, g, b);
 		return ImVec4(r, g, b, alpha);
 	};
 	style.Colors[ImGuiCol_WindowBg] = ImVec4(color[0], color[1], color[2], color[3]);
+	style.Colors[ImGuiCol_Text] = lightWindow ? ImVec4(.06f, .06f, .06f, 1.f) : ImVec4(.94f, .94f, .94f, 1.f);
+	style.Colors[ImGuiCol_TextDisabled] = lightWindow ? ImVec4(.30f, .30f, .30f, 1.f) : ImVec4(.68f, .68f, .68f, 1.f);
 	style.Colors[ImGuiCol_PopupBg] = tone(.16f, .98f);
 	style.Colors[ImGuiCol_FrameBg] = tone(.23f);
 	style.Colors[ImGuiCol_FrameBgHovered] = tone(.34f);
@@ -296,7 +306,23 @@ void ofApp::draw() {
 	for (int key = ImGuiKey_Tab; !interacting && key < ImGuiKey_MouseLeft; ++key) interacting = ImGui::IsKeyDown(static_cast<ImGuiKey>(key));
 	if (interacting) lastActivity = std::chrono::steady_clock::now();
 	#ifndef TARGET_OSX
-	if (client.isReadyToSend() && ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiMod_Shift | ImGuiKey_G, ImGuiInputFlags_RouteGlobal)) toggleAllGroups();
+	const bool menuConnected = client.isReadyToSend();
+	const ImGuiInputFlags menuShortcutFlags = ImGuiInputFlags_RouteGlobal;
+	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_K, menuShortcutFlags)) connectTo(host, port);
+	if (menuConnected && ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiMod_Shift | ImGuiKey_K, menuShortcutFlags)) disconnectFromServer();
+	if (menuConnected && ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiMod_Shift | ImGuiKey_S, menuShortcutFlags)) client.requestCompleteUpdate();
+	if (menuConnected && ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S, menuShortcutFlags)) client.saveCurrentStateToDefaultXML();
+	if (menuConnected && ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_R, menuShortcutFlags)) client.restoreAllParamsToInitialXML();
+	if (menuConnected && ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiMod_Shift | ImGuiKey_R, menuShortcutFlags)) client.restoreAllParamsToDefaultValues();
+	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_O, menuShortcutFlags)) choosePresetFile();
+	if (menuConnected && ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiMod_Shift | ImGuiKey_C, menuShortcutFlags)) glfwSetClipboardString(glfwGetCurrentContext(), client.getValuesAsString().c_str());
+	if (menuConnected && ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiMod_Shift | ImGuiKey_V, menuShortcutFlags)) { const char *v = glfwGetClipboardString(glfwGetCurrentContext()); if (v) applyClipboardValues(v); }
+	if (menuConnected && ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiMod_Shift | ImGuiKey_G, menuShortcutFlags)) toggleAllGroups();
+	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_1, menuShortcutFlags)) showLogPanel = !showLogPanel;
+	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_2, menuShortcutFlags)) showServerLogPanel = !showServerLogPanel;
+	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_3, menuShortcutFlags)) { showBindings = true; showAllBindings = true; focusBindings = true; }
+	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Comma, menuShortcutFlags)) showSettings = !showSettings;
+	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Q, menuShortcutFlags)) ofExit();
 	#endif
 	if (!ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
 		activeMouseSlider.clear();
@@ -304,37 +330,60 @@ void ofApp::draw() {
 	}
 	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DockingEnable) ImGui::DockSpaceOverViewport();
 	#ifndef TARGET_OSX
+	const float menuScale = parameterFontScale(rowHeight);
+	const ImGuiStyle &menuBaseStyle = ImGui::GetStyle();
+	const ImVec4 windowBg = menuBaseStyle.Colors[ImGuiCol_WindowBg];
+	const ImVec4 menuBarBg(windowBg.x * .88f, windowBg.y * .88f, windowBg.z * .88f, 1.f);
+	const ImVec4 menuPopupBg = menuBaseStyle.Colors[ImGuiCol_PopupBg];
+	const float popupLuma = .2126f * menuPopupBg.x + .7152f * menuPopupBg.y + .0722f * menuPopupBg.z;
+	const float borderLuma = popupLuma < .5f ? .72f : .24f;
+	ImGui::PushFont(nullptr, menuBaseStyle.FontSizeBase * menuScale);
+	ImGui::PushStyleColor(ImGuiCol_MenuBarBg, menuBarBg);
+	ImGui::PushStyleColor(ImGuiCol_PopupBg, menuPopupBg);
+	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(borderLuma, borderLuma, borderLuma, 1.f));
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2((menuBaseStyle.FramePadding.x + 5.f) * menuScale, (menuBaseStyle.FramePadding.y + 3.f) * menuScale));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2((menuBaseStyle.ItemSpacing.x + 4.f) * menuScale, menuBaseStyle.ItemSpacing.y * menuScale));
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(menuBaseStyle.WindowPadding.x * menuScale, menuBaseStyle.WindowPadding.y * menuScale));
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
 	if (ImGui::BeginMainMenuBar()) {
+		if (ImGui::BeginMenu("File")) {
+			if (ImGui::MenuItem("Quit", "Ctrl+Q")) ofExit();
+			ImGui::EndMenu();
+		}
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, std::max(2.f * menuScale, menuBaseStyle.WindowBorderSize * menuScale));
 		if (ImGui::BeginMenu("RemoteUI")) {
-			if (ImGui::MenuItem("Connect")) connectTo(host, port);
-			if (ImGui::MenuItem("Disconnect", nullptr, false, client.isReadyToSend())) disconnectFromServer();
+			if (ImGui::MenuItem("Connect", "Ctrl+K")) connectTo(host, port);
+			if (ImGui::MenuItem("Disconnect", "Ctrl+Shift+K", false, menuConnected)) disconnectFromServer();
 			ImGui::Separator();
-			if (ImGui::MenuItem("Refresh parameters", nullptr, false, client.isReadyToSend())) client.requestCompleteUpdate();
-			if (ImGui::MenuItem("Save current values to server", nullptr, false, client.isReadyToSend())) client.saveCurrentStateToDefaultXML();
-			if (ImGui::MenuItem("Restore launch values", nullptr, false, client.isReadyToSend())) client.restoreAllParamsToInitialXML();
-			if (ImGui::MenuItem("Restore code defaults", nullptr, false, client.isReadyToSend())) client.restoreAllParamsToDefaultValues();
+			if (ImGui::MenuItem("Refresh Parameters", "Ctrl+Shift+S", false, menuConnected)) client.requestCompleteUpdate();
+			if (ImGui::MenuItem("Save Current Values to Server", "Ctrl+S", false, menuConnected)) client.saveCurrentStateToDefaultXML();
+			if (ImGui::MenuItem("Restore Launch Values", "Ctrl+R", false, menuConnected)) client.restoreAllParamsToInitialXML();
+			if (ImGui::MenuItem("Restore Code Defaults", "Ctrl+Shift+R", false, menuConnected)) client.restoreAllParamsToDefaultValues();
 			ImGui::Separator();
-			if (ImGui::MenuItem("Open local preset...")) choosePresetFile();
+			if (ImGui::MenuItem("Open Local Preset...", "Ctrl+O")) choosePresetFile();
 			ImGui::Separator();
-			if (ImGui::MenuItem("Copy parameter values", nullptr, false, client.isReadyToSend())) glfwSetClipboardString(glfwGetCurrentContext(), client.getValuesAsString().c_str());
-			if (ImGui::MenuItem("Paste parameter values", nullptr, false, client.isReadyToSend())) { const char *v = glfwGetClipboardString(glfwGetCurrentContext()); if (v) applyClipboardValues(v); }
-			if (ImGui::MenuItem("Highlight changes since connection", nullptr, &highlightChangesSinceLoad, client.isReadyToSend())) savePreferences();
-			if (ImGui::MenuItem("Collapse / expand all groups", "Ctrl+Shift+G", false, client.isReadyToSend())) toggleAllGroups();
+			if (ImGui::MenuItem("Copy Parameter Values", "Ctrl+Shift+C", false, menuConnected)) glfwSetClipboardString(glfwGetCurrentContext(), client.getValuesAsString().c_str());
+			if (ImGui::MenuItem("Paste Parameter Values", "Ctrl+Shift+V", false, menuConnected)) { const char *v = glfwGetClipboardString(glfwGetCurrentContext()); if (v) applyClipboardValues(v); }
+			if (ImGui::MenuItem("Highlight Changes Since Connection", nullptr, &highlightChangesSinceLoad, menuConnected)) savePreferences();
+			if (ImGui::MenuItem("Collapse / Expand All Groups", "Ctrl+Shift+G", false, menuConnected)) toggleAllGroups();
 			ImGui::Separator();
-			if (ImGui::MenuItem("Blink MIDI-bound parameters", nullptr, false, client.isReadyToSend())) blinkBoundParameters(true);
-			if (ImGui::MenuItem("Blink USB controller-bound parameters", nullptr, false, client.isReadyToSend())) blinkBoundParameters(false);
+			if (ImGui::MenuItem("Blink MIDI-Bound Parameters", nullptr, false, menuConnected)) blinkBoundParameters(true);
+			if (ImGui::MenuItem("Blink USB Controller-Bound Parameters", nullptr, false, menuConnected)) blinkBoundParameters(false);
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Windows")) {
-			ImGui::MenuItem("Action log", nullptr, &showLogPanel);
-			ImGui::MenuItem("Server log", nullptr, &showServerLogPanel);
-			ImGui::MenuItem("Settings", nullptr, &showSettings);
-			if (ImGui::MenuItem("Controller bindings")) { showBindings = true; showAllBindings = true; focusBindings = true; }
+			ImGui::MenuItem("Action Log", "Ctrl+1", &showLogPanel);
+			ImGui::MenuItem("Server Log", "Ctrl+2", &showServerLogPanel);
+			if (ImGui::MenuItem("Controller Bindings", "Ctrl+3")) { showBindings = true; showAllBindings = true; focusBindings = true; }
+			ImGui::MenuItem("Settings", "Ctrl+,", &showSettings);
 			ImGui::EndMenu();
 		}
-		ImGui::TextDisabled("%s  ·  %zu parameters", status.c_str(), client.getAllParamNamesList().size());
+		ImGui::PopStyleVar();
 		ImGui::EndMainMenuBar();
 	}
+	ImGui::PopStyleVar(4);
+	ImGui::PopStyleColor(3);
+	ImGui::PopFont();
 	#endif
 	drawParameterPanel();
 	if (showLogPanel) drawLogPanel();
@@ -355,6 +404,21 @@ void ofApp::draw() {
 		ImGui::End();
 	}
 	if (showBindings) drawBindingsPanel();
+	if (client.isReadyToSend()) {
+		ImGuiViewport *viewport = ImGui::GetMainViewport();
+		const float statusScale = parameterFontScale(rowHeight);
+		const float padding = std::round(10.f * statusScale);
+		const float fontSize = std::max(1.f, std::round(ImGui::GetStyle().FontSizeBase * statusScale * .8f));
+		const std::string statusText = "Connected with " + std::to_string(client.getAllParamNamesList().size()) + " parameters.";
+		ImFont *font = ImGui::GetFont();
+		const ImVec2 textSize = font->CalcTextSizeA(fontSize, 100000.f, 0.f, statusText.c_str());
+		const ImVec2 position(std::round(viewport->WorkPos.x + viewport->WorkSize.x - padding - textSize.x),
+			std::round(viewport->WorkPos.y + viewport->WorkSize.y - padding - textSize.y));
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, .4f);
+		ImGui::GetForegroundDrawList(viewport)->AddText(font, fontSize, position,
+			ImGui::GetColorU32(ImGuiCol_Text), statusText.c_str());
+		ImGui::PopStyleVar();
+	}
 	gui.end();
 }
 
@@ -596,9 +660,7 @@ void ofApp::drawParameterPanel() {
 	};
 	const float connectionRowWidth = connectionWidths[0] + connectionWidths[1] + connectionWidths[2] + footerSpacing * 2.f;
 	const float serverDropdownWidth = std::min(footerWidth, std::max(1.f, connectionRowWidth - footerSpacing - syncControlsWidth));
-	const std::vector<float> actionWidths = {
-		serverDropdownWidth, syncControlsWidth
-	};
+	const std::vector<float> actionWidths = {serverDropdownWidth, syncControlsWidth};
 	auto footerLineWidths = [footerWidth, footerSpacing](const std::vector<float> &widths) {
 		std::vector<float> lines;
 		float used = 0.f;
@@ -622,8 +684,15 @@ void ofApp::drawParameterPanel() {
 	ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.f, 0.f, 0.f, .16f));
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.f);
 	if (ImGui::BeginChild("param-list", ImVec2(0, -footerHeight - ImGui::GetStyle().ItemSpacing.y - parameterListGap), ImGuiChildFlags_AlwaysUseWindowPadding)) {
-		if (client.isReadyToSend() && !receivedFullSync) ImGui::TextDisabled("Waiting for server parameter data...");
-		else if (names.empty()) ImGui::TextDisabled("Sync completed with no parameters. Check the server and try Sync.");
+		if (client.isReadyToSend() && !receivedFullSync) {
+			ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * topScale);
+			ImGui::TextDisabled("Waiting for server parameter data...");
+			ImGui::PopFont();
+		} else if (names.empty()) {
+			ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * topScale);
+			ImGui::TextDisabled("Sync completed with no parameters. Check the server and try Sync.");
+			ImGui::PopFont();
+		}
 		std::vector<std::vector<std::string>> blocks;
 		for (const auto &name : visible) {
 			const auto param = client.getParamForName(name);
@@ -664,6 +733,7 @@ void ofApp::drawParameterPanel() {
 			background.SetCurrentChannel(drawList, 1);
 			const float groupRight = ImGui::GetCursorScreenPos().x + ImGui::GetContentRegionAvail().x;
 			ImGui::BeginGroup();
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));
 			ImGui::PushID(static_cast<int>(i));
 			const float groupContentWidth = std::max(1.f, ImGui::GetContentRegionAvail().x - 12.f);
 			float longestLabelWidth = 0.f;
@@ -719,6 +789,7 @@ void ofApp::drawParameterPanel() {
 			if (animating) ImGui::EndChild();
 			ImGui::PopID();
 			ImGui::EndGroup();
+			ImGui::PopStyleColor();
 			const ImVec2 min = ImGui::GetItemRectMin(), measuredMax = ImGui::GetItemRectMax();
 			const ImVec2 max(groupRight, measuredMax.y);
 			const auto groupColor = client.getParamForName(blocks[i].front());
