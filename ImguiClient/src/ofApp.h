@@ -32,7 +32,7 @@ private:
 	void captureChangeBaseline();
 	void updateChangedParameter(const std::string &name);
 	std::string bindingServer() const;
-	void drawParameter(const std::string &name, float groupLabelWidth);
+	void drawParameter(const std::string &name);
 	void drawGroupHeader(const std::string &name, const RemoteUIParam &param);
 	void connectTo(const std::string &host, int port);
 	void disconnectFromServer();
@@ -122,4 +122,7 @@ private:
 	std::string activeMouseSlider;
 	float virtualSliderMouseX = 0.0f;
 	bool fineSliderTracking = false;
+
+	float groupAnimationDuration = .25f;
+
 };
