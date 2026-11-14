@@ -6,6 +6,7 @@
 #include <cctype>
 #include <cmath>
 #include <cstring>
+#include <ctime>
 
 using namespace ofAppImGuiHelpers;
 
@@ -40,6 +41,7 @@ void ofApp::drawParameterPanel() {
 	ImGui::SameLine();
 	if (!client.isReadyToSend()) ImGui::BeginDisabled();
 	if (ImGui::Button("+##global")) { presetNameBuffer[0] = '\0'; ImGui::OpenPopup("save-global-preset"); }
+	if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip | ImGuiHoveredFlags_AllowWhenDisabled)) ImGui::SetTooltip("Save current values as a new global preset");
 	if (ImGui::BeginPopup("save-global-preset")) {
 		ImGui::TextUnformatted("Save global preset");
 		ImGui::SetNextItemWidth(200.f * topScale);
@@ -52,12 +54,13 @@ void ofApp::drawParameterPanel() {
 	ImGui::SameLine();
 	if (selectedPreset.empty()) ImGui::BeginDisabled();
 	if (ImGui::Button("-##global")) client.deletePreset(selectedPreset);
+	if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip | ImGuiHoveredFlags_AllowWhenDisabled)) ImGui::SetTooltip("Delete the selected global preset");
 	if (selectedPreset.empty()) ImGui::EndDisabled();
 	if (!client.isReadyToSend()) ImGui::EndDisabled();
 	ImGui::EndChild();
 	ImGui::SameLine(0.f, topSectionGap);
 	ImGui::BeginChild("group-filter-controls", ImVec2(0, topSectionHeight), ImGuiChildFlags_AlwaysUseWindowPadding);
-	ImGui::TextUnformatted("Filter Parameters");
+	ImGui::TextUnformatted("type here");
 	const float clearWidth = ImGui::CalcTextSize("Clear").x + ImGui::GetStyle().FramePadding.x * 2.f;
 	ImGui::SetNextItemWidth(std::max(1.f, ImGui::GetContentRegionAvail().x - clearWidth - ImGui::GetStyle().ItemSpacing.x));
 	ImGui::InputTextWithHint("##filter", "Filter parameters...", filterBuffer, sizeof(filterBuffer));
@@ -95,8 +98,8 @@ void ofApp::drawParameterPanel() {
 	const float footerWidth = std::max(1.f, ImGui::GetContentRegionAvail().x - ImGui::GetStyle().WindowPadding.x * 2.f);
 	const float footerSpacing = ImGui::GetStyle().ItemSpacing.x * 2;
 	auto footerButtonWidth = [](const char *label) { return ImGui::CalcTextSize(label).x + ImGui::GetStyle().FramePadding.x * 2.f; };
-	const float hostWidth = std::max(1.f, std::min(110.f * footerScale, footerWidth - ImGui::CalcTextSize("Host:").x - footerSpacing));
-	const float portWidth = std::max(1.f, std::min(55.f * footerScale, footerWidth - ImGui::CalcTextSize("Port:").x - footerSpacing));
+	const float hostWidth = std::max(1.f, std::min(110.f * footerScale, footerWidth - ImGui::CalcTextSize("Host ").x - footerSpacing));
+	const float portWidth = std::max(1.f, std::min(55.f * footerScale, footerWidth - ImGui::CalcTextSize("Port ").x - footerSpacing));
 	const float hostPortGap = 10.f * footerScale;
 	const std::string pendingText = pendingPresetFiles.empty() ? "" : ofToString(pendingPresetFiles.size()) + " preset file(s) waiting for sync";
 	const auto neighbors = client.getNeighbors();
@@ -533,7 +536,7 @@ void ofApp::drawParameter(const std::string &name) {
 			activeMouseSlider.clear();
 			fineSliderTracking = false;
 		}
-		if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip)) {
+		if (p.type == REMOTEUI_PARAM_FLOAT && ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip)) {
 			ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
 			ImGui::SetTooltip("Hold Option / Alt while dragging for fine adjustment");
 		}
@@ -661,10 +664,27 @@ void ofApp::drawParameter(const std::string &name) {
 		if (ImGui::BeginTooltip()) {
 			ImGui::Text("Param: \"%s\"",name.c_str());
 			ImGui::Text("Type: %s", paramTypeName(p.type));
+			if (changedSinceLoad.count(name) && p.lastModifiedUnix > 0) {
+				const std::time_t modified = static_cast<std::time_t>(p.lastModifiedUnix);
+				if (const std::tm *localTime = std::localtime(&modified)) {
+					char formattedTime[32] = {};
+					if (std::strftime(formattedTime, sizeof(formattedTime), "%H:%M %d %b", localTime))
+						ImGui::Text("Last Modified: %s", formattedTime);
+				}
+			}
 			if (p.type == REMOTEUI_PARAM_FLOAT && p.minFloat < p.maxFloat)
-				ImGui::Text("Range: %.6g to %.6g", p.minFloat, p.maxFloat);
-			else if (p.type == REMOTEUI_PARAM_INT && p.minInt < p.maxInt)
-				ImGui::Text("Range: %d to %d", p.minInt, p.maxInt);
+				ImGui::Text("Range: [%.6g - %.6g]", p.minFloat, p.maxFloat);
+			else if ((p.type == REMOTEUI_PARAM_INT || p.type == REMOTEUI_PARAM_ENUM) && p.minInt < p.maxInt )
+				ImGui::Text("Range: [%d - %d]", p.minInt, p.maxInt);
+
+			const auto baseline = changeBaseline.find(name);
+			const bool changed = baseline != changeBaseline.end() && p.type == baseline->second.type && !sameParameterValue(p, baseline->second);
+			if(changed){
+				string tt = "Original Value: " + baseline->second.getValueAsString();
+				ImGui::TextUnformatted(tt.c_str());
+			}
+
+			ImGui::Separator();
 			ImGui::TextUnformatted("Click to bind a MIDI or joystick control");
 			if (!p.description.empty()) {
 				ImGui::Separator();
@@ -682,14 +702,14 @@ void ofApp::drawParameter(const std::string &name) {
 			RemoteUIParam restored = p;
 			if (copyParameterValue(restored, baseline->second)) {
 				sendEditedParam(name, restored);
-				appendLog("Restored connection value for " + name);
+				appendLog("Restored connection value for \"" + name + "\"");
 			}
 		}
 		ImGui::SameLine();
 		ImGui::TextDisabled("(?)");
 		if (ImGui::IsItemHovered()) {
-			if (!changed) ImGui::SetTooltip("Restores the value this client received from the server on its most recent connection.\n\nThis parameter has not changed since then.");
-			else ImGui::SetTooltip("Restores the value this client received from the server on its most recent connection.");
+			if (!changed) ImGui::SetTooltip("Restores the value to what this client received from the server on its most recent connection.\n\nThis parameter has not changed since then.");
+			else ImGui::SetTooltip("Restores the value to what this client received from the server on its most recent connection.");
 		}
 		ImGui::EndPopup();
 	}

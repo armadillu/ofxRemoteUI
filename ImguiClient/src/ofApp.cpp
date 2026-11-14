@@ -65,6 +65,9 @@ void ofApp::setup() {
 		ofLogError("ofApp") << status;
 		return;
 	}
+	auto *window = static_cast<GLFWwindow *>(ofGetWindowPtr()->getWindowContext());
+	// Cocoa clears both minimum dimensions if either is GLFW_DONT_CARE.
+	if (window) glfwSetWindowSizeLimits(window, 570, 300, GLFW_DONT_CARE, GLFW_DONT_CARE);
 	applyWindowColor(windowColor);
 	setAlwaysOnTop(alwaysOnTop);
 	controllers.setup();
@@ -109,7 +112,10 @@ void ofApp::update() {
 	client.update(dt);
 	const auto changedParams = client.getChangedParamsList();
 	if (!changedParams.empty()) lastActivity = std::chrono::steady_clock::now();
-	for (const auto &name : changedParams) updateChangedParameter(name);
+	for (const auto &name : changedParams) {
+		client.markParamModifiedNow(name);
+		updateChangedParameter(name);
+	}
 	#ifdef TARGET_OSX
 	for (const auto &path : NativeMacFileOpen::takePending()) queuePresetFile(path);
 	#endif
@@ -271,7 +277,7 @@ void ofApp::draw() {
 	const float statusScale = parameterFontScale(rowHeight);
 	const float padding = std::round(10.f * statusScale);
 	const float fontSize = std::max(1.f, std::round(ImGui::GetStyle().FontSizeBase * statusScale * .65f));
-	const std::string statusText = "Connected with " + std::to_string(client.getAllParamNamesList().size()) + " parameters.";
+	const std::string statusText = std::to_string(client.getAllParamNamesList().size()) + " params";
 
 	ImFont *font = ImGui::GetFont();
 	const ImVec2 textSize = font->CalcTextSizeA(fontSize, 100000.f, 0.f, statusText.c_str());
@@ -286,7 +292,7 @@ void ofApp::draw() {
 
 	//draw fps
 	string fps = "fps: " + ofToString(ofGetFrameRate(), 0);
-	position.x -= viewport->WorkSize.x - textSize.x - 25;
+	position.x -= viewport->WorkSize.x - textSize.x - 22;
 	ImGui::GetForegroundDrawList(viewport)->AddText(font, fontSize, position, ImGui::GetColorU32(ImGuiCol_Text), fps.c_str());
 	ImGui::PopStyleVar();
 

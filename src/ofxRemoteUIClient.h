@@ -64,6 +64,7 @@ public:
 
 	//send an "untracked" param, manually
 	void sendUntrackedParamUpdate(const RemoteUIParam &p, const std::string &paramName) override;
+	void markParamModifiedNow(const std::string &paramName);
     
     // Send message via OSC
     void sendMessage(const ofxOscMessage & m);

@@ -253,6 +253,8 @@ struct ImGui_ImplGlfw_Data
     bool                    MouseIgnoreButtonUpWaitForFocusLoss;
     bool                    MouseIgnoreButtonUp;
     ImVec2                  LastValidMousePos;
+    float                   PendingScrollX;
+    float                   PendingScrollY;
     GLFWwindow*             KeyOwnerWindows[GLFW_KEY_LAST];
     bool                    IsWayland;
     bool                    InstalledCallbacks;
@@ -503,8 +505,9 @@ void ImGui_ImplGlfw_ScrollCallback(GLFWwindow* window, double xoffset, double yo
     return;
 #endif
 
-    ImGuiIO& io = ImGui::GetIO(bd->Context);
-    io.AddMouseWheelEvent((float)xoffset, (float)yoffset);
+    constexpr float scrollScale = 0.2f;
+    bd->PendingScrollX += (float)xoffset * scrollScale;
+    bd->PendingScrollY += (float)yoffset * scrollScale;
 }
 
 // FIXME: should this be baked into ImGui_ImplGlfw_KeyToImGuiKey()? then what about the values passed to io.SetKeyEventNativeData()?
@@ -1215,6 +1218,17 @@ void ImGui_ImplGlfw_NewFrame()
         current_time = bd->Time + 0.00001;
     io.DeltaTime = bd->Time > 0.0 ? (float)(current_time - bd->Time) : (float)(1.0f / 60.0f);
     bd->Time = current_time;
+
+    // Spread wheel input over a short interval so discrete wheel steps glide
+    // while retaining the smooth fractional input provided by trackpads.
+    constexpr float scrollSmoothingSeconds = 0.025f;
+    const float scrollFraction = io.DeltaTime / (scrollSmoothingSeconds + io.DeltaTime);
+    const float scrollX = (bd->PendingScrollX > -0.001f && bd->PendingScrollX < 0.001f) ? bd->PendingScrollX : bd->PendingScrollX * scrollFraction;
+    const float scrollY = (bd->PendingScrollY > -0.001f && bd->PendingScrollY < 0.001f) ? bd->PendingScrollY : bd->PendingScrollY * scrollFraction;
+    bd->PendingScrollX -= scrollX;
+    bd->PendingScrollY -= scrollY;
+    if (scrollX != 0.0f || scrollY != 0.0f)
+        io.AddMouseWheelEvent(scrollX, scrollY);
 
     bd->MouseIgnoreButtonUp = false;
     ImGui_ImplGlfw_UpdateMouseData();

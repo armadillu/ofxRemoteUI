@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <sstream>
+#include <cstdint>
 
 #include "ofExistsTest.h"
 
@@ -193,6 +194,7 @@ public:
 	unsigned char r,g,b,a; // param bg color [0,255]
 
 	std::string description;
+	std::int64_t lastModifiedUnix = 0; // Client-side modification time, in Unix seconds.
 };
 
 

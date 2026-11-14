@@ -8,6 +8,7 @@
 
 #include "ofxRemoteUIClient.h"
 #include <iostream>
+#include <ctime>
 
 using namespace std;
 
@@ -568,11 +569,23 @@ void ofxRemoteUIClient::trackParam(const string &paramName, unsigned char* param
 
 
 void ofxRemoteUIClient::sendUntrackedParamUpdate(const RemoteUIParam &p, const string &paramName){
-	//p.print();
-	params[paramName] = p; //FIXME: error check!
+	RemoteUIParam updated = p;
+	dataMutex.lock();
+	auto existing = params.find(paramName);
+	if (existing == params.end() || !p.isEqualTo(existing->second)) updated.lastModifiedUnix = std::time(nullptr);
+	else updated.lastModifiedUnix = existing->second.lastModifiedUnix;
+	params[paramName] = updated; //FIXME: error check!
+	dataMutex.unlock();
 	vector<string>list;
 	list.emplace_back(paramName);
 	sendUpdateForParamsInList(list);
+}
+
+void ofxRemoteUIClient::markParamModifiedNow(const string &paramName){
+	dataMutex.lock();
+	auto it = params.find(paramName);
+	if (it != params.end()) it->second.lastModifiedUnix = std::time(nullptr);
+	dataMutex.unlock();
 }
 
 void ofxRemoteUIClient::sendTrackedParamUpdate(const string &paramName){
