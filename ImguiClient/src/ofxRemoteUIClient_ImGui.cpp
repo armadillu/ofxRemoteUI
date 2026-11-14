@@ -1,4 +1,4 @@
-		#include "ofxRemoteUIImGui.h"
+		#include "ofxRemoteUIClient_ImGui.h"
 
 #include "ofMain.h"
 #include "imgui.h"
@@ -43,7 +43,7 @@ void sanitizeMonitorBounds(GLFWwindow *window) {
 }
 }
 
-bool ofxRemoteUIImGui::setup(GLFWwindow *window, bool docking, bool multiViewport) {
+bool ofxRemoteUIClient_ImGui::setup(GLFWwindow *window, bool docking, bool multiViewport) {
 	if (contextCreated) return true;
 	mainWindow = window ? window : static_cast<GLFWwindow *>(ofGetWindowPtr()->getWindowContext());
 	if (!mainWindow) return false;
@@ -124,7 +124,7 @@ bool ofxRemoteUIImGui::setup(GLFWwindow *window, bool docking, bool multiViewpor
 	return true;
 }
 
-void ofxRemoteUIImGui::begin() {
+void ofxRemoteUIClient_ImGui::begin() {
 	if (!contextCreated || !platformBackendReady || !rendererBackendReady) return;
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
@@ -132,7 +132,7 @@ void ofxRemoteUIImGui::begin() {
 	ImGui::NewFrame();
 }
 
-void ofxRemoteUIImGui::end() {
+void ofxRemoteUIClient_ImGui::end() {
 	if (!contextCreated || !platformBackendReady || !rendererBackendReady) return;
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -145,7 +145,7 @@ void ofxRemoteUIImGui::end() {
 	}
 }
 
-void ofxRemoteUIImGui::shutdown() {
+void ofxRemoteUIClient_ImGui::shutdown() {
 	if (rendererBackendReady) {
 		ImGui_ImplOpenGL3_Shutdown();
 		rendererBackendReady = false;
@@ -162,6 +162,6 @@ void ofxRemoteUIImGui::shutdown() {
 	mainWindow = nullptr;
 }
 
-void ofxRemoteUIImGui::setFloating(bool enabled) {
+void ofxRemoteUIClient_ImGui::setFloating(bool enabled) {
 	if (mainWindow) glfwSetWindowAttrib(mainWindow, GLFW_FLOATING, enabled ? GLFW_TRUE : GLFW_FALSE);
 }

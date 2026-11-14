@@ -2,7 +2,7 @@
 
 #include "ofMain.h"
 #include "ofxRemoteUIClient.h"
-#include "ofxRemoteUIImGui.h"
+#include "ofxRemoteUIClient_ImGui.h"
 #include "ControllerBindings.h"
 
 #include <unordered_map>
@@ -55,7 +55,7 @@ private:
 	bool isLocalHost(const std::string &host) const;
 
 	ofxRemoteUIClient client;
-	ofxRemoteUIImGui gui;
+	ofxRemoteUIClient_ImGui gui;
 	ControllerBindings controllers;
 
 	std::string host = "127.0.0.1";

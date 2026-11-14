@@ -51,7 +51,7 @@ int main() {
 	settings.glVersionMajor = 4;
 	settings.glVersionMinor = 1;
 	settings.windowMode = OF_WINDOW;
-	settings.title = "ofxRemoteUI ImGui Client";
+	settings.title = "ofxRemoteUI Client";
 	auto window = ofCreateWindow(settings);
 	#ifdef TARGET_OSX
 	NativeMacFileOpen::setup();

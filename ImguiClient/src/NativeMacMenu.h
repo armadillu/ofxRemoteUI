@@ -55,7 +55,7 @@ static bool setup(Action handler) {
     }
     target = send<id>(send<id>((id)cls, "alloc"), "init");
     action = std::move(handler);
-    id remote = makeMenu("RemoteUI", 0, mainMenu);
+    id remote = makeMenu("ofxRemoteUI", 0, mainMenu);
     add(remote, "Connect", Connect, "k"); add(remote, "Disconnect", Disconnect, "k", true);
     separator(remote);
     add(remote, "Refresh Parameters", Refresh, "s", true);

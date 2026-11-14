@@ -158,7 +158,7 @@ void ofApp::saveCollapsedGroups() const {
 		saved[entry.first] = groups;
 	}
 	if (!ofSavePrettyJson(ClientPaths::settingsFile("collapsed-groups.json"), saved))
-		ofLogWarning("RemoteUIImGui") << "Could not save collapsed groups";
+		ofLogWarning("ofxRemoteUIClient") << "Could not save collapsed groups";
 }
 
 void ofApp::loadCollapsedGroups() {
@@ -172,7 +172,7 @@ void ofApp::loadCollapsedGroups() {
 			for (const auto &group : it.value()) if (group.is_string()) collapsedGroupsByServer[it.key()].insert(group.get<std::string>());
 		}
 	} catch (const std::exception &e) {
-		ofLogWarning("RemoteUIImGui") << "Could not load collapsed groups: " << e.what();
+		ofLogWarning("ofxRemoteUIClient") << "Could not load collapsed groups: " << e.what();
 	}
 }
 

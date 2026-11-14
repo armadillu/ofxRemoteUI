@@ -152,7 +152,11 @@ void ofApp::drawParameterPanel() {
 	ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.f, 0.f, 0.f, .16f));
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.f);
 	if (ImGui::BeginChild("param-list", ImVec2(0, -footerHeight - ImGui::GetStyle().ItemSpacing.y - parameterListGap), ImGuiChildFlags_AlwaysUseWindowPadding)) {
-		if (client.isReadyToSend() && !receivedFullSync) {
+		if (!client.isReadyToSend()) {
+			ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * topScale);
+			ImGui::TextDisabled("Connect to an ofxRemoteUI Server to edit its parameters.");
+			ImGui::PopFont();
+		} else if (!receivedFullSync) {
 			ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * topScale);
 			ImGui::TextDisabled("Waiting for server parameter data...");
 			ImGui::PopFont();

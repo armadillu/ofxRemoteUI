@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cmath>
+#include <csignal>
 #include <cstring>
 #include <cstdint>
 #include <fstream>
@@ -50,6 +51,9 @@ int refreshRateForWindow(GLFWwindow *window) {
 }
 
 void ofApp::setup() {
+#ifndef _WIN32
+	std::signal(SIGPIPE, SIG_IGN);
+#endif
 	ofSetFrameRate(0); // The client paces frames without openFrameworks' busy-waiting limiter.
 	lastActivity = std::chrono::steady_clock::now();
 	ofSetEscapeQuitsApp(false);
@@ -332,7 +336,7 @@ void ofApp::onClientEvent(const RemoteUIClientCallBackArg &arg) {
 			lastSyncCount = client.getAllParamNamesList().size();
 			lastSyncTime = ofGetElapsedTimef();
 			line << "Parameter list synchronized (" << lastSyncCount << " parameters)";
-			ofLogNotice("RemoteUIImGui") << "Full sync from " << host << ":" << port << ": " << lastSyncCount << " entries";
+			ofLogNotice("ofxRemoteUIClient") << "Full sync from " << host << ":" << port << ": " << lastSyncCount << " entries";
 			status = lastSyncCount == 0 ? "Connected · sync completed with zero parameters" : "Connected";
 			if (presetReplyPending) {
 				diffParams.clear();

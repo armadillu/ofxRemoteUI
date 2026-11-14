@@ -5,7 +5,7 @@ struct ImFont;
 
 // Minimal openFrameworks host for Dear ImGui's upstream GLFW + OpenGL3 backends.
 // The client owns its ImGui widgets; this class only manages context/frame/render glue.
-class ofxRemoteUIImGui {
+class ofxRemoteUIClient_ImGui {
 public:
 	bool setup(GLFWwindow *window = nullptr, bool docking = true, bool multiViewport = true);
 	void begin();

@@ -84,7 +84,7 @@ vector<Neighbor> ofxRemoteUIClient::getNeighbors(){
 
 void ofxRemoteUIClient::disconnect(){
 
-	OSC_CHECK;
+	if (!OSCsetup) return;
 	if (readyToSend){
 		if(verbose_) RLOG_NOTICE << "disconnect()" ;
 		sendCIAO();
