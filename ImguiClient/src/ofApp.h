@@ -21,6 +21,7 @@ private:
 	static void clientCallback(RemoteUIClientCallBackArg arg);
 	void onClientEvent(const RemoteUIClientCallBackArg &arg);
 	void drawParameterPanel();
+	void drawMenuBar();
 	void drawLogPanel();
 	void drawServerLogPanel();
 	void drawSettingsPanel();

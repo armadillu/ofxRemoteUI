@@ -18,7 +18,7 @@
 
 namespace {
 ofApp *activeApp = nullptr;
-constexpr float groupAnimationDuration = .15f;
+constexpr float groupAnimationDuration = .25f;
 
 int refreshRateForWindow(GLFWwindow *window) {
 	if (!window) return 0;
@@ -195,8 +195,8 @@ void ofApp::setup() {
 	ofSetFrameRate(0); // The client paces frames without openFrameworks' busy-waiting limiter.
 	lastActivity = std::chrono::steady_clock::now();
 	ofSetEscapeQuitsApp(false);
-	ofSetVerticalSync(true);
-	ofSetBackgroundColor(27, 29, 34);
+	ofSetVerticalSync(false);
+	ofSetBackgroundAuto(true);
 	activeApp = this;
 	client.setVerbose(false);
 	client.setCallback(&ofApp::clientCallback);
@@ -237,6 +237,7 @@ void ofApp::setup() {
 }
 
 void ofApp::update() {
+
 	const float dt = ofGetLastFrameTime();
 	monitorRefreshPoll += dt;
 	if (monitorRefreshPoll >= .5f) {
@@ -287,7 +288,7 @@ void ofApp::update() {
 	using Clock = std::chrono::steady_clock;
 	const auto now = Clock::now();
 	const bool idle = controllers.bindings.empty() && controllers.learning.empty() && now - lastActivity >= std::chrono::seconds(1);
-	const int targetRate = idle ? std::min(monitorFrameRate, 30) : monitorFrameRate;
+	const int targetRate = idle ? std::min(monitorFrameRate, 15) : monitorFrameRate;
 	const auto interval = std::chrono::duration_cast<Clock::duration>(std::chrono::duration<double>(1.0 / targetRate));
 	if (targetRate != pacedFrameRate || frameDeadline.time_since_epoch().count() == 0 || now > frameDeadline + interval) {
 		pacedFrameRate = targetRate;
@@ -297,14 +298,7 @@ void ofApp::update() {
 	frameDeadline += interval;
 }
 
-void ofApp::draw() {
-	if (!gui.isSetup()) return;
-	gui.begin();
-	const ImGuiIO &input = ImGui::GetIO();
-	bool interacting = input.MouseDelta.x != 0.f || input.MouseDelta.y != 0.f || input.MouseWheel != 0.f || input.MouseWheelH != 0.f || ImGui::IsAnyItemActive();
-	for (bool down : input.MouseDown) interacting |= down;
-	for (int key = ImGuiKey_Tab; !interacting && key < ImGuiKey_MouseLeft; ++key) interacting = ImGui::IsKeyDown(static_cast<ImGuiKey>(key));
-	if (interacting) lastActivity = std::chrono::steady_clock::now();
+void ofApp::drawMenuBar() {
 	#ifndef TARGET_OSX
 	const bool menuConnected = client.isReadyToSend();
 	const ImGuiInputFlags menuShortcutFlags = ImGuiInputFlags_RouteGlobal;
@@ -324,11 +318,6 @@ void ofApp::draw() {
 	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Comma, menuShortcutFlags)) showSettings = !showSettings;
 	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Q, menuShortcutFlags)) ofExit();
 	#endif
-	if (!ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
-		activeMouseSlider.clear();
-		fineSliderTracking = false;
-	}
-	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DockingEnable) ImGui::DockSpaceOverViewport();
 	#ifndef TARGET_OSX
 	const float menuScale = parameterFontScale(rowHeight);
 	const ImGuiStyle &menuBaseStyle = ImGui::GetStyle();
@@ -385,6 +374,22 @@ void ofApp::draw() {
 	ImGui::PopStyleColor(3);
 	ImGui::PopFont();
 	#endif
+}
+
+void ofApp::draw() {
+	if (!gui.isSetup()) return;
+	gui.begin();
+	const ImGuiIO &input = ImGui::GetIO();
+	bool interacting = input.MouseDelta.x != 0.f || input.MouseDelta.y != 0.f || input.MouseWheel != 0.f || input.MouseWheelH != 0.f || ImGui::IsAnyItemActive();
+	for (bool down : input.MouseDown) interacting |= down;
+	for (int key = ImGuiKey_Tab; !interacting && key < ImGuiKey_MouseLeft; ++key) interacting = ImGui::IsKeyDown(static_cast<ImGuiKey>(key));
+	if (interacting) lastActivity = std::chrono::steady_clock::now();
+	if (!ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+		activeMouseSlider.clear();
+		fineSliderTracking = false;
+	}
+	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DockingEnable) ImGui::DockSpaceOverViewport();
+	drawMenuBar();
 	drawParameterPanel();
 	if (showLogPanel) drawLogPanel();
 	if (showServerLogPanel) drawServerLogPanel();
@@ -404,21 +409,29 @@ void ofApp::draw() {
 		ImGui::End();
 	}
 	if (showBindings) drawBindingsPanel();
+	ImGuiViewport *viewport = ImGui::GetMainViewport();
+	const float statusScale = parameterFontScale(rowHeight);
+	const float padding = std::round(10.f * statusScale);
+	const float fontSize = std::max(1.f, std::round(ImGui::GetStyle().FontSizeBase * statusScale * .65f));
+	const std::string statusText = "Connected with " + std::to_string(client.getAllParamNamesList().size()) + " parameters.";
+
+	ImFont *font = ImGui::GetFont();
+	const ImVec2 textSize = font->CalcTextSizeA(fontSize, 100000.f, 0.f, statusText.c_str());
+	ImVec2 position(std::round(viewport->WorkPos.x + viewport->WorkSize.x - padding - textSize.x),
+		std::round(viewport->WorkPos.y + viewport->WorkSize.y - padding - textSize.y));
+	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, .3f);
+
 	if (client.isReadyToSend()) {
-		ImGuiViewport *viewport = ImGui::GetMainViewport();
-		const float statusScale = parameterFontScale(rowHeight);
-		const float padding = std::round(10.f * statusScale);
-		const float fontSize = std::max(1.f, std::round(ImGui::GetStyle().FontSizeBase * statusScale * .8f));
-		const std::string statusText = "Connected with " + std::to_string(client.getAllParamNamesList().size()) + " parameters.";
-		ImFont *font = ImGui::GetFont();
-		const ImVec2 textSize = font->CalcTextSizeA(fontSize, 100000.f, 0.f, statusText.c_str());
-		const ImVec2 position(std::round(viewport->WorkPos.x + viewport->WorkSize.x - padding - textSize.x),
-			std::round(viewport->WorkPos.y + viewport->WorkSize.y - padding - textSize.y));
-		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, .4f);
 		ImGui::GetForegroundDrawList(viewport)->AddText(font, fontSize, position,
-			ImGui::GetColorU32(ImGuiCol_Text), statusText.c_str());
-		ImGui::PopStyleVar();
+														ImGui::GetColorU32(ImGuiCol_Text), statusText.c_str());
 	}
+
+	//draw fps
+	string fps = "fps: " + ofToString(ofGetFrameRate(), 0);
+	position.x -= viewport->WorkSize.x - textSize.x - 25;
+	ImGui::GetForegroundDrawList(viewport)->AddText(font, fontSize, position, ImGui::GetColorU32(ImGuiCol_Text), fps.c_str());
+	ImGui::PopStyleVar();
+
 	gui.end();
 }
 
