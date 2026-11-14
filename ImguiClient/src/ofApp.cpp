@@ -571,8 +571,10 @@ void ofApp::drawParameterPanel() {
 	ImGui::TextUnformatted("Global Presets");
 	const float presetButtonWidths = ImGui::CalcTextSize("+").x + ImGui::CalcTextSize("-").x + 4.f * ImGui::GetStyle().FramePadding.x;
 	ImGui::SetNextItemWidth(std::max(1.f, ImGui::GetContentRegionAvail().x - presetButtonWidths - 2.f * ImGui::GetStyle().ItemSpacing.x));
-	if (ImGui::BeginCombo("##preset", selectedPreset.empty() ? "No preset" : selectedPreset.c_str())) {
-		for (const auto &preset : client.getPresetsList()) if (preset != OFXREMOTEUI_NO_PRESETS && preset.find('/') == std::string::npos && ImGui::Selectable(preset.c_str(), selectedPreset == preset)) applyPreset(preset);
+	const auto presets = client.getPresetsList();
+	ImGui::SetNextWindowSizeConstraints(ImVec2(0.f, 0.f), ImVec2(FLT_MAX, viewport->WorkSize.y * (2.f / 3.f)));
+	if (ImGui::BeginCombo("##preset", selectedPreset.empty() ? "No preset" : selectedPreset.c_str(), ImGuiComboFlags_HeightLargest)) {
+		for (const auto &preset : presets) if (preset != OFXREMOTEUI_NO_PRESETS && preset.find('/') == std::string::npos && ImGui::Selectable(preset.c_str(), selectedPreset == preset)) applyPreset(preset);
 		ImGui::EndCombo();
 	}
 	ImGui::SameLine();
