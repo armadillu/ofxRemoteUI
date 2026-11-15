@@ -7,7 +7,8 @@
 namespace NativeMacMenu {
 static Action action;
 static id target = nil;
-static id roots[3] = {nil, nil, nil};
+static id roots[4] = {nil, nil, nil, nil};
+static id hostWindowsMenu = nil;
 static id items[MetricsDebuggerPanel + 1] = {};
 
 template<typename R, typename... A> R send(id object, const char *selector, A... args) {
@@ -38,10 +39,27 @@ static void add(id menu, const char *title, Command command, const char *key = "
     send<void>(item, "release");
 }
 static void separator(id menu) { send<void>(menu, "addItem:", send<id>((id)objc_getClass("NSMenuItem"), "separatorItem")); }
+static id findMenu(id mainMenu, const char *title) {
+    id menuItems = send<id>(mainMenu, "itemArray");
+    const unsigned long count = send<unsigned long>(menuItems, "count");
+    id wanted = string(title);
+    for (unsigned long i = 0; i < count; ++i) {
+        id root = send<id>(menuItems, "objectAtIndex:", i);
+        if (send<bool>(send<id>(root, "title"), "isEqualToString:", wanted)) return send<id>(root, "submenu");
+    }
+    return nil;
+}
 bool setup(Action handler) {
     id app = send<id>((id)objc_getClass("NSApplication"), "sharedApplication");
     id mainMenu = send<id>(app, "mainMenu");
     if (!mainMenu) return false;
+    hostWindowsMenu = send<id>(app, "windowsMenu");
+    if (!hostWindowsMenu) hostWindowsMenu = findMenu(mainMenu, "Window");
+    if (!hostWindowsMenu) hostWindowsMenu = findMenu(mainMenu, "Windows");
+    if (!hostWindowsMenu) {
+        hostWindowsMenu = makeMenu("Window", 3, mainMenu);
+        send<void>(app, "setWindowsMenu:", hostWindowsMenu);
+    }
     Class cls = objc_getClass("RemoteUIImGuiMenuTarget");
     if (!cls) {
         cls = objc_allocateClassPair((Class)objc_getClass("NSObject"), "RemoteUIImGuiMenuTarget", 0);
@@ -52,6 +70,7 @@ bool setup(Action handler) {
     action = std::move(handler);
     id file = makeMenu("File", 0, mainMenu);
     add(file, "Open Local Preset...", OpenLocal, "o");
+    add(file, "Settings", PreferencesPanel, ",");
     id remote = makeMenu("ofxRemoteUI", 1, mainMenu);
     add(remote, "Connect", Connect, "k");
     separator(remote);
@@ -68,15 +87,36 @@ bool setup(Action handler) {
     separator(remote);
     add(remote, "Blink MIDI-Bound Parameters", BlinkMidi);
     add(remote, "Blink USB Controller-Bound Parameters", BlinkUsb);
-    id windows = makeMenu("Windows", 2, mainMenu);
-    add(windows, "Action Log", ActivityPanel, "1");
-    add(windows, "Server Log", ServerLogPanel, "2");
-    add(windows, "Controller Bindings", BindingsPanel, "3");
-    add(windows, "Settings", PreferencesPanel, ",");
-    id developer = makeMenu("Developer", 3, mainMenu);
+    separator(hostWindowsMenu);
+    add(hostWindowsMenu, "Action Log", ActivityPanel, "1");
+    add(hostWindowsMenu, "Server Log", ServerLogPanel, "2");
+    add(hostWindowsMenu, "Controller Bindings", BindingsPanel, "3");
+    id developer = makeMenu("Developer", 2, mainMenu);
     add(developer, "ImGui Demo", ImGuiDemoPanel);
     add(developer, "ImGui Style Editor", StyleEditorPanel);
     add(developer, "Metrics / Debugger", MetricsDebuggerPanel);
+    id menuItems = send<id>(mainMenu, "itemArray");
+    const unsigned long menuCount = send<unsigned long>(menuItems, "count");
+    long windowIndex = -1;
+    for (unsigned long i = 0; i < menuCount; ++i) {
+        id root = send<id>(menuItems, "objectAtIndex:", i);
+        if (send<id>(root, "submenu") == hostWindowsMenu) { windowIndex = static_cast<long>(i); break; }
+    }
+    if (windowIndex >= 0) {
+        for (int i = 0; i < 3; ++i) send<void>(mainMenu, "removeItem:", roots[i]);
+        menuItems = send<id>(mainMenu, "itemArray");
+        const unsigned long reorderedCount = send<unsigned long>(menuItems, "count");
+        windowIndex = -1;
+        for (unsigned long i = 0; i < reorderedCount; ++i) {
+            id root = send<id>(menuItems, "objectAtIndex:", i);
+            if (send<id>(root, "submenu") == hostWindowsMenu) { windowIndex = static_cast<long>(i); break; }
+        }
+    }
+    if (windowIndex >= 0) {
+        send<void>(mainMenu, "insertItem:atIndex:", roots[0], windowIndex);
+        send<void>(mainMenu, "insertItem:atIndex:", roots[1], windowIndex + 1);
+        send<void>(mainMenu, "insertItem:atIndex:", roots[2], windowIndex + 2);
+    }
     return true;
 }
 void update(bool connected, bool activity, bool serverLog, bool preferences, bool bindings, bool highlightChanged) {
@@ -96,6 +136,15 @@ void shutdown() {
     if (!target) return;
     action = {};
     id menu = send<id>(send<id>((id)objc_getClass("NSApplication"), "sharedApplication"), "mainMenu");
+    if (hostWindowsMenu) {
+        for (int i = ActivityPanel; i <= ServerLogPanel; ++i) send<void>(hostWindowsMenu, "removeItem:", items[i]);
+        send<void>(hostWindowsMenu, "removeItem:", items[BindingsPanel]);
+        hostWindowsMenu = nil;
+    }
+    if (roots[0]) {
+        id file = send<id>(roots[0], "submenu");
+        send<void>(file, "removeItem:", items[PreferencesPanel]);
+    }
     for (id &root : roots) { if (root) { send<void>(menu, "removeItem:", root); send<void>(root, "release"); root = nil; } }
     send<void>(target, "release"); target = nil;
 }
