@@ -46,9 +46,10 @@ int main() {
 	NativeMacFileOpen::setup();
 	#endif
 	const SavedWindowGeometry geometry = loadWindowGeometry();
-	ofGLWindowSettings settings;
+	ofGLFWWindowSettings settings;
 	settings.setSize(geometry.width, geometry.height);
 	settings.glVersionMajor = 4;
+	settings.numSamples = 0;
 	settings.glVersionMinor = 1;
 	settings.windowMode = OF_WINDOW;
 	settings.title = "ofxRemoteUI Client";
