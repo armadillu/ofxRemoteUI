@@ -54,6 +54,13 @@ void ofApp::setup() {
 #ifndef _WIN32
 	std::signal(SIGPIPE, SIG_IGN);
 #endif
+#ifdef TARGET_OSX
+	const auto bundledDataPath = ofFilePath::getCurrentExeDirFS() / "../Resources/data";
+	std::error_code dataPathError;
+	if (of::filesystem::is_directory(bundledDataPath, dataPathError)) {
+		ofSetDataPathRoot(ofFilePath::addTrailingSlash(of::filesystem::absolute(bundledDataPath).lexically_normal()));
+	}
+#endif
 	ofSetFrameRate(0); // The client paces frames without openFrameworks' busy-waiting limiter.
 	lastActivity = std::chrono::steady_clock::now();
 	ofSetEscapeQuitsApp(false);
@@ -94,7 +101,7 @@ void ofApp::setup() {
 			case NativeMacMenu::ActivityPanel: showLogPanel = !showLogPanel; break;
 			case NativeMacMenu::ServerLogPanel: showServerLogPanel = !showServerLogPanel; break;
 			case NativeMacMenu::PreferencesPanel: showSettings = !showSettings; break;
-			case NativeMacMenu::BindingsPanel: showBindings = true; showAllBindings = true; focusBindings = true; break;
+			case NativeMacMenu::BindingsPanel: showBindings = true; bindingServerFilter.clear(); focusBindings = true; break;
 		}
 	});
 	#endif
@@ -121,7 +128,10 @@ void ofApp::update() {
 		updateChangedParameter(name);
 	}
 	#ifdef TARGET_OSX
-	for (const auto &path : NativeMacFileOpen::takePending()) queuePresetFile(path);
+	for (const auto &path : NativeMacFileOpen::takePending()) {
+		if (ofToLower(ofFilePath::getFileExt(path)) == "ctrlbind") importControllerBindings(path);
+		else queuePresetFile(path);
+	}
 	#endif
 	if (receivedFullSync && client.isReadyToSend() && !pendingPresetFiles.empty()) {
 		auto files = std::move(pendingPresetFiles);
@@ -182,7 +192,7 @@ void ofApp::drawMenuBar() {
 	if (menuConnected && ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiMod_Shift | ImGuiKey_G, menuShortcutFlags)) toggleAllGroups();
 	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_1, menuShortcutFlags)) showLogPanel = !showLogPanel;
 	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_2, menuShortcutFlags)) showServerLogPanel = !showServerLogPanel;
-	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_3, menuShortcutFlags)) { showBindings = true; showAllBindings = true; focusBindings = true; }
+	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_3, menuShortcutFlags)) { showBindings = true; bindingServerFilter.clear(); focusBindings = true; }
 	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Comma, menuShortcutFlags)) showSettings = !showSettings;
 	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Q, menuShortcutFlags)) ofExit();
 	#endif
@@ -231,7 +241,7 @@ void ofApp::drawMenuBar() {
 		if (ImGui::BeginMenu("Windows")) {
 			ImGui::MenuItem("Action Log", "Ctrl+1", &showLogPanel);
 			ImGui::MenuItem("Server Log", "Ctrl+2", &showServerLogPanel);
-			if (ImGui::MenuItem("Controller Bindings", "Ctrl+3")) { showBindings = true; showAllBindings = true; focusBindings = true; }
+			if (ImGui::MenuItem("Controller Bindings", "Ctrl+3")) { showBindings = true; bindingServerFilter.clear(); focusBindings = true; }
 			ImGui::MenuItem("Settings", "Ctrl+,", &showSettings);
 			ImGui::EndMenu();
 		}

@@ -655,7 +655,6 @@ void ofApp::drawParameter(const std::string &name) {
 	if (labelClicked) {
 		if (p.type == REMOTEUI_PARAM_BOOL || p.type == REMOTEUI_PARAM_FLOAT || p.type == REMOTEUI_PARAM_INT || p.type == REMOTEUI_PARAM_ENUM || p.type == REMOTEUI_PARAM_COLOR) {
 			controllers.beginLearn(name);
-			bindingParam = name;
 			bindingPopupX = labelPos.x;
 			bindingPopupY = labelPos.y + ImGui::GetTextLineHeightWithSpacing();
 			bindingPopupRequested = true;

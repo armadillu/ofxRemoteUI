@@ -121,6 +121,31 @@ void ofApp::choosePresetFile() {
 	auto result = ofSystemLoadDialog("Load RemoteUI preset", false, ofToDataPath("", true));
 	if (result.bSuccess) queuePresetFile(result.getPath());
 }
+void ofApp::chooseControllerBindingsFile() {
+	auto result = ofSystemLoadDialog("Import controller bindings");
+	if (result.bSuccess) importControllerBindings(result.getPath());
+}
+void ofApp::importControllerBindings(const std::string &path) {
+	std::string error;
+	if (!controllers.importFile(path, error)) {
+		appendLog("Could not import controller bindings: " + error);
+		return;
+	}
+	appendLog("Imported " + ofToString(controllers.bindings.size()) + " controller binding(s) from " + ofFilePath::getFileName(path));
+}
+void ofApp::exportControllerBindingsFile() {
+	auto result = ofSystemSaveDialog("controller-bindings.ctrlBind", "Export controller bindings for all servers");
+	if (!result.bSuccess) return;
+	std::string path = result.getPath();
+	if (ofToLower(ofFilePath::getFileExt(path)) != "ctrlbind") path += ".ctrlBind";
+	std::string error;
+	size_t exportedCount = 0;
+	if (!controllers.exportFile(path, bindingServerFilter, bindingSearchBuffer, exportedCount, error)) {
+		appendLog("Could not export controller bindings: " + error);
+		return;
+	}
+	appendLog("Exported " + ofToString(exportedCount) + " controller binding(s) to " + ofFilePath::getFileName(path));
+}
 void ofApp::importPresetFile(const std::string &path) {
 	ofxXmlSettings xml;
 	if (!xml.load(path)) { appendLog("Could not open preset " + path); return; }
@@ -214,5 +239,8 @@ void ofApp::loadPreferences() {
 }
 
 void ofApp::dragEvent(ofDragInfo dragInfo) {
-	for (const auto &path : dragInfo.files) queuePresetFile(path);
+	for (const auto &path : dragInfo.files) {
+		if (ofToLower(ofFilePath::getFileExt(path)) == "ctrlbind") importControllerBindings(path);
+		else queuePresetFile(path);
+	}
 }

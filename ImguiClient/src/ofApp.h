@@ -44,6 +44,9 @@ private:
 	void saveCollapsedGroups() const;
 	void loadCollapsedGroups();
 	void importPresetFile(const std::string &path);
+	void importControllerBindings(const std::string &path);
+	void chooseControllerBindingsFile();
+	void exportControllerBindingsFile();
 	void queuePresetFile(const std::string &path);
 	void choosePresetFile();
 	void rememberCurrentValuesForDiff();
@@ -62,6 +65,7 @@ private:
 	int port = OFXREMOTEUI_PORT;
 	char hostBuffer[256] = "127.0.0.1";
 	char filterBuffer[256] = "";
+	char bindingSearchBuffer[256] = "";
 	char presetNameBuffer[128] = "";
 	char groupPresetNameBuffer[128] = "";
 	char clipboardBuffer[64 * 1024] = "";
@@ -76,12 +80,11 @@ private:
 	bool showStyleEditor = false;
 	bool showBindings = false;
 	bool focusBindings = false;
-	bool showAllBindings = true;
 	bool bindingPopupRequested = false;
 	bool bindingPopupActive = false;
 	float bindingPopupX = 0.f;
 	float bindingPopupY = 0.f;
-	std::string bindingParam;
+	std::string bindingServerFilter;
 	bool highlightPresetDiff = true;
 	float windowColor[4] = {0.06f, 0.06f, 0.06f, 1.f};
 	bool showLogPanel = false;
