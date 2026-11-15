@@ -303,7 +303,7 @@ void ofApp::drawParameterPanel() {
 				ImGui::CloseCurrentPopup();
 				bindingPopupActive = false;
 			} else {
-				ImGui::Text("Binding Param: \"%s\"",controllers.learning.c_str());
+				ImGui::Text("Waiting for controller input to connect to: \"%s\"",controllers.learning.c_str());
 				ImGui::Dummy(ImVec2(0.f, ImGui::GetTextLineHeight() * .2f));
 				ImGui::Separator();
 				ImGui::Dummy(ImVec2(0.f, ImGui::GetTextLineHeight() * .2f));
@@ -422,7 +422,7 @@ void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param)
 	}
 	const float fontSize = ImGui::GetFontSize();
 	const float inset = std::max(4.f, fontSize * .35f);
-	const float arrowSize = fontSize * .44f;
+	const float arrowSize = fontSize * .55f;
 	const float arrowX = pos.x + inset, arrowY = pos.y + (height - arrowSize) * .5f;
 	ImDrawList *headerDrawList = ImGui::GetWindowDrawList();
 	headerDrawList->PushClipRect(pos, ImVec2(pos.x + titleWidth, pos.y + height), true);
@@ -432,7 +432,7 @@ void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param)
 	} else {
 		headerDrawList->AddTriangleFilled(ImVec2(arrowX, arrowY), ImVec2(arrowX + arrowSize, arrowY), ImVec2(arrowX + arrowSize * .5f, arrowY + arrowSize), textColor);
 	}
-	headerDrawList->AddText(ImVec2(arrowX + arrowSize + inset, pos.y + (height - fontSize) * .5f), textColor, param.stringVal.c_str());
+	headerDrawList->AddText(ImVec2(arrowX + arrowSize + inset, pos.y + (height - fontSize) * .6f), textColor, param.stringVal.c_str());
 	headerDrawList->PopClipRect();
 	const float titleTextWidth = std::max(0.f, pos.x + titleWidth - (arrowX + arrowSize + inset));
 	if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip) && ImGui::CalcTextSize(param.stringVal.c_str()).x > titleTextWidth) {
@@ -551,7 +551,7 @@ void ofApp::drawParameter(const std::string &name) {
 		if (tracking) {
 			if (io.KeyAlt || fineSliderTracking) {
 				fineSliderTracking = true;
-				virtualSliderMouseX = ofClamp(virtualSliderMouseX + io.MouseDelta.x * (io.KeyAlt ? .05f : 1.f), controlStartX, controlStartX + controlWidth);
+				virtualSliderMouseX = ofClamp(virtualSliderMouseX + io.MouseDelta.x * (io.KeyAlt ? .01f : 1.f), controlStartX, controlStartX + controlWidth);
 				io.MousePos.x = virtualSliderMouseX;
 			} else {
 				virtualSliderMouseX = realMouseX;
@@ -690,9 +690,22 @@ void ofApp::drawParameter(const std::string &name) {
 	ImGui::PopFont();
 	if (ImGui::IsItemHovered() && !ImGui::IsPopupOpen("parameter-context")) {
 		ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
+
 		if (ImGui::BeginTooltip()) {
+
 			ImGui::Text("Param: \"%s\"",name.c_str());
 			ImGui::Text("Type: %s", paramTypeName(p.type));
+
+			if (p.type == REMOTEUI_PARAM_FLOAT && p.minFloat < p.maxFloat)
+				ImGui::Text("Range: [%.6g .. %.6g]", p.minFloat, p.maxFloat);
+			else if ((p.type == REMOTEUI_PARAM_INT || p.type == REMOTEUI_PARAM_ENUM) && p.minInt < p.maxInt )
+				ImGui::Text("Range: [%d .. %d]", p.minInt, p.maxInt);
+			else if (p.type == REMOTEUI_PARAM_COLOR){
+				static char hexBuffer[10];
+				std::snprintf(hexBuffer, sizeof(hexBuffer), "#%02X%02X%02X%02X", p.redVal, p.greenVal, p.blueVal, p.alphaVal);
+				ImGui::Text("RGBA hex: %s", hexBuffer);
+			}
+
 			if (changedSinceLoad.count(name) && p.lastModifiedUnix > 0) {
 				const std::time_t modified = static_cast<std::time_t>(p.lastModifiedUnix);
 				if (const std::tm *localTime = std::localtime(&modified)) {
@@ -701,11 +714,6 @@ void ofApp::drawParameter(const std::string &name) {
 						ImGui::Text("Last Modified: %s", formattedTime);
 				}
 			}
-			if (p.type == REMOTEUI_PARAM_FLOAT && p.minFloat < p.maxFloat)
-				ImGui::Text("Range: [%.6g - %.6g]", p.minFloat, p.maxFloat);
-			else if ((p.type == REMOTEUI_PARAM_INT || p.type == REMOTEUI_PARAM_ENUM) && p.minInt < p.maxInt )
-				ImGui::Text("Range: [%d - %d]", p.minInt, p.maxInt);
-
 			const auto baseline = changeBaseline.find(name);
 			const bool changed = baseline != changeBaseline.end() && p.type == baseline->second.type && !sameParameterValue(p, baseline->second);
 			if(changed){
@@ -720,6 +728,7 @@ void ofApp::drawParameter(const std::string &name) {
 			ImGui::Dummy(ImVec2(0.f, ImGui::GetTextLineHeight() * .3f));
 			ImGui::Separator();
 			ImGui::Dummy(ImVec2(0.f, ImGui::GetTextLineHeight() * .2f));
+
 			ImGui::TextUnformatted("[ Click to bind a MIDI or joystick control ]");
 
 			ImGui::EndTooltip();

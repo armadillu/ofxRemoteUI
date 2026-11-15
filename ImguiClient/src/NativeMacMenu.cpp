@@ -53,7 +53,7 @@ bool setup(Action handler) {
     id file = makeMenu("File", 0, mainMenu);
     add(file, "Open Local Preset...", OpenLocal, "o");
     id remote = makeMenu("ofxRemoteUI", 1, mainMenu);
-    add(remote, "Connect", Connect, "k"); add(remote, "Disconnect", Disconnect, "k", true);
+    add(remote, "Connect", Connect, "k");
     separator(remote);
     add(remote, "Refresh Parameters", Refresh, "s", true);
     add(remote, "Save Current Values to Server", Save, "s");
@@ -62,6 +62,7 @@ bool setup(Action handler) {
     separator(remote);
     add(remote, "Copy Parameter Values", CopyValues, "c", true);
     add(remote, "Paste Parameter Values", PasteValues, "v", true);
+	separator(remote);
     add(remote, "Highlight Changes Since Connection", HighlightChanged);
     add(remote, "Collapse / Expand All Groups", ToggleAllGroups, "g", true);
     separator(remote);
@@ -80,7 +81,7 @@ bool setup(Action handler) {
 }
 void update(bool connected, bool activity, bool serverLog, bool preferences, bool bindings, bool highlightChanged) {
     if (!target) return;
-    for (int i = Disconnect; i <= RestoreDefaults; ++i) send<void>(items[i], "setEnabled:", connected);
+    for (int i = Refresh; i <= RestoreDefaults; ++i) send<void>(items[i], "setEnabled:", connected);
     send<void>(items[CopyValues], "setEnabled:", connected);
     send<void>(items[PasteValues], "setEnabled:", connected);
     send<void>(items[BlinkMidi], "setEnabled:", connected);

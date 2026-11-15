@@ -69,6 +69,7 @@ void ofApp::setup() {
 	activeApp = this;
 	client.setVerbose(false);
 	client.setCallback(&ofApp::clientCallback);
+	updateLocalHostAddress();
 	loadPreferences();
 	loadCollapsedGroups();
 	if (!gui.setup()) {
@@ -86,7 +87,6 @@ void ofApp::setup() {
 	NativeMacMenu::setup([this](NativeMacMenu::Command command) {
 		switch (command) {
 			case NativeMacMenu::Connect: connectTo(host, port); break;
-			case NativeMacMenu::Disconnect: disconnectFromServer(); break;
 			case NativeMacMenu::Refresh: client.requestCompleteUpdate(); break;
 			case NativeMacMenu::Save: client.saveCurrentStateToDefaultXML(); break;
 			case NativeMacMenu::RestoreLaunch: client.restoreAllParamsToInitialXML(); break;
@@ -187,7 +187,6 @@ void ofApp::drawMenuBar() {
 	const bool menuConnected = client.isReadyToSend();
 	const ImGuiInputFlags menuShortcutFlags = ImGuiInputFlags_RouteGlobal;
 	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_K, menuShortcutFlags)) connectTo(host, port);
-	if (menuConnected && ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiMod_Shift | ImGuiKey_K, menuShortcutFlags)) disconnectFromServer();
 	if (menuConnected && ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiMod_Shift | ImGuiKey_S, menuShortcutFlags)) client.requestCompleteUpdate();
 	if (menuConnected && ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S, menuShortcutFlags)) client.saveCurrentStateToDefaultXML();
 	if (menuConnected && ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_R, menuShortcutFlags)) client.restoreAllParamsToInitialXML();
@@ -225,7 +224,6 @@ void ofApp::drawMenuBar() {
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, std::max(2.f * menuScale, menuBaseStyle.WindowBorderSize * menuScale));
 		if (ImGui::BeginMenu("RemoteUI")) {
 			if (ImGui::MenuItem("Connect", "Ctrl+K")) connectTo(host, port);
-			if (ImGui::MenuItem("Disconnect", "Ctrl+Shift+K", false, menuConnected)) disconnectFromServer();
 			ImGui::Separator();
 			if (ImGui::MenuItem("Refresh Parameters", "Ctrl+Shift+S", false, menuConnected)) client.requestCompleteUpdate();
 			if (ImGui::MenuItem("Save Current Values to Server", "Ctrl+S", false, menuConnected)) client.saveCurrentStateToDefaultXML();
@@ -393,7 +391,12 @@ void ofApp::onClientEvent(const RemoteUIClientCallBackArg &arg) {
 		case NEIGHBOR_JUST_LAUNCHED_SERVER:
 			line << "Server announced: " << arg.msg;
 			if (autoConnectToNewServers && !client.isReadyToSend()) {
-				for (const auto &neighbor : client.getNeighbors()) if (neighbor.IP == arg.host && neighbor.port == arg.port && (!onlyAutoConnectToLocalHost || isLocalHost(neighbor.IP))) { selectNeighbor(neighbor); break; }
+				updateLocalHostAddress();
+				for (const auto &neighbor : client.getNeighbors()){
+					if (neighbor.IP == arg.host && neighbor.port == arg.port && (!onlyAutoConnectToLocalHost || isLocalHost(neighbor.IP))) {
+						selectNeighbor(neighbor); break;
+					}
+				}
 			}
 			break;
 		case SERVER_ASKED_TO_REMOVE_PARAM: changedSinceLoad.erase(arg.msg); line << "Parameter removed: " << arg.msg; break;

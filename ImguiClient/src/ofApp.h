@@ -32,6 +32,7 @@ private:
 	void captureChangeBaseline();
 	void updateChangedParameter(const std::string &name);
 	std::string bindingServer() const;
+	void updateLocalHostAddress();
 	void drawParameter(const std::string &name);
 	void drawGroupHeader(const std::string &name, const RemoteUIParam &param);
 	void connectTo(const std::string &host, int port);
@@ -62,6 +63,7 @@ private:
 	ControllerBindings controllers;
 
 	std::string host = "127.0.0.1";
+	std::string localHostAddress;
 	int port = OFXREMOTEUI_PORT;
 	char hostBuffer[256] = "127.0.0.1";
 	char filterBuffer[256] = "";

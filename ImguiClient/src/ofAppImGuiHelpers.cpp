@@ -88,6 +88,8 @@ void applyWindowColor(const float color[4]) {
 		ImGui::ColorConvertHSVtoRGB(hue, saturation * .8f, brightness, r, g, b);
 		return ImVec4(r, g, b, alpha);
 	};
+	style.AntiAliasedLines = true;
+	style.AntiAliasedFill = true;
 	style.Colors[ImGuiCol_WindowBg] = ImVec4(color[0], color[1], color[2], color[3]);
 	style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.f, 0.f, 0.f, .9f);
 	style.Colors[ImGuiCol_Text] = lightWindow ? ImVec4(.06f, .06f, .06f, 1.f) : ImVec4(.94f, .94f, .94f, 1.f);

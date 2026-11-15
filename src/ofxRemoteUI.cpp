@@ -186,7 +186,7 @@ DecodedMessage ofxRemoteUI::decode(const ofxOscMessage & m) const{
 }
 
 
-std::string ofxRemoteUI::getMyIP(const std::string &userChosenInteface, std::string & subnetMask){
+const std::string ofxRemoteUI::getMyIP(const std::string &userChosenInteface, std::string & subnetMask){
 
 	//from https://github.com/jvcleave/LocalAddressGrabber/blob/master/src/LocalAddressGrabber.h
 	//and http://stackoverflow.com/questions/17288908/get-network-interface-name-from-ipv4-address

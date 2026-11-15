@@ -89,7 +89,7 @@ bool ofxRemoteUIClient_ImGui::setup(GLFWwindow *window, bool docking, bool multi
 	style.ItemInnerSpacing = ImVec2(4.f, 2.f);
 	style.TouchExtraPadding = ImVec2(0.f, 0.f);
 	style.IndentSpacing = 12.f;
-	style.GrabMinSize = 10.f;
+	style.GrabMinSize = 15.f;
 	style.ScrollbarSize = 10.f;
 	style.ColorMarkerSize = 1.f;
 	style.WindowBorderSize = 0.f;

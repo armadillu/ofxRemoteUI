@@ -165,8 +165,8 @@ void ofApp::drawBindingsPanel() {
 	ImGui::EndChild();
 	ImGui::Separator();
 	const float removeAllWidth = ImGui::CalcTextSize("Remove All Bindings").x + ImGui::GetStyle().FramePadding.x * 2.f;
-	const float importWidth = ImGui::CalcTextSize("Import .ctrlBind...").x + ImGui::GetStyle().FramePadding.x * 2.f;
-	const float exportWidth = ImGui::CalcTextSize("Export .ctrlBind...").x + ImGui::GetStyle().FramePadding.x * 2.f;
+	const float importWidth = ImGui::CalcTextSize("Import Bindings...").x + ImGui::GetStyle().FramePadding.x * 2.f;
+	const float exportWidth = ImGui::CalcTextSize("Export Bindings...").x + ImGui::GetStyle().FramePadding.x * 2.f;
 	const float buttonsWidth = removeAllWidth + ImGui::GetStyle().ItemSpacing.x * 2.f + importWidth + exportWidth;
 	ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x - buttonsWidth);
 	ImGui::BeginDisabled(controllers.bindings.empty());
@@ -187,9 +187,9 @@ void ofApp::drawBindingsPanel() {
 	}
 	ImGui::PopStyleVar();
 	ImGui::SameLine();
-	if (ImGui::Button("Import .ctrlBind...", ImVec2(importWidth, 0))) chooseControllerBindingsFile();
+	if (ImGui::Button("Import Bindings...", ImVec2(importWidth, 0))) chooseControllerBindingsFile();
 	ImGui::SameLine();
-	if (ImGui::Button("Export .ctrlBind...", ImVec2(exportWidth, 0))) exportControllerBindingsFile();
+	if (ImGui::Button("Export Bindings...", ImVec2(exportWidth, 0))) exportControllerBindingsFile();
 	ImGui::End();
 
 }

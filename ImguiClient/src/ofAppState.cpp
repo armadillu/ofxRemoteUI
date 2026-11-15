@@ -15,6 +15,10 @@
 
 using namespace ofAppImGuiHelpers;
 std::string ofApp::bindingServer() const { return host + ":" + ofToString(port); }
+void ofApp::updateLocalHostAddress() {
+	std::string subnetMask;
+	localHostAddress = client.getMyIP("", subnetMask);
+}
 
 void ofApp::toggleAllGroups() {
 	if (!client.isReadyToSend()) return;
@@ -109,7 +113,10 @@ void ofApp::applyClipboardValues(const std::string &values, bool highlightChange
 	else appendLog("Applied values from clipboard");
 }
 void ofApp::selectNeighbor(const Neighbor &n) { host = n.IP; port = n.port; connectTo(host, port); }
-bool ofApp::isLocalHost(const std::string &ip) const { return ip == "127.0.0.1" || ip == "localhost" || ip == "::1" || ip.rfind("192.168.", 0) == 0 || ip.rfind("10.", 0) == 0 || ip.rfind("172.16.", 0) == 0; }
+bool ofApp::isLocalHost(const std::string &ip) const {
+	if (ip == "localhost" || ip == "::1" || ip.compare(0, 4, "127.") == 0) return true;
+	return !localHostAddress.empty() && ip == localHostAddress;
+}
 void ofApp::setAlwaysOnTop(bool enabled) {
 	gui.setFloating(enabled);
 }

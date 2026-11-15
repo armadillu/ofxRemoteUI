@@ -242,7 +242,7 @@ public:
 
 	virtual void sendUntrackedParamUpdate(const RemoteUIParam &p, const std::string &paramName){};
 
-	std::string getMyIP(const std::string &userChosenInteface, std::string & subnetMask);
+	const std::string getMyIP(const std::string &userChosenInteface, std::string & subnetMask);
 
 	std::recursive_mutex & getDataMutex(){return dataMutex;}
 
