@@ -1,3 +1,4 @@
+#ifdef TARGET_OSX
 #include "NativeMacMenu.h"
 
 #include <objc/message.h>
@@ -12,6 +13,7 @@ static id items[MetricsDebuggerPanel + 1] = {};
 template<typename R, typename... A> R send(id object, const char *selector, A... args) {
     return reinterpret_cast<R (*)(id, SEL, A...)>(objc_msgSend)(object, sel_registerName(selector), args...);
 }
+#endif // TARGET_OSX
 static id string(const char *s) { return send<id>((id)objc_getClass("NSString"), "stringWithUTF8String:", s); }
 static void perform(id, SEL, id sender) {
     auto command = static_cast<Command>(send<long>(sender, "tag"));
@@ -96,3 +98,4 @@ void shutdown() {
     send<void>(target, "release"); target = nil;
 }
 }
+#endif // TARGET_OSX
