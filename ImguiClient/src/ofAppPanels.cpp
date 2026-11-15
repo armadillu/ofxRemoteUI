@@ -7,9 +7,10 @@
 using namespace ofAppImGuiHelpers;
 
 void ofApp::drawLogPanel() {
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.f, 5.f));
 	ImGui::SetNextWindowSize(ImVec2(650, 190), ImGuiCond_FirstUseEver);
 	prepareSecondaryWindow();
-	if (!ImGui::Begin("Action log", &showLogPanel, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); return; }
+	if (!ImGui::Begin("Action log", &showLogPanel, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); ImGui::PopStyleVar(); return; }
 	if (ImGui::SmallButton("Clear")) logLines.clear();
 	ImGui::SameLine(); ImGui::TextDisabled("%zu events", logLines.size());
 	ImGui::BeginChild("log-scroll", ImVec2(0, 0), true);
@@ -17,12 +18,14 @@ void ofApp::drawLogPanel() {
 	if (autoScrollLog && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) ImGui::SetScrollHereY(1.f);
 	ImGui::EndChild();
 	ImGui::End();
+	ImGui::PopStyleVar();
 }
 
 void ofApp::drawServerLogPanel() {
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.f, 5.f));
 	ImGui::SetNextWindowSize(ImVec2(650, 190), ImGuiCond_FirstUseEver);
 	prepareSecondaryWindow();
-	if (!ImGui::Begin("Server log", &showServerLogPanel, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); return; }
+	if (!ImGui::Begin("Server log", &showServerLogPanel, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); ImGui::PopStyleVar(); return; }
 	if (ImGui::SmallButton("Clear")) serverLogLines.clear();
 	ImGui::SameLine(); ImGui::TextDisabled("%zu lines", serverLogLines.size());
 	ImGui::BeginChild("server-log-scroll", ImVec2(0, 0), true);
@@ -30,12 +33,14 @@ void ofApp::drawServerLogPanel() {
 	if (autoScrollLog && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) ImGui::SetScrollHereY(1.f);
 	ImGui::EndChild();
 	ImGui::End();
+	ImGui::PopStyleVar();
 }
 
 void ofApp::drawSettingsPanel() {
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.f, 5.f));
 	ImGui::SetNextWindowSize(ImVec2(360, 260), ImGuiCond_FirstUseEver);
 	prepareSecondaryWindow();
-	if (!ImGui::Begin("Settings", &showSettings, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); return; }
+	if (!ImGui::Begin("Settings", &showSettings, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); ImGui::PopStyleVar(); return; }
 	framedCheckbox("Auto-connect to new servers", &autoConnectToNewServers);
 	ImGui::Indent();
 	framedCheckbox("Only auto-connect to localhost servers", &onlyAutoConnectToLocalHost);
@@ -46,7 +51,7 @@ void ofApp::drawSettingsPanel() {
 	framedCheckbox("Highlight changes after loading presets", &highlightPresetDiff);
 	framedCheckbox("Auto-scroll logs", &autoScrollLog);
 	float uiScalePercent = parameterFontScale(rowHeight) * 100.f;
-	if (ImGui::SliderFloat("Parameter GUI size", &uiScalePercent, 100.f * 10.f / 17.f, 100.f * 46.f / 17.f, "%.0f%%")) rowHeight = 2.f + 17.f * uiScalePercent / 100.f;
+	if (ImGui::SliderFloat("UI Scale", &uiScalePercent, 100.f * 10.f / 17.f, 100.f * 46.f / 17.f, "%.0f%%")) rowHeight = 2.f + 17.f * uiScalePercent / 100.f;
 	ImGui::SliderFloat("Column width", &columnBaseWidth, 220.f, 500.f, "%.0f px");
 	if (ImGui::IsItemHovered()) ImGui::SetTooltip("Smaller values allow more columns. The threshold also follows parameter row height.");
 	if (ImGui::ColorEdit3("Window color", windowColor)) applyWindowColor(windowColor);
@@ -56,13 +61,15 @@ void ofApp::drawSettingsPanel() {
 	ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x - saveButtonWidth);
 	if (ImGui::Button("Save preferences", ImVec2(saveButtonWidth, 0))) savePreferences();
 	ImGui::End();
+	ImGui::PopStyleVar();
 }
 
 void ofApp::drawBindingsPanel() {
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.f, 5.f));
 	ImGui::SetNextWindowSize(ImVec2(720, 300), ImGuiCond_FirstUseEver);
 	if (focusBindings) { ImGui::SetNextWindowFocus(); focusBindings = false; }
 	prepareSecondaryWindow();
-	if (!ImGui::Begin("Controller bindings", &showBindings, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); return; }
+	if (!ImGui::Begin("Controller bindings", &showBindings, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); ImGui::PopStyleVar(); return; }
 	std::vector<std::string> servers;
 	for (const auto &binding : controllers.bindings) servers.push_back(binding.server);
 	if (client.isReadyToSend()) servers.push_back(bindingServer());
@@ -172,6 +179,7 @@ void ofApp::drawBindingsPanel() {
 	ImGui::BeginDisabled(controllers.bindings.empty());
 	if (ImGui::Button("Remove All Bindings", ImVec2(removeAllWidth, 0))) ImGui::OpenPopup("Confirm remove all bindings");
 	ImGui::EndDisabled();
+	pushPopupWindowPadding();
 	if (ImGui::BeginPopupModal("Confirm remove all bindings", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 		ImGui::TextUnformatted("Remove all controller bindings from every server?");
 		ImGui::Spacing();
@@ -184,10 +192,12 @@ void ofApp::drawBindingsPanel() {
 		}
 		ImGui::EndPopup();
 	}
+	ImGui::PopStyleVar();
 	ImGui::SameLine();
 	if (ImGui::Button("Import .ctrlBind...", ImVec2(importWidth, 0))) chooseControllerBindingsFile();
 	ImGui::SameLine();
 	if (ImGui::Button("Export .ctrlBind...", ImVec2(exportWidth, 0))) exportControllerBindingsFile();
 	ImGui::End();
+	ImGui::PopStyleVar();
 }
 

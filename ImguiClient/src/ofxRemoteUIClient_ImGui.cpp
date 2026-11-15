@@ -82,7 +82,7 @@ bool ofxRemoteUIClient_ImGui::setup(GLFWwindow *window, bool docking, bool multi
 
 	ImGui::StyleColorsDark();
 	ImGuiStyle &style = ImGui::GetStyle();
-	style.WindowPadding = ImVec2(6.f, 5.f);
+	style.WindowPadding = ImVec2(14.f, 14.f);
 	style.FontScaleMain = .8f;
 	style.FramePadding = ImVec2(12.f, 3.f);
 	style.ItemSpacing = ImVec2(2.f, 2.f);
@@ -94,11 +94,11 @@ bool ofxRemoteUIClient_ImGui::setup(GLFWwindow *window, bool docking, bool multi
 	style.ColorMarkerSize = 1.f;
 	style.WindowBorderSize = 0.f;
 	style.ChildBorderSize = 0.f;
-	style.PopupBorderSize = 0.f;
+	style.PopupBorderSize = 1.f;
 	style.PopupRounding = 6.f;
 	style.WindowRounding = style.PopupRounding;
 	style.FrameBorderSize = 0.f;
-	style.Colors[ImGuiCol_Border] = ImVec4(0.f, 0.f, 0.f, .433f);
+	style.Colors[ImGuiCol_Border] = ImVec4(0.f, 0.f, 0.f, 0.4f);
 	style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 	style.FrameRounding = 3.0f;
 	style.GrabRounding = 3.0f;

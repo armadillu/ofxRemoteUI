@@ -20,4 +20,6 @@ void applyWindowColor(const float color[4]);
 const char *paramTypeName(RemoteUIParamType type);
 
 bool containsCaseInsensitive(const std::string &text, const std::string &query);
+
+void pushPopupWindowPadding();
 }

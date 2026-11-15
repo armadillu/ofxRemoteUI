@@ -215,7 +215,7 @@ void ofApp::drawMenuBar() {
 	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(borderLuma, borderLuma, borderLuma, 1.f));
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2((menuBaseStyle.FramePadding.x + 5.f) * menuScale, (menuBaseStyle.FramePadding.y + 3.f) * menuScale));
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2((menuBaseStyle.ItemSpacing.x + 4.f) * menuScale, menuBaseStyle.ItemSpacing.y * menuScale));
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(menuBaseStyle.WindowPadding.x * menuScale, menuBaseStyle.WindowPadding.y * menuScale));
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.f * menuScale, 5.f * menuScale));
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
 	if (ImGui::BeginMainMenuBar()) {
 		if (ImGui::BeginMenu("File")) {
@@ -286,6 +286,7 @@ void ofApp::draw() {
 	if (showStyleEditor) {
 		ImGui::SetNextWindowSize(ImVec2(500, 600), ImGuiCond_FirstUseEver);
 		prepareSecondaryWindow();
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.f, 5.f));
 		if (ImGui::Begin("ImGui Style Editor", &showStyleEditor, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) {
 			const ImVec4 before = ImGui::GetStyle().Colors[ImGuiCol_WindowBg];
 			ImGui::ShowStyleEditor();
@@ -296,6 +297,7 @@ void ofApp::draw() {
 			}
 		}
 		ImGui::End();
+		ImGui::PopStyleVar();
 	}
 	if (showBindings) drawBindingsPanel();
 	ImGuiViewport *viewport = ImGui::GetMainViewport();

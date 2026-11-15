@@ -11,10 +11,11 @@
 using namespace ofAppImGuiHelpers;
 
 void ofApp::drawParameterPanel() {
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.f, 5.f));
 	const ImGuiViewport *viewport = ImGui::GetMainViewport();
 	ImGui::SetNextWindowPos(viewport->WorkPos);
 	ImGui::SetNextWindowSize(viewport->WorkSize);
-	if (!ImGui::Begin("Parameters", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); return; }
+	if (!ImGui::Begin("Parameters", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); ImGui::PopStyleVar(); return; }
 	auto names = client.isReadyToSend() ? client.getAllParamNamesList() : std::vector<std::string>{};
 	// Presets and parameter filtering occupy the top bar.
 	const float topScale = parameterFontScale(rowHeight);
@@ -42,6 +43,7 @@ void ofApp::drawParameterPanel() {
 	if (!client.isReadyToSend()) ImGui::BeginDisabled();
 	if (ImGui::Button("+##global")) { presetNameBuffer[0] = '\0'; ImGui::OpenPopup("save-global-preset"); }
 	if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip | ImGuiHoveredFlags_AllowWhenDisabled)) ImGui::SetTooltip("Save current values as a new global preset");
+	pushPopupWindowPadding();
 	if (ImGui::BeginPopup("save-global-preset")) {
 		ImGui::TextUnformatted("Save global preset");
 		ImGui::SetNextItemWidth(200.f * topScale);
@@ -51,6 +53,7 @@ void ofApp::drawParameterPanel() {
 		ImGui::SameLine(); if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
 		ImGui::EndPopup();
 	}
+	ImGui::PopStyleVar();
 	ImGui::SameLine();
 	if (selectedPreset.empty()) ImGui::BeginDisabled();
 	if (ImGui::Button("-##global")) client.deletePreset(selectedPreset);
@@ -71,6 +74,7 @@ void ofApp::drawParameterPanel() {
 	ImGui::PopStyleColor();
 	ImGui::PopStyleVar(2);
 	ImGui::PopFont();
+	ImGui::PopStyleVar();
 	if (highlightChangesSinceLoad && !changedSinceLoad.empty())
 		changedHighlightPulse = .5f + .5f * std::sin(ofGetElapsedTimef() * 2.f * 3.14159265f);
 	const auto &collapsedGroups = collapsedGroupsByServer[bindingServer()];
@@ -278,14 +282,30 @@ void ofApp::drawParameterPanel() {
 	}
 	if (bindingPopupActive) {
 		ImGui::SetNextWindowPos(ImVec2(bindingPopupX, bindingPopupY), ImGuiCond_Appearing);
+		pushPopupWindowPadding();
+		const bool listeningForBinding = !controllers.learning.empty();
+		const ImVec4 popupBg = ImGui::GetStyle().Colors[ImGuiCol_PopupBg];
+		if (listeningForBinding) {
+			const float pulse = .5f + .5f * std::sin(ofGetElapsedTimef() * 2.f * 3.14159265f);
+			const float redBlend = .15f * pulse;
+			ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(
+				popupBg.x * (1.f - redBlend) + redBlend,
+				popupBg.y * (1.f - redBlend),
+				popupBg.z * (1.f - redBlend),
+				popupBg.w));
+		}
 		if (ImGui::BeginPopup("learn-control")) {
 			if (controllers.learning.empty()) {
 				ImGui::CloseCurrentPopup();
 				bindingPopupActive = false;
 			} else {
-				ImGui::TextUnformatted(controllers.learning.c_str());
-				ImGui::TextUnformatted("Move a MIDI or joystick control to bind it.");
-				if (ImGui::Button("Cancel")) {
+				ImGui::Text("Binding Param: \"%s\"",controllers.learning.c_str());
+				ImGui::Separator();
+				ImGui::TextUnformatted("Move/Press any MIDI or joystick control\nto bind it to this parameter.");
+				ImGui::Dummy(ImVec2(0.f, ImGui::GetTextLineHeight() * .5f));
+				const float cancelWidth = ImGui::CalcTextSize("Cancel Bind").x + ImGui::GetStyle().FramePadding.x * 2.f;
+				ImGui::SetCursorPosX(std::max(ImGui::GetCursorPosX(), ImGui::GetWindowContentRegionMax().x - cancelWidth));
+				if (ImGui::Button("Cancel Bind")) {
 					controllers.learning.clear();
 					bindingPopupActive = false;
 					ImGui::CloseCurrentPopup();
@@ -296,6 +316,8 @@ void ofApp::drawParameterPanel() {
 			controllers.learning.clear();
 			bindingPopupActive = false;
 		}
+		if (listeningForBinding) ImGui::PopStyleColor();
+		ImGui::PopStyleVar();
 	}
 	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + parameterListGap);
 	ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * footerScale);
@@ -440,6 +462,7 @@ void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param)
 		ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
 		ImGui::SetTooltip("Save a preset for %s", group.c_str());
 	}
+	pushPopupWindowPadding();
 	if (ImGui::BeginPopup("save-group-preset")) {
 		ImGui::Text("Save preset for %s", group.c_str());
 		ImGui::SetNextItemWidth(200.f);
@@ -452,6 +475,7 @@ void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param)
 		ImGui::SameLine(); if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
 		ImGui::EndPopup();
 	}
+	ImGui::PopStyleVar();
 	ImGui::SameLine();
 	auto &selected = groupPresetSelection[group];
 	if (selected.empty()) ImGui::BeginDisabled();
@@ -687,15 +711,17 @@ void ofApp::drawParameter(const std::string &name) {
 				ImGui::TextUnformatted(tt.c_str());
 			}
 
-			ImGui::Separator();
-			ImGui::TextUnformatted("Click to bind a MIDI or joystick control");
 			if (!p.description.empty()) {
-				ImGui::Separator();
-				ImGui::TextUnformatted(p.description.c_str());
+				ImGui::Text("Description: %s", p.description.c_str());
 			}
+
+			ImGui::Separator();
+			ImGui::TextUnformatted("[ Click to bind a MIDI or joystick control ]");
+
 			ImGui::EndTooltip();
 		}
 	}
+	pushPopupWindowPadding();
 	if (ImGui::BeginPopup("parameter-context")) {
 		const auto baseline = changeBaseline.find(name);
 		const bool changed = baseline != changeBaseline.end() && p.type == baseline->second.type && !sameParameterValue(p, baseline->second);
@@ -716,6 +742,7 @@ void ofApp::drawParameter(const std::string &name) {
 		}
 		ImGui::EndPopup();
 	}
+	ImGui::PopStyleVar();
 	if (edited) sendEditedParam(name, p);
 	ImGui::PopID();
 }

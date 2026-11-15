@@ -50,14 +50,15 @@ bool setup(Action handler) {
     }
     target = send<id>(send<id>((id)cls, "alloc"), "init");
     action = std::move(handler);
-    id remote = makeMenu("ofxRemoteUI", 0, mainMenu);
+    id file = makeMenu("File", 0, mainMenu);
+    add(file, "Open Local Preset...", OpenLocal, "o");
+    id remote = makeMenu("ofxRemoteUI", 1, mainMenu);
     add(remote, "Connect", Connect, "k"); add(remote, "Disconnect", Disconnect, "k", true);
     separator(remote);
     add(remote, "Refresh Parameters", Refresh, "s", true);
     add(remote, "Save Current Values to Server", Save, "s");
     add(remote, "Restore Launch Values", RestoreLaunch, "r");
     add(remote, "Restore Code Defaults", RestoreDefaults, "r", true);
-    separator(remote); add(remote, "Open Local Preset...", OpenLocal, "o");
     separator(remote);
     add(remote, "Copy Parameter Values", CopyValues, "c", true);
     add(remote, "Paste Parameter Values", PasteValues, "v", true);
@@ -66,12 +67,12 @@ bool setup(Action handler) {
     separator(remote);
     add(remote, "Blink MIDI-Bound Parameters", BlinkMidi);
     add(remote, "Blink USB Controller-Bound Parameters", BlinkUsb);
-    id windows = makeMenu("Windows", 1, mainMenu);
+    id windows = makeMenu("Windows", 2, mainMenu);
     add(windows, "Action Log", ActivityPanel, "1");
     add(windows, "Server Log", ServerLogPanel, "2");
     add(windows, "Controller Bindings", BindingsPanel, "3");
     add(windows, "Settings", PreferencesPanel, ",");
-    id developer = makeMenu("Developer", 2, mainMenu);
+    id developer = makeMenu("Developer", 3, mainMenu);
     add(developer, "ImGui Style Editor", StyleEditorPanel);
     add(developer, "Metrics / Debugger", MetricsDebuggerPanel);
     return true;
