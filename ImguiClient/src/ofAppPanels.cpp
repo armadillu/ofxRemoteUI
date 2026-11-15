@@ -7,7 +7,6 @@
 using namespace ofAppImGuiHelpers;
 
 void ofApp::drawLogPanel() {
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.f, 5.f));
 	ImGui::SetNextWindowSize(ImVec2(650, 190), ImGuiCond_FirstUseEver);
 	prepareSecondaryWindow();
 	if (!ImGui::Begin("Action log", &showLogPanel, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); ImGui::PopStyleVar(); return; }
@@ -18,11 +17,9 @@ void ofApp::drawLogPanel() {
 	if (autoScrollLog && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) ImGui::SetScrollHereY(1.f);
 	ImGui::EndChild();
 	ImGui::End();
-	ImGui::PopStyleVar();
 }
 
 void ofApp::drawServerLogPanel() {
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.f, 5.f));
 	ImGui::SetNextWindowSize(ImVec2(650, 190), ImGuiCond_FirstUseEver);
 	prepareSecondaryWindow();
 	if (!ImGui::Begin("Server log", &showServerLogPanel, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); ImGui::PopStyleVar(); return; }
@@ -33,11 +30,9 @@ void ofApp::drawServerLogPanel() {
 	if (autoScrollLog && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) ImGui::SetScrollHereY(1.f);
 	ImGui::EndChild();
 	ImGui::End();
-	ImGui::PopStyleVar();
 }
 
 void ofApp::drawSettingsPanel() {
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.f, 5.f));
 	ImGui::SetNextWindowSize(ImVec2(360, 260), ImGuiCond_FirstUseEver);
 	prepareSecondaryWindow();
 	if (!ImGui::Begin("Settings", &showSettings, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); ImGui::PopStyleVar(); return; }
@@ -61,11 +56,9 @@ void ofApp::drawSettingsPanel() {
 	ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x - saveButtonWidth);
 	if (ImGui::Button("Save preferences", ImVec2(saveButtonWidth, 0))) savePreferences();
 	ImGui::End();
-	ImGui::PopStyleVar();
 }
 
 void ofApp::drawBindingsPanel() {
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.f, 5.f));
 	ImGui::SetNextWindowSize(ImVec2(720, 300), ImGuiCond_FirstUseEver);
 	if (focusBindings) { ImGui::SetNextWindowFocus(); focusBindings = false; }
 	prepareSecondaryWindow();
@@ -198,6 +191,6 @@ void ofApp::drawBindingsPanel() {
 	ImGui::SameLine();
 	if (ImGui::Button("Export .ctrlBind...", ImVec2(exportWidth, 0))) exportControllerBindingsFile();
 	ImGui::End();
-	ImGui::PopStyleVar();
+
 }
 

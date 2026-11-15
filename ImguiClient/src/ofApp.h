@@ -78,13 +78,12 @@ private:
 	bool alwaysOnTop = false;
 	bool showSettings = false;
 	bool showStyleEditor = false;
+	bool showImGuiDemo = false;
 	bool showMetricsWindow = false;
 	bool showBindings = false;
 	bool focusBindings = false;
 	bool bindingPopupRequested = false;
 	bool bindingPopupActive = false;
-	float bindingPopupX = 0.f;
-	float bindingPopupY = 0.f;
 	std::string bindingServerFilter;
 	bool highlightPresetDiff = true;
 	float windowColor[4] = {0.06f, 0.06f, 0.06f, 1.f};

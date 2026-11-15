@@ -73,6 +73,7 @@ bool setup(Action handler) {
     add(windows, "Controller Bindings", BindingsPanel, "3");
     add(windows, "Settings", PreferencesPanel, ",");
     id developer = makeMenu("Developer", 3, mainMenu);
+    add(developer, "ImGui Demo", ImGuiDemoPanel);
     add(developer, "ImGui Style Editor", StyleEditorPanel);
     add(developer, "Metrics / Debugger", MetricsDebuggerPanel);
     return true;

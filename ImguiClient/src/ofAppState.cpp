@@ -42,7 +42,7 @@ void ofApp::blinkBoundParameters(bool midi) {
 		const bool matchesKind = midi ? binding.kind.compare(0, 5, "MIDI ") == 0 : binding.kind.compare(0, 9, "Joystick ") == 0;
 		if (matchesKind && binding.server == bindingServer() && client.paramExistsForName(binding.param)) blinkingBoundParams.insert(binding.param);
 	}
-	boundBlinkUntil = blinkingBoundParams.empty() ? 0.f : ofGetElapsedTimef() + 4.f;
+	boundBlinkUntil = blinkingBoundParams.empty() ? 0.f : ofGetElapsedTimef() + boundBlinkDurationSeconds();
 }
 
 void ofApp::applyControllerInput(const std::string &name, const ControllerBindings::Input &event) {
@@ -105,7 +105,7 @@ void ofApp::applyClipboardValues(const std::string &values, bool highlightChange
 			if (highlightChanges && highlightPresetDiff) diffParams.insert(entry.first);
 		}
 	}
-	if (highlightChanges) diffHighlightUntil = diffParams.empty() ? 0.f : ofGetElapsedTimef() + 5.f;
+	if (highlightChanges) diffHighlightUntil = diffParams.empty() ? 0.f : ofGetElapsedTimef() + presetDiffHighlightDurationSeconds();
 	else appendLog("Applied values from clipboard");
 }
 void ofApp::selectNeighbor(const Neighbor &n) { host = n.IP; port = n.port; connectTo(host, port); }

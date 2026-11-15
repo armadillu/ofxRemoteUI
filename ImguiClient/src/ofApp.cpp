@@ -105,6 +105,7 @@ void ofApp::setup() {
 				showBindings = !showBindings;
 				if (showBindings) { bindingServerFilter.clear(); focusBindings = true; }
 				break;
+			case NativeMacMenu::ImGuiDemoPanel: showImGuiDemo = true; break;
 			case NativeMacMenu::StyleEditorPanel: showStyleEditor = true; break;
 			case NativeMacMenu::MetricsDebuggerPanel: showMetricsWindow = true; break;
 		}
@@ -215,7 +216,6 @@ void ofApp::drawMenuBar() {
 	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(borderLuma, borderLuma, borderLuma, 1.f));
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2((menuBaseStyle.FramePadding.x + 5.f) * menuScale, (menuBaseStyle.FramePadding.y + 3.f) * menuScale));
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2((menuBaseStyle.ItemSpacing.x + 4.f) * menuScale, menuBaseStyle.ItemSpacing.y * menuScale));
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.f * menuScale, 5.f * menuScale));
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
 	if (ImGui::BeginMainMenuBar()) {
 		if (ImGui::BeginMenu("File")) {
@@ -251,6 +251,7 @@ void ofApp::drawMenuBar() {
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Developer")) {
+			if (ImGui::MenuItem("ImGui Demo")) showImGuiDemo = true;
 			if (ImGui::MenuItem("ImGui Style Editor")) showStyleEditor = true;
 			if (ImGui::MenuItem("Metrics / Debugger")) showMetricsWindow = true;
 			ImGui::EndMenu();
@@ -258,7 +259,7 @@ void ofApp::drawMenuBar() {
 		ImGui::PopStyleVar();
 		ImGui::EndMainMenuBar();
 	}
-	ImGui::PopStyleVar(4);
+	ImGui::PopStyleVar(3);
 	ImGui::PopStyleColor(3);
 	ImGui::PopFont();
 	#endif
@@ -267,6 +268,7 @@ void ofApp::drawMenuBar() {
 void ofApp::draw() {
 	if (!gui.isSetup()) return;
 	gui.begin();
+	ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * parameterFontScale(rowHeight));
 	const ImGuiIO &input = ImGui::GetIO();
 	bool interacting = input.MouseDelta.x != 0.f || input.MouseDelta.y != 0.f || input.MouseWheel != 0.f || input.MouseWheelH != 0.f || ImGui::IsAnyItemActive();
 	for (bool down : input.MouseDown) interacting |= down;
@@ -280,13 +282,13 @@ void ofApp::draw() {
 	drawMenuBar();
 	drawParameterPanel();
 	if (showMetricsWindow) ImGui::ShowMetricsWindow(&showMetricsWindow);
+	if (showImGuiDemo) ImGui::ShowDemoWindow(&showImGuiDemo);
 	if (showLogPanel) drawLogPanel();
 	if (showServerLogPanel) drawServerLogPanel();
 	if (showSettings) drawSettingsPanel();
 	if (showStyleEditor) {
 		ImGui::SetNextWindowSize(ImVec2(500, 600), ImGuiCond_FirstUseEver);
 		prepareSecondaryWindow();
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.f, 5.f));
 		if (ImGui::Begin("ImGui Style Editor", &showStyleEditor, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) {
 			const ImVec4 before = ImGui::GetStyle().Colors[ImGuiCol_WindowBg];
 			ImGui::ShowStyleEditor();
@@ -297,19 +299,18 @@ void ofApp::draw() {
 			}
 		}
 		ImGui::End();
-		ImGui::PopStyleVar();
 	}
 	if (showBindings) drawBindingsPanel();
 	ImGuiViewport *viewport = ImGui::GetMainViewport();
 	const float statusScale = parameterFontScale(rowHeight);
-	const float padding = std::round(10.f * statusScale);
+	const float padding = std::round(16 * statusScale);
 	const float fontSize = std::max(1.f, std::round(ImGui::GetStyle().FontSizeBase * statusScale * .65f));
 	const std::string statusText = std::to_string(client.getAllParamNamesList().size()) + " params";
 
 	ImFont *font = ImGui::GetFont();
 	const ImVec2 textSize = font->CalcTextSizeA(fontSize, 100000.f, 0.f, statusText.c_str());
 	ImVec2 position(std::round(viewport->WorkPos.x + viewport->WorkSize.x - padding - textSize.x),
-		std::round(viewport->WorkPos.y + viewport->WorkSize.y - padding - textSize.y + 2));
+		std::round(viewport->WorkPos.y + viewport->WorkSize.y - padding - textSize.y));
 	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, .3f);
 
 	if (client.isReadyToSend()) {
@@ -319,10 +320,11 @@ void ofApp::draw() {
 
 	//draw fps
 	string fps = "fps: " + ofToString(ofGetFrameRate(), 0);
-	position.x -= viewport->WorkSize.x - textSize.x - 22;
+	position.x -= viewport->WorkSize.x - textSize.x - 2 * padding;
 	ImGui::GetForegroundDrawList(viewport)->AddText(font, fontSize, position, ImGui::GetColorU32(ImGuiCol_Text), fps.c_str());
 	ImGui::PopStyleVar();
 
+	ImGui::PopFont();
 	gui.end();
 }
 
@@ -364,7 +366,7 @@ void ofApp::onClientEvent(const RemoteUIClientCallBackArg &arg) {
 			if (presetReplyPending) {
 				diffParams.clear();
 				if (highlightPresetDiff) for (const auto &kv : previousParams) if (client.paramExistsForName(kv.first) && !client.getParamForName(kv.first).isEqualTo(kv.second)) diffParams.insert(kv.first);
-				diffHighlightUntil = ofGetElapsedTimef() + 5.f;
+				diffHighlightUntil = ofGetElapsedTimef() + presetDiffHighlightDurationSeconds();
 				presetReplyPending = false;
 			}
 			break;

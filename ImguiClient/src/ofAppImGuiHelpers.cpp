@@ -7,7 +7,19 @@
 namespace ofAppImGuiHelpers {
 
 void pushPopupWindowPadding() {
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(14.f, 14.f));
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(12.f, 12.f));
+}
+
+float presetNameInputWidth() {
+	return 200.f;
+}
+
+float boundBlinkDurationSeconds() {
+	return 4.f;
+}
+
+float presetDiffHighlightDurationSeconds() {
+	return 5.f;
 }
 
 bool sameParameterValue(const RemoteUIParam &a, const RemoteUIParam &b) {
@@ -77,16 +89,17 @@ void applyWindowColor(const float color[4]) {
 		return ImVec4(r, g, b, alpha);
 	};
 	style.Colors[ImGuiCol_WindowBg] = ImVec4(color[0], color[1], color[2], color[3]);
+	style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.f, 0.f, 0.f, .9f);
 	style.Colors[ImGuiCol_Text] = lightWindow ? ImVec4(.06f, .06f, .06f, 1.f) : ImVec4(.94f, .94f, .94f, 1.f);
 	style.Colors[ImGuiCol_TextDisabled] = lightWindow ? ImVec4(.30f, .30f, .30f, 1.f) : ImVec4(.68f, .68f, .68f, 1.f);
-	style.Colors[ImGuiCol_PopupBg] = tone(.16f, 1.f);
+	style.Colors[ImGuiCol_PopupBg] = tone(.1f, 1.f);
 	style.Colors[ImGuiCol_FrameBg] = tone(.23f);
 	style.Colors[ImGuiCol_FrameBgHovered] = tone(.34f);
 	style.Colors[ImGuiCol_FrameBgActive] = tone(.40f);
-	style.Colors[ImGuiCol_TitleBg] = tone(.18f);
-	style.Colors[ImGuiCol_TitleBgActive] = tone(.28f);
-	style.Colors[ImGuiCol_TitleBgCollapsed] = tone(.18f);
-	style.Colors[ImGuiCol_MenuBarBg] = tone(.22f);
+	style.Colors[ImGuiCol_TitleBg] = tone(.20f);
+	style.Colors[ImGuiCol_TitleBgActive] = tone(.10f);
+	style.Colors[ImGuiCol_TitleBgCollapsed] = tone(.15f);
+	style.Colors[ImGuiCol_MenuBarBg] = tone(.20f);
 	style.Colors[ImGuiCol_ScrollbarBg] = tone(.10f, .5f);
 	style.Colors[ImGuiCol_ScrollbarGrab] = tone(.38f);
 	style.Colors[ImGuiCol_ScrollbarGrabHovered] = tone(.50f);

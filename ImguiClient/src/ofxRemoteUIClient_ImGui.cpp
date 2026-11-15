@@ -82,11 +82,11 @@ bool ofxRemoteUIClient_ImGui::setup(GLFWwindow *window, bool docking, bool multi
 
 	ImGui::StyleColorsDark();
 	ImGuiStyle &style = ImGui::GetStyle();
-	style.WindowPadding = ImVec2(14.f, 14.f);
+	style.WindowPadding = ImVec2(10.f, 10.f);
 	style.FontScaleMain = .8f;
 	style.FramePadding = ImVec2(12.f, 3.f);
-	style.ItemSpacing = ImVec2(2.f, 2.f);
-	style.ItemInnerSpacing = ImVec2(6.f, 4.f);
+	style.ItemSpacing = ImVec2(4.f, 4.f);
+	style.ItemInnerSpacing = ImVec2(4.f, 2.f);
 	style.TouchExtraPadding = ImVec2(0.f, 0.f);
 	style.IndentSpacing = 12.f;
 	style.GrabMinSize = 10.f;
@@ -100,6 +100,7 @@ bool ofxRemoteUIClient_ImGui::setup(GLFWwindow *window, bool docking, bool multi
 	style.FrameBorderSize = 0.f;
 	style.Colors[ImGuiCol_Border] = ImVec4(0.f, 0.f, 0.f, 0.4f);
 	style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+	style.Colors[ImGuiCol_ChildBg] = ImVec4(0.f, 0.f, 0.f, 0.12f);
 	style.FrameRounding = 3.0f;
 	style.GrabRounding = 3.0f;
 	style.AntiAliasedLines = false;

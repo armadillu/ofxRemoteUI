@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofxRemoteUIClient.h"
+#include "imgui.h"
 #include <string>
 
 namespace ofAppImGuiHelpers {
@@ -22,4 +23,7 @@ const char *paramTypeName(RemoteUIParamType type);
 bool containsCaseInsensitive(const std::string &text, const std::string &query);
 
 void pushPopupWindowPadding();
+float presetNameInputWidth();
+float boundBlinkDurationSeconds();
+float presetDiffHighlightDurationSeconds();
 }

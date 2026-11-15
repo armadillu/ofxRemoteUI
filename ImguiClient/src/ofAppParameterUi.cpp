@@ -11,7 +11,8 @@
 using namespace ofAppImGuiHelpers;
 
 void ofApp::drawParameterPanel() {
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.f, 5.f));
+	const ImVec2 windowPadding = ImGui::GetStyle().WindowPadding;
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, windowPadding);
 	const ImGuiViewport *viewport = ImGui::GetMainViewport();
 	ImGui::SetNextWindowPos(viewport->WorkPos);
 	ImGui::SetNextWindowSize(viewport->WorkSize);
@@ -20,14 +21,12 @@ void ofApp::drawParameterPanel() {
 	// Presets and parameter filtering occupy the top bar.
 	const float topScale = parameterFontScale(rowHeight);
 	ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * topScale);
-	const ImVec2 windowPadding = ImGui::GetStyle().WindowPadding;
 	const ImVec2 framePadding = ImGui::GetStyle().FramePadding;
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(windowPadding.x * topScale, windowPadding.y * topScale));
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(framePadding.x * topScale, framePadding.y * topScale));
 	const float topSectionGap = 10.f * topScale;
 	const float topSectionWidth = std::max(1.f, (ImGui::GetContentRegionAvail().x - topSectionGap) * .5f);
 	const float topSectionHeight = ImGui::GetTextLineHeight() + ImGui::GetFrameHeight() + ImGui::GetStyle().ItemSpacing.y + ImGui::GetStyle().WindowPadding.y * 2.f;
-	ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.f, 0.f, 0.f, .16f));
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.f);
 	ImGui::BeginChild("preset-controls", ImVec2(topSectionWidth, topSectionHeight), ImGuiChildFlags_AlwaysUseWindowPadding);
 	ImGui::TextUnformatted("Global Presets");
@@ -46,7 +45,7 @@ void ofApp::drawParameterPanel() {
 	pushPopupWindowPadding();
 	if (ImGui::BeginPopup("save-global-preset")) {
 		ImGui::TextUnformatted("Save global preset");
-		ImGui::SetNextItemWidth(200.f * topScale);
+		ImGui::SetNextItemWidth(presetNameInputWidth() * topScale);
 		if (ImGui::IsWindowAppearing()) ImGui::SetKeyboardFocusHere();
 		const bool submit = ImGui::InputText("##global-preset-name", presetNameBuffer, sizeof(presetNameBuffer), ImGuiInputTextFlags_EnterReturnsTrue);
 		if ((ImGui::Button("Save") || submit) && presetNameBuffer[0]) { client.savePresetWithName(presetNameBuffer); ImGui::CloseCurrentPopup(); }
@@ -71,7 +70,6 @@ void ofApp::drawParameterPanel() {
 	if (ImGui::Button("Clear")) filterBuffer[0] = '\0';
 	ImGui::EndChild();
 	ImGui::PopStyleVar();
-	ImGui::PopStyleColor();
 	ImGui::PopStyleVar(2);
 	ImGui::PopFont();
 	ImGui::PopStyleVar();
@@ -150,11 +148,15 @@ void ofApp::drawParameterPanel() {
 	const float footerHeight = ImGui::GetFrameHeight() * footerLines + ImGui::GetStyle().ItemSpacing.y * (footerLines - 1) + ImGui::GetStyle().WindowPadding.y * 2.f + footerRowGap;
 	ImGui::PopStyleVar(2);
 	ImGui::PopFont();
+
+	
 	const float parameterListGap = 6.f;
 	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + parameterListGap);
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImVec4(0.f, 0.f, 0.f, 0.f));
-	ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.f, 0.f, 0.f, .16f));
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.f);
+	ImVec2 tightSpacing = ImGui::GetStyle().ItemSpacing;
+	tightSpacing.y = 1;
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, tightSpacing);
 	if (ImGui::BeginChild("param-list", ImVec2(0, -footerHeight - ImGui::GetStyle().ItemSpacing.y - parameterListGap), ImGuiChildFlags_AlwaysUseWindowPadding)) {
 		if (!client.isReadyToSend()) {
 			ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * topScale);
@@ -273,15 +275,17 @@ void ofApp::drawParameterPanel() {
 		if (columnCount > 1) ImGui::Columns(1);
 	}
 	ImGui::EndChild();
-	ImGui::PopStyleVar();
-	ImGui::PopStyleColor(2);
+	ImGui::PopStyleVar(2);
+	ImGui::PopStyleColor();
 	if (bindingPopupRequested) {
-		ImGui::OpenPopup("learn-control");
+		const ImGuiViewport *viewport = ImGui::GetMainViewport();
+		ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x + viewport->WorkSize.x * .5f,
+			viewport->WorkPos.y + viewport->WorkSize.y * .5f), ImGuiCond_Appearing, ImVec2(.5f, .5f));
+		ImGui::OpenPopup("Param <-> Controller Binding...");
 		bindingPopupRequested = false;
 		bindingPopupActive = true;
 	}
 	if (bindingPopupActive) {
-		ImGui::SetNextWindowPos(ImVec2(bindingPopupX, bindingPopupY), ImGuiCond_Appearing);
 		pushPopupWindowPadding();
 		const bool listeningForBinding = !controllers.learning.empty();
 		const ImVec4 popupBg = ImGui::GetStyle().Colors[ImGuiCol_PopupBg];
@@ -294,13 +298,15 @@ void ofApp::drawParameterPanel() {
 				popupBg.z * (1.f - redBlend),
 				popupBg.w));
 		}
-		if (ImGui::BeginPopup("learn-control")) {
+		if (ImGui::BeginPopupModal("Param <-> Controller Binding...", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 			if (controllers.learning.empty()) {
 				ImGui::CloseCurrentPopup();
 				bindingPopupActive = false;
 			} else {
 				ImGui::Text("Binding Param: \"%s\"",controllers.learning.c_str());
+				ImGui::Dummy(ImVec2(0.f, ImGui::GetTextLineHeight() * .2f));
 				ImGui::Separator();
+				ImGui::Dummy(ImVec2(0.f, ImGui::GetTextLineHeight() * .2f));
 				ImGui::TextUnformatted("Move/Press any MIDI or joystick control\nto bind it to this parameter.");
 				ImGui::Dummy(ImVec2(0.f, ImGui::GetTextLineHeight() * .5f));
 				const float cancelWidth = ImGui::CalcTextSize("Cancel Bind").x + ImGui::GetStyle().FramePadding.x * 2.f;
@@ -323,7 +329,6 @@ void ofApp::drawParameterPanel() {
 	ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * footerScale);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(windowPadding.x * footerScale, windowPadding.y * footerScale));
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(framePadding.x * footerScale, framePadding.y * footerScale));
-	ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.f, 0.f, 0.f, .16f));
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.f);
 	ImGui::BeginChild("bottom-controls", ImVec2(0, footerHeight), ImGuiChildFlags_AlwaysUseWindowPadding, ImGuiWindowFlags_NoScrollbar);
 	float footerUsed = 0.f;
@@ -390,7 +395,6 @@ void ofApp::drawParameterPanel() {
 	ImGui::SameLine(0.f, syncContinuousGap); framedCheckbox("Non-Stop", &continuousRefresh);
 	ImGui::EndChild();
 	ImGui::PopStyleVar();
-	ImGui::PopStyleColor();
 	ImGui::PopStyleVar(2);
 	ImGui::PopFont();
 	ImGui::End();
@@ -465,7 +469,7 @@ void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param)
 	pushPopupWindowPadding();
 	if (ImGui::BeginPopup("save-group-preset")) {
 		ImGui::Text("Save preset for %s", group.c_str());
-		ImGui::SetNextItemWidth(200.f);
+		ImGui::SetNextItemWidth(presetNameInputWidth());
 		if (ImGui::IsWindowAppearing()) ImGui::SetKeyboardFocusHere();
 		const bool submit = ImGui::InputText("##preset-name", groupPresetNameBuffer, sizeof(groupPresetNameBuffer), ImGuiInputTextFlags_EnterReturnsTrue);
 		if ((ImGui::Button("Save") || submit) && groupPresetNameBuffer[0]) {
@@ -679,8 +683,6 @@ void ofApp::drawParameter(const std::string &name) {
 	if (labelClicked) {
 		if (p.type == REMOTEUI_PARAM_BOOL || p.type == REMOTEUI_PARAM_FLOAT || p.type == REMOTEUI_PARAM_INT || p.type == REMOTEUI_PARAM_ENUM || p.type == REMOTEUI_PARAM_COLOR) {
 			controllers.beginLearn(name);
-			bindingPopupX = labelPos.x;
-			bindingPopupY = labelPos.y + ImGui::GetTextLineHeightWithSpacing();
 			bindingPopupRequested = true;
 		}
 	}
@@ -715,7 +717,9 @@ void ofApp::drawParameter(const std::string &name) {
 				ImGui::Text("Description: %s", p.description.c_str());
 			}
 
+			ImGui::Dummy(ImVec2(0.f, ImGui::GetTextLineHeight() * .3f));
 			ImGui::Separator();
+			ImGui::Dummy(ImVec2(0.f, ImGui::GetTextLineHeight() * .2f));
 			ImGui::TextUnformatted("[ Click to bind a MIDI or joystick control ]");
 
 			ImGui::EndTooltip();
