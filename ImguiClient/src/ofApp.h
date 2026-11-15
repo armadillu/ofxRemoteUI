@@ -78,6 +78,7 @@ private:
 	bool alwaysOnTop = false;
 	bool showSettings = false;
 	bool showStyleEditor = false;
+	bool showMetricsWindow = false;
 	bool showBindings = false;
 	bool focusBindings = false;
 	bool bindingPopupRequested = false;

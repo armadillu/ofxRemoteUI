@@ -101,7 +101,12 @@ void ofApp::setup() {
 			case NativeMacMenu::ActivityPanel: showLogPanel = !showLogPanel; break;
 			case NativeMacMenu::ServerLogPanel: showServerLogPanel = !showServerLogPanel; break;
 			case NativeMacMenu::PreferencesPanel: showSettings = !showSettings; break;
-			case NativeMacMenu::BindingsPanel: showBindings = true; bindingServerFilter.clear(); focusBindings = true; break;
+			case NativeMacMenu::BindingsPanel:
+				showBindings = !showBindings;
+				if (showBindings) { bindingServerFilter.clear(); focusBindings = true; }
+				break;
+			case NativeMacMenu::StyleEditorPanel: showStyleEditor = true; break;
+			case NativeMacMenu::MetricsDebuggerPanel: showMetricsWindow = true; break;
 		}
 	});
 	#endif
@@ -245,6 +250,11 @@ void ofApp::drawMenuBar() {
 			ImGui::MenuItem("Settings", "Ctrl+,", &showSettings);
 			ImGui::EndMenu();
 		}
+		if (ImGui::BeginMenu("Developer")) {
+			if (ImGui::MenuItem("ImGui Style Editor")) showStyleEditor = true;
+			if (ImGui::MenuItem("Metrics / Debugger")) showMetricsWindow = true;
+			ImGui::EndMenu();
+		}
 		ImGui::PopStyleVar();
 		ImGui::EndMainMenuBar();
 	}
@@ -269,6 +279,7 @@ void ofApp::draw() {
 	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DockingEnable) ImGui::DockSpaceOverViewport();
 	drawMenuBar();
 	drawParameterPanel();
+	if (showMetricsWindow) ImGui::ShowMetricsWindow(&showMetricsWindow);
 	if (showLogPanel) drawLogPanel();
 	if (showServerLogPanel) drawServerLogPanel();
 	if (showSettings) drawSettingsPanel();
@@ -296,7 +307,7 @@ void ofApp::draw() {
 	ImFont *font = ImGui::GetFont();
 	const ImVec2 textSize = font->CalcTextSizeA(fontSize, 100000.f, 0.f, statusText.c_str());
 	ImVec2 position(std::round(viewport->WorkPos.x + viewport->WorkSize.x - padding - textSize.x),
-		std::round(viewport->WorkPos.y + viewport->WorkSize.y - padding - textSize.y));
+		std::round(viewport->WorkPos.y + viewport->WorkSize.y - padding - textSize.y + 2));
 	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, .3f);
 
 	if (client.isReadyToSend()) {

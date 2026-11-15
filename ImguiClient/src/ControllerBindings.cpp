@@ -47,6 +47,7 @@ bool ControllerBindings::importFile(const std::string &path, std::string &error)
                 binding.kind = item.at("kind").get<std::string>();
                 binding.channel = item.value("channel", 0);
                 binding.control = item.at("control").get<int>();
+                binding.invertRange = item.value("invertRange", false);
                 if (binding.param.empty() || binding.device.empty() || binding.kind.empty()) throw std::runtime_error("Binding is missing required fields");
                 imported.push_back(std::move(binding));
             }
@@ -78,7 +79,7 @@ bool ControllerBindings::exportFile(const std::string &path, const std::string &
         ofJson json = ofJson::array();
         for (const auto &binding : bindings) {
             if (!matchesFilters(binding, serverFilter, paramFilter)) continue;
-            json.push_back({{"server", binding.server}, {"param", binding.param}, {"device", binding.device}, {"kind", binding.kind}, {"channel", binding.channel}, {"control", binding.control}});
+            json.push_back({{"server", binding.server}, {"param", binding.param}, {"device", binding.device}, {"kind", binding.kind}, {"channel", binding.channel}, {"control", binding.control}, {"invertRange", binding.invertRange}});
         }
         exportedCount = json.size();
         std::ofstream output(path, std::ios::binary);
@@ -91,6 +92,7 @@ bool ControllerBindings::exportFile(const std::string &path, const std::string &
 
 void ControllerBindings::update(float dt, const std::string &server, std::function<void(const std::string &, const Input &)> handler, std::function<bool(const std::string &, const Input &)> canBind) {
         refreshTimer += dt;
+        activationHighlightTime = std::max(0.f, activationHighlightTime - dt);
         if (refreshTimer >= 3.f) { refreshTimer = 0; refreshMidi(); }
         std::vector<Input> events;
         { std::lock_guard<std::mutex> lock(mutex); events.swap(pending); }
@@ -107,7 +109,7 @@ void ControllerBindings::update(float dt, const std::string &server, std::functi
                 const std::string key = device + "/" + ofToString(i);
                 if (!learning.empty() && !axisBaseline.count(key)) axisBaseline[key] = a[i];
                 const float difference = !learning.empty() ? std::abs(a[i] - axisBaseline[key]) : std::abs(a[i] - previous[i]);
-                if (difference > (!learning.empty() ? .2f : .01f)) {
+                if (difference > (!learning.empty() ? .75f : .01f)) {
                     events.push_back({device, "Joystick Axis", 0, i, ofClamp((a[i] + 1.f) * .5f, 0.f, 1.f), false});
                     previous[i] = a[i];
                 }
@@ -130,12 +132,30 @@ void ControllerBindings::update(float dt, const std::string &server, std::functi
                 bindings.push_back({server, learning, event.device, event.kind, event.channel, event.control});
                 learning.clear(); save(); continue;
             }
-            for (const auto &b : bindings) if (b.server == server && b.device == event.device && b.kind == event.kind && b.channel == event.channel && b.control == event.control) handler(b.param, event);
+            for (const auto &b : bindings) if (b.server == server && b.device == event.device && b.kind == event.kind && b.channel == event.channel && b.control == event.control) {
+                recentlyActivated = b;
+                activationHighlightTime = .45f;
+                Input mappedEvent = event;
+                if (!event.button && b.invertRange) mappedEvent.value = 1.f - mappedEvent.value;
+                handler(b.param, mappedEvent);
+            }
         }
     }
 
 
 void ControllerBindings::remove(size_t i) { if (i < bindings.size()) { bindings.erase(bindings.begin() + i); save(); } }
+
+void ControllerBindings::removeAll() {
+    if (bindings.empty()) return;
+    bindings.clear();
+    save();
+}
+
+void ControllerBindings::setRangeInverted(size_t i, bool inverted) {
+    if (i >= bindings.size() || bindings[i].invertRange == inverted) return;
+    bindings[i].invertRange = inverted;
+    save();
+}
 
 
 std::string ControllerBindings::label(const Binding &b) { return b.device + " — " + b.kind + " " + ofToString(b.control) + (b.channel ? " / ch " + ofToString(b.channel) : ""); }
@@ -158,7 +178,7 @@ void ControllerBindings::refreshMidi() {
 
 void ControllerBindings::save() const {
         ofJson json = ofJson::array();
-        for (const auto &b : bindings) json.push_back({{"server", b.server}, {"param", b.param}, {"device", b.device}, {"kind", b.kind}, {"channel", b.channel}, {"control", b.control}});
+        for (const auto &b : bindings) json.push_back({{"server", b.server}, {"param", b.param}, {"device", b.device}, {"kind", b.kind}, {"channel", b.channel}, {"control", b.control}, {"invertRange", b.invertRange}});
         ofSavePrettyJson(ClientPaths::settingsFile("controller-bindings.json"), json);
     }
 
@@ -168,8 +188,18 @@ void ControllerBindings::load() {
         if (!ofFile::doesFileExist(path)) return;
         try {
             auto json = ofLoadJson(path);
-            for (const auto &j : json) bindings.push_back({j.at("server").get<std::string>(), j.at("param").get<std::string>(), j.at("device").get<std::string>(), j.at("kind").get<std::string>(), j.at("channel").get<int>(), j.at("control").get<int>()});
+            for (const auto &j : json) bindings.push_back({j.at("server").get<std::string>(), j.at("param").get<std::string>(), j.at("device").get<std::string>(), j.at("kind").get<std::string>(), j.at("channel").get<int>(), j.at("control").get<int>(), j.value("invertRange", false)});
         } catch (const std::exception &e) { ofLogWarning("ControllerBindings") << "Could not load bindings: " << e.what(); }
     }
 
 
+
+bool ControllerBindings::wasRecentlyActivated(const Binding &binding) const {
+    return activationHighlightTime > 0.f
+        && recentlyActivated.server == binding.server
+        && recentlyActivated.param == binding.param
+        && recentlyActivated.device == binding.device
+        && recentlyActivated.kind == binding.kind
+        && recentlyActivated.channel == binding.channel
+        && recentlyActivated.control == binding.control;
+}

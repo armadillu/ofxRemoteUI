@@ -11,7 +11,7 @@
 // MIDI callbacks run on a backend thread; all binding and parameter work stays on the app thread.
 class ControllerBindings : public ofxMidiListener {
 public:
-    struct Binding { std::string server, param, device, kind; int channel = 0, control = 0; };
+    struct Binding { std::string server, param, device, kind; int channel = 0, control = 0; bool invertRange = false; };
     struct Input { std::string device, kind; int channel = 0, control = 0; float value = 0; bool button = false; };
     std::vector<Binding> bindings;
     std::string learning;
@@ -27,7 +27,10 @@ public:
     bool exportFile(const std::string &path, const std::string &serverFilter, const std::string &paramFilter, size_t &exportedCount, std::string &error) const;
     void update(float dt, const std::string &server, std::function<void(const std::string &, const Input &)> handler, std::function<bool(const std::string &, const Input &)> canBind);
     void remove(size_t i);
+    void removeAll();
+    void setRangeInverted(size_t i, bool inverted);
     static std::string label(const Binding &b);
+    bool wasRecentlyActivated(const Binding &binding) const;
 private:
     std::vector<std::unique_ptr<ofxMidiIn>> inputs;
     std::vector<std::string> portNames;
@@ -37,6 +40,8 @@ private:
     std::map<int, std::vector<unsigned char>> buttons;
     std::map<std::string, float> axisBaseline;
     float refreshTimer = 0;
+    Binding recentlyActivated;
+    float activationHighlightTime = 0.f;
     void refreshMidi();
     void save() const;
     void load();

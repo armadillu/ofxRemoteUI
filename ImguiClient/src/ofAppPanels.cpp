@@ -50,10 +50,11 @@ void ofApp::drawSettingsPanel() {
 	ImGui::SliderFloat("Column width", &columnBaseWidth, 220.f, 500.f, "%.0f px");
 	if (ImGui::IsItemHovered()) ImGui::SetTooltip("Smaller values allow more columns. The threshold also follows parameter row height.");
 	if (ImGui::ColorEdit3("Window color", windowColor)) applyWindowColor(windowColor);
-	if (ImGui::Button("Open ImGui style editor")) showStyleEditor = true;
 	ImGui::Spacing();
 	ImGui::Spacing();
-	if (ImGui::Button("Save preferences")) savePreferences();
+	const float saveButtonWidth = ImGui::CalcTextSize("Save preferences").x + ImGui::GetStyle().FramePadding.x * 2.f;
+	ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x - saveButtonWidth);
+	if (ImGui::Button("Save preferences", ImVec2(saveButtonWidth, 0))) savePreferences();
 	ImGui::End();
 }
 
@@ -97,23 +98,41 @@ void ofApp::drawBindingsPanel() {
 		ImGui::EndTable();
 	}
 	ImGui::Separator();
-	bool any = false;
+	std::vector<size_t> visibleBindingIndices;
+	visibleBindingIndices.reserve(controllers.bindings.size());
+	for (size_t i = 0; i < controllers.bindings.size(); ++i) {
+		if (ControllerBindings::matchesFilters(controllers.bindings[i], bindingServerFilter, bindingSearchBuffer)) visibleBindingIndices.push_back(i);
+	}
+	const bool any = !visibleBindingIndices.empty();
 	const float buttonRowHeight = ImGui::GetFrameHeight();
 	const float footerSpace = buttonRowHeight + ImGui::GetStyle().ItemSpacing.y * 2.f + 1.f;
 	ImGui::BeginChild("bindings-list", ImVec2(0, -footerSpace));
 	const float removeColumnWidth = std::max(ImGui::CalcTextSize("Remove").x, ImGui::CalcTextSize("Action").x) + ImGui::GetStyle().FramePadding.x * 2.f + ImGui::GetStyle().CellPadding.x * 2.f;
+	const float invertColumnWidth = ImGui::CalcTextSize("Invert").x + ImGui::GetStyle().FramePadding.x * 2.f + ImGui::GetStyle().CellPadding.x * 2.f;
 	const float tableInnerWidth = std::max(ImGui::GetContentRegionAvail().x, ImGui::GetFontSize() * 36.f + removeColumnWidth);
-	if (ImGui::BeginTable("bindings-table", 4, ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollX, ImVec2(0, 0), tableInnerWidth)) {
+	if (ImGui::BeginTable("bindings-table", 5, ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollX, ImVec2(0, 0), tableInnerWidth)) {
 	ImGui::TableSetupColumn("Parameter", ImGuiTableColumnFlags_WidthStretch, 1.2f);
 	ImGui::TableSetupColumn("Controller", ImGuiTableColumnFlags_WidthStretch, 2.0f);
 	ImGui::TableSetupColumn("Server", ImGuiTableColumnFlags_WidthStretch, 1.0f);
+	ImGui::TableSetupColumn("Invert", ImGuiTableColumnFlags_WidthFixed, invertColumnWidth);
 	ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_WidthFixed, removeColumnWidth);
 	ImGui::TableHeadersRow();
-	for (size_t i = 0; i < controllers.bindings.size();) {
+		size_t pendingRemoval = controllers.bindings.size();
+		ImGuiListClipper clipper;
+		clipper.Begin((int)visibleBindingIndices.size());
+		while (clipper.Step()) for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; ++row) {
+		const size_t i = visibleBindingIndices[(size_t)row];
 		const auto &b = controllers.bindings[i];
-		if (!ControllerBindings::matchesFilters(b, bindingServerFilter, bindingSearchBuffer)) { ++i; continue; }
-		any = true; ImGui::PushID((int)i);
+		ImGui::PushID((int)i);
 		ImGui::TableNextRow();
+		if (controllers.wasRecentlyActivated(b)) {
+			const ImVec4 activeRowColor(
+				windowColor[0] + (1.f - windowColor[0]) * .28f,
+				windowColor[1] + (1.f - windowColor[1]) * .28f,
+				windowColor[2] + (1.f - windowColor[2]) * .28f,
+				1.f);
+			ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, ImGui::ColorConvertFloat4ToU32(activeRowColor));
+		}
 		ImGui::TableNextColumn();
 		if (client.isReadyToSend() && b.server == bindingServer() && client.paramExistsForName(b.param)) {
 			const auto param = client.getParamForName(b.param);
@@ -124,23 +143,48 @@ void ofApp::drawBindingsPanel() {
 		const std::string controllerLabel = ControllerBindings::label(b);
 		ImGui::TextUnformatted(controllerLabel.c_str());
 		ImGui::TableNextColumn(); ImGui::TextUnformatted(b.server.c_str());
+		ImGui::TableNextColumn();
+		const bool analogRange = b.kind == "MIDI CC" || b.kind == "Joystick Axis";
+		bool invertRange = b.invertRange;
+		ImGui::BeginDisabled(!analogRange);
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max(0.f, (ImGui::GetContentRegionAvail().x - ImGui::GetFrameHeight()) * .5f));
+		if (ImGui::Checkbox("##invert-range", &invertRange) && analogRange) controllers.setRangeInverted(i, invertRange);
+		ImGui::EndDisabled();
 		ImGui::TableNextColumn(); bool remove = ImGui::SmallButton("Remove");
 		ImGui::PopID();
-		if (remove) controllers.remove(i); else ++i;
+		if (remove) pendingRemoval = i;
 	}
 	if (!any) {
 		ImGui::TableNextRow();
 		ImGui::TableNextColumn();
 		ImGui::TextWrapped("%s", (!bindingServerFilter.empty() || bindingSearchBuffer[0] != '\0') ? "No bindings match these filters." : "No controls are bound yet.");
 	}
-	ImGui::EndTable();
+		ImGui::EndTable();
+		if (pendingRemoval < controllers.bindings.size()) controllers.remove(pendingRemoval);
 	}
 	ImGui::EndChild();
 	ImGui::Separator();
+	const float removeAllWidth = ImGui::CalcTextSize("Remove All Bindings").x + ImGui::GetStyle().FramePadding.x * 2.f;
 	const float importWidth = ImGui::CalcTextSize("Import .ctrlBind...").x + ImGui::GetStyle().FramePadding.x * 2.f;
 	const float exportWidth = ImGui::CalcTextSize("Export .ctrlBind...").x + ImGui::GetStyle().FramePadding.x * 2.f;
-	const float buttonsWidth = importWidth + ImGui::GetStyle().ItemSpacing.x + exportWidth;
+	const float buttonsWidth = removeAllWidth + ImGui::GetStyle().ItemSpacing.x * 2.f + importWidth + exportWidth;
 	ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x - buttonsWidth);
+	ImGui::BeginDisabled(controllers.bindings.empty());
+	if (ImGui::Button("Remove All Bindings", ImVec2(removeAllWidth, 0))) ImGui::OpenPopup("Confirm remove all bindings");
+	ImGui::EndDisabled();
+	if (ImGui::BeginPopupModal("Confirm remove all bindings", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+		ImGui::TextUnformatted("Remove all controller bindings from every server?");
+		ImGui::Spacing();
+		if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
+		ImGui::SameLine();
+		if (ImGui::Button("Remove All")) {
+			controllers.removeAll();
+			appendLog("Removed all controller bindings");
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
+	ImGui::SameLine();
 	if (ImGui::Button("Import .ctrlBind...", ImVec2(importWidth, 0))) chooseControllerBindingsFile();
 	ImGui::SameLine();
 	if (ImGui::Button("Export .ctrlBind...", ImVec2(exportWidth, 0))) exportControllerBindingsFile();

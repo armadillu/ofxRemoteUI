@@ -6,8 +6,8 @@
 namespace NativeMacMenu {
 static Action action;
 static id target = nil;
-static id roots[2] = {nil, nil};
-static id items[BindingsPanel + 1] = {};
+static id roots[3] = {nil, nil, nil};
+static id items[MetricsDebuggerPanel + 1] = {};
 
 template<typename R, typename... A> R send(id object, const char *selector, A... args) {
     return reinterpret_cast<R (*)(id, SEL, A...)>(objc_msgSend)(object, sel_registerName(selector), args...);
@@ -70,6 +70,9 @@ bool setup(Action handler) {
     add(windows, "Server Log", ServerLogPanel, "2");
     add(windows, "Controller Bindings", BindingsPanel, "3");
     add(windows, "Settings", PreferencesPanel, ",");
+    id developer = makeMenu("Developer", 2, mainMenu);
+    add(developer, "ImGui Style Editor", StyleEditorPanel);
+    add(developer, "Metrics / Debugger", MetricsDebuggerPanel);
     return true;
 }
 void update(bool connected, bool activity, bool serverLog, bool preferences, bool bindings, bool highlightChanged) {
