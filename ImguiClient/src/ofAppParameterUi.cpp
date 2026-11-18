@@ -531,6 +531,12 @@ void ofApp::drawParameter(const std::string &name) {
 	const float controlStartX = ImGui::GetCursorScreenPos().x;
 	ImGui::SetNextItemWidth(controlWidth);
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4.f, std::max(1.f, (targetRowHeight - ImGui::GetFontSize()) * .5f)));
+	// RUI_NEW_COLOR() changes the background alpha of subsequent parameters.
+	if (p.a) {
+		const ImVec2 rowMin = ImGui::GetCursorScreenPos();
+		const ImVec2 rowMax(rowMin.x + contentWidth, rowMin.y + ImGui::GetFrameHeight());
+		ImGui::GetWindowDrawList()->AddRectFilled(rowMin, rowMax, IM_COL32(p.r, p.g, p.b, p.a), 5.f);
+	}
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(.08f, .08f, .08f, .25f));
 	ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(.08f, .08f, .08f, .38f));
 	ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(.08f, .08f, .08f, .48f));
@@ -538,9 +544,6 @@ void ofApp::drawParameter(const std::string &name) {
 		(p.type == REMOTEUI_PARAM_INT && p.minInt < p.maxInt));
 	if (coloredSlider) {
 		const float r = p.r / 255.f, g = p.g / 255.f, b = p.b / 255.f;
-		ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(.10f + .35f * r, .10f + .35f * g, .10f + .35f * b, 1.f));
-		ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(.15f + .42f * r, .15f + .42f * g, .15f + .42f * b, 1.f));
-		ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(.19f + .45f * r, .19f + .45f * g, .19f + .45f * b, 1.f));
 		ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(.22f + .48f * r, .22f + .48f * g, .22f + .48f * b, 1.f));
 		ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImVec4(.35f + .42f * r, .35f + .42f * g, .35f + .42f * b, 1.f));
 	}
@@ -632,7 +635,7 @@ void ofApp::drawParameter(const std::string &name) {
 		}
 		default: ImGui::TextDisabled("%s", paramTypeName(p.type)); break;
 	}
-	if (coloredSlider) ImGui::PopStyleColor(5);
+	if (coloredSlider) ImGui::PopStyleColor(2);
 	ImGui::PopStyleColor(3);
 	ImGui::PopStyleVar();
 	ImGui::SameLine(0.f, controlLabelGap);
