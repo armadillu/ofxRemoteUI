@@ -580,16 +580,28 @@ void ofApp::drawParameter(const std::string &name) {
 	switch (p.type) {
 		case REMOTEUI_PARAM_BOOL: {
 			const ImVec2 pos = ImGui::GetCursorScreenPos();
-			const float buttonWidth = std::min(controlWidth, std::max(ImGui::GetFrameHeight() * 2.f, ImGui::CalcTextSize("OFF").x + ImGui::GetStyle().FramePadding.x * 2.f));
-			ImGui::SetCursorScreenPos(ImVec2(pos.x + std::max(0.f, (controlWidth - buttonWidth) * .5f), pos.y));
+			const float frameHeight = ImGui::GetFrameHeight();
+			const float horizontalPadding = ImGui::GetStyle().FramePadding.x;
+			const float buttonWidth = std::min(controlWidth, std::max(frameHeight * 2.f, ImGui::CalcTextSize("OFF").x + horizontalPadding * 2.f));
+			// Horizontal slider grabs are inset by two pixels on each edge in ImGui.
+			const float grabInset = 2.f;
+			const float buttonHeight = std::max(1.f, frameHeight - 2.f * grabInset);
+			ImGui::Dummy(ImVec2(0.f, frameHeight));
+			ImGui::SameLine(0.f, 0.f);
+			ImGui::SetCursorScreenPos(ImVec2(pos.x + (controlWidth - buttonWidth) * .5f, pos.y + (frameHeight - buttonHeight) * .5f));
+			const float fontScale = std::min(1.f, buttonHeight / ImGui::GetFontSize());
+			ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * fontScale);
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(horizontalPadding, 0.f));
 			const float r = p.a ? p.r / 255.f : .5f, g = p.a ? p.g / 255.f : .5f, b = p.a ? p.b / 255.f : .5f;
 			const float tint = p.boolVal ? .45f : .10f;
 			const float base = p.boolVal ? .16f : .18f;
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(base + tint * r, base + tint * g, base + tint * b, 1.f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(base + .08f + tint * r, base + .08f + tint * g, base + .08f + tint * b, 1.f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(base + .14f + tint * r, base + .14f + tint * g, base + .14f + tint * b, 1.f));
-			if (ImGui::Button(p.boolVal ? "ON###value" : "OFF###value", ImVec2(buttonWidth, 0))) { p.boolVal = !p.boolVal; edited = true; }
+			if (ImGui::Button(p.boolVal ? "ON###value" : "OFF###value", ImVec2(buttonWidth, buttonHeight))) { p.boolVal = !p.boolVal; edited = true; }
 			ImGui::PopStyleColor(3);
+			ImGui::PopStyleVar();
+			ImGui::PopFont();
 			break;
 		}
 		case REMOTEUI_PARAM_FLOAT: {

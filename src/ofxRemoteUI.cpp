@@ -420,6 +420,15 @@ void ofxRemoteUI::updateParamFromDecodedMessage(const ofxOscMessage & m, Decoded
 		}
 	}
 
+	if (p.writeValueBinding){
+		if (p.type != original.type || dm.argument == NULL_ARG) return;
+		p.minFloat = original.minFloat;
+		p.maxFloat = original.maxFloat;
+		p.minInt = original.minInt;
+		p.maxInt = original.maxInt;
+		p.applyValueBinding();
+	}
+
 	if ( !p.isEqualTo(original) || newParam ){ // if the udpdate changed the param, keep track of it
 		if(std::find(paramsChangedSinceLastCheck.begin(), paramsChangedSinceLastCheck.end(), paramName) == paramsChangedSinceLastCheck.end()){
 			paramsChangedSinceLastCheck.emplace_back(paramName);
@@ -496,7 +505,9 @@ void ofxRemoteUI::syncAllParamsToPointers(){
 void ofxRemoteUI::syncAllPointersToParams(){
 	dataMutex.lock();
 	for( auto ii = params.begin(); ii != params.end(); ++ii ){
-		syncPointerToParam( (*ii).first );
+		// Bindings apply changes as they arrive. Refresh their live value for the built-in UI.
+		if(ii->second.readValueBinding) ii->second.readValueBinding(ii->second);
+		else syncPointerToParam(ii->first);
 	}
 	dataMutex.unlock();
 }
@@ -504,6 +515,11 @@ void ofxRemoteUI::syncAllPointersToParams(){
 void ofxRemoteUI::syncPointerToParam(const std::string & paramName){
 
 	RemoteUIParam &p = params[paramName];
+
+	if (p.writeValueBinding){
+		p.applyValueBinding();
+		return;
+	}
 
 	switch (p.type) {
 		case REMOTEUI_PARAM_FLOAT:
@@ -544,6 +560,11 @@ void ofxRemoteUI::syncParamToPointer(const std::string & paramName){
 
 	RemoteUIParam & p = params[paramName];
 
+	if (p.readValueBinding){
+		p.readValueBinding(p);
+		return;
+	}
+
 	switch (p.type) {
 		case REMOTEUI_PARAM_FLOAT:
 			if (p.floatValAddr){
@@ -580,6 +601,11 @@ void ofxRemoteUI::syncParamToPointer(const std::string & paramName){
 
 
 bool ofxRemoteUI::hasParamChanged(const RemoteUIParam & p){
+	if (p.readValueBinding){
+		RemoteUIParam value = p;
+		p.readValueBinding(value);
+		return !p.isEqualTo(value);
+	}
 	switch (p.type) {
 		case REMOTEUI_PARAM_FLOAT:
 			if (p.floatValAddr){
@@ -668,12 +694,14 @@ RemoteUIParam& ofxRemoteUI::getParamRefForName(const std::string & paramName){
 }
 
 std::string ofxRemoteUI::getValuesAsString(const vector<std::string> & paramList){
+	std::lock_guard<std::recursive_mutex> lock(dataMutex);
 	std::stringstream out;
 	auto it = orderedKeys.begin();
 	while( it != orderedKeys.end() ){
 		std::string pname = it->second;
 		if(paramList.size() == 0 || find(paramList.begin(), paramList.end(), pname) != paramList.end()){
 			RemoteUIParam param = params[it->second];
+			if (param.readValueBinding) param.readValueBinding(param);
 			if(param.type != REMOTEUI_PARAM_SPACER){
 				out << UriEncode(it->second) << "=";
 			}
@@ -704,11 +732,14 @@ void ofxRemoteUI::setValuesFromString( const std::string & values ){
 		getline( in, name, '=' );
 		getline( in, value, '\n' );
 
-		dataMutex.lock();
-
-		if( params.find( name ) != params.end() ){
-			RemoteUIParam param = params[name];
-			RemoteUIParam original = params[name];
+		std::lock_guard<std::recursive_mutex> lock(dataMutex);
+		auto it = params.find(name);
+		if(it == params.end()) it = params.find(UriDecode(name));
+		if(it != params.end()){
+			name = it->first;
+			RemoteUIParam original = it->second;
+			if (original.readValueBinding) original.readValueBinding(original);
+			RemoteUIParam param = original;
 			changedParam.emplace_back(name);
 			stringstream valstr( UriDecode(value) );
 
@@ -738,7 +769,6 @@ void ofxRemoteUI::setValuesFromString( const std::string & values ){
 					paramsChangedSinceLastCheck.emplace_back(name);
 				}
 			}
-			dataMutex.unlock();
 		}else{
 			if(name.size()){
 				RLOG_NOTICE << "unknown param name; ignoring (" << name << ")";

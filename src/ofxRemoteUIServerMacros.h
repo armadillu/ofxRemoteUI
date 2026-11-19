@@ -19,16 +19,21 @@
 #define OFX_REMOTEUI_SERVER_SETUP(port, ...)							\
 ( ofxRemoteUIServer::instance()->setup(port, ##__VA_ARGS__) )
 
-//use this macro to share floats, ints, bools
+// Share a variable, or pass an explicit name followed by a getter and setter.
 #define OFX_REMOTEUI_SERVER_SHARE_PARAM(val, ...)						\
-( ofxRemoteUIServer::instance()->shareParam( #val, &val, ##__VA_ARGS__ ) )
+( ofxRemoteUIServer::instance()->shareParamFromMacro( #val, val, ##__VA_ARGS__ ) )
 
 #define OFX_REMOTEUI_SERVER_SHARE_PARAM_WITH_DESC(val, desc, ...)		\
-( ofxRemoteUIServer::instance()->shareParam( #val, &val, ##__VA_ARGS__ ); ofxRemoteUIServer::instance()->setParamDescription(#val, desc))
+( ofxRemoteUIServer::instance()->shareParamFromMacro( #val, val, ##__VA_ARGS__ ), \
+  ofxRemoteUIServer::instance()->setDescriptionForLastAddedParam(desc) )
 
-//WCN - "with custom name" share a param with a custom string instead of taking the var name
-#define OFX_REMOTEUI_SERVER_SHARE_PARAM_WCN(pName, val, ...)			\
-( ofxRemoteUIServer::instance()->shareParam( pName, &val, ##__VA_ARGS__ ) )
+// Share a variable or getter/setter pair under a custom name.
+#define OFX_REMOTEUI_SERVER_SHARE_PARAM_WCN(pName, ...)				\
+( ofxRemoteUIServer::instance()->shareParamFromMacro( pName, __VA_ARGS__ ) )
+
+// Replace a float, int or bool parameter's binding by its registered name.
+#define OFX_REMOTEUI_SERVER_SET_PARAM_BINDING(pName, ...)			\
+( ofxRemoteUIServer::instance()->setParamBinding( pName, __VA_ARGS__ ) )
 
 //use this macro to share enums + enumList; enum list can be vector<string> or string[]
 #define OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM(val, enumMin, enumMax, menuList, ...)	\
@@ -186,6 +191,7 @@
 #define RUI_SHARE_PARAM				OFX_REMOTEUI_SERVER_SHARE_PARAM
 #define RUI_SHARE_PARAM_DESC			OFX_REMOTEUI_SERVER_SHARE_PARAM_WITH_DESC
 #define RUI_SHARE_PARAM_WCN			OFX_REMOTEUI_SERVER_SHARE_PARAM_WCN
+#define RUI_SET_PARAM_BINDING		OFX_REMOTEUI_SERVER_SET_PARAM_BINDING
 #define RUI_SHARE_ENUM_PARAM		OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM
 #define RUI_SHARE_ENUM_PARAM_WCN    OFX_REMOTEUI_SERVER_SHARE_ENUM_PARAM_WCN
 #define RUI_SHARE_COLOR_PARAM		OFX_REMOTEUI_SERVER_SHARE_COLOR_PARAM

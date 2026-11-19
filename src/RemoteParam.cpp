@@ -26,6 +26,10 @@ RemoteUIParam::RemoteUIParam(){
 };
 
 
+void RemoteUIParam::applyValueBinding(){
+	if(writeValueBinding) writeValueBinding(*this);
+}
+
 bool RemoteUIParam::isEqualTo(const RemoteUIParam &p) const{
 
 	bool equal = true;
@@ -83,6 +87,11 @@ std::string RemoteUIParam::getValueAsString() const{
 }
 
 std::string RemoteUIParam::getValueAsStringFromPointer(){
+	if(readValueBinding){
+		RemoteUIParam value = *this;
+		readValueBinding(value);
+		return value.getValueAsString();
+	}
 	std::ostringstream ss;
 	char aux[50];
 	switch (type) {

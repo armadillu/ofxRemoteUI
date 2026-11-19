@@ -35,7 +35,11 @@ public:
 		int test = 0;
 		int test2 = 0;
 
-		
+private:
+		float animationSpeed = 1.0f;
+		int circleResolution = 32;
+		bool animateCircles = true;
+		double animationFrame = 0.0;
 };
 
 #endif

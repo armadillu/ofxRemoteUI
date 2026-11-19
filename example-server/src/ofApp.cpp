@@ -6,7 +6,7 @@ void ofApp::setup(){
 	ofBackground(22);
 	ofSetFrameRate(60);
 	ofSetVerticalSync(true);
-	ofSetCircleResolution(32);
+	ofSetCircleResolution(circleResolution);
 	ofEnableAlphaBlending();
 
 	//set some default values for your params (optional)
@@ -41,6 +41,7 @@ void ofApp::setup(){
 	RUI_SHARE_PARAM(y, 0, ofGetHeight()); //provide a variable, a rangeMin and a rangeMax
 	RUI_SET_LAST_PARAM_DESC("move your particles up and down"); //add a description to the paramater u just shared
 
+	//note the param is shared with a name different than the variable name here (WCN : With Custom Name)
 	RUI_SHARE_PARAM_WCN("Z: what", z, 0, ofGetWidth() ); //add an "x" float param to the current group ("position")
 
 	RUI_NEW_GROUP("STYLE"); //make a new group (optional)
@@ -53,6 +54,27 @@ void ofApp::setup(){
 
 	RUI_NEW_COLOR(); //slighly change the bg color within the group
 	RUI_SHARE_PARAM(circleSize, 1, 30);	//variable, rangeMin, rangeMax
+
+	RUI_NEW_GROUP("GETTERS AND SETTERS");
+
+	// Store a multiplier and display it as a percentage.
+	RUI_SHARE_PARAM("Animation speed (%)",
+		[this] { return animationSpeed * 100.0f; },
+		[this](float percent) { animationSpeed = ofClamp(percent, 0.0f, 200.0f) / 100.0f; },
+		0.0f, 200.0f);
+
+	// Apply changes to the renderer as well as updating the stored value.
+	RUI_SHARE_PARAM_DESC("Circle resolution", "Number of segments used to draw each circle.",
+		[this] { return circleResolution; },
+		[this](int resolution) {
+			circleResolution = ofClamp(resolution, 3, 128);
+			ofSetCircleResolution(circleResolution);
+		},
+		3, 128);
+
+	RUI_SHARE_PARAM_WCN("Animate circles",
+		[this] { return animateCircles; },
+		[this](bool enabled) { animateCircles = enabled; });
 
 	RUI_NEW_GROUP("OTHER"); //make a new group
 
@@ -105,7 +127,7 @@ void ofApp::setup(){
 
 void ofApp::update(){
 
-	float dt = 0.016666;
+	if(animateCircles) animationFrame += animationSpeed;
 	currentMouseX = ofGetMouseX();
 }
 
@@ -123,8 +145,8 @@ void ofApp::draw(){
 		unsigned char b = i * 17;
 		ofSetColor(r,g,b);
 		ofCircle(
-					-ofGetWidth() * 0.5 + ofGetWidth() * ofNoise((ofGetFrameNum() + 20 * i) * 0.004  + i),
-					-ofGetHeight() * 0.5 + ofGetHeight() * ofNoise((ofGetFrameNum() + 10 * i) * 0.004 + 4 * i),
+					-ofGetWidth() * 0.5 + ofGetWidth() * ofNoise((animationFrame + 20 * i) * 0.004 + i),
+					-ofGetHeight() * 0.5 + ofGetHeight() * ofNoise((animationFrame + 10 * i) * 0.004 + 4 * i),
 					circleSize
 				 );
 	}

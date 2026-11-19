@@ -15,7 +15,9 @@
 #include "ofxOsc.h"
 #include "ofxXmlSettings.h"
 #include "ofxRemoteUI.h"
+#include <type_traits>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 #include "ofxRemoteUIServerMacros.h"
 #if defined( OF_AVAILABLE )
@@ -114,6 +116,46 @@ public:
 	void shareParam(const std::string &paramName, int* param, int min, int max, const vector<std::string> &names, ofColor c = ofColor(0,0,0,0)); //enum!
 	void shareParam(const std::string &paramName, int* param, int min, int max, std::string* names, ofColor c = ofColor(0,0,0,0)); //enum with old school string array
 	void shareParam(const std::string &paramName, unsigned char* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 );	//ofColor
+
+	// Bind a float or int getter and setter. The getter's return type determines the parameter type.
+	// Callbacks run synchronously on the reading or updating thread. Keep their captures valid
+	// while the parameter is shared, and avoid throwing or reentering the server.
+	template<typename Getter, typename Setter>
+	void shareParam(const std::string &name, Getter getter, Setter setter,
+					decltype(getter()) min, decltype(getter()) max, ofColor bgColor = ofColor(0,0,0,0)){
+		using Value = decltype(getter());
+		shareBoundParam(name, std::function<Value()>(getter), std::function<void(Value)>(setter), min, max, bgColor);
+	}
+	void shareParam(const std::string &paramName, std::function<bool()> getter, std::function<void(bool)> setter,
+					ofColor bgColor = ofColor(0,0,0,0));
+
+	// Replace an existing float, int or bool binding. The new getter supplies the live value.
+	// Returns false for an unknown name, a type mismatch, or an empty getter or setter.
+	template<typename Getter, typename Setter>
+	bool setParamBinding(const std::string &name, Getter getter, Setter setter){
+		using Value = decltype(getter());
+		return setParamBindingImpl(name, std::function<Value()>(std::move(getter)),
+								   std::function<void(Value)>(std::move(setter)));
+	}
+
+	// Dispatch the sharing macros to the existing pointer or callback overloads.
+	template<typename Value, typename... Args, typename std::enable_if<!std::is_function<Value>::value, int>::type = 0>
+	auto shareParamFromMacro(const std::string &name, Value &value, Args&&... args)
+		-> decltype(shareParam(name, &value, std::forward<Args>(args)...)){
+		shareParam(name, &value, std::forward<Args>(args)...);
+	}
+
+	template<typename Getter, typename Setter, typename... Args>
+	auto shareParamFromMacro(const std::string &name, Getter &&getter, Setter &&setter, Args&&... args)
+		-> decltype(getter(), shareParam(name, std::forward<Getter>(getter), std::forward<Setter>(setter), std::forward<Args>(args)...)){
+		shareParam(name, std::forward<Getter>(getter), std::forward<Setter>(setter), std::forward<Args>(args)...);
+	}
+
+	template<typename Getter, typename Setter, typename... Args>
+	auto shareParamFromMacro(const std::string &, const std::string &name, Getter &&getter, Setter &&setter, Args&&... args)
+		-> decltype(getter(), shareParam(name, std::forward<Getter>(getter), std::forward<Setter>(setter), std::forward<Args>(args)...)){
+		shareParam(name, std::forward<Getter>(getter), std::forward<Setter>(setter), std::forward<Args>(args)...);
+	}
 
 	void addSpacer(const std::string &name);
 
@@ -296,6 +338,19 @@ protected:
 	void			saveParamToXmlSettings(const RemoteUIParam & p, const std::string & key, pugi::xml_node & s, int index, bool active);
 	#endif
 	void			saveSettingsBackup();
+
+	void shareBoundParam(const std::string &name, std::function<float()> getter, std::function<void(float)> setter,
+						 float min, float max, ofColor color);
+	void shareBoundParam(const std::string &name, std::function<int()> getter, std::function<void(int)> setter,
+						 int min, int max, ofColor color);
+	void registerBoundParam(const std::string &name, RemoteUIParam &p, ofColor color);
+	bool setParamBindingImpl(const std::string &name, const std::function<float()> &getter, const std::function<void(float)> &setter);
+	bool setParamBindingImpl(const std::string &name, const std::function<int()> &getter, const std::function<void(int)> &setter);
+	bool setParamBindingImpl(const std::string &name, const std::function<bool()> &getter, const std::function<void(bool)> &setter);
+	template<typename Value>
+	bool replaceParamBinding(const std::string &name, RemoteUIParamType type, Value RemoteUIParam::*value,
+							 Value* RemoteUIParam::*address, const std::function<Value()> &getter,
+							 const std::function<void(Value)> &setter);
 
 	void 			addParamToDB(const RemoteUIParam & p, std::string thisParamName);
 	void 			recreateOrderedKeysWithoutParam(const string & removedParam);

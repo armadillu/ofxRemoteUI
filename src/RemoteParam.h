@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <sstream>
 #include <cstdint>
+#include <functional>
 
 #include "ofExistsTest.h"
 
@@ -167,6 +168,11 @@ public:
 	ofColor getColor();
 	void setBgColor(const ofColor & c);
 	
+	// Local bindings for server parameters registered with a getter and setter.
+	std::function<void(RemoteUIParam &)> readValueBinding;
+	std::function<void(RemoteUIParam &)> writeValueBinding;
+	void applyValueBinding();
+
 	RemoteUIParamType type;
 
 	float * floatValAddr;	//used in server

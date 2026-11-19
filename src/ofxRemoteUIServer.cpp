@@ -220,7 +220,11 @@ void ofxRemoteUIServer::removeParamFromDB(const string & paramName, bool permane
 
         if(!permanently){
             //keep it in the removed struct
-            params_removed[paramName] = it->second;
+            RemoteUIParam saved = it->second;
+            if(saved.readValueBinding) saved.readValueBinding(saved);
+            saved.readValueBinding = nullptr;
+            saved.writeValueBinding = nullptr;
+            params_removed[paramName] = saved;
             orderedKeys_removed[orderedKeys_removed.size()] = paramName;
         }
 
@@ -290,7 +294,10 @@ void ofxRemoteUIServer::setDirectoryPrefix(const string & _directoryPrefix){
 }
 
 
-void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, const string &key, ofxXmlSettings & s, XmlCounter & c){
+void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& param, const string &key, ofxXmlSettings & s, XmlCounter & c){
+
+	RemoteUIParam t = param;
+	if(t.readValueBinding) t.readValueBinding(t);
 
 	switch (t.type) {
 
@@ -358,10 +365,13 @@ void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, const str
 }
 
 #ifdef OF_AVAILABLE
-void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& t, const string & key, pugi::xml_node & s, int index, bool active){
+void ofxRemoteUIServer::saveParamToXmlSettings(const RemoteUIParam& param, const string & key, pugi::xml_node & s, int index, bool active){
 
 	//1st att is name
 	s.append_attribute("name").set_value(key.c_str());
+
+	RemoteUIParam t = param;
+	if(t.readValueBinding) t.readValueBinding(t);
 
 	switch (t.type) {
 
@@ -702,8 +712,10 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(const string &fileName){
 							}else{
 								val = s.getFloatValue();
 							}
-							p.floatVal = *p.floatValAddr = val;
-							if(verbose_) RLOG_NOTICE << "loading a FLOAT '" << paramName <<"' (" << ofToString( *p.floatValAddr, 3) << ") from XML" ;
+							p.floatVal = val;
+							if(p.floatValAddr) *p.floatValAddr = val;
+							p.applyValueBinding();
+							if(verbose_) RLOG_NOTICE << "loading a FLOAT '" << paramName <<"' (" << ofToString(p.floatVal, 3) << ") from XML" ;
 						}
 					}break;
 
@@ -719,8 +731,10 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(const string &fileName){
 							}else{
 								val = s.getIntValue();
 							}
-							p.intVal = *p.intValAddr = val;
-							if(verbose_) RLOG_NOTICE << "loading an INT '" << paramName <<"' (" << (int) *p.intValAddr << ") from XML" ;
+							p.intVal = val;
+							if(p.intValAddr) *p.intValAddr = val;
+							p.applyValueBinding();
+							if(verbose_) RLOG_NOTICE << "loading an INT '" << paramName <<"' (" << p.intVal << ") from XML" ;
 						}
 					}break;
 
@@ -755,8 +769,10 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(const string &fileName){
 						}else{
 							if(p.type != REMOTEUI_PARAM_BOOL){ RLOG_ERROR << "type mismatch parsing '" << paramName << "'. Ignoring it!"; break;}
 							bool val = s.getIntValue();
-							p.boolVal = *p.boolValAddr = val;
-							if(verbose_) RLOG_NOTICE << "loading a BOOL '" << paramName <<"' (" << (bool) *p.boolValAddr << ") from XML" ;
+							p.boolVal = val;
+							if(p.boolValAddr) *p.boolValAddr = val;
+							p.applyValueBinding();
+							if(verbose_) RLOG_NOTICE << "loading a BOOL '" << paramName <<"' (" << p.boolVal << ") from XML" ;
 						}
 					}break;
 
@@ -1376,6 +1392,7 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 					RemoteUIParam & p = params[key];
 					if (p.type != REMOTEUI_PARAM_SPACER){
 						uiAlpha = 0;
+						if(p.readValueBinding) p.readValueBinding(p);
 						switch (p.type) {
 							case REMOTEUI_PARAM_FLOAT:
 								p.floatVal += sign * (p.maxFloat - p.minFloat) * 0.0025;
@@ -1880,11 +1897,14 @@ void ofxRemoteUIServer::draw(int x, int y){
 				}
 			}
 			#endif
-			for(int i = 0; i < paramsToWatch.size(); i++){
-				RemoteUIParam & p = params[paramsToWatch[i]];
-				string v = p.getValueAsStringFromPointer();
-				ofColor c = ofColor(p.r, p.g, p.b, 255);
-				onScreenNotifications.addParamWatch(paramsToWatch[i], v, c);
+			{
+				std::lock_guard<std::recursive_mutex> lock(dataMutex);
+				for(const auto &name : paramsToWatch){
+					auto param = params.find(name);
+					if(param == params.end()) continue;
+					RemoteUIParam &p = param->second;
+					onScreenNotifications.addParamWatch(name, p.getValueAsStringFromPointer(), ofColor(p.r, p.g, p.b, 255));
+				}
 			}
 
 			ofColor transp = ofColor(0,0,0,0);
@@ -2401,6 +2421,11 @@ void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamNa
 				if(pRem.type == srcP.type){
 					switch (pRem.type) {
 						case REMOTEUI_PARAM_FLOAT:
+							if (srcP.writeValueBinding){
+								srcP.floatVal = loadFromXmlClampsToValidRange
+									? ofClamp(pRem.floatVal, srcP.minFloat, srcP.maxFloat)
+									: pRem.floatVal;
+							}
 							if (srcP.floatValAddr){
 								*(srcP.floatValAddr) = srcP.floatVal = pRem.floatVal;
 								xmlP.floatValAddr = pRem.floatValAddr = srcP.floatValAddr;
@@ -2410,6 +2435,11 @@ void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamNa
 							break;
 						case REMOTEUI_PARAM_ENUM:
 						case REMOTEUI_PARAM_INT:
+							if (srcP.writeValueBinding){
+								srcP.intVal = loadFromXmlClampsToValidRange
+									? ofClamp(pRem.intVal, srcP.minInt, srcP.maxInt)
+									: pRem.intVal;
+							}
 							if (srcP.intValAddr){
 								*(srcP.intValAddr) = srcP.intVal = pRem.intVal;
 								xmlP.intValAddr = pRem.intValAddr = srcP.intValAddr;
@@ -2429,6 +2459,7 @@ void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamNa
 							}break;
 
 						case REMOTEUI_PARAM_BOOL:
+							if (srcP.writeValueBinding) srcP.boolVal = pRem.boolVal;
 							if (srcP.boolValAddr){
 								pRem.boolValAddr = srcP.boolValAddr;
 								*srcP.boolValAddr = srcP.boolVal = pRem.boolVal;
@@ -2441,6 +2472,12 @@ void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamNa
 								pRem.stringValAddr = srcP.stringValAddr;
 							}break;
 						default: break;
+					}
+					if(srcP.writeValueBinding){
+						srcP.applyValueBinding();
+						xmlP.floatVal = srcP.floatVal;
+						xmlP.intVal = srcP.intVal;
+						xmlP.boolVal = srcP.boolVal;
 					}
 					xmlP.r = srcP.r;
 					xmlP.g = srcP.g;
@@ -2487,6 +2524,118 @@ void ofxRemoteUIServer::addSpacer(const string &title){
 	lastAddedParam = title;
 }
 
+
+namespace {
+
+template<typename T>
+void bindParamValue(RemoteUIParam &p, T RemoteUIParam::*value,
+					const std::function<T()> &getter, const std::function<void(T)> &setter){
+	p.readValueBinding = [getter, value](RemoteUIParam &param){
+		param.*value = getter();
+	};
+	p.writeValueBinding = [getter, setter, value](RemoteUIParam &param){
+		T current = getter();
+		if(param.*value != current){
+			setter(param.*value);
+			current = getter();
+		}
+		param.*value = current;
+	};
+	p.readValueBinding(p);
+}
+
+} // namespace
+
+void ofxRemoteUIServer::registerBoundParam(const string &name, RemoteUIParam &p, ofColor color){
+	p.group = upcomingGroup;
+	setColorForParam(p, color);
+	addParamToDB(p, name);
+	lastAddedParam = name;
+}
+
+void ofxRemoteUIServer::shareBoundParam(const string &name, std::function<float()> getter,
+								  std::function<void(float)> setter, float min, float max, ofColor color){
+	RemoteUIParam p;
+	p.type = REMOTEUI_PARAM_FLOAT;
+	p.minFloat = min;
+	p.maxFloat = max;
+	bindParamValue(p, &RemoteUIParam::floatVal, getter, setter);
+	registerBoundParam(name, p, color);
+}
+
+void ofxRemoteUIServer::shareBoundParam(const string &name, std::function<int()> getter,
+								  std::function<void(int)> setter, int min, int max, ofColor color){
+	RemoteUIParam p;
+	p.type = REMOTEUI_PARAM_INT;
+	p.minInt = min;
+	p.maxInt = max;
+	bindParamValue(p, &RemoteUIParam::intVal, getter, setter);
+	registerBoundParam(name, p, color);
+}
+
+void ofxRemoteUIServer::shareParam(const string &name, std::function<bool()> getter,
+								  std::function<void(bool)> setter, ofColor color){
+	RemoteUIParam p;
+	p.type = REMOTEUI_PARAM_BOOL;
+	bindParamValue(p, &RemoteUIParam::boolVal, getter, setter);
+	registerBoundParam(name, p, color);
+}
+
+template<typename Value>
+bool ofxRemoteUIServer::replaceParamBinding(const string &name, RemoteUIParamType type,
+										   Value RemoteUIParam::*value, Value* RemoteUIParam::*address,
+										   const std::function<Value()> &getter,
+										   const std::function<void(Value)> &setter){
+	if(!getter || !setter) return false;
+
+	std::lock_guard<std::recursive_mutex> lock(dataMutex);
+	auto current = params.find(name);
+	auto original = paramsFromCode.find(name);
+	if(current == params.end() || original == paramsFromCode.end() ||
+	   current->second.type != type || original->second.type != type){
+		return false;
+	}
+
+	RemoteUIParam replacement = current->second;
+	replacement.*address = nullptr;
+	bindParamValue(replacement, value, getter, setter);
+
+	// Reset to defaults reinstalls the original record. Update its binding but keep its value.
+	RemoteUIParam defaults = original->second;
+	defaults.*address = nullptr;
+	defaults.readValueBinding = replacement.readValueBinding;
+	defaults.writeValueBinding = replacement.writeValueBinding;
+	current->second = std::move(replacement);
+	original->second = std::move(defaults);
+
+	// XML snapshots only need their stored values for resets and saving.
+	auto clearSnapshotBinding = [&](std::unordered_map<std::string, RemoteUIParam> &snapshots){
+		auto found = snapshots.find(name);
+		if(found != snapshots.end() && found->second.type == type){
+			found->second.*address = nullptr;
+			found->second.readValueBinding = nullptr;
+			found->second.writeValueBinding = nullptr;
+		}
+	};
+	clearSnapshotBinding(paramsFromXML);
+	clearSnapshotBinding(params_removed);
+	return true;
+}
+
+bool ofxRemoteUIServer::setParamBindingImpl(const string &name, const std::function<float()> &getter,
+										   const std::function<void(float)> &setter){
+	return replaceParamBinding(name, REMOTEUI_PARAM_FLOAT, &RemoteUIParam::floatVal, &RemoteUIParam::floatValAddr, getter, setter);
+}
+
+bool ofxRemoteUIServer::setParamBindingImpl(const string &name, const std::function<int()> &getter,
+										   const std::function<void(int)> &setter){
+	return replaceParamBinding(name, REMOTEUI_PARAM_INT, &RemoteUIParam::intVal, &RemoteUIParam::intValAddr, getter, setter);
+}
+
+bool ofxRemoteUIServer::setParamBindingImpl(const string &name, const std::function<bool()> &getter,
+										   const std::function<void(bool)> &setter){
+	return replaceParamBinding(name, REMOTEUI_PARAM_BOOL, &RemoteUIParam::boolVal, &RemoteUIParam::boolValAddr, getter, setter);
+}
 
 void ofxRemoteUIServer::shareParam(const string &paramName, float* param, float min, float max, ofColor c){
 	RemoteUIParam p;
@@ -2682,6 +2831,7 @@ vector<string> ofxRemoteUIServer::loadFromXMLv1(const string &fileName){
 	bool exists = s.loadFile(fileName);
 	unordered_map<string, bool> readKeys; //to keep track of duplicated keys;
 
+	std::lock_guard<std::recursive_mutex> lock(dataMutex);
 	if (exists){
 		if( s.getNumTags(OFXREMOTEUI_XML_TAG) > 0 ){
 			s.pushTag(OFXREMOTEUI_XML_TAG, 0);
@@ -2695,15 +2845,21 @@ vector<string> ofxRemoteUIServer::loadFromXMLv1(const string &fileName){
 					auto it = params.find(paramName);
 					if ( it != params.end() ){  // found!
 						loadedParams.emplace_back(paramName);
-						if(params[paramName].floatValAddr != NULL){
-							*params[paramName].floatValAddr = val;
-							params[paramName].floatVal = val;
-							*params[paramName].floatValAddr = ofClamp(*params[paramName].floatValAddr, params[paramName].minFloat, params[paramName].maxFloat);
+						auto & p = it->second;
+						if(p.floatValAddr || (p.type == REMOTEUI_PARAM_FLOAT && p.writeValueBinding)){
+							if(p.writeValueBinding){
+								p.floatVal = ofClamp(val, p.minFloat, p.maxFloat);
+								p.applyValueBinding();
+							}else{
+								*p.floatValAddr = val;
+								p.floatVal = val;
+								*p.floatValAddr = ofClamp(*p.floatValAddr, p.minFloat, p.maxFloat);
+							}
 							if(!paramsWereLoadedFromXML[paramName]){
 								paramsFromXML[paramName] = params[paramName];
 								paramsWereLoadedFromXML[paramName] = true;
 							}
-							if(verbose_) RLOG_VERBOSE << "Loading a FLOAT '" << paramName <<"' (" << ofToString( *params[paramName].floatValAddr, 3) << ") from XML" ;
+							if(verbose_) RLOG_VERBOSE << "Loading a FLOAT '" << paramName <<"' (" << ofToString(p.floatValAddr ? *p.floatValAddr : p.floatVal, 3) << ") from XML" ;
 						}else{
 							RLOG_ERROR << "ERROR at loading FLOAT (" << paramName << ")" ;
 						}
@@ -2720,19 +2876,25 @@ vector<string> ofxRemoteUIServer::loadFromXMLv1(const string &fileName){
 				string paramName = s.getAttribute(OFXREMOTEUI_INT_PARAM_XML_TAG, OFXREMOTEUI_PARAM_NAME_XML_KEY, OFXREMOTEUI_UNKNOWN_PARAM_NAME_XML_KEY, i);
 				if (readKeys.find(paramName) == readKeys.end()){
 					readKeys[paramName] = true;
-					float val = s.getValue(OFXREMOTEUI_INT_PARAM_XML_TAG, 0, i);
+					int val = s.getValue(OFXREMOTEUI_INT_PARAM_XML_TAG, 0, i);
 					auto it = params.find(paramName);
 					if ( it != params.end() ){  // found!
 						loadedParams.emplace_back(paramName);
-						if(params[paramName].intValAddr != NULL){
-							*params[paramName].intValAddr = val;
-							params[paramName].intVal = val;
-							*params[paramName].intValAddr = ofClamp(*params[paramName].intValAddr, params[paramName].minInt, params[paramName].maxInt);
+						auto & p = it->second;
+						if(p.intValAddr || (p.type == REMOTEUI_PARAM_INT && p.writeValueBinding)){
+							if(p.writeValueBinding){
+								p.intVal = ofClamp(val, p.minInt, p.maxInt);
+								p.applyValueBinding();
+							}else{
+								*p.intValAddr = val;
+								p.intVal = val;
+								*p.intValAddr = ofClamp(*p.intValAddr, p.minInt, p.maxInt);
+							}
 							if(!paramsWereLoadedFromXML[paramName]){
 								paramsFromXML[paramName] = params[paramName];
 								paramsWereLoadedFromXML[paramName] = true;
 							}
-							if(verbose_) RLOG_VERBOSE << "loading an INT '" << paramName <<"' (" << (int) *params[paramName].intValAddr << ") from XML" ;
+							if(verbose_) RLOG_VERBOSE << "loading an INT '" << paramName <<"' (" << (p.intValAddr ? *p.intValAddr : p.intVal) << ") from XML" ;
 						}else{
 							RLOG_ERROR << "ERROR at loading INT (" << paramName << ")" ;
 						}
@@ -2822,14 +2984,20 @@ vector<string> ofxRemoteUIServer::loadFromXMLv1(const string &fileName){
 					auto it = params.find(paramName);
 					if ( it != params.end() ){  // found!
 						loadedParams.emplace_back(paramName);
-						if(params[paramName].boolValAddr != NULL){
-							*params[paramName].boolValAddr = val;
-							params[paramName].boolVal = val;
+						auto & p = it->second;
+						if(p.boolValAddr || (p.type == REMOTEUI_PARAM_BOOL && p.writeValueBinding)){
+							if(p.writeValueBinding){
+								p.boolVal = val != 0;
+								p.applyValueBinding();
+							}else{
+								*p.boolValAddr = val;
+								p.boolVal = val;
+							}
 							if(!paramsWereLoadedFromXML[paramName]){
 								paramsFromXML[paramName] = params[paramName];
 								paramsWereLoadedFromXML[paramName] = true;
 							}
-							if(verbose_) RLOG_VERBOSE << "loading a BOOL '" << paramName <<"' (" << (bool) *params[paramName].boolValAddr << ") from XML" ;
+							if(verbose_) RLOG_VERBOSE << "loading a BOOL '" << paramName <<"' (" << p.boolVal << ") from XML" ;
 						}else{
 							RLOG_ERROR << "ERROR at loading BOOL (" << paramName << ")" ;
 						}
