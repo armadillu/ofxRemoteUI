@@ -649,13 +649,13 @@ void ofApp::drawParameter(const std::string &name) {
 	}
 	if (coloredSlider) ImGui::PopStyleColor(2);
 	ImGui::PopStyleColor(3);
-	ImGui::PopStyleVar();
 	ImGui::SameLine(0.f, controlLabelGap);
 	if (p.type == REMOTEUI_PARAM_BOOL) {
 		const ImVec2 pos = ImGui::GetCursorScreenPos();
 		ImGui::SetCursorScreenPos(ImVec2(std::max(pos.x, controlStartX + controlWidth + controlLabelGap), pos.y));
 	}
 	ImGui::AlignTextToFramePadding();
+	ImGui::PopStyleVar();
 	const bool blinkBinding = blinkingBoundParams.count(name) != 0;
 	const bool temporaryHighlight = blinkBinding || diffParams.count(name);
 	const bool highlightLabel = temporaryHighlight || (highlightChangesSinceLoad && changedSinceLoad.count(name));

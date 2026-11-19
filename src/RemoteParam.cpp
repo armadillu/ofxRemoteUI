@@ -86,7 +86,7 @@ std::string RemoteUIParam::getValueAsString() const{
 	}
 }
 
-std::string RemoteUIParam::getValueAsStringFromPointer(){
+std::string RemoteUIParam::getValueAsStringFromPointer() const{
 	if(readValueBinding){
 		RemoteUIParam value = *this;
 		readValueBinding(value);
@@ -148,7 +148,7 @@ RemoteUIServerValueWatch::RemoteUIServerValueWatch(){
 	floatAddress = nullptr; intAddress = nullptr; boolAddress = nullptr;
 }
 
-std::string RemoteUIServerValueWatch::getValueAsString(){
+std::string RemoteUIServerValueWatch::getValueAsString() const{
 	switch(type){
 		case REMOTEUI_PARAM_FLOAT: return ofToString(*floatAddress, 4);
 		case REMOTEUI_PARAM_INT: return ofToString(*intAddress);

@@ -160,7 +160,7 @@ public:
 
 	bool isEqualTo(const RemoteUIParam &p) const;
 	std::string getValueAsString() const;
-	std::string getValueAsStringFromPointer();
+	std::string getValueAsStringFromPointer() const;
 	std::string getInfoAsString();
 
 	void print();
@@ -229,5 +229,5 @@ struct RemoteUIServerValueWatch{
 	bool * boolAddress;
 	ofColor color;
 	RemoteUIServerValueWatch();
-	std::string getValueAsString();
+	std::string getValueAsString() const;
 };

@@ -51,6 +51,10 @@
 #endif
 
 
+#ifdef OF_AVAILABLE
+#include "ofxRemoteUIBuiltInClient.inl"
+#endif
+
 using namespace std;
 
 ofxRemoteUIServer* ofxRemoteUIServer::singleton = NULL;
@@ -94,13 +98,8 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	newColorInGroupCounter = 1;
 	showInterfaceKey = '\t';
 #ifdef OF_AVAILABLE
-	uiScale = 1;
-	customScreenWidth = customScreenHeight = -1;
 
-	xOffset = xOffsetTarget = 0.0f;
 	selectedColorComp = 0;
-	uiColumnWidth = 320;
-	uiAlpha = 1.0f;
 	selectedPreset = selectedGroupPreset = 0;
 	selectedItem = -1;
 	//ofSeedRandom(1979);
@@ -112,7 +111,6 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 		colorTables.emplace_back(ofColor::fromHsb(hue, 255.0f, 230.0f, BG_COLOR_ALPHA));
 	}
 
-	uiLines.setMode(OF_PRIMITIVE_LINES);
 	ofAddListener(eventShowParamUpdateNotification, this, &ofxRemoteUIServer::onShowParamUpdateNotification);
 #else
 	const int a = 44;
@@ -1325,7 +1323,7 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 					lastChosenPreset = presetsCached[selectedPreset];
 					loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + lastChosenPreset + "." + OFXREMOTEUI_PRESET_FILE_EXTENSION);
 					syncAllPointersToParams();
-					uiAlpha = 0;
+					builtInClient.setAlpha(0);
 					if(verbose_) RLOG_NOTICE << "setting preset: " << lastChosenPreset ;
 					RemoteUIServerCallBackArg cbArg;
 					cbArg.action = CLIENT_DID_SET_PRESET;
@@ -1344,7 +1342,7 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 						string presetName = p.group + "/" + groupPresetsCached[p.group][selectedGroupPreset];
 						loadFromXML(string(OFXREMOTEUI_PRESET_DIR) + "/" + presetName + "." + OFXREMOTEUI_PRESET_FILE_EXTENSION);
 						syncAllPointersToParams();
-						uiAlpha = 0;
+						builtInClient.setAlpha(0);
 						if(verbose_) RLOG_NOTICE << "setting preset: " << presetName ;
 						RemoteUIServerCallBackArg cbArg;
 						cbArg.action = CLIENT_DID_SET_GROUP_PRESET;
@@ -1368,17 +1366,17 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				if(ofGetKeyPressed(' ')) skip = 10;
 				float sign = e.key == OF_KEY_DOWN ? 1.0 : -1.0;
 				selectedGroupPreset = 0;
-				uiAlpha = 1;
+				builtInClient.setAlpha(1.0f);
 				selectedItem += sign * skip;
 				if(selectedItem < -1) selectedItem = orderedKeys.size() - 1;
 				if(selectedItem >= orderedKeys.size()) selectedItem = -1; //presets menu >> selectedItem = -1, on top of all
 				selectedGroupPreset = 0;
 				}break;
 
-			case '+': setBuiltInUiScale(uiScale + 0.1); break;
-			case '-': setBuiltInUiScale(MAX(uiScale - 0.1, 0.5)); break;
-			case '.': xOffsetTarget += (uiColumnWidth); xOffsetTarget = ofClamp(xOffsetTarget, -FLT_MAX, 4 * uiColumnWidth); break;
-			case ',': xOffsetTarget -= (uiColumnWidth); xOffsetTarget = ofClamp(xOffsetTarget, -FLT_MAX, 4 * uiColumnWidth); break;
+			case '+': setBuiltInUiScale(builtInClient.getScale() + 0.1f); break;
+			case '-': setBuiltInUiScale(MAX(builtInClient.getScale() - 0.1f, 0.5f)); break;
+			case '.': builtInClient.scrollColumns(1); break;
+			case ',': builtInClient.scrollColumns(-1); break;
 			case OF_KEY_LEFT:
 			case OF_KEY_RIGHT:{
 
@@ -1391,7 +1389,7 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 					string key = orderedKeys[selectedItem];
 					RemoteUIParam & p = params[key];
 					if (p.type != REMOTEUI_PARAM_SPACER){
-						uiAlpha = 0;
+						builtInClient.setAlpha(0);
 						if(p.readValueBinding) p.readValueBinding(p);
 						switch (p.type) {
 							case REMOTEUI_PARAM_FLOAT:
@@ -1463,16 +1461,16 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 
 
 void ofxRemoteUIServer::toggleBuiltInClientUI(){
-	if (uiAlpha < 1.0 && showUI){
-		uiAlpha = 1.0;
+	if (builtInClient.getAlpha() < 1.0f && showUI){
+		builtInClient.setAlpha(1.0f);
 		showUI = false;
 	}else{
 		showUI = !showUI;
 	}
 
 	if (showUI){
-		uiAlpha = 1;
-		uiLines.clear();
+		builtInClient.setAlpha(1.0f);
+		builtInClient.clearLayout();
 		syncAllPointersToParams();
 		refreshPresetsCache();
 	}
@@ -1510,9 +1508,7 @@ void ofxRemoteUIServer::update(float dt){
 	if(!threadedUpdate){
 		updateServer(dt);
 	}
-	uiAlpha += 0.3f * ofGetLastFrameTime();
-	if(uiAlpha > 1.0f) uiAlpha = 1.0f;
-	xOffset = 0.3f * xOffsetTarget + 0.7f * xOffset;
+	builtInClient.update(ofGetLastFrameTime());
 	#else
 	updateServer(dt);
 	#endif
@@ -1521,46 +1517,20 @@ void ofxRemoteUIServer::update(float dt){
 #ifdef OF_AVAILABLE
 
 #ifdef USE_OFX_FONTSTASH
-void ofxRemoteUIServer::drawUiWithFontStash(const string &fontPath, float fontSize_){
-
-	if(!ofIsGLProgrammableRenderer()){
-		fontRenderer = RENDER_WITH_OFXFONTSTASH;
-		fontFile = ofToDataPath(fontPath, true);
-		fontSize = fontSize_;
-		font = ofxFontStash();
-		font.setup(fontFile, 1.0, 512, false, 0, uiScale);
-		onScreenNotifications.drawUiWithFontStash(&font);
-		ofRectangle r = font.getBBox("M", fontSize, 0, 0);
-		lineH = ceil(r.height * 1.75);
-		charW = r.width;
-	}else{
-		ofLogError("ofxRemoteUIServer") << "Can't use ofxFontStash with the Programmable Renderer!";
-	}
+void ofxRemoteUIServer::drawUiWithFontStash(const string &fontPath, float fontSize){
+	builtInClient.drawUiWithFontStash(fontPath, fontSize, onScreenNotifications);
 }
-
 #endif
 
 #ifdef USE_OFX_FONTSTASH2
-void ofxRemoteUIServer::drawUiWithFontStash2(const string &fontPath, float fontSize_){
-	fontRenderer = RENDER_WITH_OFXFONTSTASH2; fontSize2 = fontSize_; fontStashFile2 = fontPath;
-	font2 = ofxFontStash2::Fonts();
-	font2.setup();
-	font2.addFont("mono", ofToDataPath(fontStashFile2, true));
-	onScreenNotifications.drawUiWithFontStash2(&font2);
-	ofxFontStash2::Style style = ofxFontStash2::Style("mono", fontSize2);
-	ofRectangle r = font2.getTextBounds("Mp", style, 0, 0);
-	charW = r.width;
-	lineH = ceil(r.height * 1.25);
+void ofxRemoteUIServer::drawUiWithFontStash2(const string &fontPath, float fontSize){
+	builtInClient.drawUiWithFontStash2(fontPath, fontSize, onScreenNotifications);
 }
 #endif
 
 void ofxRemoteUIServer::drawUiWithBitmapFont(){
-	fontRenderer = RENDER_WITH_OF_BITMAP_FONT;
-	onScreenNotifications.drawUiWithBitmapFont();
-	charW = 8;
-	lineH = ruiLineH;
+	builtInClient.drawUiWithBitmapFont(onScreenNotifications);
 }
-
 
 void ofxRemoteUIServer::threadedFunction(){
 
@@ -1574,9 +1544,8 @@ void ofxRemoteUIServer::threadedFunction(){
 
 void ofxRemoteUIServer::_draw(ofEventArgs &e){
 	if(autoDraw){
-		int h = customScreenHeight;
-		if(h < 0) h = ofGetHeight();
-		draw( 8 / uiScale, (h - 9)/ uiScale );
+		auto position = builtInClient.defaultNotificationPosition();
+		draw(position.x, position.y);
 	}
 }
 
@@ -1584,377 +1553,39 @@ void ofxRemoteUIServer::_update(ofEventArgs &e){
 	update(ofGetLastFrameTime());
 }
 
-void ofxRemoteUIServer::drawString(const string & text, const ofVec2f & pos){
-	drawString(text, pos.x, pos.y);
+void ofxRemoteUIServer::draw(int x, int y){
+	if(headlessMode || !enabled) return;
+
+	std::lock_guard<std::recursive_mutex> lock(dataMutex);
+	builtInClient.draw({
+		showUI, showUIduringEdits, drawNotifications,
+		selectedItem, selectedPreset, selectedGroupPreset, selectedColorComp,
+		computerIP, port,
+		#ifndef NO_RUI_WEB_INTERFACE
+		webPort,
+		#endif
+		presetsCached, groupPresetsCached, orderedKeys, params, paramsToWatch, varWatches
+	}, onScreenNotifications, x, y);
 }
 
-void ofxRemoteUIServer::drawString(const string & text, const float & x, const float & y){
+void ofxRemoteUIServer::setUiColumnWidth(int width){
+	builtInClient.setColumnWidth(width);
+}
 
-	switch (fontRenderer) {
+void ofxRemoteUIServer::setBuiltInUiScale(float scale){
+	builtInClient.setScale(scale, onScreenNotifications);
+}
 
-		case RENDER_WITH_OF_BITMAP_FONT: ofDrawBitmapString(text, x, y + 1);
-			break;
+void ofxRemoteUIServer::setCustomScreenHeight(int height){
+	builtInClient.setScreenHeight(height);
+}
 
-		#ifdef USE_OFX_FONTSTASH
-		case RENDER_WITH_OFXFONTSTASH: font.drawMultiLine(text, fontSize, x, y + lineH * 0.135); break;
-		#endif
-
-		#ifdef USE_OFX_FONTSTASH2
-		case RENDER_WITH_OFXFONTSTASH2:{
-			ofxFontStash2::Style style = ofxFontStash2::Style("mono", fontSize2, ofGetStyle().color);
-			font2.drawColumnNVG(text, style, x, y + lineH * 0.125, ofGetWidth());
-		}break;
-		#endif
-		default:break;
-	}
+void ofxRemoteUIServer::setCustomScreenWidth(int width){
+	builtInClient.setScreenWidth(width);
 }
 
 void ofxRemoteUIServer::setCustomDrawPos(int x, int y){
-	customPos.x = x;
-	customPos.y = y;
-}
-
-//x and y of where the notifications will get draw
-void ofxRemoteUIServer::draw(int x, int y){
-
-	if(headlessMode || !enabled) return;
-
-	bool needsToDrawNotification = !showUI || uiAlpha < 1.0;
-	int screenH, screenW;
-
-	if(needsToDrawNotification | showUI){
-		ofSetupScreen(); //FIXME: mmm this is a bit scary
-
-		ofPushStyle();
-		ofPushMatrix();
-		ofTranslate(customPos.x, customPos.y);
-		ofScale(uiScale,uiScale);
-
-		ofSetDrawBitmapMode(OF_BITMAPMODE_SIMPLE);
-		ofEnableBlendMode(OF_BLENDMODE_ALPHA);
-		ofSetRectMode(OF_RECTMODE_CORNER);
-		
-		ofFill();
-		screenH = customScreenHeight;
-		if (screenH < 0) screenH = ofGetHeight();
-		screenW = customScreenWidth;
-		if (screenW < 0) screenW = ofGetWidth();
-	}
-
-	if(showUI){
-
-		int padding = lineH * 1.5;
-		int x = padding;
-		int initialY = lineH * 2;
-		int y = initialY;
-		int colw = uiColumnWidth;
-		int realColW = colw * 0.9;
-		int valOffset = realColW * 0.7;
-		int valSpaceW = realColW - valOffset;
-		int spacing = lineH;
-		int bottomBarHeight = lineH * 4.25;
-		int frameNum = ofGetFrameNum();
-
-		//bottom bar
-		if (uiAlpha > 0.99 || showUIduringEdits){
-			ofSetColor(11, 245);
-			ofDrawRectangle(0,0, screenW / uiScale, screenH / uiScale);
-			ofSetColor(44, 245);
-			ofDrawRectangle(0,screenH / uiScale - bottomBarHeight, screenW / uiScale, bottomBarHeight );
-
-			string reachableAt;
-			if (enabled) {
-				reachableAt = "Server reachable at " + computerIP + ":";
-				reachableAt += ofToString(port) + "(OSC) ";
-				#ifndef NO_RUI_WEB_INTERFACE
-				//reachableAt += ofToString(wsState.wsPort) + "(WS) ";
-				reachableAt += ofToString(webPort) + "(WebGUI)";
-				#endif
-			}else {
-				reachableAt = "Server disabled";
-			}
-
-			ofSetColor(255);
-			string instructions = "ofxRemoteUI built in client. " + reachableAt +
-			"\nPress 's' to save current config, 'S' to make a new preset. ('E' to save in old format)\n" +
-			"Press 'r' to restore all params's launch state. '+'/'-' to set UI Scale. 'N' to toggle screen notif.\n" +
-			"Press Arrow Keys to edit values. SPACEBAR + Arrow Keys for bigger increments. ',' and '.' Keys to scroll.\n" +
-			"Press 'TAB' to hide. Press 'RETURN' to cycle through RGBA components.";
-			#ifndef NO_RUI_WEB_INTERFACE
-			instructions += " Press 'c' to launch a web client.";
-			#endif
-
-			drawString(instructions,
-					   charW * 1.5,
-					   screenH / uiScale - bottomBarHeight + lineH * 0.65);
-		}
-
-		//preset selection / top bar
-		ofSetColor(64);
-		ofDrawRectangle(0 , 0, screenW / uiScale, lineH);
-		ofColor textBlinkC ;
-		if(frameNum%6 < 4) textBlinkC = ofColor(0,0);
-		else textBlinkC = ofColor(255,0,0);
-
-		ofVec2f dpos = ofVec2f(charW * 23, lineH * 0.65);
-		if(presetsCached.size() > 0 && selectedPreset >= 0 && selectedPreset < presetsCached.size()){
-
-			ofSetColor(180);
-			if (selectedItem < 0){
-				drawString("Press RETURN to load GLOBAL PRESET: \"" + presetsCached[selectedPreset] + "\"", dpos);
-				ofSetColor(textBlinkC);
-				drawString("                                     " + presetsCached[selectedPreset], dpos);
-			}else{
-				RemoteUIParam & p = params[orderedKeys[selectedItem]];
-				int howMany = 0;
-				if(p.type == REMOTEUI_PARAM_SPACER){
-					howMany = groupPresetsCached[p.group].size();
-					if (howMany > 0){
-						string msg = "Press RETURN to load \"" + p.group + "\" GROUP PRESET: \"";
-						drawString( msg + groupPresetsCached[p.group][selectedGroupPreset] + "\"", dpos);
-						ofSetColor(textBlinkC);
-						std::string padding(msg.length(), ' ');
-						drawString(padding + groupPresetsCached[p.group][selectedGroupPreset], dpos);
-					}
-				}
-				if(howMany == 0){
-					ofSetColor(180);
-					drawString("Selected Preset: NONE", dpos);
-				}
-			}
-		}
-		if (selectedItem != -1) ofSetColor(255);
-		else ofSetColor(textBlinkC);
-		drawString("+ PRESET SELECTION: ", charW * 3,  dpos.y);
-
-		int linesInited = uiLines.getNumVertices() > 0 ;
-		ofPushMatrix();
-
-		if(uiAlpha > 0.99 || showUIduringEdits){
-
-			ofTranslate(xOffset, 0);
-
-			//param list
-			dataMutex.lock();
-			for(int i = 0; i < orderedKeys.size(); i++){
-
-				string key = orderedKeys[i];
-				RemoteUIParam & p = params[key];
-				int chars = key.size();
-				int charw = 9;
-				int column2MaxLen = ceil(valSpaceW / charw) + 1;
-				int stringw = chars * charw;
-				if (stringw > valOffset){
-					key = key.substr(0, (valOffset) / charw );
-				}
-
-				if(p.type == REMOTEUI_PARAM_SPACER){
-					ofColor c = ofColor(p.r, p.g, p.b);
-					ofSetColor(c * 0.3);
-					ofDrawRectangle(x , -spacing + y + spacing * 0.33, realColW, spacing);
-				}
-				if (selectedItem != i){
-					ofSetColor(p.r, p.g, p.b);
-				}else{
-					if(frameNum%5 < 1) ofSetColor(255);
-					else ofSetColor(255,0,0);
-				}
-
-				if(p.type != REMOTEUI_PARAM_SPACER){
-					string sel = (selectedItem == i) ? ">>" : "  ";
-					drawString(sel + key, x, y);
-				}else{
-					drawString("+ " + p.stringVal, x,y);
-				}
-
-				switch (p.type) {
-					case REMOTEUI_PARAM_FLOAT:
-						drawString(ofToString(p.floatVal), x + valOffset, y);
-						break;
-					case REMOTEUI_PARAM_ENUM: {
-						int index = p.intVal - p.minInt;
-						if (index >= 0 && index < p.enumList.size()) {
-							string val = p.enumList[index];
-							if (val.length() > column2MaxLen) {
-								val = val.substr(0, column2MaxLen);
-							}
-							drawString(val, x + valOffset, y);
-						}else {
-							drawString(ofToString(p.intVal), x + valOffset, y);
-						}
-					}break;
-					case REMOTEUI_PARAM_INT:
-						drawString(ofToString(p.intVal), x + valOffset, y);
-						break;
-					case REMOTEUI_PARAM_BOOL:
-						drawString(p.boolVal ? "true" : "false", x + valOffset, y);
-						break;
-					case REMOTEUI_PARAM_STRING:
-						drawString(p.stringVal, x + valOffset, y);
-						break;
-					case REMOTEUI_PARAM_COLOR:{
-						ofPushStyle();
-						ofSetColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal);
-						ofDrawRectangle(x + valOffset, y - spacing * 0.6, valSpaceW, spacing * 0.85);
-						char aux[200];
-						sprintf(aux, "[%0*d,%0*d,%0*d,%0*d]", 3, p.redVal, 3, p.greenVal, 3, p.blueVal, 3, p.alphaVal);
-						ofSetColor(0); //shadow
-						drawString(aux, x + valOffset + 1, y + 1);
-						ofSetColor(255);
-						drawString(aux, x + valOffset, y);
-						if(selectedItem == i){
-							char auxSelect[200];
-							switch (selectedColorComp) {
-								case 0: sprintf(auxSelect, " ___"); break;
-								case 1: sprintf(auxSelect, "     ___"); break;
-								case 2: sprintf(auxSelect, "         ___"); break;
-								case 3: sprintf(auxSelect, "             ___"); break;
-							}
-							ofSetColor(textBlinkC);
-							drawString(auxSelect, x + valOffset, y);
-						}
-						ofPopStyle();
-						}break;
-					case REMOTEUI_PARAM_SPACER:{
-						int howMany = groupPresetsCached[p.group].size();
-
-						if (selectedItem == i){ //selected
-							if (selectedGroupPreset < howMany && selectedGroupPreset >= 0){
-								string presetName = groupPresetsCached[p.group][selectedGroupPreset];
-								if (presetName.length() > column2MaxLen){
-									presetName = presetName.substr(0, column2MaxLen);
-								}
-								drawString(presetName, x + valOffset, y);
-							}
-						}else{ //not selected
-							if(howMany > 0 ){
-								drawString("(" + ofToString(howMany) + ")", x + valOffset, y);
-							}
-						}
-						}break;
-					default: printf("weird RemoteUIParam at draw()!\n"); break;
-				}
-				if(!linesInited){
-					uiLines.addVertex(ofVec3f(x, y + spacing * 0.33));
-					uiLines.addVertex(ofVec3f(x + realColW, y + spacing * 0.33));
-				}
-				y += spacing;
-				if (y > screenH / uiScale - padding * 0.5 - bottomBarHeight){
-					x += colw;
-					y = initialY;
-				}
-			}
-			dataMutex.unlock();
-			ofSetColor(32);
-			ofSetLineWidth(1);
-			uiLines.draw();
-		}
-		
-		//tiny clock top left
-		if (uiAlpha < 1.0 && !showUIduringEdits){
-			ofMesh m;
-			int step = 20;
-			m.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
-			ofVec3f origin = ofVec3f(charW * 1.5, lineH * 0.5); //rect is 22
-			m.addVertex(origin);
-			float r = lineH * 0.4;
-			float ang;
-			float lim = 360.0f * (1.0f - uiAlpha);
-			for(ang = 0; ang < lim; ang += step){
-				m.addVertex( origin + ofVec3f( r * cosf((-90.0f + ang) * DEG_TO_RAD),
-											  r * sinf((-90.0f + ang) * DEG_TO_RAD)));
-			}
-			float lastBit = lim - ang;
-			m.addVertex( origin + ofVec3f( r * cosf((-90.0f + ang + lastBit) * DEG_TO_RAD),
-										  r * sinf((-90.0f + ang + lastBit) * DEG_TO_RAD)));
-			ofSetColor(128);
-			m.draw();
-		}
-		
-		ofPopMatrix();
-		
-		//clearly draw the corners - helpful when in multi monitor setups to see if we are cropping
-		float ts = 7 * uiScale;
-		ofSetColor((frameNum * 20)%255);
-		ofDrawTriangle(0, 0, ts, 0, 0, ts);
-		ofDrawTriangle(screenW / uiScale, 0, screenW / uiScale - ts, 0, screenW / uiScale, ts);
-		ofDrawTriangle(0, screenH / uiScale, ts, screenH / uiScale, 0, screenH / uiScale - ts);
-		ofDrawTriangle(screenW / uiScale, screenH / uiScale, screenW / uiScale - ts, screenH / uiScale, screenW / uiScale, screenH / uiScale - ts);
-	}
-
-	if (needsToDrawNotification){
-		if (drawNotifications){
-			#if( defined(USE_OFX_TIME_MEASUREMENTS) && !defined(TIME_MEASUREMENTS_DISABLED))
-			ofxTimeMeasurements * tm = TIME_SAMPLE_GET_INSTANCE();
-			if (tm->getEnabled()) {
-				if (tm->getDrawLocation() == TIME_MEASUREMENTS_BOTTOM_LEFT) {
-					float scale = tm->getUiScale();
-					ofTranslate(0, scale * (-tm->getHeight() - 10 - tm->getPlotsHeight()));
-				}
-				if (tm->getDrawLocation() == TIME_MEASUREMENTS_BOTTOM_RIGHT) {
-					float scale = tm->getUiScale();
-					ofTranslate(0, scale * (-10 - tm->getPlotsHeight()));
-				}
-			}
-			#endif
-			{
-				std::lock_guard<std::recursive_mutex> lock(dataMutex);
-				for(const auto &name : paramsToWatch){
-					auto param = params.find(name);
-					if(param == params.end()) continue;
-					RemoteUIParam &p = param->second;
-					onScreenNotifications.addParamWatch(name, p.getValueAsStringFromPointer(), ofColor(p.r, p.g, p.b, 255));
-				}
-			}
-
-			ofColor transp = ofColor(0,0,0,0);
-			for(auto & w : varWatches){ // add watches
-				onScreenNotifications.addVariableWatch(w.first, w.second.getValueAsString(), (w.second.color == transp) ? ofColor(0, 190) : w.second.color );
-			}
-			onScreenNotifications.draw(x, y);
-		}
-	}
-	if(needsToDrawNotification | showUI){
-		ofPopMatrix();
-		ofPopStyle();
-	}
-}
-#endif
-
-#ifdef OF_AVAILABLE
-
-void ofxRemoteUIServer::setUiColumnWidth(int w){
-	if(fabs(uiColumnWidth - w) < 0.1) uiLines.clear();
-	uiColumnWidth = w;
-}
-
-void ofxRemoteUIServer::setBuiltInUiScale(float s){
-	if(fabs(s - uiScale) > FLT_EPSILON){
-		uiScale = s;
-		#ifdef USE_OFX_FONTSTASH
-		if(fontFile.size()){ //re-create font with higher uiscale
-			drawUiWithFontStash(fontFile, fontSize);
-		}
-		#endif
-		#ifdef USE_OFX_FONTSTASH2
-		if(fontStashFile2.size()){ //re-create font with higher uiscale
-			drawUiWithFontStash2(fontStashFile2, fontSize2);
-		}
-		#endif
-		if (fabs(uiScale - s) < 0.01) uiLines.clear();
-	}
-}
-
-
-void ofxRemoteUIServer::setCustomScreenHeight(int h){
-	if(fabs(customScreenHeight - h) < 0.1) uiLines.clear();
-	customScreenHeight = h;
-}
-
-
-void ofxRemoteUIServer::setCustomScreenWidth(int w){
-	if(fabs(customScreenWidth - w) < 0.1) uiLines.clear();
-	customScreenWidth = w;
+	builtInClient.setCustomDrawPos(x, y);
 }
 
 #endif

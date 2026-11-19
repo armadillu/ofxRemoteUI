@@ -21,40 +21,11 @@
 #include <vector>
 #include "ofxRemoteUIServerMacros.h"
 #if defined( OF_AVAILABLE )
-	#include "ofxRemoteUISimpleNotifications.h"
 	#ifdef TARGET_OSX
 		#include "OscQueryServerMgr.h"
 	#endif
 #endif
 
-
-// ofxFontStash ///////////////////////////////////////////////////////////////////////////////////
-
-#if defined(__has_include) /*llvm only - query about header files being available or not*/
-	#if __has_include("ofxFontStash.h") && !defined(DISABLE_AUTO_FIND_FONSTASH_HEADERS)
-		#ifndef USE_OFX_FONTSTASH
-			#define USE_OFX_FONTSTASH
-		#endif
-	#endif
-#endif
-
-#ifdef USE_OFX_FONTSTASH
-	#include "ofxFontStash.h"
-#endif
-
-// ofxFontStash2 //////////////////////////////////////////////////////////////////////////////////
-
-#if defined(__has_include) /*llvm only - query about header files being available or not*/
-#if __has_include("ofxFontStash2.h") && !defined(DISABLE_AUTO_FIND_FONSTASH_HEADERS)
-	#ifndef USE_OFX_FONTSTASH2
-		#define USE_OFX_FONTSTASH2
-	#endif
-#endif
-#endif
-
-#ifdef USE_OFX_FONTSTASH2
-#include "ofxFontStash2.h"
-#endif
 
 // ofxTimeMeasurements /////////////////////////////////////////////////////////////////////////////
 
@@ -71,6 +42,10 @@
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#ifdef OF_AVAILABLE
+#include "ofxRemoteUIBuiltInClient.h"
+#endif
 
 #define BG_COLOR_ALPHA			55
 
@@ -229,12 +204,12 @@ public:
 	void drawUiWithBitmapFont();
 	#ifdef USE_OFX_FONTSTASH
 	void drawUiWithFontStash(const std::string &fontPath, float fontSize = 15 /*good with veraMono*/ );
-	ofxFontStash & getFont(){return font;}
+	ofxFontStash & getFont(){return builtInClient.getFont();}
 	#endif
 
 	#if defined(USE_OFX_FONTSTASH2)
 	void drawUiWithFontStash2(const std::string &fontPath, float fontSize = 15.0f /*good with VeraMonoBold*/);
-	ofxFontStash2::Fonts & getFont2(){return font2;}
+	ofxFontStash2::Fonts & getFont2(){return builtInClient.getFont2();}
 	#endif
 
 	bool builtInClientIsVisible(){return showUI;}
@@ -409,7 +384,7 @@ protected:
 	bool			_keyPressed(ofKeyEventArgs &e);
 
 	int														selectedItem;
-	ofVboMesh												uiLines;
+	ofxRemoteUIBuiltInClient builtInClient;
 	ofxRemoteUISimpleNotifications							onScreenNotifications;
 
 	std::vector<std::string>										presetsCached; //for the built in client
@@ -417,46 +392,14 @@ protected:
 	int 													selectedGroupPreset;
 	int 													selectedPreset;
 	std::string												lastChosenPreset;
-	float													uiColumnWidth;
-	float													uiAlpha;
-	float													uiScale;
-	float													xOffset;		 //my ghetto scrolling
-	float													xOffsetTarget; //smooth transitions scrolling
-	int														customScreenHeight;
-	int														customScreenWidth;
-	ofVec2f													customPos;
-	int														selectedColorComp; //[0..4]
-
-	enum FontRenderer{
-		RENDER_WITH_OF_BITMAP_FONT,
-		RENDER_WITH_OFXFONTSTASH,
-		RENDER_WITH_OFXFONTSTASH2
-	};
-	FontRenderer											fontRenderer = RENDER_WITH_OF_BITMAP_FONT;
-
-	#ifdef USE_OFX_FONTSTASH
-	ofxFontStash											font;
-	std::string												fontFile;
-	float													fontSize;
-	#endif
-
-	#ifdef USE_OFX_FONTSTASH2
-	std::string 											fontStashFile2;
-	ofxFontStash2::Fonts									font2;
-	float													fontSize2;
-	#endif
+	int														selectedColorComp; // [0..3]
 
 	bool													headlessMode;
 	std::string												dataPath;
 
 	void			refreshPresetsCache();
-	void			drawString(const std::string & text, const float & x, const float & y);
-	void			drawString(const std::string & text, const ofVec2f & pos);
 
 	std::string 			cleanCharsForFileSystem(const std::string & s);
-	const float 											ruiLineH = 20;
-	float 													lineH = ruiLineH;
-	float													charW = 8;
 
 	#ifdef TARGET_OSX
 	#ifdef RUI_ENABLE_QUERYSERVER
