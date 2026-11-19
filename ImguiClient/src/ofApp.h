@@ -72,7 +72,6 @@ private:
 	char groupPresetNameBuffer[128] = "";
 	char clipboardBuffer[64 * 1024] = "";
 
-	bool autoDiscovery = true;
 	bool autoConnectToNewServers = false;
 	bool onlyAutoConnectToLocalHost = true;
 	bool continuousRefresh = false;
@@ -126,8 +125,8 @@ private:
 	float columnBaseWidth = 300.0f;
 	std::string activeMouseSlider;
 	float virtualSliderMouseX = 0.0f;
-	bool fineSliderTracking = false;
+	bool relativeSliderTracking = false;
 
-	float groupAnimationDuration = .25f;
+	float groupAnimationDuration = .18f;
 
 };

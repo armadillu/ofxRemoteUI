@@ -58,23 +58,25 @@ bool ofxRemoteUIClient_ImGui::setup(GLFWwindow *window, bool docking, bool multi
 	io.IniFilename = imguiSettingsPath.c_str();
 	#endif
 	// ImGui bakes each weight at the viewport's framebuffer density.
-	auto loadFont = [&](const std::string &path) -> ImFont * {
+	auto loadFont = [&](const std::string &path, float fontSize, float vOffset, float ExtraSizeScale) -> ImFont * {
 		const ofBuffer data = ofBufferFromFile(path, true);
 		if (data.size() <= 100) return nullptr;
 		ImFontConfig config;
 		config.OversampleH = config.OversampleV = 1;
 		config.PixelSnapH = true;
+		config.ExtraSizeScale = ExtraSizeScale;
+		config.GlyphOffset.y = vOffset;
 		void *bytes = IM_ALLOC(data.size());
 		std::memcpy(bytes, data.getData(), data.size());
-		return io.Fonts->AddFontFromMemoryTTF(bytes, static_cast<int>(data.size()), 17.f, &config);
+		return io.Fonts->AddFontFromMemoryTTF(bytes, static_cast<int>(data.size()), fontSize, &config);
 	};
-	ImFont *regularFont = loadFont("fonts/Rubik-Regular.ttf");
+	ImFont *regularFont = loadFont("fonts/Rubik-Regular.ttf", 17.f, -1.f, 1.0f);
 	if (!regularFont) {
 		ofLogWarning("ofxRemoteUIImGui") << "Rubik font could not be read; using the embedded vector font";
 		regularFont = io.Fonts->AddFontDefaultVector();
 	}
 	io.FontDefault = regularFont;
-	groupHeaderFont = loadFont("fonts/Rubik-Bold.ttf");
+	groupHeaderFont = loadFont("fonts/Rubik-Medium.ttf", 17.f, 0.f, 1.1f);
 	if (!groupHeaderFont) groupHeaderFont = regularFont;
 	if (docking) io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	if (multiViewport) io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
@@ -84,7 +86,7 @@ bool ofxRemoteUIClient_ImGui::setup(GLFWwindow *window, bool docking, bool multi
 	ImGuiStyle &style = ImGui::GetStyle();
 	style.WindowPadding = ImVec2(10.f, 10.f);
 	style.FontScaleMain = .8f;
-	style.FramePadding = ImVec2(12.f, 3.f);
+	style.FramePadding = ImVec2(10.f, 3.f);
 	style.ItemSpacing = ImVec2(4.f, 4.f);
 	style.ItemInnerSpacing = ImVec2(4.f, 2.f);
 	style.TouchExtraPadding = ImVec2(0.f, 0.f);
@@ -94,6 +96,7 @@ bool ofxRemoteUIClient_ImGui::setup(GLFWwindow *window, bool docking, bool multi
 	style.ColorMarkerSize = 1.f;
 	style.WindowBorderSize = 0.f;
 	style.ChildBorderSize = 0.f;
+	style.ChildRounding = 5.0f;
 	style.PopupBorderSize = 1.f;
 	style.PopupRounding = 6.f;
 	style.WindowRounding = style.PopupRounding;

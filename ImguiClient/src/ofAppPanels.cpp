@@ -9,7 +9,7 @@ using namespace ofAppImGuiHelpers;
 void ofApp::drawLogPanel() {
 	ImGui::SetNextWindowSize(ImVec2(650, 190), ImGuiCond_FirstUseEver);
 	prepareSecondaryWindow();
-	if (!ImGui::Begin("Action log", &showLogPanel, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); ImGui::PopStyleVar(); return; }
+	if (!ImGui::Begin("Action log", &showLogPanel, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); return; }
 	if (ImGui::SmallButton("Clear")) logLines.clear();
 	ImGui::SameLine(); ImGui::TextDisabled("%zu events", logLines.size());
 	ImGui::BeginChild("log-scroll", ImVec2(0, 0), true);
@@ -22,7 +22,7 @@ void ofApp::drawLogPanel() {
 void ofApp::drawServerLogPanel() {
 	ImGui::SetNextWindowSize(ImVec2(650, 190), ImGuiCond_FirstUseEver);
 	prepareSecondaryWindow();
-	if (!ImGui::Begin("Server log", &showServerLogPanel, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); ImGui::PopStyleVar(); return; }
+	if (!ImGui::Begin("Server log", &showServerLogPanel, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); return; }
 	if (ImGui::SmallButton("Clear")) serverLogLines.clear();
 	ImGui::SameLine(); ImGui::TextDisabled("%zu lines", serverLogLines.size());
 	ImGui::BeginChild("server-log-scroll", ImVec2(0, 0), true);
@@ -33,9 +33,9 @@ void ofApp::drawServerLogPanel() {
 }
 
 void ofApp::drawSettingsPanel() {
-	ImGui::SetNextWindowSize(ImVec2(360, 260), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(344, 310), ImGuiCond_Always);
 	prepareSecondaryWindow();
-	if (!ImGui::Begin("Settings", &showSettings, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); ImGui::PopStyleVar(); return; }
+	if (!ImGui::Begin("Settings", &showSettings, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize)) { ImGui::End(); return; }
 	framedCheckbox("Auto-connect to new servers", &autoConnectToNewServers);
 	ImGui::Indent();
 	framedCheckbox("Only auto-connect to localhost servers", &onlyAutoConnectToLocalHost);
@@ -62,7 +62,7 @@ void ofApp::drawBindingsPanel() {
 	ImGui::SetNextWindowSize(ImVec2(720, 300), ImGuiCond_FirstUseEver);
 	if (focusBindings) { ImGui::SetNextWindowFocus(); focusBindings = false; }
 	prepareSecondaryWindow();
-	if (!ImGui::Begin("Controller bindings", &showBindings, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); ImGui::PopStyleVar(); return; }
+	if (!ImGui::Begin("Controller bindings", &showBindings, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); return; }
 	std::vector<std::string> servers;
 	for (const auto &binding : controllers.bindings) servers.push_back(binding.server);
 	if (client.isReadyToSend()) servers.push_back(bindingServer());
@@ -172,7 +172,6 @@ void ofApp::drawBindingsPanel() {
 	ImGui::BeginDisabled(controllers.bindings.empty());
 	if (ImGui::Button("Remove All Bindings", ImVec2(removeAllWidth, 0))) ImGui::OpenPopup("Confirm remove all bindings");
 	ImGui::EndDisabled();
-	pushPopupWindowPadding();
 	if (ImGui::BeginPopupModal("Confirm remove all bindings", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 		ImGui::TextUnformatted("Remove all controller bindings from every server?");
 		ImGui::Spacing();
@@ -185,7 +184,6 @@ void ofApp::drawBindingsPanel() {
 		}
 		ImGui::EndPopup();
 	}
-	ImGui::PopStyleVar();
 	ImGui::SameLine();
 	if (ImGui::Button("Import Bindings...", ImVec2(importWidth, 0))) chooseControllerBindingsFile();
 	ImGui::SameLine();

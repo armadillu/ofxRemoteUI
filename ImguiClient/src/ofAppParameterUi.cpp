@@ -7,27 +7,96 @@
 #include <cmath>
 #include <cstring>
 #include <ctime>
+#include <type_traits>
 
 using namespace ofAppImGuiHelpers;
 
+static float sliderGrabHeight(float frameHeight) {
+	// ImGui insets horizontal slider grabs by two pixels on each edge.
+	return std::max(1.f, frameHeight - 4.f);
+}
+
+template <typename DrawControl>
+static bool drawControlAtHeight(float height, float y, DrawControl drawControl) {
+	ImGui::SetCursorScreenPos(ImVec2(ImGui::GetCursorScreenPos().x, y));
+	const float fontScale = std::min(1.f, std::floor(height) / ImGui::GetFontSize());
+	ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * fontScale);
+	ImGui::PushStyleVarY(ImGuiStyleVar_FramePadding, std::max(0.f, (height - ImGui::GetFontSize()) * .5f));
+	const bool activated = drawControl();
+	ImGui::PopStyleVar();
+	ImGui::PopFont();
+	return activated;
+}
+
+static bool drawColorEditor(float color[4], float width) {
+	const auto &style = ImGui::GetStyle();
+	const float height = ImGui::GetFrameHeight();
+	const float spacing = style.ItemInnerSpacing.x;
+	const float swatchWidth = std::clamp(width - 4.f * (1.f + spacing), 1.f, 2.f * height);
+	const auto options = ImGui::GetIO().ConfigColorEditFlags;
+	bool changed = false;
+
+	auto drawChannels = [&] {
+		ImGui::SetNextItemWidth(std::max(1.f, width - swatchWidth - spacing));
+		changed |= ImGui::ColorEdit4("##value", color, ImGuiColorEditFlags_NoSmallPreview);
+	};
+	auto drawSwatch = [&] {
+		const auto previewFlags = options & (ImGuiColorEditFlags_AlphaOpaque | ImGuiColorEditFlags_AlphaNoBg |
+			ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoDragDrop);
+		const bool clicked = ImGui::ColorButton("##color-swatch", ImVec4(color[0], color[1], color[2], color[3]), previewFlags, ImVec2(swatchWidth, height));
+		const ImGuiID originalIds[] = {
+			ImGui::GetID("##original-red"), ImGui::GetID("##original-green"),
+			ImGui::GetID("##original-blue"), ImGui::GetID("##original-alpha")
+		};
+		ImGuiStorage *storage = ImGui::GetStateStorage();
+		if (clicked) {
+			for (int i = 0; i < 4; ++i) storage->SetFloat(originalIds[i], color[i]);
+			ImGui::OpenPopup("##color-picker");
+			ImGui::SetNextWindowPos(ImVec2(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y + style.ItemSpacing.y));
+		}
+		if (!(previewFlags & ImGuiColorEditFlags_NoDragDrop) && ImGui::BeginDragDropTarget()) {
+			const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(IMGUI_PAYLOAD_TYPE_COLOR_4F);
+			if (!payload) payload = ImGui::AcceptDragDropPayload(IMGUI_PAYLOAD_TYPE_COLOR_3F);
+			if (payload) {
+				std::memcpy(color, payload->Data, payload->DataSize);
+				changed = true;
+			}
+			ImGui::EndDragDropTarget();
+		}
+		if (ImGui::BeginPopup("##color-picker")) {
+			float original[4];
+			for (int i = 0; i < 4; ++i) original[i] = storage->GetFloat(originalIds[i], color[i]);
+			ImGui::SetNextItemWidth(height * 12.f);
+			changed |= ImGui::ColorPicker4("##picker", color, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoLabel |
+				ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_DisplayHSV | ImGuiColorEditFlags_DisplayHex, original);
+			ImGui::EndPopup();
+		}
+	};
+
+	if (style.ColorButtonPosition == ImGuiDir_Left) {
+		drawSwatch();
+		ImGui::SameLine(0.f, spacing);
+		drawChannels();
+	} else {
+		drawChannels();
+		ImGui::SameLine(0.f, spacing);
+		drawSwatch();
+	}
+	return changed;
+}
+
 void ofApp::drawParameterPanel() {
-	const ImVec2 windowPadding = ImGui::GetStyle().WindowPadding;
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, windowPadding);
 	const ImGuiViewport *viewport = ImGui::GetMainViewport();
 	ImGui::SetNextWindowPos(viewport->WorkPos);
 	ImGui::SetNextWindowSize(viewport->WorkSize);
-	if (!ImGui::Begin("Parameters", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); ImGui::PopStyleVar(); return; }
+	if (!ImGui::Begin("Parameters", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); return; }
 	auto names = client.isReadyToSend() ? client.getAllParamNamesList() : std::vector<std::string>{};
 	// Presets and parameter filtering occupy the top bar.
 	const float topScale = parameterFontScale(rowHeight);
 	ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * topScale);
-	const ImVec2 framePadding = ImGui::GetStyle().FramePadding;
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(windowPadding.x * topScale, windowPadding.y * topScale));
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(framePadding.x * topScale, framePadding.y * topScale));
 	const float topSectionGap = 10.f * topScale;
 	const float topSectionWidth = std::max(1.f, (ImGui::GetContentRegionAvail().x - topSectionGap) * .5f);
 	const float topSectionHeight = ImGui::GetTextLineHeight() + ImGui::GetFrameHeight() + ImGui::GetStyle().ItemSpacing.y + ImGui::GetStyle().WindowPadding.y * 2.f;
-	ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.f);
 	ImGui::BeginChild("preset-controls", ImVec2(topSectionWidth, topSectionHeight), ImGuiChildFlags_AlwaysUseWindowPadding);
 	ImGui::TextUnformatted("Global Presets");
 	const float presetButtonWidths = ImGui::CalcTextSize("+").x + ImGui::CalcTextSize("-").x + 4.f * ImGui::GetStyle().FramePadding.x;
@@ -42,7 +111,6 @@ void ofApp::drawParameterPanel() {
 	if (!client.isReadyToSend()) ImGui::BeginDisabled();
 	if (ImGui::Button("+##global")) { presetNameBuffer[0] = '\0'; ImGui::OpenPopup("save-global-preset"); }
 	if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip | ImGuiHoveredFlags_AllowWhenDisabled)) ImGui::SetTooltip("Save current values as a new global preset");
-	pushPopupWindowPadding();
 	if (ImGui::BeginPopup("save-global-preset")) {
 		ImGui::TextUnformatted("Save global preset");
 		ImGui::SetNextItemWidth(presetNameInputWidth() * topScale);
@@ -52,7 +120,6 @@ void ofApp::drawParameterPanel() {
 		ImGui::SameLine(); if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
 		ImGui::EndPopup();
 	}
-	ImGui::PopStyleVar();
 	ImGui::SameLine();
 	if (selectedPreset.empty()) ImGui::BeginDisabled();
 	if (ImGui::Button("-##global")) client.deletePreset(selectedPreset);
@@ -62,17 +129,14 @@ void ofApp::drawParameterPanel() {
 	ImGui::EndChild();
 	ImGui::SameLine(0.f, topSectionGap);
 	ImGui::BeginChild("group-filter-controls", ImVec2(0, topSectionHeight), ImGuiChildFlags_AlwaysUseWindowPadding);
-	ImGui::TextUnformatted("type here");
+	ImGui::TextUnformatted("Filter Parameters");
 	const float clearWidth = ImGui::CalcTextSize("Clear").x + ImGui::GetStyle().FramePadding.x * 2.f;
 	ImGui::SetNextItemWidth(std::max(1.f, ImGui::GetContentRegionAvail().x - clearWidth - ImGui::GetStyle().ItemSpacing.x));
-	ImGui::InputTextWithHint("##filter", "Filter parameters...", filterBuffer, sizeof(filterBuffer));
+	ImGui::InputTextWithHint("##filter", "type here...", filterBuffer, sizeof(filterBuffer));
 	ImGui::SameLine();
 	if (ImGui::Button("Clear")) filterBuffer[0] = '\0';
 	ImGui::EndChild();
-	ImGui::PopStyleVar();
-	ImGui::PopStyleVar(2);
 	ImGui::PopFont();
-	ImGui::PopStyleVar();
 	if (highlightChangesSinceLoad && !changedSinceLoad.empty())
 		changedHighlightPulse = .5f + .5f * std::sin(ofGetElapsedTimef() * 2.f * 3.14159265f);
 	const auto &collapsedGroups = collapsedGroupsByServer[bindingServer()];
@@ -95,17 +159,16 @@ void ofApp::drawParameterPanel() {
 	}
 	const float footerScale = topScale;
 	ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * footerScale);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(windowPadding.x * footerScale, windowPadding.y * footerScale));
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(framePadding.x * footerScale, framePadding.y * footerScale));
 	const float footerWidth = std::max(1.f, ImGui::GetContentRegionAvail().x - ImGui::GetStyle().WindowPadding.x * 2.f);
-	const float footerSpacing = ImGui::GetStyle().ItemSpacing.x * 2;
+	const float footerSpacing = ImGui::GetStyle().ItemSpacing.x;
 	auto footerButtonWidth = [](const char *label) { return ImGui::CalcTextSize(label).x + ImGui::GetStyle().FramePadding.x * 2.f; };
-	const float hostWidth = std::max(1.f, std::min(110.f * footerScale, footerWidth - ImGui::CalcTextSize("Host ").x - footerSpacing));
-	const float portWidth = std::max(1.f, std::min(55.f * footerScale, footerWidth - ImGui::CalcTextSize("Port ").x - footerSpacing));
+	const float hostWidth = std::max(1.f, std::floor(std::min(110.f * footerScale, footerWidth - ImGui::CalcTextSize("Host:").x - footerSpacing)));
+	const float portWidth = std::max(1.f, std::floor(std::min(60.f * footerScale, footerWidth - ImGui::CalcTextSize("Port:").x - footerSpacing)));
 	const float hostPortGap = 10.f * footerScale;
 	const std::string pendingText = pendingPresetFiles.empty() ? "" : ofToString(pendingPresetFiles.size()) + " preset file(s) waiting for sync";
 	const auto neighbors = client.getNeighbors();
-	std::string serverPreview = "Servers: (" + ofToString(neighbors.size()) + ")";
+	const char *serverLabel = "Servers:";
+	std::string serverPreview = "(" + ofToString(neighbors.size()) + ")";
 	if (client.isReadyToSend()) {
 		std::string connectedServer = host + ":" + ofToString(port);
 		for (const auto &neighbor : neighbors) {
@@ -121,7 +184,8 @@ void ofApp::drawParameterPanel() {
 	const float footerRowGap = 6.f * footerScale;
 	const float syncContinuousGap = 10.f * footerScale;
 	const float connectButtonWidth = std::max(footerButtonWidth("Connect"), footerButtonWidth("Disconnect"));
-	const float syncControlsWidth = dividerWidth + footerSpacing + footerButtonWidth("Sync") + syncContinuousGap + ImGui::GetFrameHeight() + ImGui::GetStyle().ItemInnerSpacing.x + ImGui::CalcTextSize("Non-Stop").x;
+	const float nonStopLabelWidth = ImGui::CalcTextSize("Non-Stop").x;
+	const float syncControlsWidth = dividerWidth + footerSpacing + footerButtonWidth("Sync") + syncContinuousGap + ImGui::GetFrameHeight() + ImGui::GetStyle().ItemInnerSpacing.x + nonStopLabelWidth;
 	const std::vector<float> connectionWidths = {
 		ImGui::CalcTextSize("Host:").x + footerSpacing + hostWidth,
 		hostPortGap + ImGui::CalcTextSize("Port:").x + footerSpacing + portWidth,
@@ -129,8 +193,11 @@ void ofApp::drawParameterPanel() {
 		pendingText.empty() ? 0.f : ImGui::CalcTextSize(pendingText.c_str()).x
 	};
 	const float connectionRowWidth = connectionWidths[0] + connectionWidths[1] + connectionWidths[2] + footerSpacing * 2.f;
-	const float serverDropdownWidth = std::min(footerWidth, std::max(1.f, connectionRowWidth - footerSpacing - syncControlsWidth));
-	const std::vector<float> actionWidths = {serverDropdownWidth, syncControlsWidth};
+	const float serverLabelWidth = ImGui::CalcTextSize(serverLabel).x + footerSpacing;
+	const float minDropdownWidth = ImGui::GetFrameHeight() + footerButtonWidth("(0)");
+	const float serverDropdownWidth = std::floor(std::clamp(connectionRowWidth - serverLabelWidth - footerSpacing - syncControlsWidth,
+		std::min(minDropdownWidth, std::max(1.f, footerWidth - serverLabelWidth)), std::max(1.f, footerWidth - serverLabelWidth)));
+	const std::vector<float> actionWidths = {serverLabelWidth + serverDropdownWidth, syncControlsWidth};
 	auto footerLineWidths = [footerWidth, footerSpacing](const std::vector<float> &widths) {
 		std::vector<float> lines;
 		float used = 0.f;
@@ -142,21 +209,20 @@ void ofApp::drawParameterPanel() {
 		lines.push_back(used);
 		return lines;
 	};
-	const auto connectionLines = footerLineWidths(connectionWidths);
-	const auto actionLines = footerLineWidths(actionWidths);
+	auto connectionLines = footerLineWidths(connectionWidths);
+	auto actionLines = footerLineWidths(actionWidths);
+	if (connectionRowWidth <= footerWidth && actionLines.size() == 1) {
+		// Center both rows together so their first labels share a left edge.
+		connectionLines.front() = actionLines.front() = std::max(connectionLines.front(), actionLines.front());
+	}
 	const int footerLines = static_cast<int>(connectionLines.size() + actionLines.size());
 	const float footerHeight = ImGui::GetFrameHeight() * footerLines + ImGui::GetStyle().ItemSpacing.y * (footerLines - 1) + ImGui::GetStyle().WindowPadding.y * 2.f + footerRowGap;
-	ImGui::PopStyleVar(2);
 	ImGui::PopFont();
 
 	
 	const float parameterListGap = 6.f;
 	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + parameterListGap);
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarBg, ImVec4(0.f, 0.f, 0.f, 0.f));
-	ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.f);
-	ImVec2 tightSpacing = ImGui::GetStyle().ItemSpacing;
-	tightSpacing.y = 1;
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, tightSpacing);
 	if (ImGui::BeginChild("param-list", ImVec2(0, -footerHeight - ImGui::GetStyle().ItemSpacing.y - parameterListGap), ImGuiChildFlags_AlwaysUseWindowPadding)) {
 		if (!client.isReadyToSend()) {
 			ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * topScale);
@@ -171,6 +237,7 @@ void ofApp::drawParameterPanel() {
 			ImGui::TextDisabled("Sync completed with no parameters. Check the server and try Sync.");
 			ImGui::PopFont();
 		}
+		ImGui::PushStyleVarY(ImGuiStyleVar_ItemSpacing, 2.0f);
 		std::vector<std::vector<std::string>> blocks;
 		for (const auto &name : visible) {
 			const auto param = client.getParamForName(name);
@@ -203,6 +270,8 @@ void ofApp::drawParameterPanel() {
 			rowsInColumn += blockRows;
 		}
 		ImDrawList *drawList = ImGui::GetWindowDrawList();
+		const float parameterIndent = ImGui::GetStyle().IndentSpacing * .5f;
+		const float groupBottomPadding = 4.f;
 		size_t nextColumn = 0;
 		for (size_t i = 0; i < blocks.size(); ++i) {
 			if (nextColumn < columnStarts.size() && i == columnStarts[nextColumn]) { ImGui::NextColumn(); ++nextColumn; }
@@ -226,36 +295,48 @@ void ofApp::drawParameterPanel() {
 			const bool collapsing = collapsedGroups.count(group) != 0;
 			const auto animation = groupToggleTimes.find(group);
 			const bool animating = hasContent && animation != groupToggleTimes.end();
+			bool drawContent = hasContent;
+			bool animationChild = false;
 			if (animating) {
-				const float progress = ofClamp((ofGetElapsedTimef() - animation->second) / groupAnimationDuration, 0.f, 1.f);
-				const float eased = .5f + .5f * std::tanh((progress * 2.f - 1.f) * 3.f) / std::tanh(3.f);
+				const float progress = ofClamp((groupAnimationNow - animation->second) / groupAnimationDuration, 0.f, 1.f);
+				constexpr float curveStrength = 1.25f;
+				const float eased = .5f + .5f * std::tanh((2.f * progress - 1.f) * curveStrength) / std::tanh(curveStrength);
 				const float fraction = collapsing ? 1.f - eased : eased;
 				const auto height = groupContentHeights.find(group);
-				const float fullHeight = height != groupContentHeights.end() ? height->second : 8.f + (blocks[i].size() - firstRow) * (effectiveRowHeight + ImGui::GetStyle().ItemSpacing.y);
-				ImGui::BeginChild("group-animation", ImVec2(0.f, std::max(1.f, fullHeight * fraction)), ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+				const float rowSpacing = ImGui::GetStyle().ItemSpacing.y;
+				const float estimatedHeight = groupBottomPadding + (blocks[i].size() - firstRow) * (ImGui::GetFrameHeight() + rowSpacing);
+				const float fullHeight = height != groupContentHeights.end() ? height->second : estimatedHeight;
+				const float animatedHeight = std::floor(fullHeight * fraction);
+				// ImGui clamps child windows to four pixels. Keep moving through the last pixels.
+				animationChild = animatedHeight >= 4.f;
+				if (animationChild) {
+					drawContent = ImGui::BeginChild("group-animation", ImVec2(0.f, animatedHeight), ImGuiChildFlags_None,
+						ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+				} else {
+					drawContent = false;
+					if (animatedHeight > 0.f) ImGui::Dummy(ImVec2(0.f, animatedHeight));
+				}
 			}
-			const float contentStartY = ImGui::GetCursorPosY();
-			if (hasContent) {
-				ImGui::Dummy(ImVec2(0.f, 4.f));
-				ImGui::Indent(6.f);
+			if (drawContent) {
+				const float contentStartY = ImGui::GetCursorPosY();
+				if (parameterIndent > 0.f) ImGui::Indent(parameterIndent);
+				for (size_t row = firstRow; row < blocks[i].size(); ++row) {
+					const auto &name = blocks[i][row];
+					ImGui::PushID(static_cast<int>(row));
+					if (continuousRefresh) ImGui::BeginDisabled();
+					if (animating) ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+					drawParameter(name);
+					if (animating) ImGui::PopItemFlag();
+					if (continuousRefresh) ImGui::EndDisabled();
+					ImGui::PopID();
+				}
+				if (parameterIndent > 0.f) ImGui::Unindent(parameterIndent);
+				ImGui::Dummy(ImVec2(0.f, groupBottomPadding));
+				// EndChild adds the trailing item spacing when it advances the parent cursor.
+				const float measuredHeight = ImGui::GetCursorPosY() - contentStartY - ImGui::GetStyle().ItemSpacing.y;
+				if (measuredHeight > groupBottomPadding) groupContentHeights[group] = measuredHeight;
 			}
-			for (size_t row = firstRow; row < blocks[i].size(); ++row) {
-				const auto &name = blocks[i][row];
-				ImGui::PushID(static_cast<int>(row));
-				if (continuousRefresh) ImGui::BeginDisabled();
-				if (animating) ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-				drawParameter(name);
-				if (animating) ImGui::PopItemFlag();
-				if (continuousRefresh) ImGui::EndDisabled();
-				ImGui::PopID();
-			}
-			if (hasContent) {
-				ImGui::Unindent(6.f);
-				ImGui::Dummy(ImVec2(0.f, 4.f));
-				const float measuredHeight = ImGui::GetCursorPosY() - contentStartY;
-				if (measuredHeight > 8.f) groupContentHeights[group] = measuredHeight;
-			}
-			if (animating) ImGui::EndChild();
+			if (animationChild) ImGui::EndChild();
 			ImGui::PopID();
 			ImGui::EndGroup();
 			ImGui::PopStyleColor();
@@ -273,9 +354,9 @@ void ofApp::drawParameterPanel() {
 			ImGui::Spacing();
 		}
 		if (columnCount > 1) ImGui::Columns(1);
+		ImGui::PopStyleVar();
 	}
 	ImGui::EndChild();
-	ImGui::PopStyleVar(2);
 	ImGui::PopStyleColor();
 	if (bindingPopupRequested) {
 		const ImGuiViewport *viewport = ImGui::GetMainViewport();
@@ -286,7 +367,6 @@ void ofApp::drawParameterPanel() {
 		bindingPopupActive = true;
 	}
 	if (bindingPopupActive) {
-		pushPopupWindowPadding();
 		const bool listeningForBinding = !controllers.learning.empty();
 		const ImVec4 popupBg = ImGui::GetStyle().Colors[ImGuiCol_PopupBg];
 		if (listeningForBinding) {
@@ -323,13 +403,9 @@ void ofApp::drawParameterPanel() {
 			bindingPopupActive = false;
 		}
 		if (listeningForBinding) ImGui::PopStyleColor();
-		ImGui::PopStyleVar();
 	}
 	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + parameterListGap);
 	ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * footerScale);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(windowPadding.x * footerScale, windowPadding.y * footerScale));
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(framePadding.x * footerScale, framePadding.y * footerScale));
-	ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.f);
 	ImGui::BeginChild("bottom-controls", ImVec2(0, footerHeight), ImGuiChildFlags_AlwaysUseWindowPadding, ImGuiWindowFlags_NoScrollbar);
 	float footerUsed = 0.f;
 	size_t footerLine = 0;
@@ -360,6 +436,9 @@ void ofApp::drawParameterPanel() {
 	footerLine = 0;
 	footerLayout = &actionLines;
 	footerNext(actionWidths[0]);
+	ImGui::AlignTextToFramePadding();
+	ImGui::TextUnformatted(serverLabel);
+	ImGui::SameLine();
 	ImGui::SetNextItemWidth(serverDropdownWidth);
 	const bool serverDropdownOpen = ImGui::BeginCombo("##servers", serverPreview.c_str());
 		if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip)) {
@@ -367,7 +446,6 @@ void ofApp::drawParameterPanel() {
 			ImGui::SetTooltip("Connect ofxRemoteUIServers running on this lan");
 		}
 	if (serverDropdownOpen) {
-		framedCheckbox("Discover servers", &autoDiscovery);
 		if (neighbors.empty()) ImGui::TextDisabled("No servers discovered yet");
 		for (size_t i = 0; i < neighbors.size(); ++i) {
 			const auto &neighbor = neighbors[i];
@@ -394,8 +472,6 @@ void ofApp::drawParameterPanel() {
 	}
 	ImGui::SameLine(0.f, syncContinuousGap); framedCheckbox("Non-Stop", &continuousRefresh);
 	ImGui::EndChild();
-	ImGui::PopStyleVar();
-	ImGui::PopStyleVar(2);
 	ImGui::PopFont();
 	ImGui::End();
 }
@@ -403,7 +479,7 @@ void ofApp::drawParameterPanel() {
 void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param) {
 	ImGui::PushID(name.c_str());
 	ImGui::PushFont(gui.getGroupHeaderFont(), ImGui::GetStyle().FontSizeBase * parameterFontScale(rowHeight));
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(3.f, 1.f + ImGui::GetFontSize() * .125f));
+	const auto &style = ImGui::GetStyle();
 	const ImVec2 pos = ImGui::GetCursorScreenPos();
 	const float width = ImGui::GetContentRegionAvail().x;
 	const float height = ImGui::GetFrameHeight();
@@ -421,20 +497,20 @@ void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param)
 		saveCollapsedGroups();
 	}
 	const float fontSize = ImGui::GetFontSize();
-	const float inset = std::max(4.f, fontSize * .35f);
-	const float arrowSize = fontSize * .55f;
-	const float arrowX = pos.x + inset, arrowY = pos.y + (height - arrowSize) * .5f;
+	const float arrowSize = fontSize * .70f;
+	const float arrowX = pos.x + style.FramePadding.x, arrowY = pos.y + (height - arrowSize) * .5f;
+	const float titleX = arrowX + arrowSize + style.ItemInnerSpacing.x;
 	ImDrawList *headerDrawList = ImGui::GetWindowDrawList();
 	headerDrawList->PushClipRect(pos, ImVec2(pos.x + titleWidth, pos.y + height), true);
 	const ImU32 textColor = ImGui::GetColorU32(ImGuiCol_Text);
 	if (collapsedGroups.count(group)) {
-		headerDrawList->AddTriangleFilled(ImVec2(arrowX, arrowY), ImVec2(arrowX, arrowY + arrowSize), ImVec2(arrowX + arrowSize, arrowY + arrowSize * .5f), textColor);
+		headerDrawList->AddTriangleFilled(ImVec2(arrowX, arrowY), ImVec2(arrowX + arrowSize, arrowY + arrowSize * .5f), ImVec2(arrowX, arrowY + arrowSize), textColor);
 	} else {
 		headerDrawList->AddTriangleFilled(ImVec2(arrowX, arrowY), ImVec2(arrowX + arrowSize, arrowY), ImVec2(arrowX + arrowSize * .5f, arrowY + arrowSize), textColor);
 	}
-	headerDrawList->AddText(ImVec2(arrowX + arrowSize + inset, pos.y + (height - fontSize) * .6f), textColor, param.stringVal.c_str());
+	headerDrawList->AddText(ImVec2(titleX, pos.y + style.FramePadding.y), textColor, param.stringVal.c_str());
 	headerDrawList->PopClipRect();
-	const float titleTextWidth = std::max(0.f, pos.x + titleWidth - (arrowX + arrowSize + inset));
+	const float titleTextWidth = std::max(0.f, pos.x + titleWidth - titleX);
 	if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip) && ImGui::CalcTextSize(param.stringVal.c_str()).x > titleTextWidth) {
 		ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
 		ImGui::SetTooltip("%s", param.stringVal.c_str());
@@ -443,21 +519,18 @@ void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param)
 	ImGui::PopFont();
 	ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * parameterFontScale(rowHeight));
 	ImGui::SameLine();
-	ImGui::SetCursorScreenPos(ImVec2(pos.x + titleWidth + ImGui::GetStyle().ItemSpacing.x, ImGui::GetCursorScreenPos().y));
 	const bool canUseGroup = client.isReadyToSend() && !group.empty();
-	const float presetButtonWidth = std::min(std::max(24.f, fontSize * 1.5f), std::max(1.f, (controlsWidth - 40.f - ImGui::GetStyle().ItemSpacing.x * 2.f) * .5f));
-	const float presetButtonHeight = std::min(height, std::max(ImGui::GetFontSize() + 2.f, height * .75f));
+	const float presetHeight = sliderGrabHeight(ImGui::GetFrameHeight());
+	const float presetY = pos.y + (height - presetHeight) * .5f;
+	const float presetSignWidth = std::max(ImGui::CalcTextSize("+").x, ImGui::CalcTextSize("-").x) + 2.f * style.FramePadding.x;
+	const float presetButtonWidth = std::min(std::max({24.f, fontSize * 1.5f, presetSignWidth}), std::max(1.f, (controlsWidth - 40.f - ImGui::GetStyle().ItemSpacing.x * 2.f) * .5f));
 	const float buttonR = param.r / 255.f, buttonG = param.g / 255.f, buttonB = param.b / 255.f;
 	auto presetButton = [&](const char *label) {
-		const ImVec2 buttonPos = ImGui::GetCursorScreenPos();
-		ImGui::SetCursorScreenPos(ImVec2(buttonPos.x, pos.y + (height - presetButtonHeight) * .5f));
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(3.f, 1.f));
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(.08f + buttonR * .35f, .08f + buttonG * .35f, .08f + buttonB * .35f, 1.f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.16f + buttonR * .45f, .16f + buttonG * .45f, .16f + buttonB * .45f, 1.f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.22f + buttonR * .5f, .22f + buttonG * .5f, .22f + buttonB * .5f, 1.f));
-		const bool pressed = ImGui::Button(label, ImVec2(presetButtonWidth, presetButtonHeight));
+		const bool pressed = drawControlAtHeight(presetHeight, presetY, [&] { return ImGui::Button(label, ImVec2(presetButtonWidth, presetHeight)); });
 		ImGui::PopStyleColor(3);
-		ImGui::PopStyleVar();
 		return pressed;
 	};
 	if (!canUseGroup) ImGui::BeginDisabled();
@@ -466,7 +539,6 @@ void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param)
 		ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
 		ImGui::SetTooltip("Save a preset for %s", group.c_str());
 	}
-	pushPopupWindowPadding();
 	if (ImGui::BeginPopup("save-group-preset")) {
 		ImGui::Text("Save preset for %s", group.c_str());
 		ImGui::SetNextItemWidth(presetNameInputWidth());
@@ -479,7 +551,6 @@ void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param)
 		ImGui::SameLine(); if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
 		ImGui::EndPopup();
 	}
-	ImGui::PopStyleVar();
 	ImGui::SameLine();
 	auto &selected = groupPresetSelection[group];
 	if (selected.empty()) ImGui::BeginDisabled();
@@ -490,16 +561,14 @@ void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param)
 		ImGui::SetTooltip("Delete selected group preset");
 	}
 	ImGui::SameLine();
-	ImGui::SetCursorScreenPos(ImVec2(ImGui::GetCursorScreenPos().x, pos.y + (height - presetButtonHeight) * .5f));
 	ImGui::SetNextItemWidth(std::max(1.f, ImGui::GetContentRegionAvail().x - 1.5f * parameterFontScale(rowHeight)));
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetStyle().FramePadding.x + 2.f * parameterFontScale(rowHeight), std::max(0.f, (presetButtonHeight - ImGui::GetFontSize()) * .5f)));
 	const float r = param.r / 255.f, g = param.g / 255.f, b = param.b / 255.f;
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(.12f + r * .32f, .12f + g * .32f, .12f + b * .32f, 1.f));
 	ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(.16f + r * .38f, .16f + g * .38f, .16f + b * .38f, 1.f));
 	ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(.20f + r * .42f, .20f + g * .42f, .20f + b * .42f, 1.f));
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(.16f + r * .40f, .16f + g * .40f, .16f + b * .40f, 1.f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.20f + r * .48f, .20f + g * .48f, .20f + b * .48f, 1.f));
-	if (ImGui::BeginCombo("##group-preset", selected.empty() ? "No preset" : selected.c_str())) {
+	if (drawControlAtHeight(presetHeight, presetY, [&] { return ImGui::BeginCombo("##group-preset", selected.empty() ? "No preset" : selected.c_str()); })) {
 		const std::string prefix = group + "/";
 		for (const auto &preset : client.getPresetsList()) {
 			if (preset.compare(0, prefix.size(), prefix) != 0) continue;
@@ -509,9 +578,7 @@ void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param)
 		ImGui::EndCombo();
 	}
 	ImGui::PopStyleColor(5);
-	ImGui::PopStyleVar();
 	if (!canUseGroup) ImGui::EndDisabled();
-	ImGui::PopStyleVar();
 	ImGui::PopFont();
 	ImGui::PopID();
 }
@@ -519,8 +586,6 @@ void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param)
 void ofApp::drawParameter(const std::string &name) {
 	RemoteUIParam p = client.getParamForName(name);
 	ImGui::PushID(name.c_str());
-	const float defaultFontSize = ImGui::GetFontSize() / .8f;
-	const float targetRowHeight = rowHeight > 0.f ? rowHeight : defaultFontSize + 2.f;
 	ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * parameterFontScale(rowHeight));
 	bool edited = false;
 	const float contentWidth = std::max(1.f, ImGui::GetContentRegionAvail().x - 6.f);
@@ -530,7 +595,6 @@ void ofApp::drawParameter(const std::string &name) {
 	const float controlWidth = splitWidth * .6f;
 	const float controlStartX = ImGui::GetCursorScreenPos().x;
 	ImGui::SetNextItemWidth(controlWidth);
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4.f, std::max(1.f, (targetRowHeight - ImGui::GetFontSize()) * .5f)));
 	// RUI_NEW_COLOR() changes the background alpha of subsequent parameters.
 	if (p.a) {
 		const ImVec2 rowMin = ImGui::GetCursorScreenPos();
@@ -547,13 +611,30 @@ void ofApp::drawParameter(const std::string &name) {
 		ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(.22f + .48f * r, .22f + .48f * g, .22f + .48f * b, 1.f));
 		ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImVec4(.35f + .42f * r, .35f + .42f * g, .35f + .42f * b, 1.f));
 	}
-	auto drawFineSlider = [&](auto drawSlider) {
+	auto drawNumericSlider = [&](auto &value, auto min, auto max, auto drawSlider) {
 		ImGuiIO &io = ImGui::GetIO();
 		const float realMouseX = io.MousePos.x;
+		const auto previousValue = value;
 		const bool tracking = activeMouseSlider == name && ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsMousePosValid();
-		if (tracking) {
-			if (io.KeyAlt || fineSliderTracking) {
-				fineSliderTracking = true;
+		const ImVec2 sliderPos = ImGui::GetCursorScreenPos();
+		const float sliderWidth = ImGui::CalcItemWidth();
+		const bool startRelative = io.KeyShift && !io.KeyCtrl && ImGui::IsMouseClicked(ImGuiMouseButton_Left) &&
+			ImGui::IsWindowHovered() && ImGui::IsMouseHoveringRect(sliderPos, ImVec2(sliderPos.x + sliderWidth, sliderPos.y + ImGui::GetFrameHeight()));
+		if (startRelative) {
+			// Start the native slider drag at the grab center instead of the click position.
+			constexpr float grabInset = 2.f;
+			const float trackWidth = std::max(0.f, sliderWidth - 2.f * grabInset);
+			const double range = static_cast<double>(max) - min;
+			float grabWidth = ImGui::GetStyle().GrabMinSize;
+			if constexpr (std::is_integral_v<decltype(min)>) {
+				grabWidth = std::max(grabWidth, static_cast<float>(trackWidth / (range + 1.0)));
+			}
+			grabWidth = std::min(grabWidth, trackWidth);
+			const float fraction = static_cast<float>(std::clamp((static_cast<double>(value) - min) / range, 0.0, 1.0));
+			io.MousePos.x = sliderPos.x + grabInset + grabWidth * .5f + (trackWidth - grabWidth) * fraction;
+		} else if (tracking) {
+			if (io.KeyAlt || relativeSliderTracking) {
+				relativeSliderTracking = true;
 				virtualSliderMouseX = ofClamp(virtualSliderMouseX + io.MouseDelta.x * (io.KeyAlt ? .01f : 1.f), controlStartX, controlStartX + controlWidth);
 				io.MousePos.x = virtualSliderMouseX;
 			} else {
@@ -561,19 +642,25 @@ void ofApp::drawParameter(const std::string &name) {
 			}
 		}
 		const bool changed = drawSlider();
+		const float sliderMouseX = io.MousePos.x;
 		io.MousePos.x = realMouseX;
-		if (ImGui::IsItemActivated() && ImGui::IsMouseDown(ImGuiMouseButton_Left) && !io.KeyCtrl) {
+		const bool activated = ImGui::IsItemActivated() && ImGui::IsMouseDown(ImGuiMouseButton_Left) && !io.KeyCtrl;
+		if (activated) {
 			activeMouseSlider = name;
-			virtualSliderMouseX = realMouseX;
-			fineSliderTracking = false;
+			virtualSliderMouseX = sliderMouseX;
+			relativeSliderTracking = startRelative;
 		}
 		if (ImGui::IsItemDeactivated() && activeMouseSlider == name) {
 			activeMouseSlider.clear();
-			fineSliderTracking = false;
+			relativeSliderTracking = false;
 		}
-		if (p.type == REMOTEUI_PARAM_FLOAT && ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip)) {
+		if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip)) {
 			ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
-			ImGui::SetTooltip("Hold Option / Alt while dragging for fine adjustment");
+			ImGui::SetTooltip("Shift-drag anywhere on the slider to adjust without jumping.\nHold Option / Alt while dragging for fine adjustment.");
+		}
+		if ((activated && startRelative) || (tracking && relativeSliderTracking && io.MouseDelta.x == 0.f && ImGui::IsItemActive())) {
+			value = previousValue;
+			return false;
 		}
 		return changed;
 	};
@@ -583,43 +670,60 @@ void ofApp::drawParameter(const std::string &name) {
 			const float frameHeight = ImGui::GetFrameHeight();
 			const float horizontalPadding = ImGui::GetStyle().FramePadding.x;
 			const float buttonWidth = std::min(controlWidth, std::max(frameHeight * 2.f, ImGui::CalcTextSize("OFF").x + horizontalPadding * 2.f));
-			// Horizontal slider grabs are inset by two pixels on each edge in ImGui.
-			const float grabInset = 2.f;
-			const float buttonHeight = std::max(1.f, frameHeight - 2.f * grabInset);
+			const float buttonHeight = sliderGrabHeight(frameHeight);
 			ImGui::Dummy(ImVec2(0.f, frameHeight));
 			ImGui::SameLine(0.f, 0.f);
 			ImGui::SetCursorScreenPos(ImVec2(pos.x + (controlWidth - buttonWidth) * .5f, pos.y + (frameHeight - buttonHeight) * .5f));
-			const float fontScale = std::min(1.f, buttonHeight / ImGui::GetFontSize());
-			ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * fontScale);
-			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(horizontalPadding, 0.f));
 			const float r = p.a ? p.r / 255.f : .5f, g = p.a ? p.g / 255.f : .5f, b = p.a ? p.b / 255.f : .5f;
 			const float tint = p.boolVal ? .45f : .10f;
 			const float base = p.boolVal ? .16f : .18f;
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(base + tint * r, base + tint * g, base + tint * b, 1.f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(base + .08f + tint * r, base + .08f + tint * g, base + .08f + tint * b, 1.f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(base + .14f + tint * r, base + .14f + tint * g, base + .14f + tint * b, 1.f));
-			if (ImGui::Button(p.boolVal ? "ON###value" : "OFF###value", ImVec2(buttonWidth, buttonHeight))) { p.boolVal = !p.boolVal; edited = true; }
-			ImGui::PopStyleColor(3);
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, std::max(1.f, ImGui::GetStyle().FrameBorderSize));
+			ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(p.r / 655.f, p.g / 655.f, p.b / 655.f, .5f));
+			if (ImGui::Button("###value", ImVec2(buttonWidth, buttonHeight))) { p.boolVal = !p.boolVal; edited = true; }
+			ImGui::PopStyleColor(4);
 			ImGui::PopStyleVar();
-			ImGui::PopFont();
+			if (ImGui::IsItemVisible()) {
+				const char *label = p.boolVal ? "ON" : "OFF";
+				ImFont *font = ImGui::GetFont();
+				const float labelSize = std::min(ImGui::GetFontSize(), buttonHeight);
+				const float textWidth = font->CalcTextSizeA(labelSize, FLT_MAX, 0.f, label).x;
+				const ImVec2 min = ImGui::GetItemRectMin(), max = ImGui::GetItemRectMax();
+				const ImVec2 textPos(min.x + (buttonWidth - textWidth) * .5f, min.y + (buttonHeight - labelSize) * .5f);
+				ImDrawList *drawList = ImGui::GetWindowDrawList();
+				drawList->PushClipRect(min, max, true);
+				drawList->AddText(font, labelSize, textPos, ImGui::GetColorU32(ImGuiCol_Text), label);
+				drawList->PopClipRect();
+			}
 			break;
 		}
 		case REMOTEUI_PARAM_FLOAT: {
 			float value = p.floatVal;
-			if (p.minFloat < p.maxFloat) edited = drawFineSlider([&] { return ImGui::SliderFloat("##value", &value, p.minFloat, p.maxFloat, "%.4g"); });
+			if (p.minFloat < p.maxFloat) edited = drawNumericSlider(value, p.minFloat, p.maxFloat, [&] { return ImGui::SliderFloat("##value", &value, p.minFloat, p.maxFloat, "%.4g"); });
 			else edited = ImGui::DragFloat("##value", &value, 0.01f, 0, 0, "%.4g");
 			p.floatVal = value; break;
 		}
 		case REMOTEUI_PARAM_INT: {
 			int value = p.intVal;
-			if (p.minInt < p.maxInt) edited = drawFineSlider([&] { return ImGui::SliderInt("##value", &value, p.minInt, p.maxInt); });
+			if (p.minInt < p.maxInt) edited = drawNumericSlider(value, p.minInt, p.maxInt, [&] { return ImGui::SliderInt("##value", &value, p.minInt, p.maxInt); });
 			else edited = ImGui::InputInt("##value", &value);
 			p.intVal = value; break;
 		}
 		case REMOTEUI_PARAM_ENUM: {
 			int index = p.intVal - p.minInt;
 			const char *preview = index >= 0 && index < (int)p.enumList.size() ? p.enumList[index].c_str() : "(invalid)";
-			if (ImGui::BeginCombo("##value", preview)) {
+			const float frameHeight = ImGui::GetFrameHeight();
+			const float comboHeight = sliderGrabHeight(frameHeight);
+			const float comboInset = (frameHeight - comboHeight) * .5f;
+			const float comboY = ImGui::GetCursorScreenPos().y + comboInset;
+			const float leftInset = std::min(comboInset, std::max(0.f, controlWidth - 1.f));
+			ImGui::Dummy(ImVec2(0.f, frameHeight));
+			ImGui::SameLine(0.f, 0.f);
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + leftInset);
+			ImGui::SetNextItemWidth(controlWidth - leftInset);
+			if (drawControlAtHeight(comboHeight, comboY, [&] { return ImGui::BeginCombo("##value", preview); })) {
 				for (int i = 0; i < (int)p.enumList.size(); ++i) {
 					ImGui::PushID(i);
 					if (ImGui::Selectable(p.enumList[i].c_str(), i == index)) { p.intVal = p.minInt + i; edited = true; }
@@ -632,17 +736,30 @@ void ofApp::drawParameter(const std::string &name) {
 		case REMOTEUI_PARAM_STRING: {
 			char value[4096]{};
 			std::strncpy(value, p.stringVal.c_str(), sizeof(value) - 1);
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, std::max(1.f, ImGui::GetStyle().FrameBorderSize));
+			ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(p.r / 755.f, p.g / 755.f, p.b / 755.f, .5f));
 			if (ImGui::InputText("##value", value, sizeof(value), ImGuiInputTextFlags_EnterReturnsTrue)) { p.stringVal = value; edited = true; }
+			ImGui::PopStyleColor();
+			ImGui::PopStyleVar();
 			break;
 		}
 		case REMOTEUI_PARAM_COLOR: {
 			float color[4] = {p.redVal / 255.f, p.greenVal / 255.f, p.blueVal / 255.f, p.alphaVal / 255.f};
-			if (ImGui::ColorEdit4("##value", color, ImGuiColorEditFlags_AlphaBar)) {
+			const ImVec2 rowPos = ImGui::GetCursorScreenPos();
+			const float frameHeight = ImGui::GetFrameHeight();
+			const float colorHeight = sliderGrabHeight(frameHeight);
+			const float inset = (frameHeight - colorHeight) * .5f;
+			const float leftInset = std::min(inset, std::max(0.f, controlWidth - 1.f));
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + leftInset);
+			if (drawControlAtHeight(colorHeight, rowPos.y + inset, [&] { return drawColorEditor(color, controlWidth - leftInset); })) {
 				p.redVal = (unsigned char)(ofClamp(color[0], 0.f, 1.f) * 255.f + .5f);
 				p.greenVal = (unsigned char)(ofClamp(color[1], 0.f, 1.f) * 255.f + .5f);
 				p.blueVal = (unsigned char)(ofClamp(color[2], 0.f, 1.f) * 255.f + .5f);
 				p.alphaVal = (unsigned char)(ofClamp(color[3], 0.f, 1.f) * 255.f + .5f); edited = true;
 			}
+			// Lay out the color controls on their own line before reserving the full row.
+			ImGui::SetCursorScreenPos(rowPos);
+			ImGui::Dummy(ImVec2(controlWidth, frameHeight));
 			break;
 		}
 		default: ImGui::TextDisabled("%s", paramTypeName(p.type)); break;
@@ -655,7 +772,6 @@ void ofApp::drawParameter(const std::string &name) {
 		ImGui::SetCursorScreenPos(ImVec2(std::max(pos.x, controlStartX + controlWidth + controlLabelGap), pos.y));
 	}
 	ImGui::AlignTextToFramePadding();
-	ImGui::PopStyleVar();
 	const bool blinkBinding = blinkingBoundParams.count(name) != 0;
 	const bool temporaryHighlight = blinkBinding || diffParams.count(name);
 	const bool highlightLabel = temporaryHighlight || (highlightChangesSinceLoad && changedSinceLoad.count(name));
@@ -679,7 +795,7 @@ void ofApp::drawParameter(const std::string &name) {
 	ImGui::PushStyleVar(ImGuiStyleVar_SelectableRounding, 5.f);
 	const float glow = temporaryHighlight ? .32f * highlightPulse : 0.f;
 	ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(.12f + .35f * r + glow, .12f + .35f * g + glow * .30f, .12f + .35f * b, 1.f));
-	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(.16f + .42f * r + glow, .16f + .42f * g + glow * .30f, .16f + .42f * b, 1.f));
+	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(.16f + .62f * r + glow, .16f + .62f * g + glow * .30f, .16f + .62f * b, 1.f));
 	ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(.20f + .48f * r + glow, .20f + .48f * g + glow * .30f, .20f + .48f * b, 1.f));
 	ImGui::PushClipRect(ImVec2(labelPos.x - halfSpacing, windowPos.y), ImVec2(labelPos.x + clippedLabelWidth + halfSpacing, windowPos.y + windowSize.y), true);
 	const bool labelClicked = ImGui::Selectable("##parameter-label", controllers.learning == name || temporaryHighlight, 0, ImVec2(clippedLabelWidth, ImGui::GetTextLineHeight()));
@@ -749,7 +865,6 @@ void ofApp::drawParameter(const std::string &name) {
 			ImGui::EndTooltip();
 		}
 	}
-	pushPopupWindowPadding();
 	if (ImGui::BeginPopup("parameter-context")) {
 		const auto baseline = changeBaseline.find(name);
 		const bool changed = baseline != changeBaseline.end() && p.type == baseline->second.type && !sameParameterValue(p, baseline->second);
@@ -770,7 +885,6 @@ void ofApp::drawParameter(const std::string &name) {
 		}
 		ImGui::EndPopup();
 	}
-	ImGui::PopStyleVar();
 	if (edited) sendEditedParam(name, p);
 	ImGui::PopID();
 }

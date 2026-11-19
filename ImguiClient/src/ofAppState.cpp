@@ -211,8 +211,8 @@ void ofApp::loadCollapsedGroups() {
 void ofApp::savePreferences() const {
 	std::ofstream out(ClientPaths::settingsFile("remoteui-imgui-client.ini"));
 	if (!out) return;
-	// Keep the retired filter's slot for compatibility with existing settings.
-	out << host << '\n' << port << '\n' << autoDiscovery << '\n' << autoConnectToNewServers << '\n' << onlyAutoConnectToLocalHost << '\n' << continuousRefresh << '\n' << false << '\n' << alwaysOnTop << '\n' << autoScrollLog << '\n' << controllers.toggleButtons << '\n' << controllers.colorControlsAlpha << '\n' << highlightPresetDiff << '\n' << rowHeight << '\n' << windowColor[0] << ' ' << windowColor[1] << ' ' << windowColor[2] << '\n';
+	// Keep the retired discovery and filter slots for compatibility with existing settings.
+	out << host << '\n' << port << '\n' << true << '\n' << autoConnectToNewServers << '\n' << onlyAutoConnectToLocalHost << '\n' << continuousRefresh << '\n' << false << '\n' << alwaysOnTop << '\n' << autoScrollLog << '\n' << controllers.toggleButtons << '\n' << controllers.colorControlsAlpha << '\n' << highlightPresetDiff << '\n' << rowHeight << '\n' << windowColor[0] << ' ' << windowColor[1] << ' ' << windowColor[2] << '\n';
 	out << columnBaseWidth << '\n';
 	out << "highlightChangesSinceLoad=" << (highlightChangesSinceLoad ? 1 : 0) << '\n';
 	if (auto window = ofGetWindowPtr()) {
@@ -230,8 +230,9 @@ void ofApp::loadPreferences() {
 	std::ifstream in(ClientPaths::existingSettingsFile("remoteui-imgui-client.ini"));
 	if (!in) return;
 	std::getline(in, host);
+	bool retiredDiscovery = false;
 	bool retiredChangedFilter = false;
-	in >> port >> autoDiscovery >> autoConnectToNewServers >> onlyAutoConnectToLocalHost >> continuousRefresh >> retiredChangedFilter >> alwaysOnTop >> autoScrollLog;
+	in >> port >> retiredDiscovery >> autoConnectToNewServers >> onlyAutoConnectToLocalHost >> continuousRefresh >> retiredChangedFilter >> alwaysOnTop >> autoScrollLog;
 	in >> controllers.toggleButtons >> controllers.colorControlsAlpha >> highlightPresetDiff >> rowHeight >> windowColor[0] >> windowColor[1] >> windowColor[2];
 	float savedColumnWidth;
 	if (in >> savedColumnWidth) columnBaseWidth = ofClamp(savedColumnWidth, 220.f, 500.f);

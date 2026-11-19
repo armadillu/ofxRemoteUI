@@ -151,9 +151,7 @@ void ofApp::update() {
 			appendLog("Connection lost");
 		}
 	}
-	if (autoDiscovery) {
-		client.updateAutoDiscovery(dt);
-	}
+	client.updateAutoDiscovery(dt);
 	if (continuousRefresh && client.ready()) {
 		continuousRefreshTimer += dt;
 		if (continuousRefreshTimer >= 1.0f) {
@@ -213,15 +211,11 @@ void ofApp::drawMenuBar() {
 	ImGui::PushStyleColor(ImGuiCol_MenuBarBg, menuBarBg);
 	ImGui::PushStyleColor(ImGuiCol_PopupBg, menuPopupBg);
 	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(borderLuma, borderLuma, borderLuma, 1.f));
-	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2((menuBaseStyle.FramePadding.x + 5.f) * menuScale, (menuBaseStyle.FramePadding.y + 3.f) * menuScale));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2((menuBaseStyle.ItemSpacing.x + 4.f) * menuScale, menuBaseStyle.ItemSpacing.y * menuScale));
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.f);
 	if (ImGui::BeginMainMenuBar()) {
 		if (ImGui::BeginMenu("File")) {
 			if (ImGui::MenuItem("Quit", "Ctrl+Q")) ofExit();
 			ImGui::EndMenu();
 		}
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, std::max(2.f * menuScale, menuBaseStyle.WindowBorderSize * menuScale));
 		if (ImGui::BeginMenu("RemoteUI")) {
 			if (ImGui::MenuItem("Connect", "Ctrl+K")) connectTo(host, port);
 			ImGui::Separator();
@@ -254,10 +248,8 @@ void ofApp::drawMenuBar() {
 			if (ImGui::MenuItem("Metrics / Debugger")) showMetricsWindow = true;
 			ImGui::EndMenu();
 		}
-		ImGui::PopStyleVar();
 		ImGui::EndMainMenuBar();
 	}
-	ImGui::PopStyleVar(3);
 	ImGui::PopStyleColor(3);
 	ImGui::PopFont();
 	#endif
@@ -274,7 +266,7 @@ void ofApp::draw() {
 	if (interacting) lastActivity = std::chrono::steady_clock::now();
 	if (!ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
 		activeMouseSlider.clear();
-		fineSliderTracking = false;
+		relativeSliderTracking = false;
 	}
 	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DockingEnable) ImGui::DockSpaceOverViewport();
 	drawMenuBar();
@@ -308,7 +300,7 @@ void ofApp::draw() {
 	ImFont *font = ImGui::GetFont();
 	const ImVec2 textSize = font->CalcTextSizeA(fontSize, 100000.f, 0.f, statusText.c_str());
 	ImVec2 position(std::round(viewport->WorkPos.x + viewport->WorkSize.x - padding - textSize.x),
-		std::round(viewport->WorkPos.y + viewport->WorkSize.y - padding - textSize.y));
+		std::round(viewport->WorkPos.y + viewport->WorkSize.y - padding - textSize.y + 2.0f));
 	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, .3f);
 
 	if (client.isReadyToSend()) {

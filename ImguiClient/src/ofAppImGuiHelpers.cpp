@@ -6,10 +6,6 @@
 
 namespace ofAppImGuiHelpers {
 
-void pushPopupWindowPadding() {
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(12.f, 12.f));
-}
-
 float presetNameInputWidth() {
 	return 200.f;
 }
@@ -57,10 +53,7 @@ float parameterFontScale(float rowHeight) {
 }
 
 bool framedCheckbox(const char *label, bool *value) {
-	//ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.f);
-	const bool changed = ImGui::Checkbox(label, value);
-	//ImGui::PopStyleVar();
-	return changed;
+	return ImGui::Checkbox(label, value);
 }
 
 void prepareSecondaryWindow() {
