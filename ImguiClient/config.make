@@ -53,11 +53,15 @@ OF_ROOT = ../../OpenFrameworks
 #   Like source folders in the PROJECT_ROOT, these paths are subject to 
 #   exlclusion via the PROJECT_EXLCUSIONS list.
 #
-#     (default) PROJECT_EXTERNAL_SOURCE_PATHS = ../../ExternalAddons/ofxRemoteUI/ImguiClient/src ../../ExternalAddons/ofxRemoteUI/libs/imgui
+#     (default) PROJECT_EXTERNAL_SOURCE_PATHS = (blank)
 #
 #   Note: Leave a leading space when adding list items with the += operator
 ################################################################################
-PROJECT_EXTERNAL_SOURCE_PATHS = ../../ExternalAddons/ofxRemoteUI
+PROJECT_EXTERNAL_SOURCE_PATHS = ../../ExternalAddons/ofxRemoteUI/ImguiClient/src ../../ExternalAddons/ofxRemoteUI/libs/imgui
+
+# The openFrameworks Makefile needs one external root for its object rules.
+override ALL_OF_PROJECT_SOURCE_PATHS := $(shell find $(PROJECT_EXTERNAL_SOURCE_PATHS) -type d)
+override PROJECT_EXTERNAL_SOURCE_PATHS := ../../ExternalAddons/ofxRemoteUI
 
 ################################################################################
 # PROJECT EXCLUSIONS
@@ -81,7 +85,7 @@ PROJECT_EXTERNAL_SOURCE_PATHS = ../../ExternalAddons/ofxRemoteUI
 #
 #   Note: Leave a leading space when adding list items with the += operator
 ################################################################################
-PROJECT_EXCLUSIONS = ./src% ../../ExternalAddons/ofxRemoteUI/src% ../../ExternalAddons/ofxRemoteUI/example-% ../../ExternalAddons/ofxRemoteUI/_example% ../../ExternalAddons/ofxRemoteUI/noOFLibs%
+PROJECT_EXCLUSIONS = ./src%
 
 ################################################################################
 # PROJECT LINKER FLAGS
