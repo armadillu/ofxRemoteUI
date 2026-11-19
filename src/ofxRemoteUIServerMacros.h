@@ -24,8 +24,8 @@
 ( ofxRemoteUIServer::instance()->shareParamFromMacro( #val, val, ##__VA_ARGS__ ) )
 
 #define OFX_REMOTEUI_SERVER_SHARE_PARAM_WITH_DESC(val, desc, ...)		\
-( ofxRemoteUIServer::instance()->shareParamFromMacro( #val, val, ##__VA_ARGS__ ), \
-  ofxRemoteUIServer::instance()->setDescriptionForLastAddedParam(desc) )
+( ofxRemoteUIServer::instance()->shareParamFromMacro( #val, val, ##__VA_ARGS__ ) && \
+  ( ofxRemoteUIServer::instance()->setDescriptionForLastAddedParam(desc), true ) )
 
 // Share a variable or getter/setter pair under a custom name.
 #define OFX_REMOTEUI_SERVER_SHARE_PARAM_WCN(pName, ...)				\

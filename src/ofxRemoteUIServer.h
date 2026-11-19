@@ -109,24 +109,24 @@ public:
 	void saveToXML(const std::string &fileName, bool oldFormat = false); //save the whole list of params to an xml
 	void saveGroupToXML(std::string fileName, const std::string &groupName, bool oldFormat = false); //save only a subset of params into xml
 
-	void shareParam(const std::string &paramName, float* param, float min, float max, ofColor bgColor = ofColor(0,0,0,0) );
-	void shareParam(const std::string &paramName, bool* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
-	void shareParam(const std::string &paramName, int* param, int min, int max, ofColor bgColor = ofColor(0,0,0,0) );
-	void shareParam(std::string paramName, std::string* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
-	void shareParam(const std::string &paramName, int* param, int min, int max, const vector<std::string> &names, ofColor c = ofColor(0,0,0,0)); //enum!
-	void shareParam(const std::string &paramName, int* param, int min, int max, std::string* names, ofColor c = ofColor(0,0,0,0)); //enum with old school string array
-	void shareParam(const std::string &paramName, unsigned char* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 );	//ofColor
+	bool shareParam(const std::string &paramName, float* param, float min, float max, ofColor bgColor = ofColor(0,0,0,0) );
+	bool shareParam(const std::string &paramName, bool* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
+	bool shareParam(const std::string &paramName, int* param, int min, int max, ofColor bgColor = ofColor(0,0,0,0) );
+	bool shareParam(std::string paramName, std::string* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 ); //"nothing" args are just to match other methods
+	bool shareParam(const std::string &paramName, int* param, int min, int max, const vector<std::string> &names, ofColor c = ofColor(0,0,0,0)); //enum!
+	bool shareParam(const std::string &paramName, int* param, int min, int max, std::string* names, ofColor c = ofColor(0,0,0,0)); //enum with old school string array
+	bool shareParam(const std::string &paramName, unsigned char* param, ofColor bgColor = ofColor(0,0,0,0), int nothing = 0 );	//ofColor
 
 	// Bind a float or int getter and setter. The getter's return type determines the parameter type.
 	// Callbacks run synchronously on the reading or updating thread. Keep their captures valid
 	// while the parameter is shared, and avoid throwing or reentering the server.
 	template<typename Getter, typename Setter>
-	void shareParam(const std::string &name, Getter getter, Setter setter,
+	bool shareParam(const std::string &name, Getter getter, Setter setter,
 					decltype(getter()) min, decltype(getter()) max, ofColor bgColor = ofColor(0,0,0,0)){
 		using Value = decltype(getter());
-		shareBoundParam(name, std::function<Value()>(getter), std::function<void(Value)>(setter), min, max, bgColor);
+		return shareBoundParam(name, std::function<Value()>(getter), std::function<void(Value)>(setter), min, max, bgColor);
 	}
-	void shareParam(const std::string &paramName, std::function<bool()> getter, std::function<void(bool)> setter,
+	bool shareParam(const std::string &paramName, std::function<bool()> getter, std::function<void(bool)> setter,
 					ofColor bgColor = ofColor(0,0,0,0));
 
 	// Replace an existing float, int or bool binding. The new getter supplies the live value.
@@ -142,19 +142,19 @@ public:
 	template<typename Value, typename... Args, typename std::enable_if<!std::is_function<Value>::value, int>::type = 0>
 	auto shareParamFromMacro(const std::string &name, Value &value, Args&&... args)
 		-> decltype(shareParam(name, &value, std::forward<Args>(args)...)){
-		shareParam(name, &value, std::forward<Args>(args)...);
+		return shareParam(name, &value, std::forward<Args>(args)...);
 	}
 
 	template<typename Getter, typename Setter, typename... Args>
 	auto shareParamFromMacro(const std::string &name, Getter &&getter, Setter &&setter, Args&&... args)
 		-> decltype(getter(), shareParam(name, std::forward<Getter>(getter), std::forward<Setter>(setter), std::forward<Args>(args)...)){
-		shareParam(name, std::forward<Getter>(getter), std::forward<Setter>(setter), std::forward<Args>(args)...);
+		return shareParam(name, std::forward<Getter>(getter), std::forward<Setter>(setter), std::forward<Args>(args)...);
 	}
 
 	template<typename Getter, typename Setter, typename... Args>
 	auto shareParamFromMacro(const std::string &, const std::string &name, Getter &&getter, Setter &&setter, Args&&... args)
 		-> decltype(getter(), shareParam(name, std::forward<Getter>(getter), std::forward<Setter>(setter), std::forward<Args>(args)...)){
-		shareParam(name, std::forward<Getter>(getter), std::forward<Setter>(setter), std::forward<Args>(args)...);
+		return shareParam(name, std::forward<Getter>(getter), std::forward<Setter>(setter), std::forward<Args>(args)...);
 	}
 
 	void addSpacer(const std::string &name);
@@ -339,11 +339,11 @@ protected:
 	#endif
 	void			saveSettingsBackup();
 
-	void shareBoundParam(const std::string &name, std::function<float()> getter, std::function<void(float)> setter,
+	bool shareBoundParam(const std::string &name, std::function<float()> getter, std::function<void(float)> setter,
 						 float min, float max, ofColor color);
-	void shareBoundParam(const std::string &name, std::function<int()> getter, std::function<void(int)> setter,
+	bool shareBoundParam(const std::string &name, std::function<int()> getter, std::function<void(int)> setter,
 						 int min, int max, ofColor color);
-	void registerBoundParam(const std::string &name, RemoteUIParam &p, ofColor color);
+	bool registerBoundParam(const std::string &name, RemoteUIParam &p, ofColor color);
 	bool setParamBindingImpl(const std::string &name, const std::function<float()> &getter, const std::function<void(float)> &setter);
 	bool setParamBindingImpl(const std::string &name, const std::function<int()> &getter, const std::function<void(int)> &setter);
 	bool setParamBindingImpl(const std::string &name, const std::function<bool()> &getter, const std::function<void(bool)> &setter);
@@ -352,7 +352,7 @@ protected:
 							 Value* RemoteUIParam::*address, const std::function<Value()> &getter,
 							 const std::function<void(Value)> &setter);
 
-	void 			addParamToDB(const RemoteUIParam & p, std::string thisParamName);
+	bool			addParamToDB(RemoteUIParam p, const std::string &thisParamName);
 	void 			recreateOrderedKeysWithoutParam(const string & removedParam);
 
 	std::string 			getFinalPath(const std::string &);

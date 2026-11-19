@@ -108,6 +108,8 @@ the most basic setup only requires a few calls.
 Then, use any of the client options to view and edit your shared parameters.
 Look into the server example to see more features. It is fairly documented.
 
+Parameter names are unique across the server, including across groups. `shareParam()` and the `RUI_SHARE_PARAM` macros return `true` when registration succeeds. A duplicate logs an error, returns `false`, and leaves the existing parameter in place. Use `RUI_SET_PARAM_BINDING` to change an existing parameter's binding.
+
 
 ### Share a parameter with a getter and setter
 

@@ -2401,7 +2401,8 @@ void ofxRemoteUIServer::removeAllParamWatches(){
 	onScreenNotifications.removeAllParamWatches();
 }
 
-void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamName){
+bool ofxRemoteUIServer::addParamToDB(RemoteUIParam p, const string &thisParamName){
+	std::lock_guard<std::recursive_mutex> lock(dataMutex);
 
 	if(p.type != REMOTEUI_PARAM_SPACER && params.size() == 0){ //adding first param! and its not spacer!
 		upcomingGroup = OFXREMOTEUI_DEFAULT_PARAM_GROUP;
@@ -2409,93 +2410,102 @@ void ofxRemoteUIServer::addParamToDB(const RemoteUIParam & p, string thisParamNa
 		addSpacer(OFXREMOTEUI_DEFAULT_PARAM_GROUP);
 	}
 
-	if(loadedFromXML){ //lets see if we had loaded this param from xml - will upate its values if so
-		auto it = params_removed.find(thisParamName);
-		bool added = ofxRemoteUI::addParamToDB(p, thisParamName);
-		if(added){
-			dataMutex.lock();
-			if(it != params_removed.end()){
-				RemoteUIParam & pRem = params_removed[thisParamName];
-				RemoteUIParam & xmlP = paramsFromXML[thisParamName];
-				RemoteUIParam & srcP = params[thisParamName];
-				if(pRem.type == srcP.type){
-					switch (pRem.type) {
-						case REMOTEUI_PARAM_FLOAT:
-							if (srcP.writeValueBinding){
-								srcP.floatVal = loadFromXmlClampsToValidRange
-									? ofClamp(pRem.floatVal, srcP.minFloat, srcP.maxFloat)
-									: pRem.floatVal;
-							}
-							if (srcP.floatValAddr){
-								*(srcP.floatValAddr) = srcP.floatVal = pRem.floatVal;
-								xmlP.floatValAddr = pRem.floatValAddr = srcP.floatValAddr;
-							}
-							xmlP.minFloat = srcP.minFloat; //the xml doesnt store ranges, but the param we are adding does! so we copy the other way in this case
-							xmlP.maxFloat = srcP.maxFloat;
-							break;
-						case REMOTEUI_PARAM_ENUM:
-						case REMOTEUI_PARAM_INT:
-							if (srcP.writeValueBinding){
-								srcP.intVal = loadFromXmlClampsToValidRange
-									? ofClamp(pRem.intVal, srcP.minInt, srcP.maxInt)
-									: pRem.intVal;
-							}
-							if (srcP.intValAddr){
-								*(srcP.intValAddr) = srcP.intVal = pRem.intVal;
-								xmlP.intValAddr = pRem.intValAddr = srcP.intValAddr;
-							}
-							xmlP.maxInt = srcP.maxInt;
-							xmlP.minInt = srcP.minInt;
-							xmlP.enumList = srcP.enumList;
-							break;
-
-						case REMOTEUI_PARAM_COLOR:
-							if (srcP.redValAddr){
-								*srcP.redValAddr = srcP.redVal = pRem.redVal;
-								*(srcP.redValAddr+1) = srcP.greenVal = pRem.greenVal;
-								*(srcP.redValAddr+2) = srcP.blueVal = pRem.blueVal;
-								*(srcP.redValAddr+3) = srcP.alphaVal = pRem.alphaVal;
-								pRem.redValAddr = srcP.redValAddr;
-							}break;
-
-						case REMOTEUI_PARAM_BOOL:
-							if (srcP.writeValueBinding) srcP.boolVal = pRem.boolVal;
-							if (srcP.boolValAddr){
-								pRem.boolValAddr = srcP.boolValAddr;
-								*srcP.boolValAddr = srcP.boolVal = pRem.boolVal;
-							}break;
-
-						case REMOTEUI_PARAM_SPACER:
-						case REMOTEUI_PARAM_STRING:
-							if (srcP.stringValAddr){
-								*srcP.stringValAddr = srcP.stringVal = pRem.stringVal;
-								pRem.stringValAddr = srcP.stringValAddr;
-							}break;
-						default: break;
-					}
-					if(srcP.writeValueBinding){
-						srcP.applyValueBinding();
-						xmlP.floatVal = srcP.floatVal;
-						xmlP.intVal = srcP.intVal;
-						xmlP.boolVal = srcP.boolVal;
-					}
-					xmlP.r = srcP.r;
-					xmlP.g = srcP.g;
-					xmlP.b = srcP.b;
-					xmlP.a = srcP.a;
-					pRem.group = xmlP.group = srcP.group;
-					if (verbose_) RLOG_NOTICE << "Updating value of param \"" << thisParamName << "\" according to the previously loaded XML!";
-				}
-			}
-			dataMutex.unlock();
-		}
-	}else{
-		ofxRemoteUI::addParamToDB(p, thisParamName);
+	if(params.find(thisParamName) != params.end()){
+		lastAddedParam.clear();
+		RLOG_ERROR << "Cannot share parameter '" << thisParamName << "': that name is already registered. Keeping the existing parameter.";
+		return false;
 	}
+	if(p.readValueBinding) p.readValueBinding(p);
+	if(!ofxRemoteUI::addParamToDB(p, thisParamName)){
+		lastAddedParam.clear();
+		return false;
+	}
+	if(p.floatValAddr) *p.floatValAddr = p.floatVal;
+	if(p.intValAddr) *p.intValAddr = p.intVal;
+
+	if(loadedFromXML){
+		auto it = params_removed.find(thisParamName);
+		if(it != params_removed.end()){
+			RemoteUIParam & pRem = params_removed[thisParamName];
+			RemoteUIParam & xmlP = paramsFromXML[thisParamName];
+			RemoteUIParam & srcP = params[thisParamName];
+			if(pRem.type == srcP.type){
+				switch (pRem.type) {
+					case REMOTEUI_PARAM_FLOAT:
+						if (srcP.writeValueBinding){
+							srcP.floatVal = loadFromXmlClampsToValidRange
+								? ofClamp(pRem.floatVal, srcP.minFloat, srcP.maxFloat)
+								: pRem.floatVal;
+						}
+						if (srcP.floatValAddr){
+							*(srcP.floatValAddr) = srcP.floatVal = pRem.floatVal;
+							xmlP.floatValAddr = pRem.floatValAddr = srcP.floatValAddr;
+						}
+						xmlP.minFloat = srcP.minFloat; //the xml doesnt store ranges, but the param we are adding does! so we copy the other way in this case
+						xmlP.maxFloat = srcP.maxFloat;
+						break;
+					case REMOTEUI_PARAM_ENUM:
+					case REMOTEUI_PARAM_INT:
+						if (srcP.writeValueBinding){
+							srcP.intVal = loadFromXmlClampsToValidRange
+								? ofClamp(pRem.intVal, srcP.minInt, srcP.maxInt)
+								: pRem.intVal;
+						}
+						if (srcP.intValAddr){
+							*(srcP.intValAddr) = srcP.intVal = pRem.intVal;
+							xmlP.intValAddr = pRem.intValAddr = srcP.intValAddr;
+						}
+						xmlP.maxInt = srcP.maxInt;
+						xmlP.minInt = srcP.minInt;
+						xmlP.enumList = srcP.enumList;
+						break;
+
+					case REMOTEUI_PARAM_COLOR:
+						if (srcP.redValAddr){
+							*srcP.redValAddr = srcP.redVal = pRem.redVal;
+							*(srcP.redValAddr+1) = srcP.greenVal = pRem.greenVal;
+							*(srcP.redValAddr+2) = srcP.blueVal = pRem.blueVal;
+							*(srcP.redValAddr+3) = srcP.alphaVal = pRem.alphaVal;
+							pRem.redValAddr = srcP.redValAddr;
+						}break;
+
+					case REMOTEUI_PARAM_BOOL:
+						if (srcP.writeValueBinding) srcP.boolVal = pRem.boolVal;
+						if (srcP.boolValAddr){
+							pRem.boolValAddr = srcP.boolValAddr;
+							*srcP.boolValAddr = srcP.boolVal = pRem.boolVal;
+						}break;
+
+					case REMOTEUI_PARAM_SPACER:
+					case REMOTEUI_PARAM_STRING:
+						if (srcP.stringValAddr){
+							*srcP.stringValAddr = srcP.stringVal = pRem.stringVal;
+							pRem.stringValAddr = srcP.stringValAddr;
+						}break;
+					default: break;
+				}
+				if(srcP.writeValueBinding){
+					srcP.applyValueBinding();
+					xmlP.floatVal = srcP.floatVal;
+					xmlP.intVal = srcP.intVal;
+					xmlP.boolVal = srcP.boolVal;
+				}
+				xmlP.r = srcP.r;
+				xmlP.g = srcP.g;
+				xmlP.b = srcP.b;
+				xmlP.a = srcP.a;
+				pRem.group = xmlP.group = srcP.group;
+				if (verbose_) RLOG_NOTICE << "Updating value of param \"" << thisParamName << "\" according to the previously loaded XML!";
+			}
+		}
+	}
+	lastAddedParam = thisParamName;
+	return true;
 }
 
 
 void ofxRemoteUIServer::setDescriptionForLastAddedParam(const string & description){
+	std::lock_guard<std::recursive_mutex> lock(dataMutex);
 	bool ok = false;
 	if(lastAddedParam.size()){
 		auto it = params.find(lastAddedParam);
@@ -2519,9 +2529,8 @@ void ofxRemoteUIServer::addSpacer(const string &title){
 	p.b = paramColor.b;
 	p.group = upcomingGroup; //to ignore those in the client app later when grouping
 	p.a = 255; //spacer has full alpha
-	addParamToDB(p, title);
+	if(!addParamToDB(p, title)) return;
 	if(verbose_) RLOG_NOTICE << "Adding Group '" << title << "' ######################################" ;
-	lastAddedParam = title;
 }
 
 
@@ -2541,44 +2550,42 @@ void bindParamValue(RemoteUIParam &p, T RemoteUIParam::*value,
 		}
 		param.*value = current;
 	};
-	p.readValueBinding(p);
 }
 
 } // namespace
 
-void ofxRemoteUIServer::registerBoundParam(const string &name, RemoteUIParam &p, ofColor color){
+bool ofxRemoteUIServer::registerBoundParam(const string &name, RemoteUIParam &p, ofColor color){
 	p.group = upcomingGroup;
 	setColorForParam(p, color);
-	addParamToDB(p, name);
-	lastAddedParam = name;
+	return addParamToDB(std::move(p), name);
 }
 
-void ofxRemoteUIServer::shareBoundParam(const string &name, std::function<float()> getter,
+bool ofxRemoteUIServer::shareBoundParam(const string &name, std::function<float()> getter,
 								  std::function<void(float)> setter, float min, float max, ofColor color){
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_FLOAT;
 	p.minFloat = min;
 	p.maxFloat = max;
 	bindParamValue(p, &RemoteUIParam::floatVal, getter, setter);
-	registerBoundParam(name, p, color);
+	return registerBoundParam(name, p, color);
 }
 
-void ofxRemoteUIServer::shareBoundParam(const string &name, std::function<int()> getter,
+bool ofxRemoteUIServer::shareBoundParam(const string &name, std::function<int()> getter,
 								  std::function<void(int)> setter, int min, int max, ofColor color){
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_INT;
 	p.minInt = min;
 	p.maxInt = max;
 	bindParamValue(p, &RemoteUIParam::intVal, getter, setter);
-	registerBoundParam(name, p, color);
+	return registerBoundParam(name, p, color);
 }
 
-void ofxRemoteUIServer::shareParam(const string &name, std::function<bool()> getter,
+bool ofxRemoteUIServer::shareParam(const string &name, std::function<bool()> getter,
 								  std::function<void(bool)> setter, ofColor color){
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_BOOL;
 	bindParamValue(p, &RemoteUIParam::boolVal, getter, setter);
-	registerBoundParam(name, p, color);
+	return registerBoundParam(name, p, color);
 }
 
 template<typename Value>
@@ -2599,6 +2606,7 @@ bool ofxRemoteUIServer::replaceParamBinding(const string &name, RemoteUIParamTyp
 	RemoteUIParam replacement = current->second;
 	replacement.*address = nullptr;
 	bindParamValue(replacement, value, getter, setter);
+	replacement.readValueBinding(replacement);
 
 	// Reset to defaults reinstalls the original record. Update its binding but keep its value.
 	RemoteUIParam defaults = original->second;
@@ -2637,36 +2645,35 @@ bool ofxRemoteUIServer::setParamBindingImpl(const string &name, const std::funct
 	return replaceParamBinding(name, REMOTEUI_PARAM_BOOL, &RemoteUIParam::boolVal, &RemoteUIParam::boolValAddr, getter, setter);
 }
 
-void ofxRemoteUIServer::shareParam(const string &paramName, float* param, float min, float max, ofColor c){
+bool ofxRemoteUIServer::shareParam(const string &paramName, float* param, float min, float max, ofColor c){
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_FLOAT;
 	p.floatValAddr = param;
 	p.maxFloat = max;
 	p.minFloat = min;
-	if (isnan(*param)) *param = 0.0f;
-	p.floatVal = *param = ofClamp(*param, min, max);
+	p.floatVal = ofClamp(isnan(*param) ? 0.0f : *param, min, max);
 	p.group = upcomingGroup;
 	setColorForParam(p, c);
-	addParamToDB(p, paramName);
+	if(!addParamToDB(std::move(p), paramName)) return false;
 	if(verbose_) RLOG_NOTICE << "Sharing Float Param '" << paramName << "'" ;
-	lastAddedParam = paramName;
+	return true;
 }
 
 
-void ofxRemoteUIServer::shareParam(const string &paramName, bool* param, ofColor c, int nothingUseful ){
+bool ofxRemoteUIServer::shareParam(const string &paramName, bool* param, ofColor c, int nothingUseful ){
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_BOOL;
 	p.boolValAddr = param;
 	p.boolVal = *param;
 	p.group = upcomingGroup;
 	setColorForParam(p, c);
-	addParamToDB(p, paramName);
+	if(!addParamToDB(std::move(p), paramName)) return false;
 	if(verbose_) RLOG_NOTICE << "Sharing Bool Param '" << paramName << "'" ;
-	lastAddedParam = paramName;
+	return true;
 }
 
 
-void ofxRemoteUIServer::shareParam(const string &paramName, int* param, int min, int max, ofColor c ){
+bool ofxRemoteUIServer::shareParam(const string &paramName, int* param, int min, int max, ofColor c ){
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_INT;
 	p.intValAddr = param;
@@ -2674,13 +2681,13 @@ void ofxRemoteUIServer::shareParam(const string &paramName, int* param, int min,
 	p.minInt = min;
 	p.group = upcomingGroup;
 	setColorForParam(p, c);
-	p.intVal = *param = ofClamp(*param, min, max);
-	addParamToDB(p, paramName);
+	p.intVal = ofClamp(*param, min, max);
+	if(!addParamToDB(std::move(p), paramName)) return false;
 	if(verbose_) RLOG_NOTICE << "Sharing Int Param '" << paramName << "'" ;
-	lastAddedParam = paramName;
+	return true;
 }
 
-void ofxRemoteUIServer::shareParam(const string &paramName, int* param, int min, int max, const vector<string> &names, ofColor c ){
+bool ofxRemoteUIServer::shareParam(const string &paramName, int* param, int min, int max, const vector<string> &names, ofColor c ){
 	if (names.size() != max - min + 1){
 		RLOG_ERROR << "Error sharing enum param '" << paramName << "': Number of supplied strings doesnt match enum range!";
 	}
@@ -2692,13 +2699,13 @@ void ofxRemoteUIServer::shareParam(const string &paramName, int* param, int min,
 	p.enumList = names;
 	p.group = upcomingGroup;
 	setColorForParam(p, c);
-	p.intVal = *param = ofClamp(*param, min, max);
-	addParamToDB(p, paramName);
+	p.intVal = ofClamp(*param, min, max);
+	if(!addParamToDB(std::move(p), paramName)) return false;
 	if(verbose_) RLOG_NOTICE << "Sharing Enum Param '" << paramName << "'" ;
-	lastAddedParam = paramName;
+	return true;
 }
 
-void ofxRemoteUIServer::shareParam(const string &paramName, int* param, int min, int max, string* names, ofColor c ){
+bool ofxRemoteUIServer::shareParam(const string &paramName, int* param, int min, int max, string* names, ofColor c ){
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_ENUM;
 	p.intValAddr = param;
@@ -2711,27 +2718,27 @@ void ofxRemoteUIServer::shareParam(const string &paramName, int* param, int min,
 	p.enumList = list;
 	p.group = upcomingGroup;
 	setColorForParam(p, c);
-	p.intVal = *param = ofClamp(*param, min, max);
-	addParamToDB(p, paramName);
+	p.intVal = ofClamp(*param, min, max);
+	if(!addParamToDB(std::move(p), paramName)) return false;
 	if(verbose_) RLOG_NOTICE << "Sharing Enum Param '" << paramName << "'" ;
-	lastAddedParam = paramName;
+	return true;
 }
 
 
 
-void ofxRemoteUIServer::shareParam(string paramName, string* param, ofColor c, int nothingUseful ){
+bool ofxRemoteUIServer::shareParam(string paramName, string* param, ofColor c, int nothingUseful ){
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_STRING;
 	p.stringValAddr = param;
 	p.stringVal = *param;
 	p.group = upcomingGroup;
 	setColorForParam(p, c);
-	addParamToDB(p, paramName);
+	if(!addParamToDB(std::move(p), paramName)) return false;
 	if(verbose_) RLOG_NOTICE << "Sharing String Param '" << paramName << "'";
-	lastAddedParam = paramName;
+	return true;
 }
 
-void ofxRemoteUIServer::shareParam(const string &paramName, unsigned char* param, ofColor bgColor, int nothingUseful){
+bool ofxRemoteUIServer::shareParam(const string &paramName, unsigned char* param, ofColor bgColor, int nothingUseful){
 	RemoteUIParam p;
 	p.type = REMOTEUI_PARAM_COLOR;
 	p.redValAddr = param;
@@ -2741,9 +2748,9 @@ void ofxRemoteUIServer::shareParam(const string &paramName, unsigned char* param
 	p.alphaVal = param[3];
 	p.group = upcomingGroup;
 	setColorForParam(p, bgColor);
-	addParamToDB(p, paramName);
+	if(!addParamToDB(std::move(p), paramName)) return false;
 	if(verbose_) RLOG_NOTICE << "Sharing Color Param '" << paramName << "'";
-	lastAddedParam = paramName;
+	return true;
 }
 
 
