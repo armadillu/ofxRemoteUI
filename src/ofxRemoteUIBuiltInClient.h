@@ -69,6 +69,8 @@ private:
 	void drawString(const std::string &text, const ofVec2f &pos);
 
 	ofVboMesh uiLines;
+	int layoutScreenWidth = -1;
+	int layoutScreenHeight = -1;
 	float uiColumnWidth = 320;
 	float uiAlpha = 1.0f;
 	float uiScale = 1.0f;

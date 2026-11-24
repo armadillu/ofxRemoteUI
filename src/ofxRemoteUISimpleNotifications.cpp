@@ -66,7 +66,6 @@ void ofxRemoteUISimpleNotifications::update(float dt){
 
 void ofxRemoteUISimpleNotifications::draw(float x, float y){
 
-	float spacing = RUI_NOTIFICATION_LINEHEIGHT;
 	float yy = y;
 
 	for(size_t i = 0; i < notifications.size(); i++){
@@ -85,9 +84,7 @@ void ofxRemoteUISimpleNotifications::draw(float x, float y){
 		string repeatCount;
 		if (logLines[i].repeatCount > 1) repeatCount = " (x" + ofToString(logLines[i].repeatCount) + ")";
 		float highlight = ofClamp(logLines[i].highlight, 0, 1); //will decrease from 1 to 0 over time
-		float blink = powf(highlight, 0.5) * fabs(sin(3 * M_PI * highlight));
-		//float fontBump = RUI_NOTIFICATION_FONTSIZE + 4 * highlight;
-		//float lineHeightBump = RUI_NOTIFICATION_LINEHEIGHT + 4 * highlight;
+		float blink = highlight > 0.0f ? highlight * (2.0f - highlight) * fabs(sin(3 * M_PI * highlight)) : 0.0f;
 		ofColor fontColor = RUI_LOG_COLOR; fontColor.a = 255;
 		ofColor rainbow;
 		if(blink > 0.01){
@@ -168,8 +165,9 @@ void ofxRemoteUISimpleNotifications::draw(float x, float y){
 	auto it2 = paramWatchOrder.begin();
 	while(it2 != paramWatchOrder.end()){
 		string & name = it2->second;
-		float hh = drawStringWithBox( "[" + name + "] " + paramWatch[name].value,
-									 x, yy, paramWatch[name].bgColor, paramWatch[name].color );
+		const auto & watch = paramWatch[name];
+		float hh = drawStringWithBox( "[" + name + "] " + watch.value,
+									 x, yy, watch.bgColor, watch.color );
 		yy -= hh;
 		++it2;
 	}
@@ -177,8 +175,9 @@ void ofxRemoteUISimpleNotifications::draw(float x, float y){
 	auto it3 = variableWatchOrder.rbegin();
 	while(it3 != variableWatchOrder.rend()){
 		string & name = it3->second;
-		float hh = drawStringWithBox( "*(" + name + ") = " + variableWatch[name].value,
-									 x, yy, variableWatch[name].bgColor, variableWatch[name].color, 11, 12 );
+		const auto & watch = variableWatch[name];
+		float hh = drawStringWithBox( "*(" + name + ") = " + watch.value,
+									 x, yy, watch.bgColor, watch.color, 11, 12 );
 		yy -= hh;
 		++it3;
 	}

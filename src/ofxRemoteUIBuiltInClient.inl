@@ -35,6 +35,7 @@ void ofxRemoteUIBuiltInClient::drawUiWithFontStash(const std::string &fontPath, 
 		ofRectangle r = font.getBBox("M", fontSize, 0, 0);
 		lineH = ceil(r.height * 1.75);
 		charW = r.width;
+		clearLayout();
 	}else{
 		ofLogError("ofxRemoteUIServer") << "Can't use ofxFontStash with the Programmable Renderer!";
 	}
@@ -53,6 +54,7 @@ void ofxRemoteUIBuiltInClient::drawUiWithFontStash2(const std::string &fontPath,
 	ofRectangle r = font2.getTextBounds("Mp", style, 0, 0);
 	charW = r.width;
 	lineH = ceil(r.height * 1.25);
+	clearLayout();
 }
 #endif
 
@@ -61,6 +63,7 @@ void ofxRemoteUIBuiltInClient::drawUiWithBitmapFont(ofxRemoteUISimpleNotificatio
 	onScreenNotifications.drawUiWithBitmapFont();
 	charW = 8;
 	lineH = ruiLineH;
+	clearLayout();
 }
 
 
@@ -96,6 +99,8 @@ void ofxRemoteUIBuiltInClient::setCustomDrawPos(int x, int y){
 
 void ofxRemoteUIBuiltInClient::draw(const View &view, ofxRemoteUISimpleNotifications &notifications, int x, int y){
 	const bool showNotifications = !view.showUI || uiAlpha < 1.0f;
+	if(!view.showUI && (!view.drawNotifications ||
+		(notifications.empty() && view.paramsToWatch.empty() && view.varWatches.empty()))) return;
 
 	ofSetupScreen();
 	ofPushStyle();
@@ -112,13 +117,20 @@ void ofxRemoteUIBuiltInClient::draw(const View &view, ofxRemoteUISimpleNotificat
 		const int screenH = customScreenHeight < 0 ? ofGetHeight() : customScreenHeight;
 		drawOverlay(view, screenW, screenH);
 	}
-	if(showNotifications && view.drawNotifications) drawNotifications(view, notifications, x, y);
+	if(showNotifications && view.drawNotifications){
+		drawNotifications(view, notifications, x, y);
+	}
 
 	ofPopMatrix();
 	ofPopStyle();
 }
 
 void ofxRemoteUIBuiltInClient::drawOverlay(const View &view, int screenW, int screenH){
+	if(screenW != layoutScreenWidth || screenH != layoutScreenHeight){
+		clearLayout();
+		layoutScreenWidth = screenW;
+		layoutScreenHeight = screenH;
+	}
 	const std::vector<std::string> noPresets;
 	auto presetsForGroup = [&](const std::string &group) -> const std::vector<std::string> & {
 		auto found = view.groupPresets.find(group);
@@ -391,7 +403,7 @@ void ofxRemoteUIBuiltInClient::drawNotifications(const View &view, ofxRemoteUISi
 }
 
 void ofxRemoteUIBuiltInClient::setColumnWidth(int w){
-	if(fabs(uiColumnWidth - w) < 0.1) uiLines.clear();
+	if(fabs(uiColumnWidth - w) >= 0.1) clearLayout();
 	uiColumnWidth = w;
 }
 
@@ -408,18 +420,18 @@ void ofxRemoteUIBuiltInClient::setScale(float s, ofxRemoteUISimpleNotifications 
 			drawUiWithFontStash2(fontStashFile2, fontSize2, onScreenNotifications);
 		}
 		#endif
-		if (fabs(uiScale - s) < 0.01) uiLines.clear();
+		clearLayout();
 	}
 }
 
 
 void ofxRemoteUIBuiltInClient::setScreenHeight(int h){
-	if(fabs(customScreenHeight - h) < 0.1) uiLines.clear();
+	if(customScreenHeight != h) clearLayout();
 	customScreenHeight = h;
 }
 
 
 void ofxRemoteUIBuiltInClient::setScreenWidth(int w){
-	if(fabs(customScreenWidth - w) < 0.1) uiLines.clear();
+	if(customScreenWidth != w) clearLayout();
 	customScreenWidth = w;
 }

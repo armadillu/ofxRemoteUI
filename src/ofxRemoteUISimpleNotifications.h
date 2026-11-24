@@ -81,6 +81,10 @@ public:
 
 	void update(float dt);
 	void draw(float x, float y);
+	bool empty() const {
+		return notifications.empty() && logLines.empty() && paramNotifications.empty()
+			&& paramWatchOrder.empty() && variableWatchOrder.empty();
+	}
 
 	void addNotification(const string & msg);
 

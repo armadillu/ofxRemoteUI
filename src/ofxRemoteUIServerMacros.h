@@ -163,6 +163,13 @@
 #define OFX_REMOTEUI_SERVER_WATCH_PARAM_WCN(paramName)					\
 ( ofxRemoteUIServer::instance()->watchParamOnScreen(paramName) )
 
+// Watch a float, int or bool variable, optionally specifying a color.
+// The variable must remain valid for the lifetime of the watch.
+#define OFX_REMOTEUI_SERVER_ADD_VARIABLE_WATCH(val, ...)				\
+( ofxRemoteUIServer::instance()->addVariableWatch(#val, &(val), ##__VA_ARGS__) )
+#define OFX_REMOTEUI_SERVER_ADD_VARIABLE_WATCH_WCN(name, val, ...)		\
+( ofxRemoteUIServer::instance()->addVariableWatch(name, &(val), ##__VA_ARGS__) )
+
 //add a description to the last added param
 #define	OFX_REMOTEUI_SERVER_SET_PARAM_DESC(param,desc)		\
 ( ofxRemoteUIServer::instance()->setParamDescription(param,desc) )
@@ -213,6 +220,8 @@
 #define RUI_REMOVE_PARAM_WCN		OFX_REMOTEUI_SERVER_REMOVE_PARAM_WCN
 #define RUI_WATCH_PARAM				OFX_REMOTEUI_SERVER_WATCH_PARAM
 #define RUI_WATCH_PARAM_WCN			OFX_REMOTEUI_SERVER_WATCH_PARAM_WCN
+#define RUI_ADD_VARIABLE_WATCH		OFX_REMOTEUI_SERVER_ADD_VARIABLE_WATCH
+#define RUI_ADD_VARIABLE_WATCH_WCN	OFX_REMOTEUI_SERVER_ADD_VARIABLE_WATCH_WCN
 #define RUI_SET_INTERFACE_KEY       OFX_REMOTEUI_SERVER_SET_SHOW_INTERFACE_KEY
 #define RUI_SET_CONFIGS_DIR			OFX_REMOTEUI_SERVER_SET_CONFIGS_DIR
 #define RUI_GET_OF_EVENT			OFX_REMOTEUI_SERVER_GET_CLIENT_OF_EVENT
