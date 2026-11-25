@@ -3,6 +3,7 @@
 #import <Foundation/Foundation.h>
 #include <string>
 #import "ColorView.h"
+@class CAShapeLayer;
 
 @interface ParamUI : NSObject <NSTextFieldDelegate>{
 
@@ -32,6 +33,8 @@
 	int numberID; // to handlestringFromString alternating rows in table draw
 	bool shouldBeFlashing;
 
+	CAShapeLayer *watchStar;
+	NSMenuItem *watchMenuItem;
 	bool deleting; //we are about to dealloc this param!
 	//midi
 	bool midiHighlightAnim;
@@ -56,6 +59,8 @@
 -(id)initWithParam:(const RemoteUIParam&)p paramName:(const string &)name ID:(int)n rowH:(unsigned char) rowH;
 -(void)updateParam:(const RemoteUIParam &)p;
 -(void)updateUI;
+-(void)setWatched:(BOOL)watched;
+-(void)toggleWatch:(id)sender;
 
 -(NSPopUpButton*)getPresetsMenu;
 -(void)updatePresetMenuSelectionToCurrent;

@@ -2,6 +2,7 @@
 #include "ofxRemoteUI.h"
 #include "AppDelegate.h"
 #import <QuartzCore/QuartzCore.h>
+#include <cmath>
 
 //int numParamUIs = 0;
 int maxDecimals = 6;
@@ -34,6 +35,8 @@ static NSMutableDictionary *sharedLayerActionsForRowHeight(RowHeightSize rowH) {
 
 - (void)dealloc{
 	deleting = true;
+	[watchStar removeFromSuperlayer];
+	[watchStar release];
 	[widget setTarget:nil];
 	[ui removeFromSuperviewWithoutNeedingDisplay];
 	[ui release];
@@ -55,6 +58,8 @@ static NSMutableDictionary *sharedLayerActionsForRowHeight(RowHeightSize rowH) {
 	needsUIUpdate = YES;
 	needsRemapSlider = YES;
 	_floatFormatter = nil;
+	watchStar = nil;
+	watchMenuItem = nil;
 	_lastColorString = nil;
 	BOOL didLoad = FALSE;
 
@@ -84,8 +89,70 @@ static NSMutableDictionary *sharedLayerActionsForRowHeight(RowHeightSize rowH) {
 	[warningSign layer].actions = sharedActions;
 	
 	[paramLabel setButtonType:NSButtonTypeMomentaryChange];
+	if (param.type != REMOTEUI_PARAM_SPACER) {
+		NSMenu *menu = [[[NSMenu alloc] initWithTitle:@"Parameter"] autorelease];
+		watchMenuItem = [[[NSMenuItem alloc] initWithTitle:@"Watch on server screen" action:@selector(toggleWatch:) keyEquivalent:@""] autorelease];
+		[watchMenuItem setTarget:self];
+		[menu addItem:watchMenuItem];
+		[paramLabel setMenu:menu];
+	}
 	
 	return self;
+}
+
+-(void)toggleWatch:(id)sender{
+	AppDelegate *delegate = (AppDelegate *)[NSApp delegate];
+	if (delegate->client && delegate->client->isReadyToSend())
+		delegate->client->setParamWatched(paramName, !delegate->client->isParamWatched(paramName));
+}
+
+-(void)setWatched:(BOOL)watched{
+	[watchMenuItem setState:watched ? NSControlStateValueOn : NSControlStateValueOff];
+	if (!watched) {
+		[watchStar removeFromSuperlayer];
+		[watchStar release];
+		watchStar = nil;
+		return;
+	}
+	NSView *parent = [paramLabel superview];
+	if (!parent || param.type == REMOTEUI_PARAM_SPACER) return;
+	[parent setWantsLayer:YES];
+	if (!watchStar) {
+		watchStar = [[CAShapeLayer alloc] init];
+		watchStar.zPosition = 100;
+		[parent.layer addSublayer:watchStar];
+		CABasicAnimation *pulse = [CABasicAnimation animationWithKeyPath:@"opacity"];
+		pulse.fromValue = @0.f;
+		pulse.toValue = @1.f;
+		pulse.duration = 0.314159;
+		pulse.autoreverses = YES;
+		pulse.repeatCount = HUGE_VALF;
+		pulse.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+		[watchStar addAnimation:pulse forKey:@"watchPulse"];
+	}
+	NSRect label = [paramLabel frame];
+	CGFloat radius = [paramLabel font].pointSize * .36;
+	CGFloat centerX = NSMinX(label) - radius + 3;
+	CGFloat centerY = NSMidY(label);
+	CGMutablePathRef path = CGPathCreateMutable();
+	for (int i = 0; i < 10; ++i) {
+		CGFloat angle = -M_PI_2 + i * M_PI / 5;
+		CGFloat length = i % 2 ? radius * .43 : radius;
+		CGFloat x = centerX + cos(angle) * length, y = centerY + sin(angle) * length;
+		if (i == 0) CGPathMoveToPoint(path, nullptr, x, y);
+		else CGPathAddLineToPoint(path, nullptr, x, y);
+	}
+	CGPathCloseSubpath(path);
+	[CATransaction begin];
+	[CATransaction setDisableActions:YES];
+	watchStar.frame = parent.bounds;
+	watchStar.path = path;
+	CGFloat red = param.a ? param.r / 255.0 : .5;
+	CGFloat green = param.a ? param.g / 255.0 : .5;
+	CGFloat blue = param.a ? param.b / 255.0 : .5;
+	watchStar.fillColor = [NSColor colorWithSRGBRed:.35 + .65 * red green:.35 + .65 * green blue:.35 + .65 * blue alpha:1].CGColor;
+	[CATransaction commit];
+	CGPathRelease(path);
 }
 
 -(void)fadeOut{

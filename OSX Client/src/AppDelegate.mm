@@ -1492,6 +1492,8 @@ bool resizeWindowUpDown = false; //if you keep changing paramUI size, with this 
 	if (client->isSetup()){
 		client->updateAutoDiscovery(REFRESH_RATE);
 		client->update(REFRESH_RATE);
+		for (auto &entry : widgets)
+			[entry.second setWatched:client->isReadyToSend() && client->isParamWatched(entry.first)];
 
 		userChosePresetTimeout -= REFRESH_RATE;
 		if(userChosePresetTimeout < 0.0f) userChosePresetTimeout = 0.0f;
