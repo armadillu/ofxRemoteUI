@@ -90,6 +90,7 @@ void ofxRemoteUIClient::disconnect(){
 		sendCIAO();
 		readyToSend = false;
 		presetNames.clear();
+		watchedParams.clear();
 	}else{
 		if(verbose_) RLOG_NOTICE << "can't disconnect(); we arent connected!" ;
 	}
@@ -212,6 +213,16 @@ void ofxRemoteUIClient::update(float dt){
 
 			switch (dm.action) {
 
+				case WATCH_LIST_ACTION: {
+					std::set<std::string> received;
+					bool valid = true;
+					for (int i = 0; i < m.getNumArgs(); ++i) {
+						if (m.getArgType(i) != OFXOSC_TYPE_STRING) { valid = false; break; }
+						received.insert(m.getArgAsString(i));
+					}
+					if (valid) watchedParams.swap(received);
+				} break;
+
 				case SEND_LOG_LINE_ACTION:{
 					cbArg.msg = m.getArgAsString(0); //only one arg for the log msg
 					if(callBack != NULL){
@@ -253,6 +264,7 @@ void ofxRemoteUIClient::update(float dt){
 					sendCIAO();
 					params.clear();
 					orderedKeys.clear();
+					watchedParams.clear();
 					clearOscReceiverMsgQueue();
 					readyToSend = false;
 				}break;
@@ -601,6 +613,26 @@ void ofxRemoteUIClient::sendTrackedParamUpdate(const string &paramName){
 
 void ofxRemoteUIClient::sendMessage(const ofxOscMessage & m){
     oscSender.sendMessage((ofxOscMessage &)m);
+}
+
+void ofxRemoteUIClient::setParamWatched(const std::string &name, bool watched){
+	if (!readyToSend) return;
+	ofxOscMessage m;
+	m.setAddress("/WATC");
+	m.addStringArg(name);
+	m.addIntArg(watched ? 1 : 0);
+	sendMessage(m);
+}
+
+void ofxRemoteUIClient::removeAllParamWatches(){
+	if (!readyToSend) return;
+	ofxOscMessage m;
+	m.setAddress("/WCLR");
+	sendMessage(m);
+}
+
+bool ofxRemoteUIClient::isParamWatched(const std::string &name) const{
+	return watchedParams.count(name) != 0;
 }
 
 void ofxRemoteUIClient::requestCompleteUpdate(){

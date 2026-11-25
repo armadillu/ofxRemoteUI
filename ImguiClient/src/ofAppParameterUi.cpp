@@ -800,15 +800,31 @@ void ofApp::drawParameter(const std::string &name) {
 	ImGui::PushClipRect(ImVec2(labelPos.x - halfSpacing, windowPos.y), ImVec2(labelPos.x + clippedLabelWidth + halfSpacing, windowPos.y + windowSize.y), true);
 	const bool labelClicked = ImGui::Selectable("##parameter-label", controllers.learning == name || temporaryHighlight, 0, ImVec2(clippedLabelWidth, ImGui::GetTextLineHeight()));
 	const bool labelHovered = ImGui::IsItemHovered();
-	if (labelHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) ImGui::OpenPopup("parameter-context");
 	const ImVec2 itemMin = ImGui::GetItemRectMin();
 	const float textY = itemMin.y + std::floor(ImGui::GetStyle().ItemSpacing.y * .5f);
+	const bool watched = client.isParamWatched(name);
 	const float textLeft = labelPos.x + labelPadding;
 	const float textRight = std::max(textLeft, labelPos.x + clippedLabelWidth - labelPadding);
 	ImGui::PushClipRect(ImVec2(textLeft, windowPos.y), ImVec2(textRight, windowPos.y + windowSize.y), true);
-	ImGui::GetWindowDrawList()->AddText(ImVec2(textLeft, textY), ImGui::GetColorU32(ImGuiCol_Text), name.c_str(), name.c_str() + name.size());
+	ImDrawList *drawList = ImGui::GetWindowDrawList();
+	const ImU32 textColor = ImGui::GetColorU32(ImGuiCol_Text);
+	drawList->AddText(ImVec2(textLeft, textY), textColor, name.c_str());
 	ImGui::PopClipRect();
 	ImGui::PopClipRect();
+	if (watched) {
+		const float radius = ImGui::GetFontSize() * .36f;
+		const ImVec2 center(labelPos.x - radius + 3.f, textY + ImGui::GetFontSize() * .5f);
+		const float pulse = .5f + .5f * std::sin(ofGetElapsedTimef() * 10.f);
+		const ImU32 starColor = ImGui::GetColorU32(ImVec4(.35f + .65f * r, .35f + .65f * g, .35f + .65f * b, pulse));
+		ImVec2 points[10];
+		for (int i = 0; i < 10; ++i) {
+			const float angle = -1.57079633f + i * 0.62831853f;
+			const float r = (i % 2 == 0) ? radius : radius * .43f;
+			points[i] = ImVec2(center.x + std::cos(angle) * r, center.y + std::sin(angle) * r);
+		}
+		for (int i = 0; i < 10; ++i)
+			drawList->AddTriangleFilled(center, points[i], points[(i + 1) % 10], starColor);
+	}
 	ImGui::PopStyleColor(3);
 	ImGui::PopStyleVar();
 	if (labelClicked) {
@@ -819,7 +835,31 @@ void ofApp::drawParameter(const std::string &name) {
 	}
 	if (highlightLabel) ImGui::PopStyleColor();
 	ImGui::PopFont();
-	if (ImGui::IsItemHovered() && !ImGui::IsPopupOpen("parameter-context")) {
+	ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 8.f);
+	ImGui::PushStyleVar(ImGuiStyleVar_PopupBorderSize, 1.f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10.f, 8.f));
+	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.f, 0.f, 0.f, 1.f));
+	if (ImGui::BeginPopupContextItem("parameter-context")) {
+		if (ImGui::MenuItem("\"Watch\" on Server", nullptr, watched, client.isReadyToSend()))
+			client.setParamWatched(name, !watched);
+		const auto baseline = changeBaseline.find(name);
+		const bool changed = baseline != changeBaseline.end() && p.type == baseline->second.type && !sameParameterValue(p, baseline->second);
+		if (ImGui::MenuItem("Restore Parameter Value", nullptr, false, client.isReadyToSend() && changed)) {
+			RemoteUIParam restored = p;
+			if (copyParameterValue(restored, baseline->second)) {
+				sendEditedParam(name, restored);
+				appendLog("Restored connection value for \"" + name + "\"");
+			}
+		}
+		if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+			if (!changed) ImGui::SetTooltip("Restores the value to what this client received from the server on its most recent connection.\n\nThis parameter has not changed since then.");
+			else ImGui::SetTooltip("Restores the value to what this client received from the server on its most recent connection.");
+		}
+		ImGui::EndPopup();
+	}
+	ImGui::PopStyleColor();
+	ImGui::PopStyleVar(3);
+	if (labelHovered && !ImGui::IsPopupOpen("parameter-context")) {
 		ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
 
 		if (ImGui::BeginTooltip()) {
@@ -865,26 +905,7 @@ void ofApp::drawParameter(const std::string &name) {
 			ImGui::EndTooltip();
 		}
 	}
-	if (ImGui::BeginPopup("parameter-context")) {
-		const auto baseline = changeBaseline.find(name);
-		const bool changed = baseline != changeBaseline.end() && p.type == baseline->second.type && !sameParameterValue(p, baseline->second);
-		const float restoreWidth = ImGui::CalcTextSize("Restore Parameter Value").x + ImGui::GetStyle().FramePadding.x * 2.f;
-		const ImGuiSelectableFlags restoreFlags = client.isReadyToSend() && changed ? ImGuiSelectableFlags_None : ImGuiSelectableFlags_Disabled;
-		if (ImGui::Selectable("Restore Parameter Value", false, restoreFlags, ImVec2(restoreWidth, 0.f))) {
-			RemoteUIParam restored = p;
-			if (copyParameterValue(restored, baseline->second)) {
-				sendEditedParam(name, restored);
-				appendLog("Restored connection value for \"" + name + "\"");
-			}
-		}
-		ImGui::SameLine();
-		ImGui::TextDisabled("(?)");
-		if (ImGui::IsItemHovered()) {
-			if (!changed) ImGui::SetTooltip("Restores the value to what this client received from the server on its most recent connection.\n\nThis parameter has not changed since then.");
-			else ImGui::SetTooltip("Restores the value to what this client received from the server on its most recent connection.");
-		}
-		ImGui::EndPopup();
-	}
+
 	if (edited) sendEditedParam(name, p);
 	ImGui::PopID();
 }

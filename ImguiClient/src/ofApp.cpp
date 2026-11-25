@@ -97,6 +97,7 @@ void ofApp::setup() {
 			case NativeMacMenu::BlinkMidi: blinkBoundParameters(true); break;
 			case NativeMacMenu::BlinkUsb: blinkBoundParameters(false); break;
 			case NativeMacMenu::ToggleAllGroups: toggleAllGroups(); break;
+			case NativeMacMenu::RemoveAllWatches: client.removeAllParamWatches(); break;
 			case NativeMacMenu::HighlightChanged: highlightChangesSinceLoad = !highlightChangesSinceLoad; savePreferences(); break;
 			case NativeMacMenu::ActivityPanel: showLogPanel = !showLogPanel; break;
 			case NativeMacMenu::ServerLogPanel: showServerLogPanel = !showServerLogPanel; break;
@@ -230,6 +231,7 @@ void ofApp::drawMenuBar() {
 			if (ImGui::MenuItem("Paste Parameter Values", "Ctrl+Shift+V", false, menuConnected)) { const char *v = glfwGetClipboardString(glfwGetCurrentContext()); if (v) applyClipboardValues(v); }
 			if (ImGui::MenuItem("Highlight Changes Since Connection", nullptr, &highlightChangesSinceLoad, menuConnected)) savePreferences();
 			if (ImGui::MenuItem("Collapse / Expand All Groups", "Ctrl+Shift+G", false, menuConnected)) toggleAllGroups();
+			if (ImGui::MenuItem("Remove All Watches", nullptr, false, menuConnected)) client.removeAllParamWatches();
 			ImGui::Separator();
 			if (ImGui::MenuItem("Blink MIDI-Bound Parameters", nullptr, false, menuConnected)) blinkBoundParameters(true);
 			if (ImGui::MenuItem("Blink USB Controller-Bound Parameters", nullptr, false, menuConnected)) blinkBoundParameters(false);

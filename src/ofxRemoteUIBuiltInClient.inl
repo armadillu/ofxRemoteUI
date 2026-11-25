@@ -167,7 +167,7 @@ void ofxRemoteUIBuiltInClient::drawOverlay(const View &view, int screenW, int sc
 		"\nPress 's' to save current config, 'S' to make a new preset. ('E' to save in old format)\n" +
 		"Press 'r' to restore all params's launch state. '+'/'-' to set UI Scale. 'N' to toggle screen notif.\n" +
 		"Press Arrow Keys to edit values. SPACEBAR + Arrow Keys for bigger increments. ',' and '.' Keys to scroll.\n" +
-		"Press 'TAB' to hide. Press 'RETURN' to cycle through RGBA components.";
+		"Press 'w' to toggle watch. Press 'TAB' to hide. Press 'RETURN' to cycle RGBA components.";
 		#ifndef NO_RUI_WEB_INTERFACE
 		instructions += " Press 'c' to launch a web client.";
 		#endif
@@ -254,7 +254,8 @@ void ofxRemoteUIBuiltInClient::drawOverlay(const View &view, int screenW, int sc
 
 			if(p.type != REMOTEUI_PARAM_SPACER){
 				std::string sel = (view.selectedItem == i) ? ">>" : "  ";
-				drawString(sel + key, x, y);
+				const bool watched = std::find(view.paramsToWatch.begin(), view.paramsToWatch.end(), entry.second) != view.paramsToWatch.end();
+				drawString(sel + (watched ? "*" : " ") + key, x, y);
 			}else{
 				drawString("+ " + p.stringVal, x,y);
 			}

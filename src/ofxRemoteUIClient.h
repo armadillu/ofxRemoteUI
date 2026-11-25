@@ -32,6 +32,10 @@ public:
 	void connect();
 	void disconnect();
 
+	// Watch state is authoritative on the server and refreshed on sync.
+	void setParamWatched(const std::string &name, bool watched);
+	void removeAllParamWatches();
+	bool isParamWatched(const std::string &name) const;
 	void requestCompleteUpdate(); //ask the server to send us all params and presets
 
 	void restoreAllParamsToInitialXML();
@@ -92,6 +96,7 @@ private:
 
 	void					fillPresetListFromMessage(const ofxOscMessage &m);
 
+	std::set<std::string> watchedParams;
 	bool					OSCsetup;
 	std::string				host;
 	int						pendingOperations;

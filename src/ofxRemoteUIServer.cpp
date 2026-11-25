@@ -226,6 +226,7 @@ void ofxRemoteUIServer::removeParamFromDB(const string & paramName, bool permane
             orderedKeys_removed[orderedKeys_removed.size()] = paramName;
         }
 
+		removeParamWatch(paramName);
 		params.erase(it);
 
 		it = paramsFromCode.find(paramName);
@@ -251,6 +252,7 @@ void ofxRemoteUIServer::removeParamFromDB(const string & paramName, bool permane
 void ofxRemoteUIServer::removeAllParams(){
 	dataMutex.lock();
 
+	removeAllParamWatches();
 	params.clear();
 	orderedKeys.clear();
 	presetNames.clear();
@@ -560,6 +562,11 @@ void ofxRemoteUIServer::saveToXMLv2(string fileName, const string &groupName){
 			}
 		}
 	}
+	if (!savingGroupOnly) {
+		auto watches = root.append_child("WATCHES");
+		for (const auto &name : paramsToWatch)
+			watches.append_child("P").append_attribute("name").set_value(name.c_str());
+	}
 	dataMutex.unlock();
 
 	if(!savingGroupOnly){ //group presets dont embed port
@@ -665,6 +672,8 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(const string &fileName){
 		return loadedParams;
 	}
 
+	auto root = xml.findFirst("//" + string(OFXREMOTEUI_XML_ROOT_TAG));
+	auto watchesXml = root.getChildren("WATCHES");
 	auto paramsXml = xml.findFirst("//" + string(OFXREMOTEUI_XML_ROOT_TAG) + "/" + string(OFXREMOTEUI_XML_TAG)).getChildren("P");
 
 	dataMutex.lock();
@@ -843,9 +852,20 @@ vector<string> ofxRemoteUIServer::loadFromXMLv2(const string &fileName){
 		}
 	}
 	loadedFromXML = true;
-	
+	bool hasWatches = false;
+	for (auto &watchList : watchesXml) {
+		hasWatches = true;
+		paramsToWatch.clear();
+		onScreenNotifications.removeAllParamWatches();
+		for (auto &watch : watchList.getChildren("P")) {
+			string name = watch.getAttribute("name").getValue();
+			if (!name.empty() && std::find(paramsToWatch.begin(), paramsToWatch.end(), name) == paramsToWatch.end())
+				paramsToWatch.emplace_back(name);
+		}
+		break;
+	}
 	dataMutex.unlock();
-	
+	if (hasWatches) sendWatchList();
 	return paramsNotInXML;
 }
 
@@ -1292,6 +1312,21 @@ bool ofxRemoteUIServer::_keyPressed(ofKeyEventArgs &e){
 				loadFromXML(ofToDataPath(p));
 				}break;
 
+			case 'w': {
+				std::lock_guard<std::recursive_mutex> lock(dataMutex);
+				auto selected = orderedKeys.find(selectedItem);
+				if (selected != orderedKeys.end()) {
+					auto param = params.find(selected->second);
+					if (param != params.end() && param->second.type != REMOTEUI_PARAM_SPACER) {
+						const string &name = selected->second;
+						if (std::find(paramsToWatch.begin(), paramsToWatch.end(), name) != paramsToWatch.end())
+							removeParamWatch(name);
+						else
+							watchParamOnScreen(name);
+					}
+				}
+			} break;
+
 			case 'N': drawNotifications ^= true; break;
 			case ' ': { //press spacebar to edit string fields! return didnt work well on windows
 				if (selectedItem >= 0) { //selection on params list
@@ -1684,8 +1719,23 @@ void ofxRemoteUIServer::updateServer(float dt){
 			case REQUEST_ACTION:{ //send all params to client
 				if(verbose_) RLOG_VERBOSE << remoteIP << " sends REQU!";
 				pushParamsToClient();
+				sendWatchList();
 				sentParamsToClient = true;
 				}break;
+
+			case WATCH_SET_ACTION: {
+				if (m.getNumArgs() == 2 && m.getArgType(0) == OFXOSC_TYPE_STRING && m.getArgType(1) == OFXOSC_TYPE_INT32) {
+					const string name = m.getArgAsString(0);
+					if (params.find(name) != params.end() && params[name].type != REMOTEUI_PARAM_SPACER) {
+						if (m.getArgAsInt32(1)) watchParamOnScreen(name);
+						else removeParamWatch(name);
+					}
+				}
+				sendWatchList();
+			} break;
+
+			case WATCH_LIST_ACTION: sendWatchList(); break;
+			case WATCH_CLEAR_ACTION: removeAllParamWatches(); break;
 
 			case SEND_PARAM_ACTION:{ //client is sending us an updated val
 				if(verbose_) RLOG_VERBOSE << remoteIP << " sends SEND!";
@@ -2000,36 +2050,40 @@ void ofxRemoteUIServer::setColorForParam(RemoteUIParam &p, ofColor c){
 	}
 }
 
-void ofxRemoteUIServer::watchParamOnScreen(const string & paramName){
-	dataMutex.lock();
-	if (params.find(paramName) != params.end()){
-		paramsToWatch.emplace_back(paramName);
-	}else{
-		RLOG_ERROR << "can't watch that param; it doesnt exist! " << paramName << endl;
-	}
-	dataMutex.unlock();
+void ofxRemoteUIServer::sendWatchList(){
+	std::lock_guard<std::recursive_mutex> lock(dataMutex);
+	if (!readyToSend) return;
+	ofxOscMessage m;
+	m.setAddress("/WATL");
+	for (const auto &name : paramsToWatch) m.addStringArg(name);
+	sendMessage(m);
 }
 
-void ofxRemoteUIServer::removeParamWatch(const string & paramName){
-	dataMutex.lock();
-	if (params.find(paramName) != params.end()){
-		auto it = std::find(paramsToWatch.begin(), paramsToWatch.end(), paramName);
-		if(it != paramsToWatch.end()){
-			paramsToWatch.erase(it);
-			onScreenNotifications.removeParamWatch(paramName);
-		}else{
-			RLOG_ERROR << "can't remove watch for that param; it isn't being watched! " << paramName;
-		}
-	}else{
-		RLOG_ERROR << "can't remove watch for that param; it doesnt exist! " << paramName;
+void ofxRemoteUIServer::watchParamOnScreen(const string &paramName){
+	std::lock_guard<std::recursive_mutex> lock(dataMutex);
+	auto it = params.find(paramName);
+	if (it == params.end() || it->second.type == REMOTEUI_PARAM_SPACER) return;
+	if (std::find(paramsToWatch.begin(), paramsToWatch.end(), paramName) == paramsToWatch.end()) {
+		paramsToWatch.emplace_back(paramName);
+		sendWatchList();
 	}
-	dataMutex.unlock();
+}
+
+void ofxRemoteUIServer::removeParamWatch(const string &paramName){
+	std::lock_guard<std::recursive_mutex> lock(dataMutex);
+	auto it = std::find(paramsToWatch.begin(), paramsToWatch.end(), paramName);
+	if (it != paramsToWatch.end()) {
+		paramsToWatch.erase(it);
+		onScreenNotifications.removeParamWatch(paramName);
+		sendWatchList();
+	}
 }
 
 void ofxRemoteUIServer::removeAllParamWatches(){
-	RLOG_NOTICE << "Removing all Param Watches";
+	std::lock_guard<std::recursive_mutex> lock(dataMutex);
 	paramsToWatch.clear();
 	onScreenNotifications.removeAllParamWatches();
+	sendWatchList();
 }
 
 bool ofxRemoteUIServer::addParamToDB(RemoteUIParam p, const string &thisParamName){

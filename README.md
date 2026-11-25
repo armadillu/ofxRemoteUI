@@ -111,6 +111,12 @@ Look into the server example to see more features. It is fairly documented.
 Parameter names are unique across the server, including across groups. `shareParam()` and the `RUI_SHARE_PARAM` macros return `true` when registration succeeds. A duplicate logs an error, returns `false`, and leaves the existing parameter in place. Use `RUI_SET_PARAM_BINDING` to change an existing parameter's binding.
 
 
+### Watch parameters on the server screen
+
+In the built-in client, select a parameter and press **w** to toggle its watch; `*` marks watched parameters. In the ImGui client, right-click a parameter label and choose **Watch on server screen**. A star identifies watched parameters; choose the same menu item to stop watching. Use **RemoteUI → Remove All Watches** to clear the entire list. The server sends its watch list when the client syncs and when watches change. Save the current state using the normal save command to persist watches in the `.rui` file. Loading a full `.rui` file with watch metadata restores the list; older files without it leave the current list alone. Group presets do not change watches. On-screen watches require the server application to draw RemoteUI notifications.
+
+Clients can use `setParamWatched(name, bool)` and `isParamWatched(name)`. Over OSC, `/WATC` takes a string parameter name and an int32 (1 to watch, 0 to unwatch). `/WCLR` removes all watches; `/WATL` requests the list; the server also sends `/WATL` with zero or more string arguments containing the complete list after a change or full sync. As with other RemoteUI changes, save the server state to persist it.
+
 ### Share a parameter with a getter and setter
 
 Use `RUI_SHARE_PARAM("Display name", getter, setter, ...)` when a value lives behind a method, needs unit conversion, or requires work when it changes. Pass a getter that takes no arguments and returns the current value, then a setter that takes the new value. Use a getter that returns `float` or `int` by value and pass the slider's minimum and maximum after the setter. For `bool`, omit the range. Each form also accepts an optional background color as its last argument.

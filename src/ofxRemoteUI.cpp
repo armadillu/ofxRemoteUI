@@ -136,6 +136,9 @@ DecodedMessage ofxRemoteUI::decode(const ofxOscMessage & m) const{
 		if (action == "HELO") dm.action = HELO_ACTION;
 		else if (action == "REQU") dm.action = REQUEST_ACTION;
 		else if (action == "SEND") dm.action = SEND_PARAM_ACTION;
+		else if (action == "WATC") dm.action = WATCH_SET_ACTION;
+		else if (action == "WATL") dm.action = WATCH_LIST_ACTION;
+		else if (action == "WCLR") dm.action = WATCH_CLEAR_ACTION;
 		else if (action == "CIAO") dm.action = CIAO_ACTION;
 		else if (action == "TEST") dm.action = TEST_ACTION;
 		else if (action == "PREL") dm.action = PRESET_LIST_ACTION;

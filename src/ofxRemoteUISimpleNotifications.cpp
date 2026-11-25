@@ -263,21 +263,11 @@ void ofxRemoteUISimpleNotifications::removeParamWatch(const string & paramName){
 	auto it = paramWatch.find(paramName);
 	if(it != paramWatch.end()){
 		paramWatch.erase(it);
-		int count = 0;
-		bool found = false;
-		for(auto i : paramWatchOrder){
-			if(i.second == paramName){
-				found = true;
-				break;
-			}
-			count++;
+		map<int, string> remaining;
+		for (const auto &entry : paramWatchOrder) {
+			if (entry.second != paramName) remaining[remaining.size()] = entry.second;
 		}
-		if(found){
-			auto f = paramWatchOrder.find(count);
-			if(f != paramWatchOrder.end()){
-				paramWatchOrder.erase(f);
-			}
-		}
+		paramWatchOrder.swap(remaining);
 	}
 }
 

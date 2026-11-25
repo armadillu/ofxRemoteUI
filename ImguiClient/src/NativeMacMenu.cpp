@@ -84,6 +84,7 @@ bool setup(Action handler) {
 	separator(remote);
     add(remote, "Highlight Changes Since Connection", HighlightChanged);
     add(remote, "Collapse / Expand All Groups", ToggleAllGroups, "g", true);
+    add(remote, "Remove All Watches", RemoveAllWatches);
     separator(remote);
     add(remote, "Blink MIDI-Bound Parameters", BlinkMidi);
     add(remote, "Blink USB Controller-Bound Parameters", BlinkUsb);
@@ -127,6 +128,7 @@ void update(bool connected, bool activity, bool serverLog, bool preferences, boo
     send<void>(items[BlinkMidi], "setEnabled:", connected);
     send<void>(items[BlinkUsb], "setEnabled:", connected);
     send<void>(items[ToggleAllGroups], "setEnabled:", connected);
+    send<void>(items[RemoveAllWatches], "setEnabled:", connected);
     send<void>(items[HighlightChanged], "setEnabled:", connected);
     send<void>(items[HighlightChanged], "setState:", (long)(highlightChanged ? 1 : 0));
     const bool states[] = {activity, serverLog, preferences, bindings};

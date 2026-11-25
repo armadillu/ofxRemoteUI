@@ -104,6 +104,18 @@
  // client updates a param
  CLIENT:	/SEND *** PARAM_NAME val (*** Type)		//client sends a var change to server, where *** is FLT, INT, BOL, etc
 
+ // watch a parameter on the server's screen
+ CLIENT: /WATC PARAM_NAME WATCHED             // OSC string name, int32: 1 = watch, 0 = unwatch
+ SERVER: /WATL [PARAM_NAME ...]                // complete authoritative list, each name an OSC string
+                                               // zero arguments means no parameters are watched
+ CLIENT: /WCLR                                 // remove all watches; server replies with an empty /WATL
+ CLIENT: /WATL                                 // request the current list
+ SERVER: /WATL [PARAM_NAME ...]                // server also sends it on /REQU and when watches change
+ // Watch requests for unknown parameters or group headers do not change the list. The server
+ // replies with the current list. Watching is idempotent; there is no separate acknowledgement.
+ // /SAVE persists the list in the default .rui file. Full .rui files with watch metadata restore
+ // it when loaded; older files without metadata and group presets leave the current list unchanged.
+
  // keep alive
  CLIENT:	/TEST								//every OFXREMOTEUI_LATENCY_TEST_RATE, client sends a msg to server to measure delay and connectivity
  SERVER:	/TEST								//server replies

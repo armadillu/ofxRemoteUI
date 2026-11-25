@@ -188,6 +188,7 @@ public:
 	void watchParamOnScreen(const std::string& paramName);
 	void removeParamWatch(const std::string& paramName);
 	void removeAllParamWatches();
+	void sendWatchList();
 
 	void setShowInterfaceKey(char key){showInterfaceKey = key;};
 	void setAutomaticBackupsEnabled(bool enabled){autoBackups = enabled;}
