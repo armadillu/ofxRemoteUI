@@ -33,7 +33,7 @@ void ofApp::drawServerLogPanel() {
 }
 
 void ofApp::drawSettingsPanel() {
-	ImGui::SetNextWindowSize(ImVec2(344, 310), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(350, 340), ImGuiCond_Always);
 	prepareSecondaryWindow();
 	if (!ImGui::Begin("Settings", &showSettings, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize)) { ImGui::End(); return; }
 	framedCheckbox("Auto-connect to new servers", &autoConnectToNewServers);

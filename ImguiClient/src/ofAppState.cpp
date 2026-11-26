@@ -95,8 +95,8 @@ void ofApp::updateChangedParameter(const std::string &name) {
 	else changedSinceLoad.erase(name);
 }
 
-void ofApp::applyPreset(const std::string &name) { rememberCurrentValuesForDiff(); selectedPreset = name; groupPresetSelection.clear(); presetReplyPending = true; client.setPreset(name); }
-void ofApp::applyGroupPreset(const std::string &name, const std::string &group) { rememberCurrentValuesForDiff(); selectedPreset.clear(); groupPresetSelection[group] = name; presetReplyPending = true; client.setGroupPreset(name, group); }
+void ofApp::applyPreset(const std::string &name) { missingPresetParams.clear(); missingPresetWarningUntil = 0.f; rememberCurrentValuesForDiff(); selectedPreset = name; groupPresetSelection.clear(); presetReplyPending = true; client.setPreset(name); }
+void ofApp::applyGroupPreset(const std::string &name, const std::string &group) { missingPresetParams.clear(); missingPresetWarningUntil = 0.f; rememberCurrentValuesForDiff(); selectedPreset.clear(); groupPresetSelection[group] = name; presetReplyPending = true; client.setGroupPreset(name, group); }
 void ofApp::applyClipboardValues(const std::string &values, bool highlightChanges) {
 	std::unordered_map<std::string, RemoteUIParam> before;
 	for (const auto &name : client.getAllParamNamesList()) before.emplace(name, client.getParamForName(name));
@@ -157,6 +157,7 @@ void ofApp::importPresetFile(const std::string &path) {
 	ofxXmlSettings xml;
 	if (!xml.load(path)) { appendLog("Could not open preset " + path); return; }
 	std::string values;
+	std::unordered_set<std::string> presetNames;
 	if (xml.pushTag("OFX_REMOTE_UI")) {
 		const int version = xml.getValue("OFX_REMOTE_UI_V", -1);
 		if (version == 2 && xml.pushTag("OFX_REMOTE_UI_PARAMS")) {
@@ -165,6 +166,7 @@ void ofApp::importPresetFile(const std::string &path) {
 				const std::string name = xml.getAttribute("P", "name", "", i);
 				const bool disabled = xml.getAttribute("P", "disabled", 0, i) != 0;
 				if (name.empty() || disabled) continue;
+				presetNames.insert(name);
 				if (type == "bool") values += name + "=" + (xml.getValue("P", 0, i) ? "1\n" : "0\n");
 				else if (type == "float") values += name + "=" + ofToString(xml.getValue("P", 0.0f, i)) + "\n";
 				else if (type == "int" || type == "enum") values += name + "=" + ofToString(xml.getValue("P", 0, i)) + "\n";
@@ -178,6 +180,11 @@ void ofApp::importPresetFile(const std::string &path) {
 		xml.popTag();
 	}
 	if (values.empty()) { appendLog("Preset has no compatible v2 parameter values: " + path); return; }
+	missingPresetParams.clear();
+	for (const auto &name : client.getAllParamNamesList()) {
+		if (client.getParamForName(name).type != REMOTEUI_PARAM_SPACER && !presetNames.count(name)) missingPresetParams.insert(name);
+	}
+	missingPresetWarningUntil = missingPresetParams.empty() ? 0.f : ofGetElapsedTimef() + 5.f;
 	applyClipboardValues(values, true);
 	appendLog("Loaded preset " + ofFilePath::getFileName(path));
 }

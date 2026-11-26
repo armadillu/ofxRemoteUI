@@ -161,6 +161,7 @@ void ofApp::update() {
 		}
 	}
 	if (diffHighlightUntil > 0.0f && ofGetElapsedTimef() >= diffHighlightUntil) { diffParams.clear(); diffHighlightUntil = 0.0f; }
+	if (missingPresetWarningUntil > 0.f && ofGetElapsedTimef() >= missingPresetWarningUntil) { missingPresetParams.clear(); missingPresetWarningUntil = 0.f; }
 	if (boundBlinkUntil > 0.0f && ofGetElapsedTimef() >= boundBlinkUntil) { blinkingBoundParams.clear(); boundBlinkUntil = 0.0f; }
 	controllers.update(dt, bindingServer(), [this](const std::string &name, const ControllerBindings::Input &event) { applyControllerInput(name, event); }, [this](const std::string &name, const ControllerBindings::Input &event) {
 		return client.isReadyToSend() && client.paramExistsForName(name) && (!event.button || client.getParamForName(name).type == REMOTEUI_PARAM_BOOL);
@@ -170,8 +171,10 @@ void ofApp::update() {
 	#endif
 	using Clock = std::chrono::steady_clock;
 	const auto now = Clock::now();
-	const bool idle = controllers.bindings.empty() && controllers.learning.empty() && now - lastActivity >= std::chrono::seconds(1);
-	const int targetRate = idle ? std::min(monitorFrameRate, 15) : monitorFrameRate;
+	auto *window = static_cast<GLFWwindow *>(ofGetWindowPtr()->getWindowContext());
+	const bool mouseInWindow = window && glfwGetWindowAttrib(window, GLFW_HOVERED) == GLFW_TRUE;
+	const bool idle = !mouseInWindow && controllers.bindings.empty() && controllers.learning.empty() && now - lastActivity >= std::chrono::seconds(1);
+	const int targetRate = idle ? std::min(monitorFrameRate, 5) : monitorFrameRate;
 	const auto interval = std::chrono::duration_cast<Clock::duration>(std::chrono::duration<double>(1.0 / targetRate));
 	if (targetRate != pacedFrameRate || frameDeadline.time_since_epoch().count() == 0 || now > frameDeadline + interval) {
 		pacedFrameRate = targetRate;
@@ -364,6 +367,9 @@ void ofApp::onClientEvent(const RemoteUIClientCallBackArg &arg) {
 			break;
 		case SERVER_PRESETS_LIST_UPDATED: line << "Preset list updated"; break;
 		case SERVER_REPORTS_MISSING_PARAMS_IN_PRESET:
+			missingPresetParams.clear();
+			missingPresetParams.insert(arg.paramList.begin(), arg.paramList.end());
+			missingPresetWarningUntil = ofGetElapsedTimef() + 5.f;
 			lastPresetWarning = arg.msg + " is missing " + ofToString(arg.paramList.size()) + " parameter(s)";
 			line << lastPresetWarning;
 			break;
@@ -444,6 +450,8 @@ void ofApp::clearConnectionView() {
 	changeBaseline.clear();
 	changedSinceLoad.clear();
 	diffParams.clear();
+	missingPresetParams.clear();
+	missingPresetWarningUntil = 0.f;
 	diffHighlightUntil = 0.0f;
 	blinkingBoundParams.clear();
 	boundBlinkUntil = 0.0f;

@@ -99,13 +99,14 @@ bool ofxRemoteUIClient_ImGui::setup(GLFWwindow *window, bool docking, bool multi
 	style.ChildRounding = 5.0f;
 	style.PopupBorderSize = 1.f;
 	style.PopupRounding = 6.f;
+	style.MenuItemRounding = 5.f;
 	style.WindowRounding = style.PopupRounding;
 	style.FrameBorderSize = 0.f;
 	style.Colors[ImGuiCol_Border] = ImVec4(0.f, 0.f, 0.f, 0.4f);
 	style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 	style.Colors[ImGuiCol_ChildBg] = ImVec4(0.f, 0.f, 0.f, 0.12f);
-	style.FrameRounding = 3.0f;
-	style.GrabRounding = 3.0f;
+	style.FrameRounding = 5.0f;
+	style.GrabRounding = style.FrameRounding - 1.0f;
 	style.AntiAliasedLines = false;
 	style.AntiAliasedLineEnds = false;
 	style.AntiAliasedFill = false;

@@ -584,22 +584,24 @@ void ofApp::drawGroupHeader(const std::string &name, const RemoteUIParam &param)
 }
 
 void ofApp::drawParameter(const std::string &name) {
+	auto & style = ImGui::GetStyle();
 	RemoteUIParam p = client.getParamForName(name);
 	ImGui::PushID(name.c_str());
 	ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * parameterFontScale(rowHeight));
 	bool edited = false;
 	const float contentWidth = std::max(1.f, ImGui::GetContentRegionAvail().x - 6.f);
-	const float controlLabelGap = std::min(contentWidth - 1.f, ImGui::GetStyle().ItemSpacing.x + 4.f * parameterFontScale(rowHeight));
+	const float controlLabelGap = std::min(contentWidth - 1.f, style.ItemSpacing.x + 4.f * parameterFontScale(rowHeight));
 	const float splitWidth = contentWidth - controlLabelGap;
 	const float labelWidth = splitWidth * .4f;
 	const float controlWidth = splitWidth * .6f;
 	const float controlStartX = ImGui::GetCursorScreenPos().x;
+	const float rectRounding = style.FrameRounding;
 	ImGui::SetNextItemWidth(controlWidth);
 	// RUI_NEW_COLOR() changes the background alpha of subsequent parameters.
 	if (p.a) {
 		const ImVec2 rowMin = ImGui::GetCursorScreenPos();
 		const ImVec2 rowMax(rowMin.x + contentWidth, rowMin.y + ImGui::GetFrameHeight());
-		ImGui::GetWindowDrawList()->AddRectFilled(rowMin, rowMax, IM_COL32(p.r, p.g, p.b, p.a), 5.f);
+		ImGui::GetWindowDrawList()->AddRectFilled(rowMin, rowMax, IM_COL32(p.r, p.g, p.b, p.a), rectRounding);
 	}
 	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(.08f, .08f, .08f, .25f));
 	ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(.08f, .08f, .08f, .38f));
@@ -625,7 +627,7 @@ void ofApp::drawParameter(const std::string &name) {
 			constexpr float grabInset = 2.f;
 			const float trackWidth = std::max(0.f, sliderWidth - 2.f * grabInset);
 			const double range = static_cast<double>(max) - min;
-			float grabWidth = ImGui::GetStyle().GrabMinSize;
+			float grabWidth = style.GrabMinSize;
 			if constexpr (std::is_integral_v<decltype(min)>) {
 				grabWidth = std::max(grabWidth, static_cast<float>(trackWidth / (range + 1.0)));
 			}
@@ -668,7 +670,7 @@ void ofApp::drawParameter(const std::string &name) {
 		case REMOTEUI_PARAM_BOOL: {
 			const ImVec2 pos = ImGui::GetCursorScreenPos();
 			const float frameHeight = ImGui::GetFrameHeight();
-			const float horizontalPadding = ImGui::GetStyle().FramePadding.x;
+			const float horizontalPadding = style.FramePadding.x;
 			const float buttonWidth = std::min(controlWidth, std::max(frameHeight * 2.f, ImGui::CalcTextSize("OFF").x + horizontalPadding * 2.f));
 			const float buttonHeight = sliderGrabHeight(frameHeight);
 			ImGui::Dummy(ImVec2(0.f, frameHeight));
@@ -680,7 +682,7 @@ void ofApp::drawParameter(const std::string &name) {
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(base + tint * r, base + tint * g, base + tint * b, 1.f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(base + .08f + tint * r, base + .08f + tint * g, base + .08f + tint * b, 1.f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(base + .14f + tint * r, base + .14f + tint * g, base + .14f + tint * b, 1.f));
-			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, std::max(1.f, ImGui::GetStyle().FrameBorderSize));
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, std::max(1.f, style.FrameBorderSize));
 			ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(p.r / 655.f, p.g / 655.f, p.b / 655.f, .5f));
 			if (ImGui::Button("###value", ImVec2(buttonWidth, buttonHeight))) { p.boolVal = !p.boolVal; edited = true; }
 			ImGui::PopStyleColor(4);
@@ -736,7 +738,7 @@ void ofApp::drawParameter(const std::string &name) {
 		case REMOTEUI_PARAM_STRING: {
 			char value[4096]{};
 			std::strncpy(value, p.stringVal.c_str(), sizeof(value) - 1);
-			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, std::max(1.f, ImGui::GetStyle().FrameBorderSize));
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, std::max(1.f, style.FrameBorderSize));
 			ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(p.r / 755.f, p.g / 755.f, p.b / 755.f, .5f));
 			if (ImGui::InputText("##value", value, sizeof(value), ImGuiInputTextFlags_EnterReturnsTrue)) { p.stringVal = value; edited = true; }
 			ImGui::PopStyleColor();
@@ -775,63 +777,66 @@ void ofApp::drawParameter(const std::string &name) {
 	const bool blinkBinding = blinkingBoundParams.count(name) != 0;
 	const bool temporaryHighlight = blinkBinding || diffParams.count(name);
 	const bool highlightLabel = temporaryHighlight || (highlightChangesSinceLoad && changedSinceLoad.count(name));
+	const float r = p.a ? p.r / 255.f : .5f, g = p.a ? p.g / 255.f : .5f, b = p.a ? p.b / 255.f : .5f;
 	float highlightPulse = 0.f;
 	if (blinkBinding) {
-		highlightPulse = .5f + .5f * std::cos((boundBlinkUntil - ofGetElapsedTimef()) * 3.14159265f * 2.f);
+		highlightPulse = .5f + .5f * std::sinf((boundBlinkUntil - ofGetElapsedTimef()) * 3.14159265f * 2.f);
 		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));
-	} else if (temporaryHighlight) {
-		// A slow white-to-amber pulse keeps the label readable throughout.
-		highlightPulse = .5f + .5f * std::sin(ofGetElapsedTimef() * 3.14159265f);
-		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f - .22f * highlightPulse, 1.f - .6f * highlightPulse, 1.f));
-	} else if (highlightLabel) {
-		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f - .5f * changedHighlightPulse, 1.f - .5f * changedHighlightPulse, 1.f));
+	} else if (temporaryHighlight) { //shows a param is different than what it was
+		// Pulse between white and a light tint of the parameter color.
+		highlightPulse = .5f + .5f * std::sinf(3.0f * ofGetElapsedTimef() * 3.14159265f);
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f - .3f * (1.f - r) * highlightPulse, 1.f - .3f * (1.f - g) * highlightPulse, 1.f - .3f * (1.f - b) * highlightPulse, 1.f));
+	} else if (highlightLabel) { //shows a param is dirty
+		float d = 0.6f + .4f * changedHighlightPulse;
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, d, d, 1.0f));
 	}
 	const ImVec2 labelPos = ImGui::GetCursorScreenPos();
-	const float halfSpacing = ImGui::GetStyle().ItemSpacing.x * .5f;
+	const float halfSpacing = style.ItemSpacing.x * .5f;
 	const float labelPadding = 3.f * parameterFontScale(rowHeight);
-	const float clippedLabelWidth = std::max(1.f, std::min(labelWidth, ImGui::GetContentRegionAvail().x - 6.f - ImGui::GetStyle().ItemSpacing.x));
+	const float clippedLabelWidth = std::max(1.f, std::min(labelWidth, ImGui::GetContentRegionAvail().x - 6.f - style.ItemSpacing.x));
 	const ImVec2 windowPos = ImGui::GetWindowPos(), windowSize = ImGui::GetWindowSize();
-	const float r = p.a ? p.r / 255.f : .5f, g = p.a ? p.g / 255.f : .5f, b = p.a ? p.b / 255.f : .5f;
 	ImGui::PushStyleVar(ImGuiStyleVar_SelectableRounding, 5.f);
-	const float glow = temporaryHighlight ? .32f * highlightPulse : 0.f;
-	ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(.12f + .35f * r + glow, .12f + .35f * g + glow * .30f, .12f + .35f * b, 1.f));
-	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(.16f + .62f * r + glow, .16f + .62f * g + glow * .30f, .16f + .62f * b, 1.f));
-	ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(.20f + .48f * r + glow, .20f + .48f * g + glow * .30f, .20f + .48f * b, 1.f));
+	const float glow = temporaryHighlight ? .25f * highlightPulse : 0.f;
+	ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(.12f + .4f * r + glow * r, .12f + .4f * g + glow * g, .12f + .4f * b + glow * b, 1.f));
+	ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(.16f + .62f * r + glow * r, .16f + .62f * g + glow * g, .16f + .62f * b + glow * b, 1.f));
+	ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(.20f + .48f * r + glow * r, .20f + .48f * g + glow * g, .20f + .48f * b + glow * b, 1.f));
 	ImGui::PushClipRect(ImVec2(labelPos.x - halfSpacing, windowPos.y), ImVec2(labelPos.x + clippedLabelWidth + halfSpacing, windowPos.y + windowSize.y), true);
 	const bool labelClicked = ImGui::Selectable("##parameter-label", controllers.learning == name || temporaryHighlight, 0, ImVec2(clippedLabelWidth, ImGui::GetTextLineHeight()));
 	const bool labelHovered = ImGui::IsItemHovered();
 	const ImVec2 itemMin = ImGui::GetItemRectMin();
-	const float textY = itemMin.y + std::floor(ImGui::GetStyle().ItemSpacing.y * .5f);
+	const float textY = itemMin.y + std::floor(style.ItemSpacing.y * .5f);
 	const bool watched = client.isParamWatched(name);
 	const float textLeft = labelPos.x + labelPadding;
 	const float textRight = std::max(textLeft, labelPos.x + clippedLabelWidth - labelPadding);
-	ImGui::PushClipRect(ImVec2(textLeft, windowPos.y), ImVec2(textRight, windowPos.y + windowSize.y), true);
+	const bool missingFromPreset = missingPresetParams.count(name) != 0;
+	const float warningSize = ImGui::GetFontSize();
+	const float labelTextRight = missingFromPreset ? std::max(textLeft, textRight - warningSize - labelPadding) : textRight;
+	ImGui::PushClipRect(ImVec2(textLeft, windowPos.y), ImVec2(labelTextRight, windowPos.y + windowSize.y), true);
 	ImDrawList *drawList = ImGui::GetWindowDrawList();
 	const ImU32 textColor = ImGui::GetColorU32(ImGuiCol_Text);
 	drawList->AddText(ImVec2(textLeft, textY), textColor, name.c_str());
 	ImGui::PopClipRect();
+	if (missingFromPreset && std::sinf(ofGetElapsedTimef() * 3.14159265f * 4.f) >= 0.f) {
+		const float x = textRight - warningSize, y = textY;
+		const ImU32 yellow = IM_COL32(255, 195, 32, 255), dark = IM_COL32(35, 30, 15, 255);
+		drawList->AddTriangleFilled(ImVec2(x + warningSize * .5f, y), ImVec2(x + warningSize, y + warningSize), ImVec2(x, y + warningSize), yellow);
+		drawList->AddLine(ImVec2(x + warningSize * .5f, y + warningSize * .32f), ImVec2(x + warningSize * .5f, y + warningSize * .65f), dark, std::max(1.f, warningSize * .1f));
+		drawList->AddCircleFilled(ImVec2(x + warningSize * .5f, y + warningSize * .79f), std::max(1.f, warningSize * .06f), dark);
+	}
 	ImGui::PopClipRect();
-	if (watched) {
-		const float radius = ImGui::GetFontSize() * .36f;
-		const ImVec2 center(labelPos.x - radius + 3.f, textY + ImGui::GetFontSize() * .5f);
-		const float pulse = .5f + .5f * std::sin(ofGetElapsedTimef() * 10.f);
-		const ImU32 starColor = ImGui::GetColorU32(ImVec4(.35f + .65f * r, .35f + .65f * g, .35f + .65f * b, pulse));
-		ImVec2 points[10];
-		for (int i = 0; i < 10; ++i) {
-			const float angle = -1.57079633f + i * 0.62831853f;
-			const float r = (i % 2 == 0) ? radius : radius * .43f;
-			points[i] = ImVec2(center.x + std::cos(angle) * r, center.y + std::sin(angle) * r);
-		}
-		for (int i = 0; i < 10; ++i)
-			drawList->AddTriangleFilled(center, points[i], points[(i + 1) % 10], starColor);
+	if (watched) { //draw blinking dot
+		const float radius = ImGui::GetFontSize() * .15f;
+		const ImVec2 center(labelPos.x - radius, textY + ImGui::GetFontSize() * .5f);
+		const float pulse = .5f + .5f * std::sinf(ofGetElapsedTimef() * 10.f);
+		const ImU32 starColor = ImGui::GetColorU32(ImVec4(.35f + .55f * r, .35f + .55f * g, .35f + .55f * b, pulse));
+		drawList->AddCircleFilled(center, radius, starColor, 10);
 	}
 	ImGui::PopStyleColor(3);
 	ImGui::PopStyleVar();
-	if (labelClicked) {
-		if (p.type == REMOTEUI_PARAM_BOOL || p.type == REMOTEUI_PARAM_FLOAT || p.type == REMOTEUI_PARAM_INT || p.type == REMOTEUI_PARAM_ENUM || p.type == REMOTEUI_PARAM_COLOR) {
-			controllers.beginLearn(name);
-			bindingPopupRequested = true;
-		}
+	const bool canBind = p.type == REMOTEUI_PARAM_BOOL || p.type == REMOTEUI_PARAM_FLOAT || p.type == REMOTEUI_PARAM_INT || p.type == REMOTEUI_PARAM_ENUM || p.type == REMOTEUI_PARAM_COLOR;
+	if (labelClicked && canBind) {
+		controllers.beginLearn(name);
+		bindingPopupRequested = true;
 	}
 	if (highlightLabel) ImGui::PopStyleColor();
 	ImGui::PopFont();
@@ -840,21 +845,44 @@ void ofApp::drawParameter(const std::string &name) {
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10.f, 8.f));
 	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.f, 0.f, 0.f, 1.f));
 	if (ImGui::BeginPopupContextItem("parameter-context")) {
-		if (ImGui::MenuItem("\"Watch\" on Server", nullptr, watched, client.isReadyToSend()))
-			client.setParamWatched(name, !watched);
+
 		const auto baseline = changeBaseline.find(name);
 		const bool changed = baseline != changeBaseline.end() && p.type == baseline->second.type && !sameParameterValue(p, baseline->second);
-		if (ImGui::MenuItem("Restore Parameter Value", nullptr, false, client.isReadyToSend() && changed)) {
+
+		if (ImGui::MenuItem("Restore parameter value", nullptr, false, client.isReadyToSend() && changed)) {
 			RemoteUIParam restored = p;
 			if (copyParameterValue(restored, baseline->second)) {
 				sendEditedParam(name, restored);
 				appendLog("Restored connection value for \"" + name + "\"");
 			}
 		}
+
 		if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
 			if (!changed) ImGui::SetTooltip("Restores the value to what this client received from the server on its most recent connection.\n\nThis parameter has not changed since then.");
 			else ImGui::SetTooltip("Restores the value to what this client received from the server on its most recent connection.");
 		}
+
+		if (ImGui::MenuItem("Watch parameter on Server", nullptr, watched, client.isReadyToSend()))
+			client.setParamWatched(name, !watched);
+
+		if (p.type == REMOTEUI_PARAM_COLOR && ImGui::MenuItem("Copy as RGBA uint8")) {
+			const std::string rgba = std::to_string(p.redVal) + ", " + std::to_string(p.greenVal) + "," +
+				std::to_string(p.blueVal) + "" + std::to_string(p.alphaVal);
+			ImGui::SetClipboardText(rgba.c_str());
+		}
+
+		if (p.type == REMOTEUI_PARAM_COLOR && ImGui::MenuItem("Copy as RGBA hex")) {
+			char hex[10];
+			std::snprintf(hex, sizeof(hex), "#%02X%02X%02X%02X", p.redVal, p.greenVal, p.blueVal, p.alphaVal);
+			ImGui::SetClipboardText(hex);
+		}
+
+		if (p.type == REMOTEUI_PARAM_COLOR && ImGui::MenuItem("Copy as RGBA float")) {
+			const std::string rgba = std::to_string(p.redVal/255.0f) + "," + std::to_string(p.greenVal/255.0f) + "," +
+				std::to_string(p.blueVal/255.0f) + ", " + std::to_string(p.alphaVal/255.0f);
+			ImGui::SetClipboardText(rgba.c_str());
+		}
+
 		ImGui::EndPopup();
 	}
 	ImGui::PopStyleColor();
@@ -866,6 +894,7 @@ void ofApp::drawParameter(const std::string &name) {
 
 			ImGui::Text("Param: \"%s\"",name.c_str());
 			ImGui::Text("Type: %s", paramTypeName(p.type));
+			if (missingFromPreset) ImGui::TextUnformatted("This parameter was not defined in the loaded preset.");
 
 			if (p.type == REMOTEUI_PARAM_FLOAT && p.minFloat < p.maxFloat)
 				ImGui::Text("Range: [%.6g .. %.6g]", p.minFloat, p.maxFloat);
@@ -896,11 +925,12 @@ void ofApp::drawParameter(const std::string &name) {
 				ImGui::Text("Description: %s", p.description.c_str());
 			}
 
-			ImGui::Dummy(ImVec2(0.f, ImGui::GetTextLineHeight() * .3f));
-			ImGui::Separator();
-			ImGui::Dummy(ImVec2(0.f, ImGui::GetTextLineHeight() * .2f));
-
-			ImGui::TextUnformatted("[ Click to bind a MIDI or joystick control ]");
+			if (canBind) {
+				ImGui::Dummy(ImVec2(0.f, ImGui::GetTextLineHeight() * .3f));
+				ImGui::Separator();
+				ImGui::Dummy(ImVec2(0.f, ImGui::GetTextLineHeight() * .2f));
+				ImGui::TextUnformatted("[ Click to bind a MIDI or joystick control ]");
+			}
 
 			ImGui::EndTooltip();
 		}

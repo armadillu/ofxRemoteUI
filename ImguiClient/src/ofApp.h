@@ -108,6 +108,8 @@ private:
 	std::unordered_map<std::string, RemoteUIParam> changeBaseline;
 	std::unordered_set<std::string> changedSinceLoad;
 	std::unordered_set<std::string> diffParams;
+	std::unordered_set<std::string> missingPresetParams;
+	float missingPresetWarningUntil = 0.f;
 	std::unordered_set<std::string> blinkingBoundParams;
 	float boundBlinkUntil = 0.0f;
 	float changedHighlightPulse = 0.0f;
