@@ -46,7 +46,7 @@ void ofApp::drawSettingsPanel() {
 	framedCheckbox("Highlight changes after loading presets", &highlightPresetDiff);
 	framedCheckbox("Auto-scroll logs", &autoScrollLog);
 	float uiScalePercent = parameterFontScale(rowHeight) * 100.f;
-	if (ImGui::SliderFloat("UI Scale", &uiScalePercent, 100.f * 10.f / 17.f, 100.f * 46.f / 17.f, "%.0f%%")) rowHeight = 2.f + 17.f * uiScalePercent / 100.f;
+	if (ImGui::SliderFloat("UI Scale", &uiScalePercent, 100.f * 12.f / 17.f, 100.f * 22.f / 17.f, "%.0f%%")) rowHeight = 2.f + 17.f * uiScalePercent / 100.f;
 	ImGui::SliderFloat("Column width", &columnBaseWidth, 220.f, 500.f, "%.0f px");
 	if (ImGui::IsItemHovered()) ImGui::SetTooltip("Smaller values allow more columns. The threshold also follows parameter row height.");
 	if (ImGui::ColorEdit3("Window color", windowColor)) applyWindowColor(windowColor);
