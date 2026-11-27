@@ -15,7 +15,7 @@ public:
     struct Input { std::string device, kind; int channel = 0, control = 0; float value = 0; bool button = false; };
     std::vector<Binding> bindings;
     std::string learning;
-    bool toggleButtons = false;
+    bool toggleButtons = true;
     bool colorControlsAlpha = false;
 
     void setup();

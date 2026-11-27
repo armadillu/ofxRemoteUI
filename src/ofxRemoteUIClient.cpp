@@ -204,7 +204,7 @@ void ofxRemoteUIClient::update(float dt){
 		while( oscReceiver.hasWaitingMessages() ){// check for waiting messages from server
 
 			ofxOscMessage m;
-			oscReceiver.getNextMessage(m);
+			if (!oscReceiver.getNextMessage(m)) break;
 
 			DecodedMessage dm = decode(m);
 			RemoteUIClientCallBackArg cbArg; // to notify our "delegate"
@@ -395,9 +395,11 @@ void ofxRemoteUIClient::update(float dt){
 						cbArg.msg = dm.paramName;
 						callBack(cbArg);
 					}
-				}
+				}break;
 
-				default: RLOG_ERROR << "update >> UNKNOWN ACTION!!" <<endl; break;
+				default: RLOG_ERROR << "update >> UNKNOWN ACTION: '" << m.getAddress()
+					<< "' from " << host << ":" << m.getRemotePort()
+					<< " (" << m.getNumArgs() << " arguments)" << endl; break;
 			}
 		}
 	}

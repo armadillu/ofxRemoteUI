@@ -90,7 +90,10 @@ void ofApp::drawParameterPanel() {
 	ImGui::SetNextWindowViewport(viewport->ID);
 	ImGui::SetNextWindowPos(viewport->WorkPos);
 	ImGui::SetNextWindowSize(viewport->WorkSize);
-	if (!ImGui::Begin("Parameters", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); return; }
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.f);
+	const bool windowVisible = ImGui::Begin("Parameters", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking);
+	ImGui::PopStyleVar();
+	if (!windowVisible) { ImGui::End(); return; }
 	auto names = client.isReadyToSend() ? client.getAllParamNamesList() : std::vector<std::string>{};
 	// Presets and parameter filtering occupy the top bar.
 	const float topScale = parameterFontScale(rowHeight);
