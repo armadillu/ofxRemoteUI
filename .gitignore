@@ -3,5 +3,5 @@ OSX Client/src/GitCommitNumber.h
 .DS_Store
 
 #Linux
-.AppleDouble
-
+*AppleDouble
+*.AppImage
