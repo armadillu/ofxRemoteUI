@@ -11,7 +11,10 @@ with "OF_0.9.8". It requires ofxPoco in OF versions >0.9.8__
 
 Watch a quick [Intro Video](http://youtu.be/F18f67d_WjU).
 
-![Clients](screenshots/clientList.png "List of Clients")  
+![imgui](screenshots/imguiClient.png "Dear Imgui Client")  
+![osx](screenshots/osxClient.png "Dear Imgui Client")  
+![builtIn](screenshots/builtInClient.png "Dear Imgui Client")  
+![web](screenshots/webClient.png "Dear Imgui Client")  
 
 In order of appearance in the screenshot above, Mac OS X native Client, ImGui Client (multiplatform), Built In Client (inside your OpenFrameworks app, keyboard operated only), Web Client (served from your OpenFrameworks app).
 
@@ -281,7 +284,7 @@ Commits before the Git Tag "LastCommitWithXMLv1" use the original file format fo
 
 The new file format is proper XML with a root node, it's more human readable, it keeps params listed in the same order they are added in so its easier to read changes on versioning systems, and it has comments showing the group they belong to.
 
-![g](https://farm8.staticflickr.com/7358/16344314099_97e5a68275_o_d.png)
+![g](screenshots/xml.png)
 
 ## LICENSE and ATTRIBUTIONS
 
