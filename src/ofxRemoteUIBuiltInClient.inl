@@ -157,17 +157,17 @@ void ofxRemoteUIBuiltInClient::drawOverlay(const View &view, int screenW, int sc
 		ofSetColor(44, 245);
 		ofDrawRectangle(0,screenH / uiScale - bottomBarHeight, screenW / uiScale, bottomBarHeight );
 
-		std::string reachableAt = "Server reachable at " + view.computerIP + ":" + ofToString(view.port) + "(OSC) ";
+		std::string reachableAt = "Server reachable at " + view.computerIP + ":" + ofToString(view.port) + " (OSC)";
 		#ifndef NO_RUI_WEB_INTERFACE
-		reachableAt += ofToString(view.webPort) + "(WebGUI)";
+		reachableAt += " http://" + view.computerIP + ":" + ofToString(view.webPort) + "(WebGUI)";
 		#endif
 
 		ofSetColor(255);
 		std::string instructions = "ofxRemoteUI built in client. " + reachableAt +
-		"\nPress 's' to save current config, 'S' to make a new preset. ('E' to save in old format)\n" +
+		"\nPress 's' to save current config, 'S' to make a new preset.\n" +
 		"Press 'r' to restore all params's launch state. '+'/'-' to set UI Scale. 'N' to toggle screen notif.\n" +
 		"Press Arrow Keys to edit values. SPACEBAR + Arrow Keys for bigger increments. ',' and '.' Keys to scroll.\n" +
-		"Press 'w' to toggle watch. Press 'TAB' to hide. Press 'RETURN' to cycle RGBA components.";
+		"Press 'w' to toggle watch. Press 'TAB' to hide. Press 'RETURN' to cycle RGBA comp.";
 		#ifndef NO_RUI_WEB_INTERFACE
 		instructions += " Press 'c' to launch a web client.";
 		#endif
@@ -181,7 +181,7 @@ void ofxRemoteUIBuiltInClient::drawOverlay(const View &view, int screenW, int sc
 	ofSetColor(64);
 	ofDrawRectangle(0 , 0, screenW / uiScale, lineH);
 	ofColor textBlinkC ;
-	if(frameNum%6 < 4) textBlinkC = ofColor(0,0);
+	if(frameNum%6 < 3) textBlinkC = ofColor(0,0);
 	else textBlinkC = ofColor(255,0,0);
 
 	ofVec2f dpos = ofVec2f(charW * 23, lineH * 0.65);
@@ -224,6 +224,10 @@ void ofxRemoteUIBuiltInClient::drawOverlay(const View &view, int screenW, int sc
 	if(uiAlpha > 0.99 || view.showDuringEdits){
 
 		ofTranslate(xOffset, 0);
+
+		ofSetColor(32);
+		ofSetLineWidth(1);
+		uiLines.draw();
 
 		//param list
 		for(const auto &entry : view.orderedKeys){
@@ -288,7 +292,7 @@ void ofxRemoteUIBuiltInClient::drawOverlay(const View &view, int screenW, int sc
 				case REMOTEUI_PARAM_COLOR:{
 					ofPushStyle();
 					ofSetColor(p.redVal, p.greenVal, p.blueVal, p.alphaVal);
-					ofDrawRectangle(x + valOffset, y - spacing * 0.6, valSpaceW, spacing * 0.85);
+					ofDrawRectangle(x + valOffset - 1, y - spacing * 0.6, -spacing * 0.85, spacing * 0.85);
 					char aux[200];
 					sprintf(aux, "[%0*d,%0*d,%0*d,%0*d]", 3, p.redVal, 3, p.greenVal, 3, p.blueVal, 3, p.alphaVal);
 					ofSetColor(0); //shadow
@@ -296,15 +300,13 @@ void ofxRemoteUIBuiltInClient::drawOverlay(const View &view, int screenW, int sc
 					ofSetColor(255);
 					drawString(aux, x + valOffset, y);
 					if(view.selectedItem == i){
-						char auxSelect[200];
-						switch (view.selectedColorComp) {
-							case 0: sprintf(auxSelect, " ___"); break;
-							case 1: sprintf(auxSelect, "     ___"); break;
-							case 2: sprintf(auxSelect, "         ___"); break;
-							case 3: sprintf(auxSelect, "             ___"); break;
-						}
 						ofSetColor(textBlinkC);
-						drawString(auxSelect, x + valOffset, y);
+						switch (view.selectedColorComp) {
+							case 0: drawString(" ………", x + valOffset, y + 4); break;
+							case 1: drawString("     ………", x + valOffset, y + 4); break;
+							case 2: drawString("         ………", x + valOffset, y + 4); break;
+							case 3: drawString("             ………", x + valOffset, y + 4); break;
+						}
 					}
 					ofPopStyle();
 					}break;
@@ -338,9 +340,6 @@ void ofxRemoteUIBuiltInClient::drawOverlay(const View &view, int screenW, int sc
 				y = initialY;
 			}
 		}
-		ofSetColor(32);
-		ofSetLineWidth(1);
-		uiLines.draw();
 	}
 
 	//tiny clock top left

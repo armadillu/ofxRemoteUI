@@ -25,6 +25,7 @@ void ofxRemoteUIWebServer::start() {
             break;
         case kSetup:
             server->start();
+            state = kStarted;
             ofLogNotice("ofxRemoteUIWebServer") << "Started server on " << server->port();
             break;
         case kStarted:
@@ -32,6 +33,7 @@ void ofxRemoteUIWebServer::start() {
             break;
         case kStopped:
             server->start();
+            state = kStarted;
             break;
     }
 }
@@ -44,6 +46,7 @@ void ofxRemoteUIWebServer::stop() {
             break;
         case kStarted:
             server->stop();
+            state = kStopped;
             break;
         default: break;
     }
@@ -60,6 +63,7 @@ extern unsigned RUI_WEB_BINARY_SIZE;
 extern unsigned char RUI_WEB_BINARY_CONTENT[];
 
 void ofxRemoteUIWebServer::RUIRequestHandler::handleRequest(Poco::Net::HTTPServerRequest &req, Poco::Net::HTTPServerResponse &resp) {
+    resp.setContentType("text/html; charset=utf-8");
     resp.set("Content-Encoding", "gzip");
     resp.sendBuffer(RUI_WEB_BINARY_CONTENT, RUI_WEB_BINARY_SIZE);
 }

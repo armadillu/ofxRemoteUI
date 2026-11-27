@@ -6,6 +6,9 @@
 //
 //
 
+
+#ifdef RUI_ENABLE_QUERYSERVER
+
 #pragma once
 
 #include "ofMain.h"
@@ -60,3 +63,4 @@ protected:
 	int webPort = -1;
 };
 
+#endif

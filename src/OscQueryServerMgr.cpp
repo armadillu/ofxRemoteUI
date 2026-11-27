@@ -6,6 +6,8 @@
 //
 //
 
+#ifdef RUI_ENABLE_QUERYSERVER
+
 #include "OscQueryServerMgr.h"
 #include <Poco/Net/HTTPServerResponse.h>
 #include "ofxRemoteUIServer.h"
@@ -266,3 +268,5 @@ void OscQueryServerMgr::stopBonjour(){
 		//ofLogWarning("ofxRemoteUI::OscQueryServerMgr") << "Done killing process!";
 	}
 }
+
+#endif

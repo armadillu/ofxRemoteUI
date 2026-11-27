@@ -101,7 +101,7 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 
 	selectedColorComp = 0;
 	selectedPreset = selectedGroupPreset = 0;
-	selectedItem = -1;
+	selectedItem = -1;	
 	//ofSeedRandom(1979);
 	headlessMode = false;
 
@@ -114,18 +114,19 @@ ofxRemoteUIServer::ofxRemoteUIServer(){
 	ofAddListener(eventShowParamUpdateNotification, this, &ofxRemoteUIServer::onShowParamUpdateNotification);
 #else
 	const int a = 44;
-	colorTables.emplace_back(ofColor(194,144,221,a));
-	colorTables.emplace_back(ofColor(202,246,70,a));
-	colorTables.emplace_back(ofColor(74,236,173,a));
-	colorTables.emplace_back(ofColor(253,144,150,a));
-	colorTables.emplace_back(ofColor(41,176,238,a));
-	colorTables.emplace_back(ofColor(180,155,45,a));
-	colorTables.emplace_back(ofColor(63,216,92,a));
-	colorTables.emplace_back(ofColor(226,246,139,a));
-	colorTables.emplace_back(ofColor(239,209,46,a));
-	colorTables.emplace_back(ofColor(234,127,169,a));
-	colorTables.emplace_back(ofColor(227,184,233,a));
-	colorTables.emplace_back(ofColor(165,154,206,a));
+
+	colorTables.emplace_back(ofColor(255, 102, 102, a));
+	colorTables.emplace_back(ofColor(255, 204, 102, a));
+	colorTables.emplace_back(ofColor(255, 255, 102, a));
+	colorTables.emplace_back(ofColor(204, 255, 102, a));
+	colorTables.emplace_back(ofColor(102, 255, 102, a));
+	colorTables.emplace_back(ofColor(102, 255, 204, a));
+	colorTables.emplace_back(ofColor(102, 255, 255, a));
+	colorTables.emplace_back(ofColor(102, 204, 255, a));
+	colorTables.emplace_back(ofColor(102, 102, 255, a));
+	colorTables.emplace_back(ofColor(204, 102, 255, a));
+	colorTables.emplace_back(ofColor(255, 102, 255, a));
+	colorTables.emplace_back(ofColor(255, 111, 207, a));
 #endif
 
 }
@@ -1689,7 +1690,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 		ofxOscMessage m;
 		string remoteIP;
 		#ifndef NO_RUI_WEB_INTERFACE
-        if (wsState.connected && wsState.messages.size()) {
+        if (!wsState.messages.empty()) {
             m = ofxOscMessage(wsState.messages.front());
 			remoteIP = m.getRemoteIp();
             wsState.messages.pop_front();
@@ -2945,15 +2946,19 @@ void ofxRemoteUIServer::onShowParamUpdateNotification(ScreenNotifArg& a){
 
 void ofxRemoteUIServer::sendMessage(const ofxOscMessage & m) {
 	#ifndef NO_RUI_WEB_INTERFACE
-	if (wsState.connected){
-		string json = oscToJson(m);
-		//wsState.wsMutex.lock();
-		//wsState.pendingMessages.push_back(json);
-		//ofLogNotice("ofxRemoteUIServer") << "Ws sent msg '" << m.getAddress() << "'";
-		((Poco::Net::WebSocket*)wsState.ws)->sendFrame(json.c_str(), json.size(), Poco::Net::WebSocket::FRAME_TEXT);
-		//wsState.wsMutex.unlock();
-	}
-	else
+    {
+        std::lock_guard<std::mutex> lock(wsState.connectionMutex);
+        if (wsState.connected && wsState.ws) {
+            try {
+                const string json = oscToJson(m);
+                wsState.ws->sendFrame(json.data(), static_cast<int>(json.size()), Poco::Net::WebSocket::FRAME_TEXT);
+            } catch (const std::exception &e) {
+                ofLogWarning("ofxRemoteUIServer") << "WebSocket send failed: " << e.what();
+                try { wsState.ws->shutdown(); } catch (...) {}
+            }
+            return;
+        }
+    }
 	#endif
 	if(readyToSend && oscSender.getHost().size()){
 		oscSender.sendMessage(m);
@@ -3020,47 +3025,65 @@ public:
 		Poco::Net::WebSocket ws(request, response);
 		ofLogNotice("MyWebSocketHandler") << "WebSocket handleRequest from " << request.clientAddress().toString();
 
-		state->connected = true;
-		state->ws = &ws;
-		int flags = 0;
-		int n = 0;
-		do { //loop for connection handling
+        {
+            std::lock_guard<std::mutex> lock(state->connectionMutex);
+            if (state->connected) {
+                ofLogWarning("MyWebSocketHandler") << "Another web client is already connected";
+                ws.shutdown();
+                return;
+            }
+            state->ws = &ws;
+            state->connected = true;
+        }
 
-			char buffer[4096] = { 0 };
-			int msgSize = 0;
-			do { //loop for message
-				//ofLogNotice("MyWebSocketHandler") << "waiting ...";
-				n = ws.receiveFrame(buffer, sizeof(buffer), flags);
-				//ofLogNotice("MyWebSocketHandler") << "RXd: " << buffer;
-				msgSize +=n;
-			} while ( n > 0 && ( (flags & 0xf0 /* masking op code bits*/) != Poco::Net::WebSocket::FRAME_FLAG_FIN) );
-
-			if(msgSize){
-				string jsonStr = std::string(buffer, msgSize);
-				ofJson json;
-				try{ //parse JSON
-					json = ofJson::parse(jsonStr);
-					//ofLogNotice("MyWebSocketHandler") << "parsed json ok!" << jsonStr;
-
-					ofxOscMessage m = jsonToOsc(json);
-					m.setRemoteEndpoint(request.clientAddress().host().toString(), state->wsPort);
-
-					state->wsMutex.lock();
-					state->messages.emplace_back(m); //store what we RX
-					state->wsMutex.unlock();
-
-				}catch(std::exception e){
-					ofLogError("MyWebSocketHandler") << "err parsing json!" << e.what() << " " << jsonStr;
-				}
-			}else{
-				ofLogWarning("MyWebSocketHandler") << "empty message!";
-			}
-
-		} while (  n > 0 && ( (flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) != Poco::Net::WebSocket::FRAME_OP_CLOSE) );
-
-		ofLogNotice("MyWebSocketHandler") << "WS Client closing connection" << std::endl;
-		state->connected = false;
-		state->ws = nullptr;
+        try {
+            std::string message;
+            const size_t maxMessageSize = 1024 * 1024;
+            ws.setMaxPayloadSize(static_cast<int>(maxMessageSize));
+            bool receivingText = false;
+            for (;;) {
+                Poco::Buffer<char> buffer(0);
+                int flags = 0;
+                int n = ws.receiveFrame(buffer, flags);
+                if (n < 0 || (n == 0 && flags == 0)) break;
+                int opcode = flags & Poco::Net::WebSocket::FRAME_OP_BITMASK;
+                if (opcode == Poco::Net::WebSocket::FRAME_OP_CLOSE) break;
+                if (opcode == Poco::Net::WebSocket::FRAME_OP_PING) {
+                    std::lock_guard<std::mutex> lock(state->connectionMutex);
+                    ws.sendFrame(buffer.begin(), n, Poco::Net::WebSocket::FRAME_FLAG_FIN | Poco::Net::WebSocket::FRAME_OP_PONG);
+                    continue;
+                }
+                if (opcode == Poco::Net::WebSocket::FRAME_OP_PONG) continue;
+                if (opcode == Poco::Net::WebSocket::FRAME_OP_TEXT) {
+                    message.clear();
+                    receivingText = true;
+                } else if (opcode != Poco::Net::WebSocket::FRAME_OP_CONT || !receivingText) {
+                    throw std::runtime_error("Unexpected WebSocket frame");
+                }
+                if (message.size() + static_cast<size_t>(n) > maxMessageSize)
+                    throw std::runtime_error("WebSocket message exceeds size limit");
+                if (n > 0) message.append(buffer.begin(), static_cast<size_t>(n));
+                if (!(flags & Poco::Net::WebSocket::FRAME_FLAG_FIN)) continue;
+                receivingText = false;
+                try {
+                    ofJson json = ofJson::parse(message);
+                    ofxOscMessage m = jsonToOsc(json);
+                    m.setRemoteEndpoint(request.clientAddress().host().toString(), state->wsPort);
+                    std::lock_guard<std::mutex> lock(state->wsMutex);
+                    state->messages.emplace_back(m);
+                } catch (const std::exception &e) {
+                    ofLogWarning("MyWebSocketHandler") << "Invalid WebSocket message: " << e.what();
+                }
+            }
+        } catch (const std::exception &e) {
+            ofLogWarning("MyWebSocketHandler") << "WebSocket connection ended: " << e.what();
+        }
+        {
+            std::lock_guard<std::mutex> lock(state->connectionMutex);
+            state->connected = false;
+            state->ws = nullptr;
+        }
+        ofLogNotice("MyWebSocketHandler") << "WS Client closing connection";
 	}
 
 protected:
@@ -3075,16 +3098,8 @@ public:
 	};
 
 	Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request){
-		if(!state->connected){
-			if (request.find("Upgrade") != request.end() && Poco::icompare(request["Upgrade"], "websocket") == 0){ //we only care about websockets
-				return new MyWebSocketHandler(state);
-			}else{
-				ofLogWarning("ofxRemoteUIServer") << "MyHTTPRequestHandlerFactory got request but no websocket support?";
-			}
-		}else{
-			ofLogError("ofxRemoteUIServer") << "Web Client trying to connect but there's already one connected, ignoring...";
-			return nullptr;
-		}
+        if (request.find("Upgrade") != request.end() && Poco::icompare(request["Upgrade"], "websocket") == 0)
+            return new MyWebSocketHandler(state);
 		return nullptr;
 	}
 protected:
@@ -3107,43 +3122,24 @@ void ofxRemoteUIServer::setupWebSocket(int port) {
 
 
 string ofxRemoteUIServer::oscToJson(const ofxOscMessage & m) {
-
-	std::string json = " { \"addr\": \"" + m.getAddress() + "\", \"args\" : [ ";
-	int argc = m.getNumArgs();
-
-	for (int i = 0; i < argc; i++) {
-		switch(m.getArgType(i)) {
-			case OFXOSC_TYPE_INT32:
-			case OFXOSC_TYPE_INT64:
-				json += to_string(m.getArgAsInt(i));
-				break;
-			case OFXOSC_TYPE_FLOAT:
-				json += to_string(m.getArgAsFloat(i));
-				break;
-			case OFXOSC_TYPE_DOUBLE:
-				json += to_string(m.getArgAsDouble(i));
-				break;
-			case OFXOSC_TYPE_STRING:
-				json += "\"" + m.getArgAsString(i) + "\"";
-				break;
-			case OFXOSC_TYPE_CHAR:
-				json += "\"" + to_string(m.getArgAsChar(i)) + "\"";
-				break;
-			case OFXOSC_TYPE_TRUE:
-			case OFXOSC_TYPE_FALSE:
-				json += to_string(m.getArgAsBool(i));
-				break;
-			case OFXOSC_TYPE_RGBA_COLOR:
-				json += to_string(m.getArgAsRgbaColor(i));
-				break;
-			default: break;
-		}
-		if ( i < (argc - 1)){
-			json += ",";
-		}
-	}
-	json += "] }";
-	return json;
+    ofJson json;
+    json["addr"] = m.getAddress();
+    json["args"] = ofJson::array();
+    for (int i = 0; i < m.getNumArgs(); ++i) {
+        switch (m.getArgType(i)) {
+            case OFXOSC_TYPE_INT32: json["args"].push_back(m.getArgAsInt(i)); break;
+            case OFXOSC_TYPE_INT64: json["args"].push_back(m.getArgAsInt64(i)); break;
+            case OFXOSC_TYPE_FLOAT: json["args"].push_back(m.getArgAsFloat(i)); break;
+            case OFXOSC_TYPE_DOUBLE: json["args"].push_back(m.getArgAsDouble(i)); break;
+            case OFXOSC_TYPE_STRING: json["args"].push_back(m.getArgAsString(i)); break;
+            case OFXOSC_TYPE_CHAR: json["args"].push_back(std::string(1, m.getArgAsChar(i))); break;
+            case OFXOSC_TYPE_TRUE:
+            case OFXOSC_TYPE_FALSE: json["args"].push_back(m.getArgAsBool(i)); break;
+            case OFXOSC_TYPE_RGBA_COLOR: json["args"].push_back(m.getArgAsRgbaColor(i)); break;
+            default: json["args"].push_back(nullptr); break;
+        }
+    }
+    return json.dump();
 }
 
 #endif

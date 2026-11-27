@@ -9,6 +9,8 @@
 #ifndef _ofxRemoteUIServer__
 #define _ofxRemoteUIServer__
 
+#include <atomic>
+
 
 // you will need to add this to your "Header Search Path" for ofxOsc to compile
 // ../../../addons/ofxOsc/libs ../../../addons/ofxOsc/libs/oscpack ../../../addons/ofxOsc/libs/oscpack/src ../../../addons/ofxOsc/libs/oscpack/src/ip ../../../addons/ofxOsc/libs/oscpack/src/ip/posix ../../../addons/ofxOsc/libs/oscpack/src/ip/win32 ../../../addons/ofxOsc/libs/oscpack/src/osc ../../../addons/ofxOsc/src
@@ -22,7 +24,9 @@
 #include "ofxRemoteUIServerMacros.h"
 #if defined( OF_AVAILABLE )
 	#ifdef TARGET_OSX
-		#include "OscQueryServerMgr.h"
+		#ifdef RUI_ENABLE_QUERYSERVER
+			#include "OscQueryServerMgr.h"
+		#endif
 	#endif
 #endif
 
@@ -266,7 +270,8 @@ public:
 	struct WebSocketState{
 		int wsPort;
 		bool setup = false;
-		bool connected = false;
+		std::atomic<bool> connected{false};
+		std::mutex connectionMutex;
 		std::deque<ofxOscMessage> messages; //messages we got
 		std::mutex wsMutex;
 		Poco::Net::WebSocket * ws = nullptr;
