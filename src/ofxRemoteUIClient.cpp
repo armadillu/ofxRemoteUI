@@ -29,6 +29,9 @@ void ofxRemoteUIClient::setCallback( void (*callb)(RemoteUIClientCallBackArg) ){
 }
 
 bool ofxRemoteUIClient::setup(string address, int port_){
+	syncInProgress = false;
+	syncCompleted = false;
+	syncRequestPending = false;
 
 	params.clear();
 	orderedKeys.clear();
@@ -83,6 +86,9 @@ vector<Neighbor> ofxRemoteUIClient::getNeighbors(){
 
 
 void ofxRemoteUIClient::disconnect(){
+	syncInProgress = false;
+	syncCompleted = false;
+	syncRequestPending = false;
 
 	if (!OSCsetup) return;
 	if (readyToSend){
@@ -176,6 +182,14 @@ void ofxRemoteUIClient::update(float dt){
 
 		OSC_CHECK;
 
+		if (syncRequestPending && (syncRequestTimer += dt) >= 2.f) {
+			syncRequestTimer = 0.f;
+			ofxOscMessage request;
+			request.setAddress("/REQU");
+			request.addStringArg("ACK1");
+			sendMessage(request);
+		}
+
 		timeCounter += dt;
 		timeSinceLastReply += dt;
 
@@ -242,6 +256,33 @@ void ofxRemoteUIClient::update(float dt){
 				}break;
 
 				case REQUEST_ACTION: //server closed the REQU, so we should have all the params
+					if (m.getNumArgs() >= 2 && m.getArgType(0) == OFXOSC_TYPE_STRING && m.getArgType(1) == OFXOSC_TYPE_INT32) {
+						const string phase = m.getArgAsString(0);
+						const int token = m.getArgAsInt32(1);
+						if (phase == "ACK1_BEGIN") {
+							syncRequestPending = false;
+							if (!syncInProgress || syncToken != token) { syncToken = token; syncCompleted = false; syncOrder.clear(); }
+							syncInProgress = true;
+							break;
+						}
+						if (phase == "ACK1_END") {
+							if (!syncInProgress || syncToken != token) break;
+							acknowledgeSyncParam(token, "");
+							if (syncCompleted) break;
+							syncCompleted = true;
+							{
+								std::lock_guard<std::recursive_mutex> lock(dataMutex);
+								std::vector<string> order;
+								std::set<string> included;
+								for (const auto &entry : syncOrder) if (params.count(entry.second) && included.insert(entry.second).second) order.push_back(entry.second);
+								for (const auto &entry : orderedKeys) if (included.insert(entry.second).second) order.push_back(entry.second);
+								orderedKeys.clear();
+								for (size_t i = 0; i < order.size(); ++i) orderedKeys[static_cast<int>(i)] = order[i];
+							}
+						}
+					}
+					else if (syncInProgress && !syncCompleted) break;
+					else syncRequestPending = false;
 					if(verbose_) RLOG_VERBOSE << host << " says REQUEST_ACTION!" ;
 					if(callBack != NULL){
 						cbArg.action = SERVER_SENT_FULL_PARAMS_UPDATE;
@@ -252,6 +293,12 @@ void ofxRemoteUIClient::update(float dt){
 				case SEND_PARAM_ACTION:{ //server is sending us an updated val
 					if(verbose_) RLOG_VERBOSE << host << " says SEND_PARAM_ACTION!" ;
 					updateParamFromDecodedMessage(m, dm);
+					const int n = m.getNumArgs();
+					if (syncInProgress && !syncCompleted && n >= 2 && m.getArgType(n - 2) == OFXOSC_TYPE_INT32 &&
+						m.getArgType(n - 1) == OFXOSC_TYPE_INT32 && m.getArgAsInt32(n - 2) == syncToken) {
+						syncOrder[m.getArgAsInt32(n - 1)] = dm.paramName;
+						acknowledgeSyncParam(syncToken, dm.paramName);
+					}
 				}
 					break;
 
@@ -640,12 +687,37 @@ bool ofxRemoteUIClient::isParamWatched(const std::string &name) const{
 void ofxRemoteUIClient::requestCompleteUpdate(){
 	//cout << "ofxRemoteUIClient: requestCompleteUpdate()" ;
 	if(readyToSend){
-		sendREQU();
+		syncInProgress = false;
+		syncCompleted = false;
+		syncRequestPending = true;
+		syncRequestTimer = 0.f;
+		ofxOscMessage request;
+		request.setAddress("/REQU");
+		request.addStringArg("ACK1");
+		sendMessage(request);
 		vector<string> a;
 		sendPREL(a);
 	}
 }
 
+
+void ofxRemoteUIClient::requestUnacknowledgedUpdate(){
+	if (!readyToSend) return;
+	syncInProgress = false;
+	syncCompleted = false;
+	syncRequestPending = false;
+	sendREQU();
+	vector<string> presets;
+	sendPREL(presets);
+}
+
+void ofxRemoteUIClient::acknowledgeSyncParam(int token, const string &name){
+	ofxOscMessage ack;
+	ack.setAddress("/ACKP");
+	ack.addIntArg(token);
+	ack.addStringArg(name);
+	sendMessage(ack);
+}
 
 bool ofxRemoteUIClient::isReadyToSend(){
 	return readyToSend;

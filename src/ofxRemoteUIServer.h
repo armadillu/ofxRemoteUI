@@ -419,6 +419,14 @@ protected:
 	std::unordered_map<int, std::string>						orderedKeys_removed; // used to keep the order in which the params were added
 	bool														sentParamsToClient = false; //keep track of a client having been connected far enough for us to send them param list
 	std::map<std::string, RemoteUIServerValueWatch> 			varWatches;
+	std::vector<std::string> pendingParamsToSend; // registration order; protected by dataMutex
+	std::vector<std::string> syncParams;
+	std::set<std::string> syncUnacknowledged;
+	std::size_t syncCursor = 0;
+	int syncToken = 0;
+	float syncTimer = 0.f;
+	bool syncAwaitingAck = false;
+	std::string syncClientIP;
 	static ofxRemoteUIServer* 								singleton;
 
 	//handle params that are to be ignored when loading presets

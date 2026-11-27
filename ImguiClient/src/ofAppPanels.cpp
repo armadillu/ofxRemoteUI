@@ -4,6 +4,12 @@
 #include "ClientStyle.h"
 #include "AboutIconData.h"
 
+#if __has_include("BuildCommit.h")
+#include "BuildCommit.h"
+#else
+#define OFX_REMOTEUI_BUILD_COMMIT "unknown"
+#endif
+
 #include <algorithm>
 
 using namespace ofAppImGuiHelpers;
@@ -18,7 +24,7 @@ void ofApp::drawAboutPanel() {
 	}
 	const ImGuiViewport *viewport = ImGui::GetMainViewport();
 	ImGui::SetNextWindowPos(viewport->GetWorkCenter(), ImGuiCond_Appearing, ImVec2(.5f, .5f));
-	ImGui::SetNextWindowSize(ImVec2(380, 320), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_Always);
 	prepareSecondaryWindow();
 	if (!ImGui::Begin("About ofxRemoteUI", &showAbout, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize)) { ImGui::End(); return; }
 	const auto centerItem = [](float width) {
@@ -40,6 +46,10 @@ void ofApp::drawAboutPanel() {
 	ImGui::Spacing();
 	centeredText("By Oriol Ferrer Mesià");
 	centeredText("Build: " __DATE__ " " __TIME__);
+	centeredText("Git commit:");
+	const std::string commit = OFX_REMOTEUI_BUILD_COMMIT;
+	centeredText(commit.substr(0, 20).c_str());
+	if (commit.size() > 20) centeredText(commit.substr(20).c_str());
 	ImGui::Spacing();
 	centerItem(ImGui::CalcTextSize("GitHub project").x);
 	if (ImGui::TextLink("GitHub project")) ofLaunchBrowser("https://github.com/armadillu/ofxRemoteUI");

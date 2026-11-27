@@ -182,3 +182,9 @@ PROJECT_DEFINES =
 # Default is C++23 (falls back to c++2b on older Apple Clang). Uncomment to override.
 # export MAC_OS_MIN_VERSION = 12.0
 # export MAC_OS_CPP_VER = -std=c++23
+
+# Refresh the embedded revision before make checks source dependencies.
+REMOTEUI_COMMIT_SCRIPT := $(firstword $(wildcard update-build-commit.sh ../../ExternalAddons/ofxRemoteUI/ImguiClient/update-build-commit.sh))
+ifneq ($(REMOTEUI_COMMIT_SCRIPT),)
+$(shell sh "$(REMOTEUI_COMMIT_SCRIPT)")
+endif

@@ -103,7 +103,7 @@ void ofApp::setup() {
 			case NativeMacMenu::ActivityPanel: showLogPanel = !showLogPanel; break;
 			case NativeMacMenu::ServerLogPanel: showServerLogPanel = !showServerLogPanel; break;
 			case NativeMacMenu::PreferencesPanel: showSettings = !showSettings; break;
-			case NativeMacMenu::AboutPanel: showAbout = true; break;
+			case NativeMacMenu::AboutPanel: break;
 			case NativeMacMenu::BindingsPanel:
 				showBindings = !showBindings;
 				if (showBindings) { bindingServerFilter.clear(); focusBindings = true; }
@@ -158,7 +158,7 @@ void ofApp::update() {
 	if (continuousRefresh && client.ready()) {
 		continuousRefreshTimer += dt;
 		if (continuousRefreshTimer >= 1.0f) {
-			client.requestCompleteUpdate();
+			client.requestUnacknowledgedUpdate();
 			continuousRefreshTimer = 0.0f;
 		}
 	}
@@ -219,6 +219,8 @@ void ofApp::drawMenuBar() {
 	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(borderLuma, borderLuma, borderLuma, 1.f));
 	if (ImGui::BeginMainMenuBar()) {
 		if (ImGui::BeginMenu("File")) {
+			if (ImGui::MenuItem("Open Local Preset...", "Ctrl+O")) choosePresetFile();
+			ImGui::Separator();
 			if (ImGui::MenuItem("Quit", "Ctrl+Q")) ofExit();
 			ImGui::EndMenu();
 		}
@@ -229,8 +231,6 @@ void ofApp::drawMenuBar() {
 			if (ImGui::MenuItem("Save Current Values to Server", "Ctrl+S", false, menuConnected)) client.saveCurrentStateToDefaultXML();
 			if (ImGui::MenuItem("Restore Launch Values", "Ctrl+R", false, menuConnected)) client.restoreAllParamsToInitialXML();
 			if (ImGui::MenuItem("Restore Code Defaults", "Ctrl+Shift+R", false, menuConnected)) client.restoreAllParamsToDefaultValues();
-			ImGui::Separator();
-			if (ImGui::MenuItem("Open Local Preset...", "Ctrl+O")) choosePresetFile();
 			ImGui::Separator();
 			if (ImGui::MenuItem("Copy Parameter Values", "Ctrl+Shift+C", false, menuConnected)) glfwSetClipboardString(glfwGetCurrentContext(), client.getValuesAsString().c_str());
 			if (ImGui::MenuItem("Paste Parameter Values", "Ctrl+Shift+V", false, menuConnected)) { const char *v = glfwGetClipboardString(glfwGetCurrentContext()); if (v) applyClipboardValues(v); }

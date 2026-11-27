@@ -4,17 +4,51 @@
 #include <objc/message.h>
 #include <objc/runtime.h>
 
+#if __has_include("BuildCommit.h")
+#include "BuildCommit.h"
+#else
+#define OFX_REMOTEUI_BUILD_COMMIT "unknown"
+#endif
+
 namespace NativeMacMenu {
 static Action action;
 static id target = nil;
 static id roots[4] = {nil, nil, nil, nil};
 static id hostWindowsMenu = nil;
+static id aboutItem = nil;
+static id previousAboutTarget = nil;
+static SEL previousAboutAction = nullptr;
 static id items[AboutPanel + 1] = {};
 
 template<typename R, typename... A> R send(id object, const char *selector, A... args) {
     return reinterpret_cast<R (*)(id, SEL, A...)>(objc_msgSend)(object, sel_registerName(selector), args...);
 }
 static id string(const char *s) { return send<id>((id)objc_getClass("NSString"), "stringWithUTF8String:", s); }
+static void showAbout(id, SEL, id) {
+    id text = string("By Oriol Ferrer Mesià\nBuild: " __DATE__ " " __TIME__
+                     "\nGit commit: " OFX_REMOTEUI_BUILD_COMMIT "\nGitHub project");
+    id credits = send<id>(send<id>((id)objc_getClass("NSMutableAttributedString"), "alloc"), "initWithString:", text);
+    struct Range { unsigned long location; unsigned long length; };
+    id paragraph = send<id>(send<id>((id)objc_getClass("NSMutableParagraphStyle"), "alloc"), "init");
+    send<void>(paragraph, "setAlignment:", (unsigned long)2); // NSTextAlignmentCenter
+    Range allText = {0, send<unsigned long>(text, "length")};
+    send<void>(credits, "addAttribute:value:range:", string("NSParagraphStyle"), paragraph, allText);
+    send<void>(paragraph, "release");
+    id linkText = string("GitHub project");
+    Range range = send<Range>(text, "rangeOfString:", linkText);
+    id url = send<id>((id)objc_getClass("NSURL"), "URLWithString:", string("https://github.com/armadillu/ofxRemoteUI"));
+    send<void>(credits, "addAttribute:value:range:", string("NSLink"), url, range);
+    id options = send<id>((id)objc_getClass("NSDictionary"), "dictionaryWithObject:forKey:", credits, string("Credits"));
+    id app = send<id>((id)objc_getClass("NSApplication"), "sharedApplication");
+    send<void>(app, "orderFrontStandardAboutPanelWithOptions:", options);
+    id window = send<id>(app, "keyWindow");
+    if (window) {
+        struct Size { double width; double height; };
+        send<void>(window, "setContentSize:", Size{400, 300});
+        send<void>(window, "center");
+    }
+    send<void>(credits, "release");
+}
 static void perform(id, SEL, id sender) {
     auto command = static_cast<Command>(send<long>(sender, "tag"));
     if (action) action(command);
@@ -64,16 +98,31 @@ bool setup(Action handler) {
     if (!cls) {
         cls = objc_allocateClassPair((Class)objc_getClass("NSObject"), "RemoteUIImGuiMenuTarget", 0);
         class_addMethod(cls, sel_registerName("remoteUIAction:"), (IMP)perform, "v@:@");
+        class_addMethod(cls, sel_registerName("remoteUIAbout:"), (IMP)showAbout, "v@:@");
         objc_registerClassPair(cls);
     }
     target = send<id>(send<id>((id)cls, "alloc"), "init");
     action = std::move(handler);
+    // GLFW's first menu is the application menu. Reuse its standard About item.
+    id applicationRoot = send<id>(mainMenu, "itemAtIndex:", (long)0);
+    id applicationMenu = send<id>(applicationRoot, "submenu");
+    id applicationItems = send<id>(applicationMenu, "itemArray");
+    const unsigned long applicationItemCount = send<unsigned long>(applicationItems, "count");
+    for (unsigned long i = 0; i < applicationItemCount; ++i) {
+        id item = send<id>(applicationItems, "objectAtIndex:", i);
+        if (send<SEL>(item, "action") == sel_registerName("orderFrontStandardAboutPanel:")) {
+            aboutItem = item;
+            previousAboutTarget = send<id>(item, "target");
+            previousAboutAction = send<SEL>(item, "action");
+            send<void>(item, "setTarget:", target);
+            send<void>(item, "setAction:", sel_registerName("remoteUIAbout:"));
+            break;
+        }
+    }
     id file = makeMenu("File", 0, mainMenu);
     add(file, "Open Local Preset...", OpenLocal, "o");
     add(file, "Settings", PreferencesPanel, ",");
     id remote = makeMenu("ofxRemoteUI", 1, mainMenu);
-    add(remote, "About ofxRemoteUI", AboutPanel);
-    separator(remote);
     add(remote, "Connect", Connect, "k");
     separator(remote);
     add(remote, "Refresh Parameters", Refresh, "s", true);
@@ -139,6 +188,13 @@ void update(bool connected, bool activity, bool serverLog, bool preferences, boo
 void shutdown() {
     if (!target) return;
     action = {};
+    if (aboutItem) {
+        send<void>(aboutItem, "setTarget:", previousAboutTarget);
+        send<void>(aboutItem, "setAction:", previousAboutAction);
+        aboutItem = nil;
+        previousAboutTarget = nil;
+        previousAboutAction = nullptr;
+    }
     id menu = send<id>(send<id>((id)objc_getClass("NSApplication"), "sharedApplication"), "mainMenu");
     if (hostWindowsMenu) {
         for (int i = ActivityPanel; i <= ServerLogPanel; ++i) send<void>(hostWindowsMenu, "removeItem:", items[i]);

@@ -37,6 +37,7 @@ public:
 	void removeAllParamWatches();
 	bool isParamWatched(const std::string &name) const;
 	void requestCompleteUpdate(); //ask the server to send us all params and presets
+	void requestUnacknowledgedUpdate(); //legacy full update without acknowledgements
 
 	void restoreAllParamsToInitialXML();
 	void restoreAllParamsToDefaultValues();
@@ -91,6 +92,13 @@ public:
 	bool isSetup();
 
 private:
+	void acknowledgeSyncParam(int token, const std::string &name);
+	int syncToken = 0;
+	bool syncInProgress = false;
+	bool syncCompleted = false;
+	bool syncRequestPending = false;
+	float syncRequestTimer = 0.f;
+	std::map<int, std::string> syncOrder;
 
 	void 				removeParamFromDB(const std::string & paramName);
 

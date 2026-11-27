@@ -95,6 +95,20 @@
  SERVER:	/SEND COL PARAM_NAME6 val (int)
  SERVER:	/REQU OK								//server closes REQU
  ...
+ // Optional acknowledged parameter sync (OSC arguments shown after each address):
+ CLIENT: /REQU "ACK1"                          // request acknowledged sync
+ SERVER: /REQU "ACK1_BEGIN" TOKEN              // TOKEN is an int32 sync identifier
+ SERVER: /SEND TYPE PARAM_NAME ... TOKEN INDEX // normal arguments followed by int32 token and order index
+ CLIENT: /ACKP TOKEN PARAM_NAME                // acknowledge each received parameter (string name)
+ SERVER: /REQU "ACK1_END" TOKEN                // all parameters acknowledged
+ CLIENT: /ACKP TOKEN ""                        // acknowledge completion (empty string name)
+ // BEGIN and unacknowledged parameters are retried; END is retried until acknowledged.
+ // The client uses INDEX to restore registration order after out-of-order delivery.
+ // A client retries its request if it receives no response. Legacy clients send /REQU
+ // without ACK1 and receive /REQU "OK"; legacy servers ignore the extra request argument
+ // and reply in that original format. Only opt-in peers exchange /ACKP messages.
+ // The ImGui client's Non-Stop refresh uses the legacy exchange without acknowledgements.
+ ...
  CLIENT:	/PREL								//Preset List - client requests list of presets
  SERVER:	/PREL PRESET_NAME_LIST(n)			//server sends all preset names
  ...
@@ -261,7 +275,7 @@ public:
 protected:
 
 	virtual void update(float dt) = 0;
-	void sendParam(const std::string &paramName, const RemoteUIParam & p);
+	void sendParam(const std::string &paramName, const RemoteUIParam & p, int syncToken = -1, int syncIndex = -1);
 	DecodedMessage decode(const ofxOscMessage & m) const;
 
 	std::vector<std::string> scanForUpdatedParamsAndSync();	//goes through all params, comparing * to real value

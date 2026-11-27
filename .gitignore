@@ -5,3 +5,5 @@ OSX Client/src/GitCommitNumber.h
 #Linux
 *AppleDouble
 *.AppImage
+
+ImguiClient/src/BuildCommit.h

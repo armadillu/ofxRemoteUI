@@ -215,6 +215,8 @@ void ofxRemoteUIServer::removeParamFromDB(const string & paramName, bool permane
 		if(it2 != paramsSentOverOsc.end()){
 			paramsSentOverOsc.erase(it2);
 		}
+		syncUnacknowledged.erase(paramName);
+		pendingParamsToSend.erase(std::remove(pendingParamsToSend.begin(), pendingParamsToSend.end(), paramName), pendingParamsToSend.end());
 
         if(!permanently){
             //keep it in the removed struct
@@ -261,6 +263,8 @@ void ofxRemoteUIServer::removeAllParams(){
 	paramsFromXML.clear();
 	paramsWereLoadedFromXML.clear();
 	paramsSentOverOsc.clear();
+	syncUnacknowledged.clear();
+	pendingParamsToSend.clear();
 
 	dataMutex.unlock();
 
@@ -1718,10 +1722,35 @@ void ofxRemoteUIServer::updateServer(float dt){
 
 			case REQUEST_ACTION:{ //send all params to client
 				if(verbose_) RLOG_VERBOSE << remoteIP << " sends REQU!";
-				pushParamsToClient();
+				const bool reliable = m.getNumArgs() > 0 && m.getArgType(0) == OFXOSC_TYPE_STRING && m.getArgAsString(0) == "ACK1";
+				if (reliable) {
+					scanForUpdatedParamsAndSync();
+					syncAllParamsToPointers();
+					syncParams = getAllParamNamesList();
+					syncUnacknowledged = std::set<std::string>(syncParams.begin(), syncParams.end());
+					syncToken = syncToken == INT_MAX ? 1 : syncToken + 1;
+					syncCursor = 0;
+					syncTimer = 1.f;
+					syncClientIP = remoteIP;
+					syncAwaitingAck = true;
+				} else {
+					syncAwaitingAck = false;
+					pushParamsToClient();
+				}
 				sendWatchList();
 				sentParamsToClient = true;
 				}break;
+
+			case SYNC_ACK_ACTION: {
+				if (syncAwaitingAck && remoteIP == syncClientIP && m.getNumArgs() == 2 &&
+					m.getArgType(0) == OFXOSC_TYPE_INT32 && m.getArgType(1) == OFXOSC_TYPE_STRING &&
+					m.getArgAsInt32(0) == syncToken) {
+					const string name = m.getArgAsString(1);
+					if (name.empty()) {
+						if (syncUnacknowledged.empty()) syncAwaitingAck = false;
+					} else syncUnacknowledged.erase(name);
+				}
+			} break;
 
 			case WATCH_SET_ACTION: {
 				if (m.getNumArgs() == 2 && m.getArgType(0) == OFXOSC_TYPE_STRING && m.getArgType(1) == OFXOSC_TYPE_INT32) {
@@ -1764,6 +1793,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				break;
 
 			case CIAO_ACTION:{
+				syncAwaitingAck = false;
 				sendCIAO(); //TODO !!!!!!!! this was only sent when !ws
 				cbArg.action = CLIENT_DISCONNECTED;
 				if(callBack) callBack(cbArg);
@@ -1931,18 +1961,48 @@ void ofxRemoteUIServer::updateServer(float dt){
 		}
 	}
 
-	//let's see if there's some params that we have that have never been sent to the client
-	//this would happen if we added new params on the fly as the app runs
-	if(sentParamsToClient && readyToSend){ //only do this after a client successfully connected already (sentParamsToClient==true)
+	// Send small batches and retry unacknowledged entries, including the completion message.
+	if (syncAwaitingAck && readyToSend) {
+		syncTimer += dt;
+		if (syncTimer >= .02f) {
+			syncTimer = 0.f;
+			ofxOscMessage marker;
+			marker.setAddress("/REQU");
+			marker.addStringArg("ACK1_BEGIN");
+			marker.addIntArg(syncToken);
+			sendMessage(marker);
+			if (!syncUnacknowledged.empty()) {
+				int sent = 0;
+				while (syncCursor < syncParams.size() && sent < 64) {
+					const int index = static_cast<int>(syncCursor);
+					const string &name = syncParams[syncCursor++];
+					auto it = params.find(name);
+					if (syncUnacknowledged.count(name) && it != params.end()) { sendParam(name, it->second, syncToken, index); ++sent; }
+				}
+				if (syncCursor == syncParams.size()) { syncCursor = 0; syncTimer = -.48f; }
+			} else {
+				ofxOscMessage done;
+				done.setAddress("/REQU");
+				done.addStringArg("ACK1_END");
+				done.addIntArg(syncToken);
+				sendMessage(done);
+				syncTimer = -.48f;
+			}
+		}
+	}
+
+	// Send parameters registered since the last sync, once the acknowledged sync is complete.
+	if(sentParamsToClient && readyToSend && !syncAwaitingAck && !pendingParamsToSend.empty()){
 		bool didSendSome = false;
-		for(auto & pit : orderedKeys){
-			const string & pName = pit.second;
-			auto it = std::find(paramsSentOverOsc.begin(), paramsSentOverOsc.end(), pName);
-			if(it == paramsSentOverOsc.end() ){
-				sendParam(pName, params[pName]);
+		for(const auto &pName : pendingParamsToSend){
+			if(paramsSentOverOsc.find(pName) == paramsSentOverOsc.end()){
+				sendParam(pName, params.at(pName));
 				didSendSome = true;
 			}
 		}
+		// Keep failed sends pending; a full sync may already have sent other entries.
+		pendingParamsToSend.erase(std::remove_if(pendingParamsToSend.begin(), pendingParamsToSend.end(),
+			[this](const string &name){ return paramsSentOverOsc.find(name) != paramsSentOverOsc.end(); }), pendingParamsToSend.end());
 		if(didSendSome) sendREQU(true);
 	}
 	dataMutex.unlock();
@@ -2105,6 +2165,7 @@ bool ofxRemoteUIServer::addParamToDB(RemoteUIParam p, const string &thisParamNam
 		lastAddedParam.clear();
 		return false;
 	}
+	pendingParamsToSend.push_back(thisParamName);
 	if(p.floatValAddr) *p.floatValAddr = p.floatVal;
 	if(p.intValAddr) *p.intValAddr = p.intVal;
 

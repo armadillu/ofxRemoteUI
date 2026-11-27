@@ -194,7 +194,7 @@ To build it:
 
 1. Install this addon as `openFrameworks/addons/ofxRemoteUI` and install [ofxMidi](https://github.com/danomatika/ofxMidi) as `openFrameworks/addons/ofxMidi`. 
 2. Open Project Generator and select the addon's `ImguiClient` directory as the project. The included `addons.make` selects `ofxRemoteUI` and `ofxMidi`; the addon's dependencies include `ofxOsc`, `ofxPoco` and `ofxXmlSettings`. The included `config.make` points Project Generator at the client-only Dear ImGui sources in `../libs/imgui`.
-3. Generate the project for your platform, then open and build the generated project. Keep `ImguiClient/bin/data/fonts` with the application so it can load its fonts.
+3. Generate the project for your platform, then open and build the generated project. Keep `ImguiClient/bin/data/fonts` with the application so it can load its fonts. For a generated Xcode project, add a Run Script build phase before Compile Sources that runs `"$SRCROOT/update-build-commit.sh"` and disable dependency analysis for that phase. This embeds the addon Git commit shown in About; Make builds refresh it automatically. Builds without Git metadata show `unknown`.
 4. On macOS, retain the provided `openFrameworks-Info.plist` when generating the Xcode project (or restore it afterward) for Retina support and Finder's `.rui` Open With entry. 
 
 The generated build should compile the Dear ImGui core, `imgui_demo.cpp` (used by the style editor), and the GLFW and OpenGL3 backends from `libs/imgui`. These sources are excluded from ordinary `ofxRemoteUI` addon builds to avoid conflicts with an application's own ImGui version. A standalone macOS distribution must also include the data folder; Project Generator's default app build does not bundle it automatically.

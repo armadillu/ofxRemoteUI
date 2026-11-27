@@ -139,6 +139,7 @@ DecodedMessage ofxRemoteUI::decode(const ofxOscMessage & m) const{
 		else if (action == "WATC") dm.action = WATCH_SET_ACTION;
 		else if (action == "WATL") dm.action = WATCH_LIST_ACTION;
 		else if (action == "WCLR") dm.action = WATCH_CLEAR_ACTION;
+		else if (action == "ACKP") dm.action = SYNC_ACK_ACTION;
 		else if (action == "CIAO") dm.action = CIAO_ACTION;
 		else if (action == "TEST") dm.action = TEST_ACTION;
 		else if (action == "PREL") dm.action = PRESET_LIST_ACTION;
@@ -800,7 +801,7 @@ void ofxRemoteUI::setValuesFromString( const std::string & values ){
 }
 
 
-void ofxRemoteUI::sendParam(const std::string &paramName, const RemoteUIParam & p){
+void ofxRemoteUI::sendParam(const std::string &paramName, const RemoteUIParam & p, int syncToken, int syncIndex){
 	ofxOscMessage m;
 	//if(verbose_){ ofLogVerbose("sending >> %s ", paramName.c_str()); p.print(); }
 	m.setAddress("/SEND " + stringForParamType(p.type) + " " + paramName);
@@ -822,6 +823,7 @@ void ofxRemoteUI::sendParam(const std::string &paramName, const RemoteUIParam & 
 	m.addIntArg(p.r); m.addIntArg(p.g); m.addIntArg(p.b); m.addIntArg(p.a); // set bg color!
 	m.addStringArg(p.group);
 	m.addStringArg(p.description);
+	if (syncToken >= 0) { m.addIntArg(syncToken); m.addIntArg(syncIndex); }
 	try{
 		sendMessage(m);
 		if(verbose_) RLOG_VERBOSE << "sendParam(" << paramName << ")";
