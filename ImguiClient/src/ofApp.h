@@ -56,6 +56,7 @@ private:
 	void applyClipboardValues(const std::string &values, bool highlightChanges = false);
 	void selectNeighbor(const Neighbor &neighbor);
 	void setAlwaysOnTop(bool enabled);
+	void applyWindowOpacity();
 	bool isLocalHost(const std::string &host) const;
 
 	ofxRemoteUIClient client;
@@ -125,6 +126,7 @@ private:
 	bool autoSavePreferences = true;
 	float rowHeight = 20.7f;
 	float columnBaseWidth = 300.0f;
+	float windowOpacity = 1.f;
 	std::string activeMouseSlider;
 	float virtualSliderMouseX = 0.0f;
 	bool relativeSliderTracking = false;

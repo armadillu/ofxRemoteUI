@@ -34,7 +34,7 @@ void ofApp::drawServerLogPanel() {
 }
 
 void ofApp::drawSettingsPanel() {
-	ImGui::SetNextWindowSize(ImVec2(350, 340), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(350, 370), ImGuiCond_Always);
 	prepareSecondaryWindow();
 	if (!ImGui::Begin("Settings", &showSettings, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize)) { ImGui::End(); return; }
 	framedCheckbox("Auto-connect to new servers", &autoConnectToNewServers);
@@ -51,6 +51,8 @@ void ofApp::drawSettingsPanel() {
 	ImGui::SliderFloat("Column width", &columnBaseWidth, 220.f, 500.f, "%.0f px");
 	if (ImGui::IsItemHovered()) ImGui::SetTooltip("Smaller values allow more columns. The threshold also follows parameter row height.");
 	if (ImGui::ColorEdit3("Window color", windowColor)) applyWindowColor(windowColor);
+	float opacityPercent = windowOpacity * 100.f;
+	if (ImGui::SliderFloat("Window opacity", &opacityPercent, 20.f, 100.f, "%.0f%%")) { windowOpacity = opacityPercent / 100.f; applyWindowOpacity(); }
 	ImGui::Spacing();
 	ImGui::Spacing();
 	const float saveButtonWidth = ImGui::CalcTextSize("Save preferences").x + ImGui::GetStyle().FramePadding.x * 2.f;

@@ -120,6 +120,11 @@ bool ofApp::isLocalHost(const std::string &ip) const {
 void ofApp::setAlwaysOnTop(bool enabled) {
 	gui.setFloating(enabled);
 }
+void ofApp::applyWindowOpacity() {
+	if (auto window = ofGetWindowPtr()) {
+		if (auto *glfwWindow = static_cast<GLFWwindow *>(window->getWindowContext())) glfwSetWindowOpacity(glfwWindow, windowOpacity);
+	}
+}
 void ofApp::queuePresetFile(const std::string &path) {
 	if (receivedFullSync && client.isReadyToSend()) importPresetFile(path);
 	else { pendingPresetFiles.push_back(path); appendLog("Preset waiting for server sync: " + path); }
@@ -222,6 +227,7 @@ void ofApp::savePreferences() const {
 	out << host << '\n' << port << '\n' << true << '\n' << autoConnectToNewServers << '\n' << onlyAutoConnectToLocalHost << '\n' << continuousRefresh << '\n' << false << '\n' << alwaysOnTop << '\n' << autoScrollLog << '\n' << controllers.toggleButtons << '\n' << controllers.colorControlsAlpha << '\n' << highlightPresetDiff << '\n' << rowHeight << '\n' << windowColor[0] << ' ' << windowColor[1] << ' ' << windowColor[2] << '\n';
 	out << columnBaseWidth << '\n';
 	out << "highlightChangesSinceLoad=" << (highlightChangesSinceLoad ? 1 : 0) << '\n';
+	out << "windowOpacity=" << windowOpacity << '\n';
 	if (auto window = ofGetWindowPtr()) {
 		int x = 0, y = 0, width = 0, height = 0;
 		auto *glfwWindow = static_cast<GLFWwindow *>(window->getWindowContext());
@@ -247,6 +253,11 @@ void ofApp::loadPreferences() {
 	while (std::getline(in, option)) {
 		if (option == "highlightChangesSinceLoad=1") highlightChangesSinceLoad = true;
 		else if (option == "highlightChangesSinceLoad=0") highlightChangesSinceLoad = false;
+		else if (option.rfind("windowOpacity=", 0) == 0) {
+			float savedOpacity;
+			std::istringstream value(option.substr(14));
+			if (value >> savedOpacity && std::isfinite(savedOpacity)) windowOpacity = ofClamp(savedOpacity, .2f, 1.f);
+		}
 	}
 	if (host.empty()) host = "127.0.0.1";
 	std::strncpy(hostBuffer, host.c_str(), sizeof(hostBuffer) - 1);

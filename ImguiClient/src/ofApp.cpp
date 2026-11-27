@@ -81,6 +81,7 @@ void ofApp::setup() {
 	// Cocoa clears both minimum dimensions if either is GLFW_DONT_CARE.
 	if (window) glfwSetWindowSizeLimits(window, 570, 300, GLFW_DONT_CARE, GLFW_DONT_CARE);
 	applyWindowColor(windowColor);
+	applyWindowOpacity();
 	setAlwaysOnTop(alwaysOnTop);
 	controllers.setup();
 	#ifdef TARGET_OSX
