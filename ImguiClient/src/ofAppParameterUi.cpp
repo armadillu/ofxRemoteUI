@@ -780,11 +780,11 @@ void ofApp::drawParameter(const std::string &name) {
 	const float r = p.a ? p.r / 255.f : .5f, g = p.a ? p.g / 255.f : .5f, b = p.a ? p.b / 255.f : .5f;
 	float highlightPulse = 0.f;
 	if (blinkBinding) {
-		highlightPulse = .5f + .5f * std::sinf((boundBlinkUntil - ofGetElapsedTimef()) * 3.14159265f * 2.f);
+		highlightPulse = .5f + .5f * std::sin((boundBlinkUntil - ofGetElapsedTimef()) * 3.14159265f * 2.f);
 		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));
 	} else if (temporaryHighlight) { //shows a param is different than what it was
 		// Pulse between white and a light tint of the parameter color.
-		highlightPulse = .5f + .5f * std::sinf(3.0f * ofGetElapsedTimef() * 3.14159265f);
+		highlightPulse = .5f + .5f * std::sin(3.0f * ofGetElapsedTimef() * 3.14159265f);
 		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f - .3f * (1.f - r) * highlightPulse, 1.f - .3f * (1.f - g) * highlightPulse, 1.f - .3f * (1.f - b) * highlightPulse, 1.f));
 	} else if (highlightLabel) { //shows a param is dirty
 		float d = 0.6f + .4f * changedHighlightPulse;
@@ -816,7 +816,7 @@ void ofApp::drawParameter(const std::string &name) {
 	const ImU32 textColor = ImGui::GetColorU32(ImGuiCol_Text);
 	drawList->AddText(ImVec2(textLeft, textY), textColor, name.c_str());
 	ImGui::PopClipRect();
-	if (missingFromPreset && std::sinf(ofGetElapsedTimef() * 3.14159265f * 4.f) >= 0.f) {
+	if (missingFromPreset && std::sin(ofGetElapsedTimef() * 3.14159265f * 4.f) >= 0.f) {
 		const float x = textRight - warningSize, y = textY;
 		const ImU32 yellow = IM_COL32(255, 195, 32, 255), dark = IM_COL32(35, 30, 15, 255);
 		drawList->AddTriangleFilled(ImVec2(x + warningSize * .5f, y), ImVec2(x + warningSize, y + warningSize), ImVec2(x, y + warningSize), yellow);
@@ -827,7 +827,7 @@ void ofApp::drawParameter(const std::string &name) {
 	if (watched) { //draw blinking dot
 		const float radius = ImGui::GetFontSize() * .15f;
 		const ImVec2 center(labelPos.x - radius, textY + ImGui::GetFontSize() * .5f);
-		const float pulse = .5f + .5f * std::sinf(ofGetElapsedTimef() * 10.f);
+		const float pulse = .5f + .5f * std::sin(ofGetElapsedTimef() * 10.f);
 		const ImU32 starColor = ImGui::GetColorU32(ImVec4(.35f + .55f * r, .35f + .55f * g, .35f + .55f * b, pulse));
 		drawList->AddCircleFilled(center, radius, starColor, 10);
 	}
