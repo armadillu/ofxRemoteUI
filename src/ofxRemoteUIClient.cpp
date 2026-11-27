@@ -29,6 +29,9 @@ void ofxRemoteUIClient::setCallback( void (*callb)(RemoteUIClientCallBackArg) ){
 }
 
 bool ofxRemoteUIClient::setup(string address, int port_){
+	helloPending = false;
+	helloWarningTimer = 0.f;
+	helloRetries = 0;
 	syncInProgress = false;
 	syncCompleted = false;
 	syncRequestPending = false;
@@ -94,9 +97,10 @@ void ofxRemoteUIClient::disconnect(){
 
 	if (!OSCsetup) return;
 	if (readyToSend){
-		if(verbose_) RLOG_NOTICE << "disconnect()" ;
+		RLOG_NOTICE << (helloPending ? "Stopping connection attempt to " : "Disconnecting from ") << host << ":" << port << "; sending /CIAO";
 		sendCIAO();
 		readyToSend = false;
+		helloPending = false;
 		presetNames.clear();
 		watchedParams.clear();
 	}else{
@@ -108,7 +112,10 @@ void ofxRemoteUIClient::disconnect(){
 void ofxRemoteUIClient::connect(){
 	OSC_CHECK;
 	if(!readyToSend){
-		if(verbose_) RLOG_NOTICE << "connect()" ;
+		helloPending = true;
+		helloWarningTimer = 0.f;
+		helloRetries = 0;
+		RLOG_NOTICE << "Connecting to " << host << ":" << port << "; sending /HELO";
 		sendHELLO();	//on first connect, send HI!
 		sendTEST();		//and a lag test
 		readyToSend = true;
@@ -183,10 +190,12 @@ void ofxRemoteUIClient::update(float dt){
 	if (readyToSend){ // if connected
 
 		OSC_CHECK;
+		if (helloPending) helloWarningTimer += dt;
+		if (syncInProgress && !syncCompleted) syncNoProgressTimer += dt;
 
-		if (syncRequestPending && (syncRequestTimer += dt) >= 2.f) {
+		if (syncRequestPending && (syncRequestTimer += dt) >= ofxRemoteUISyncSettings::requestRetryIntervalSeconds) {
 			syncRequestTimer = 0.f;
-			RLOG_WARNING << "Parameter sync request unanswered; retrying";
+			RLOG_WARNING << "Parameter sync /REQU unanswered; retrying";
 			ofxOscMessage request;
 			request.setAddress("/REQU");
 			request.addStringArg("ACK1");
@@ -199,18 +208,20 @@ void ofxRemoteUIClient::update(float dt){
 		if (timeCounter > OFXREMOTEUI_LATENCY_TEST_RATE){
 
 			if(waitingForReply){ //we never heard back from the client, keep count of how many we missed
-				RLOG_NOTICE << "missed one TEST Packet... (" << disconnectStrikes << " left)" ;
+				if(verbose_ && disconnectStrikes < 2) RLOG_NOTICE << "missed some /TEST packets... (" << disconnectStrikes << " left before we disconnect)" ;
 				disconnectStrikes--;
 			}else{
 				disconnectStrikes = OFXREMOTEUI_DISCONNECTION_STRIKES; //reset the strike count, we heard back from server
 			}
 
+			if (helloPending && disconnectStrikes < 0) disconnectStrikes = 0;
 			if(disconnectStrikes >= 0){ //we got a reply, time to send another test pkt
 
 				timeCounter = 0.0f; //reset timer
 				sendTEST();
 			}else{ //we tried for too long, out of strikes! assume server is gone
-				RLOG_WARNING << "disconnecting bc server connection timed out!" ;
+				RLOG_WARNING << "Connection to " << host << ":" << port << " timed out"
+					<< (helloPending ? " before receiving /HELO" : "");
 				avgTimeSinceLastReply = -1;
 				disconnect(); // testing here
 				params.clear();
@@ -251,6 +262,10 @@ void ofxRemoteUIClient::update(float dt){
 				}break;
 
 				case HELO_ACTION:{ //server says hi back, we ask for a big update
+					if (!helloPending) break; // Ignore delayed replies to earlier /HELO retries.
+					helloPending = false;
+					disconnectStrikes = OFXREMOTEUI_DISCONNECTION_STRIKES;
+					RLOG_NOTICE << "Received /HELO from " << host << ":" << port;
 					requestCompleteUpdate();
 					if(callBack != NULL){
 						cbArg.action = SERVER_CONNECTED;
@@ -264,7 +279,15 @@ void ofxRemoteUIClient::update(float dt){
 						const int token = m.getArgAsInt32(1);
 						if (phase == "ACK1_BEGIN") {
 							syncRequestPending = false;
-							if (!syncInProgress || syncToken != token) { syncToken = token; syncCompleted = false; syncOrder.clear(); syncTotalCount = -1; syncRetryCount = 0; }
+							if (!syncInProgress || syncToken != token) {
+								RLOG_NOTICE << "Received /REQU ACK1_BEGIN from " << host << ":" << port << " (token " << token << ")";
+								syncToken = token;
+								syncCompleted = false;
+								syncOrder.clear();
+								syncTotalCount = ofxRemoteUISyncSettings::unknownParameterCount;
+								syncRetryCount = 0;
+								syncNoProgressTimer = 0.f;
+							}
 							syncInProgress = true;
 							if (m.getNumArgs() >= 3 && m.getArgType(2) == OFXOSC_TYPE_INT32) syncTotalCount = m.getArgAsInt32(2);
 							if (m.getNumArgs() >= 5 && m.getArgType(3) == OFXOSC_TYPE_INT32 && m.getArgType(4) == OFXOSC_TYPE_INT32) {
@@ -282,6 +305,7 @@ void ofxRemoteUIClient::update(float dt){
 							acknowledgeSyncParam(token, "");
 							if (syncCompleted) break;
 							syncCompleted = true;
+							RLOG_NOTICE << "Received /REQU ACK1_END from " << host << ":" << port << ": " << syncOrder.size() << " parameters";
 							{
 								std::lock_guard<std::recursive_mutex> lock(dataMutex);
 								std::vector<string> order;
@@ -294,8 +318,12 @@ void ofxRemoteUIClient::update(float dt){
 						}
 					}
 					else if (syncInProgress && !syncCompleted) break;
-					else { syncRequestPending = false; legacySyncPending = false; }
-					if(verbose_) RLOG_VERBOSE << host << " says REQUEST_ACTION!" ;
+					else {
+						if (syncRequestPending) RLOG_NOTICE << "Received legacy /REQU response from " << host << ":" << port << ": " << orderedKeys.size() << " parameters received";
+						syncRequestPending = false;
+						legacySyncPending = false;
+					}
+					if(verbose_) RLOG_VERBOSE << host << " says /REQU!" ;
 					if(callBack != NULL){
 						cbArg.action = SERVER_SENT_FULL_PARAMS_UPDATE;
 						callBack(cbArg);
@@ -308,14 +336,17 @@ void ofxRemoteUIClient::update(float dt){
 					const int n = m.getNumArgs();
 					if (syncInProgress && !syncCompleted && n >= 2 && m.getArgType(n - 2) == OFXOSC_TYPE_INT32 &&
 						m.getArgType(n - 1) == OFXOSC_TYPE_INT32 && m.getArgAsInt32(n - 2) == syncToken) {
-						syncOrder[m.getArgAsInt32(n - 1)] = dm.paramName;
+						const int index = m.getArgAsInt32(n - 1);
+						if (syncOrder.find(index) == syncOrder.end()) syncNoProgressTimer = 0.f;
+						syncOrder[index] = dm.paramName;
 						acknowledgeSyncParam(syncToken, dm.paramName);
 					}
 				}
 					break;
 
 				case CIAO_ACTION:{
-					if(verbose_) RLOG_VERBOSE << host << " says CIAO!" ;
+					RLOG_NOTICE << "Received /CIAO from " << host << ":" << port;
+					helloPending = false;
 					if(callBack != NULL){
 						cbArg.action = SERVER_DISCONNECTED;
 						callBack(cbArg);
@@ -460,6 +491,33 @@ void ofxRemoteUIClient::update(float dt){
 					<< "' from " << host << ":" << m.getRemotePort()
 					<< " (" << m.getNumArgs() << " arguments)" << endl; break;
 			}
+		}
+		// Process received messages before deciding whether the handshake has timed out.
+		if (helloPending && helloWarningTimer >= ofxRemoteUIConnectionSettings::helloWarningIntervalSeconds) {
+			helloWarningTimer = 0.f;
+			if (helloRetries >= ofxRemoteUIConnectionSettings::helloMaxRetries) {
+				RLOG_WARNING << "Connection to " << host << ":" << port << " timed out after "
+					<< helloRetries << " /HELO retries";
+				avgTimeSinceLastReply = -1;
+				disconnect();
+				params.clear();
+				orderedKeys.clear();
+				return;
+			}
+			++helloRetries;
+			RLOG_WARNING << "Still waiting for /HELO response from " << host << ":" << port
+				<< "; sending /HELO retry " << helloRetries << "/" << ofxRemoteUIConnectionSettings::helloMaxRetries;
+			sendHELLO();
+		}
+		if (syncInProgress && !syncCompleted && syncNoProgressTimer >= ofxRemoteUISyncSettings::noProgressWarningIntervalSeconds) {
+			if (syncTotalCount >= 0 && syncOrder.size() >= static_cast<std::size_t>(syncTotalCount)) {
+				RLOG_WARNING << "Parameter sync: waiting for completion; no progress for " << ofxRemoteUISyncSettings::noProgressWarningIntervalSeconds << " seconds ("
+					<< syncOrder.size() << "/" << syncTotalCount << " parameters received)";
+			} else {
+				RLOG_WARNING << "Parameter sync: no new parameters received for " << ofxRemoteUISyncSettings::noProgressWarningIntervalSeconds << " seconds ("
+					<< syncOrder.size() << " received" << (syncTotalCount < 0 ? ", total unknown" : " of " + std::to_string(syncTotalCount)) << ")";
+			}
+			syncNoProgressTimer = 0.f;
 		}
 	}
 }
@@ -699,13 +757,15 @@ bool ofxRemoteUIClient::isParamWatched(const std::string &name) const{
 void ofxRemoteUIClient::requestCompleteUpdate(){
 	//cout << "ofxRemoteUIClient: requestCompleteUpdate()" ;
 	if(readyToSend){
+		RLOG_NOTICE << "Sending /REQU ACK1 to " << host << ":" << port;
 		syncInProgress = false;
 		syncCompleted = false;
 		syncRequestPending = true;
 		legacySyncPending = false;
 		syncRequestTimer = 0.f;
+		syncNoProgressTimer = 0.f;
 		syncOrder.clear();
-		syncTotalCount = -1;
+		syncTotalCount = ofxRemoteUISyncSettings::unknownParameterCount;
 		syncRetryCount = 0;
 		ofxOscMessage request;
 		request.setAddress("/REQU");
@@ -723,7 +783,7 @@ void ofxRemoteUIClient::requestUnacknowledgedUpdate(){
 	syncCompleted = false;
 	syncRequestPending = false;
 	legacySyncPending = true;
-	syncTotalCount = -1;
+	syncTotalCount = ofxRemoteUISyncSettings::unknownParameterCount;
 	sendREQU();
 	vector<string> presets;
 	sendPREL(presets);

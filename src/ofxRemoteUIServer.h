@@ -424,7 +424,7 @@ protected:
 	std::set<std::string> syncUnacknowledged;
 	std::size_t syncCursor = 0;
 	int syncToken = 0;
-	float syncTimer = 0.f;
+	float syncSendDelayRemaining = 0.f;
 	bool syncAwaitingAck = false;
 	bool syncRetryPending = false;
 	int syncRetryCount = 0;

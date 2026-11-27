@@ -41,12 +41,31 @@
 
 #define OFXREMOTEUI_PORT									10000
 #define OFXREMOTEUI_BROADCAST_PORT							25748
-#define OFXREMOTEUI_BORADCAST_INTERVAL						1 /*secs*/
-#define OFXREMOTEUI_NEIGHBOR_DEATH_BY_TIME					2.6 /*sec*/
 
-#define OFXREMOTEUI_LATENCY_TEST_RATE						0.3333
-#define OFXREMOTEUI_DISCONNECTION_STRIKES					6
+namespace ofxRemoteUIConnectionSettings {
+	constexpr int broadcastIntervalSeconds = 1;
+	constexpr double neighborTimeoutSeconds = 2.6;
+	constexpr double latencyTestIntervalSeconds = 0.3333;
+	constexpr int disconnectionStrikes = 6;
+	constexpr float helloWarningIntervalSeconds = 1.f;
+	constexpr int helloMaxRetries = 5;
+}
+
+#define OFXREMOTEUI_BORADCAST_INTERVAL						(::ofxRemoteUIConnectionSettings::broadcastIntervalSeconds)
+#define OFXREMOTEUI_NEIGHBOR_DEATH_BY_TIME					(::ofxRemoteUIConnectionSettings::neighborTimeoutSeconds)
+#define OFXREMOTEUI_LATENCY_TEST_RATE						(::ofxRemoteUIConnectionSettings::latencyTestIntervalSeconds)
+#define OFXREMOTEUI_DISCONNECTION_STRIKES					(::ofxRemoteUIConnectionSettings::disconnectionStrikes)
 #define OFXREMOTEUI_CONNECTION_TIMEOUT						OFXREMOTEUI_LATENCY_TEST_RATE * OFXREMOTEUI_DISCONNECTION_STRIKES
+
+namespace ofxRemoteUISyncSettings {
+	constexpr int maxParametersPerBatch = 32;
+	constexpr int unknownParameterCount = -1;
+	constexpr float batchIntervalSeconds = 0.02f;
+	constexpr float retryIntervalSeconds = 0.5f;
+	constexpr float requestRetryIntervalSeconds = 2.f;
+	constexpr float noProgressWarningIntervalSeconds = 5.f;
+}
+
 #define OFXREMOTEUI_PRESET_FILE_EXTENSION					"rui"
 #define OFXREMOTEUI_SETTINGS_FILENAME						string("ofxRemoteUISettings." + string(OFXREMOTEUI_PRESET_FILE_EXTENSION))
 #define OFXREMOTEUI_SETTINGS_BACKUP_FOLDER					"ofxRemoteUISettings Backups"

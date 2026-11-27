@@ -1716,12 +1716,12 @@ void ofxRemoteUIServer::updateServer(float dt){
 				onScreenNotifications.addNotification("CONNECTED (" + cbArg.host +  ")!");
 				ofNotifyEvent(clientAction, cbArg, this);
 				#endif
-				if(verbose_) RLOG_VERBOSE << remoteIP << " says HELLO!";
+				if(verbose_) RLOG_VERBOSE << remoteIP << " says /HELO!";
 
 				break;
 
 			case REQUEST_ACTION:{ //send all params to client
-				if(verbose_) RLOG_VERBOSE << remoteIP << " sends REQU!";
+				if(verbose_) RLOG_VERBOSE << remoteIP << " sends /REQU!";
 				const bool reliable = m.getNumArgs() > 0 && m.getArgType(0) == OFXOSC_TYPE_STRING && m.getArgAsString(0) == "ACK1";
 				if (reliable) {
 					scanForUpdatedParamsAndSync();
@@ -1730,7 +1730,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 					syncUnacknowledged = std::set<std::string>(syncParams.begin(), syncParams.end());
 					syncToken = syncToken == INT_MAX ? 1 : syncToken + 1;
 					syncCursor = 0;
-					syncTimer = 1.f;
+					syncSendDelayRemaining = 0.f;
 					syncRetryPending = false;
 					syncRetryCount = 0;
 					syncClientIP = remoteIP;
@@ -1805,7 +1805,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 				#endif
 				clearOscReceiverMsgQueue();
 				readyToSend = false;
-				if(verbose_) RLOG_VERBOSE << remoteIP << " says CIAO!" ;
+				if(verbose_) RLOG_VERBOSE << remoteIP << " says /CIAO!" ;
 			}break;
 
 			case TEST_ACTION: // we got a request from client, lets bounce back asap.
@@ -1965,9 +1965,9 @@ void ofxRemoteUIServer::updateServer(float dt){
 
 	// Send small batches and retry unacknowledged entries, including the completion message.
 	if (syncAwaitingAck && readyToSend) {
-		syncTimer += dt;
-		if (syncTimer >= .02f) {
-			syncTimer = 0.f;
+		syncSendDelayRemaining -= dt;
+		if (syncSendDelayRemaining <= 0.f) {
+			syncSendDelayRemaining = ofxRemoteUISyncSettings::batchIntervalSeconds;
 			if (syncRetryPending && !syncUnacknowledged.empty()) {
 				++syncRetryCount;
 				RLOG_WARNING << "Parameter sync retry " << syncRetryCount << ": " << syncUnacknowledged.size()
@@ -1984,20 +1984,24 @@ void ofxRemoteUIServer::updateServer(float dt){
 			sendMessage(marker);
 			if (!syncUnacknowledged.empty()) {
 				int sent = 0;
-				while (syncCursor < syncParams.size() && sent < 64) { //64 params per batch,
+				while (syncCursor < syncParams.size() && sent < ofxRemoteUISyncSettings::maxParametersPerBatch) {
 					const int index = static_cast<int>(syncCursor);
 					const string &name = syncParams[syncCursor++];
 					auto it = params.find(name);
 					if (syncUnacknowledged.count(name) && it != params.end()) { sendParam(name, it->second, syncToken, index); ++sent; }
 				}
-				if (syncCursor == syncParams.size()) { syncCursor = 0; syncTimer = -.48f; syncRetryPending = true; }
+				if (syncCursor == syncParams.size()) {
+					syncCursor = 0;
+					syncSendDelayRemaining = ofxRemoteUISyncSettings::retryIntervalSeconds;
+					syncRetryPending = true;
+				}
 			} else {
 				ofxOscMessage done;
 				done.setAddress("/REQU");
 				done.addStringArg("ACK1_END");
 				done.addIntArg(syncToken);
 				sendMessage(done);
-				syncTimer = -.48f;
+				syncSendDelayRemaining = ofxRemoteUISyncSettings::retryIntervalSeconds;
 			}
 		}
 	}

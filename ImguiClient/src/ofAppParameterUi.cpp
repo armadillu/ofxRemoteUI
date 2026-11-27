@@ -179,11 +179,7 @@ void ofApp::drawParameterPanel() {
 			syncProgressText = "Waiting for parameter sync";
 		}
 	}
-	std::string pendingText = syncProgressText;
-	if (!pendingPresetFiles.empty()) {
-		if (!pendingText.empty()) pendingText += " · ";
-		pendingText += ofToString(pendingPresetFiles.size()) + " preset file(s) waiting for sync";
-	}
+	const std::string pendingText = pendingPresetFiles.empty() ? "" : ofToString(pendingPresetFiles.size()) + " preset file(s) waiting for sync";
 	const auto neighbors = client.getNeighbors();
 	const char *serverLabel = "Servers:";
 	std::string serverPreview = "(" + ofToString(neighbors.size()) + ")";
@@ -246,7 +242,7 @@ void ofApp::drawParameterPanel() {
 			ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * topScale);
 			ImGui::TextDisabled("Connect to an ofxRemoteUI Server to edit its parameters.");
 			ImGui::PopFont();
-		} else if (!receivedFullSync) {
+		} else if (!receivedFullSync && names.empty()) {
 			ImGui::PushFont(nullptr, ImGui::GetStyle().FontSizeBase * topScale);
 			ImGui::TextDisabled("Waiting for server parameter data...");
 			ImGui::PopFont();
@@ -444,8 +440,25 @@ void ofApp::drawParameterPanel() {
 	const ImVec2 indicatorCenter((indicatorMin.x + indicatorMax.x) * .5f, (indicatorMin.y + indicatorMax.y) * .5f);
 	const ImU32 indicatorColor = status == "Connecting…" || syncingParams ? IM_COL32(240, 190, 45, 255) :
 		(client.isReadyToSend() ? IM_COL32(75, 210, 100, 255) : IM_COL32(145, 145, 145, 255));
-	ImGui::GetWindowDrawList()->AddCircleFilled(indicatorCenter, ImGui::GetFrameHeight() * .25f,
-		indicatorColor);
+	ImDrawList *indicatorDrawList = ImGui::GetWindowDrawList();
+	const float indicatorRadius = ImGui::GetFrameHeight() * .25f;
+	const int syncTotal = client.getSyncTotalCount();
+	if (status == "Connecting…" || syncingParams) {
+		const float fraction = syncingParams && client.isSyncingParameters() && syncTotal > 0
+			? std::clamp(static_cast<float>(client.getSyncReceivedCount()) / syncTotal, 0.f, 1.f)
+			: 0.f;
+		indicatorDrawList->AddCircleFilled(indicatorCenter, indicatorRadius, IM_COL32(90, 75, 30, 255));
+		if (fraction >= 1.f) {
+			indicatorDrawList->AddCircleFilled(indicatorCenter, indicatorRadius, indicatorColor);
+		} else if (fraction > 0.f) {
+			constexpr float pi = 3.14159265358979323846f;
+			indicatorDrawList->PathLineTo(indicatorCenter);
+			indicatorDrawList->PathArcTo(indicatorCenter, indicatorRadius, -pi * .5f, -pi * .5f + 2.f * pi * fraction);
+			indicatorDrawList->PathFillConcave(indicatorColor);
+		}
+	} else {
+		indicatorDrawList->AddCircleFilled(indicatorCenter, indicatorRadius, indicatorColor);
+	}
 	if (ImGui::IsItemHovered()) {
 		ImGui::BeginTooltip();
 		if (syncingParams) {

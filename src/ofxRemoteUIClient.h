@@ -40,7 +40,7 @@ public:
 	void requestUnacknowledgedUpdate(); //legacy full update without acknowledgements
 	bool isSyncingParameters() const { return syncRequestPending || legacySyncPending || (syncInProgress && !syncCompleted); }
 	std::size_t getSyncReceivedCount() const { return syncOrder.size(); }
-	int getSyncTotalCount() const { return syncTotalCount; } // -1 when the server has not provided a total
+	int getSyncTotalCount() const { return syncTotalCount; } // unknownParameterCount until the server provides a total
 
 	void restoreAllParamsToInitialXML();
 	void restoreAllParamsToDefaultValues();
@@ -96,14 +96,18 @@ public:
 
 private:
 	void acknowledgeSyncParam(int token, const std::string &name);
+	bool helloPending = false;
+	float helloWarningTimer = 0.f;
+	int helloRetries = 0;
 	int syncToken = 0;
 	bool syncInProgress = false;
 	bool syncCompleted = false;
 	bool syncRequestPending = false;
 	bool legacySyncPending = false;
 	float syncRequestTimer = 0.f;
+	float syncNoProgressTimer = 0.f;
 	std::map<int, std::string> syncOrder;
-	int syncTotalCount = -1;
+	int syncTotalCount = ofxRemoteUISyncSettings::unknownParameterCount;
 	int syncRetryCount = 0;
 
 	void 				removeParamFromDB(const std::string & paramName);
