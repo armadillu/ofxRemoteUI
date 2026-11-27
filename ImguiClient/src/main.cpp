@@ -54,19 +54,20 @@ int main() {
 	settings.windowMode = OF_WINDOW;
 	settings.title = "ofxRemoteUI Client";
 	auto window = ofCreateWindow(settings);
+	auto glfwWindow = std::dynamic_pointer_cast<ofAppGLFWWindow>(window);
+	if (!glfwWindow || !glfwWindow->getWindowContext()) {
+		ofLogError("ofxRemoteUIClient") << "Could not create a window; check the display connection and graphics support";
+		return 1;
+	}
 	#ifdef TARGET_OSX
 	NativeMacFileOpen::setup();
 	// OF's window shape is specified in framebuffer pixels, so compensate for
 	// Retina to keep the requested dimensions in logical screen coordinates.
-	if (auto glfwWindow = std::dynamic_pointer_cast<ofAppGLFWWindow>(window)) {
-		const int scale = glfwWindow->getPixelScreenCoordScale();
-		glfwWindow->setWindowShape(geometry.width * scale, geometry.height * scale);
-	}
+	const int scale = glfwWindow->getPixelScreenCoordScale();
+	glfwWindow->setWindowShape(geometry.width * scale, geometry.height * scale);
 	#endif
 	if (geometry.hasPosition) {
-		if (auto glfwWindow = std::dynamic_pointer_cast<ofAppGLFWWindow>(window)) {
-			glfwSetWindowPos(static_cast<GLFWwindow *>(glfwWindow->getWindowContext()), geometry.x, geometry.y);
-		}
+		glfwSetWindowPos(static_cast<GLFWwindow *>(glfwWindow->getWindowContext()), geometry.x, geometry.y);
 	}
 	ofRunApp(std::make_shared<ofApp>());
 }
