@@ -2077,8 +2077,9 @@ vector<string> ofxRemoteUIServer::getAvailablePresets(bool onlyGlobal){
 	struct dirent *ent;
 	if ((dir2 = opendir(getFinalPath(OFXREMOTEUI_PRESET_DIR).c_str() )) != NULL) {
 		while ((ent = readdir (dir2)) != NULL) {
-			if ( strcmp( get_filename_ext(ent->d_name), OFXREMOTEUI_PRESET_FILE_EXTENSION) == 0 ){
-				string fileName = string(ent->d_name);
+			string fileName = ent->d_name;
+			auto dot = fileName.find_last_of('.');
+			if (dot != string::npos && dot != 0 && fileName.substr(dot + 1) == OFXREMOTEUI_PRESET_FILE_EXTENSION){
 				string presetName = fileName.substr(0, fileName.size()-4);
 				presets.emplace_back(presetName);
 			}

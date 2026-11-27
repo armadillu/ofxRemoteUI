@@ -485,14 +485,14 @@ void ofApp::drawParameterPanel() {
 	const bool serverDropdownOpen = ImGui::BeginCombo("##servers", serverPreview.c_str());
 		if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip)) {
 			ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
-			ImGui::SetTooltip("Connect ofxRemoteUIServers running on this lan");
+			ImGui::SetTooltip("Connect ofxRemoteUIServers running on this LAN");
 		}
 	if (serverDropdownOpen) {
 		if (neighbors.empty()) ImGui::TextDisabled("No servers discovered yet");
 		for (size_t i = 0; i < neighbors.size(); ++i) {
 			const auto &neighbor = neighbors[i];
 			std::string label = neighbor.binary.empty() ? "Server" : neighbor.binary;
-			if (!neighbor.name.empty()) label += " on " + neighbor.name;
+			if (!neighbor.name.empty()) label += " on \"" + neighbor.name + "\"";
 			label += " @ " + neighbor.IP + ":" + ofToString(neighbor.port);
 			const bool selected = client.isReadyToSend() && neighbor.IP == host && neighbor.port == port;
 			ImGui::PushID(static_cast<int>(i));

@@ -186,7 +186,7 @@ Bools can also be bound to "piano keys"; params being set to true for as long as
 
 Bindings are saved when the app is quit. You can also save any particular device binding configuration into a ".midiBind" file. You can also double-click any .midiBind file form the finder to load your previously saved bindings. There is a "bindings" window that allows you to delete particular bindings. You can see what parameters are currently bound by choosing "File->Blink Bound Midi Controls".
 
-## ImGui client
+## Dear ImGui client
 
 This tries to mirror the original OSX client 1:1.  
   
@@ -213,6 +213,37 @@ The web interface is developed in a separate repository [ofxRemoteUI-Web](https:
 The web client has completely been developed by [@jackosx](http://github.com/jackosx), with some quality-of-life tweaks by [@armadillu](http://github.com/armadillu).
 
 Note that this interface is not very tested. Don't use several clients at the same time, only one will be allowed to connect. Web client connection/disconnection doesnt seem very realiable at the moment, but should be ok for a quick edit. You can completely disable the web interface by defining the preprocessor macro "NO_RUI_WEB_INTERFACE" in your project. 
+
+
+## OSC Query and Vezér
+
+On macOS, ofxRemoteUI can advertise an OSC Query server so applications such as [Vezér](https://imimot.com/blog/vezer-1-7-released/) can discover the parameters shared by your app and create OSC tracks for them. The server publishes a JSON description of the current parameters, grouped as in RemoteUI, including their OSC addresses, types and available ranges. It supports floats, integers, enums, booleans, colors and strings. The exact track types supported depend on the client.
+
+OSC Query is optional and disabled by default. To enable it, add `RUI_ENABLE_QUERYSERVER=1` to your **application target's** preprocessor definitions.
+
+This feature currently requires an openFrameworks macOS build, ofxPoco, and `OscQueryServerMgr.cpp` in the target's compiled sources. `RUI_SETUP()` starts it automatically; register the parameters you want to expose using the usual `RUI_SHARE_PARAM` and related macros. There is no separate setup call. For example:
+
+```cpp
+// ofApp.h: float brightness = 0.5f;
+// ofApp.cpp:
+void ofApp::setup() {
+    RUI_SETUP(10000); // OSC control port
+    RUI_NEW_GROUP("LIGHTS");
+    RUI_SHARE_PARAM(brightness, 0.0f, 1.0f);
+}
+```
+
+The query server runs an HTTP server on a port selected at startup in the range 25000–25999 and advertises it through Bonjour as `_oscjson._tcp.`. The query service describes parameters; control messages still need to be sent over OSC to the app's OSC port. 
+
+To use it with Vezér 1.7 or later:
+
+1. Build and run the macOS app with the macro enabled and its parameters registered. Run Vezér on the same Mac or on the same local network.
+2. In a Vezér composition, open the **Add Track** menu or right-click the timeline, then select the advertised ofxRemoteUI query server. Its name includes the app, computer and OSC port.
+3. In the OSC Address-space window, browse or search the parameters and double-click one to create a track. Vezér uses the published type and range when creating the track.
+4. Make sure Vezér's OSC output destination points to the app's IP address and RemoteUI **OSC control port** (10000 in the example), then add keyframes and play the composition. For a float called `brightness`, the advertised OSC address is `/SEND/FLT/brightness`.
+
+See [Vezér's OSC Query Server documentation](https://imimot.com/help/vezer/osc-track-extras/osc-query-server-support) for its interface. 
+
 
 ## Random Notes
 

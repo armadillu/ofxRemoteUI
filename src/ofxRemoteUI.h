@@ -255,8 +255,6 @@ namespace ofxRemoteUISyncSettings {
 
  */
 
-const char *get_filename_ext(const char *filename) ;
-
 #ifdef _WIN32
 void GetHostName(std::string& host_name);
 #endif
