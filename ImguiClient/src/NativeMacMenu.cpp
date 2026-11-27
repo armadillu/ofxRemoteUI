@@ -9,7 +9,7 @@ static Action action;
 static id target = nil;
 static id roots[4] = {nil, nil, nil, nil};
 static id hostWindowsMenu = nil;
-static id items[MetricsDebuggerPanel + 1] = {};
+static id items[AboutPanel + 1] = {};
 
 template<typename R, typename... A> R send(id object, const char *selector, A... args) {
     return reinterpret_cast<R (*)(id, SEL, A...)>(objc_msgSend)(object, sel_registerName(selector), args...);
@@ -72,6 +72,8 @@ bool setup(Action handler) {
     add(file, "Open Local Preset...", OpenLocal, "o");
     add(file, "Settings", PreferencesPanel, ",");
     id remote = makeMenu("ofxRemoteUI", 1, mainMenu);
+    add(remote, "About ofxRemoteUI", AboutPanel);
+    separator(remote);
     add(remote, "Connect", Connect, "k");
     separator(remote);
     add(remote, "Refresh Parameters", Refresh, "s", true);

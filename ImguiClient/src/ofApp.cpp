@@ -103,6 +103,7 @@ void ofApp::setup() {
 			case NativeMacMenu::ActivityPanel: showLogPanel = !showLogPanel; break;
 			case NativeMacMenu::ServerLogPanel: showServerLogPanel = !showServerLogPanel; break;
 			case NativeMacMenu::PreferencesPanel: showSettings = !showSettings; break;
+			case NativeMacMenu::AboutPanel: showAbout = true; break;
 			case NativeMacMenu::BindingsPanel:
 				showBindings = !showBindings;
 				if (showBindings) { bindingServerFilter.clear(); focusBindings = true; }
@@ -254,6 +255,10 @@ void ofApp::drawMenuBar() {
 			if (ImGui::MenuItem("Metrics / Debugger")) showMetricsWindow = true;
 			ImGui::EndMenu();
 		}
+		if (ImGui::BeginMenu("Help")) {
+			if (ImGui::MenuItem("About ofxRemoteUI")) showAbout = true;
+			ImGui::EndMenu();
+		}
 		ImGui::EndMainMenuBar();
 	}
 	ImGui::PopStyleColor(3);
@@ -282,6 +287,7 @@ void ofApp::draw() {
 	if (showLogPanel) drawLogPanel();
 	if (showServerLogPanel) drawServerLogPanel();
 	if (showSettings) drawSettingsPanel();
+	if (showAbout) drawAboutPanel();
 	if (showStyleEditor) {
 		ImGui::SetNextWindowSize(ImVec2(500, 600), ImGuiCond_FirstUseEver);
 		prepareSecondaryWindow();

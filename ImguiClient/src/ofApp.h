@@ -25,6 +25,7 @@ private:
 	void drawLogPanel();
 	void drawServerLogPanel();
 	void drawSettingsPanel();
+	void drawAboutPanel();
 	void drawBindingsPanel();
 	void applyControllerInput(const std::string &name, const ControllerBindings::Input &event);
 	void blinkBoundParameters(bool midi);
@@ -79,6 +80,9 @@ private:
 	bool highlightChangesSinceLoad = false;
 	bool alwaysOnTop = false;
 	bool showSettings = false;
+	bool showAbout = false;
+	bool aboutIconLoaded = false;
+	ofTexture aboutIcon;
 	bool showStyleEditor = false;
 	bool showImGuiDemo = false;
 	bool showMetricsWindow = false;

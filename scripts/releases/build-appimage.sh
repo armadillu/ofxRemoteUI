@@ -33,7 +33,7 @@ file -b "$binary" | grep -q 'ELF 64-bit.*x86-64' || { echo "Not an x86_64 Linux 
 mkdir -p "$output_dir" "$cache_dir"
 output_dir=$(cd -- "$output_dir" && pwd)
 output="$output_dir/ofxRemoteUIClient-x86_64.AppImage"
-[[ ! -e $output ]] || { echo "Output already exists: $output (move it or choose another directory)." >&2; exit 1; }
+#[[ ! -e $output ]] || { echo "Output already exists: $output (move it or choose another directory)." >&2; exit 1; }
 
 get_tool() {
     local destination=$1 url=$2

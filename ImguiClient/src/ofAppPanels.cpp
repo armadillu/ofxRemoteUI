@@ -2,10 +2,49 @@
 #include "imgui.h"
 #include "ofAppImGuiHelpers.h"
 #include "ClientStyle.h"
+#include "AboutIconData.h"
 
 #include <algorithm>
 
 using namespace ofAppImGuiHelpers;
+
+void ofApp::drawAboutPanel() {
+	if (!aboutIconLoaded) {
+		aboutIconLoaded = true;
+		const bool useArbTex = ofGetUsingArbTex();
+		ofDisableArbTex();
+		ofLoadImage(aboutIcon, ofBuffer(reinterpret_cast<const char *>(remoteUIAboutIcon), remoteUIAboutIcon_len));
+		if (useArbTex) ofEnableArbTex();
+	}
+	const ImGuiViewport *viewport = ImGui::GetMainViewport();
+	ImGui::SetNextWindowPos(viewport->GetWorkCenter(), ImGuiCond_Appearing, ImVec2(.5f, .5f));
+	ImGui::SetNextWindowSize(ImVec2(380, 320), ImGuiCond_Always);
+	prepareSecondaryWindow();
+	if (!ImGui::Begin("About ofxRemoteUI", &showAbout, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize)) { ImGui::End(); return; }
+	const auto centerItem = [](float width) {
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + std::max(0.f, (ImGui::GetContentRegionAvail().x - width) * .5f));
+	};
+	const auto centeredText = [&](const char *text) {
+		centerItem(ImGui::CalcTextSize(text).x);
+		ImGui::TextUnformatted(text);
+	};
+	ImGui::Spacing();
+	if (aboutIcon.isAllocated()) {
+		centerItem(96.f);
+		ImGui::Image(static_cast<ImTextureID>(aboutIcon.getTextureData().textureID), ImVec2(96, 96));
+	}
+	ImGui::Spacing();
+	ImGui::PushFont(gui.getGroupHeaderFont(), ImGui::GetStyle().FontSizeBase * 1.3f);
+	centeredText("ofxRemoteUI");
+	ImGui::PopFont();
+	ImGui::Spacing();
+	centeredText("By Oriol Ferrer Mesià");
+	centeredText("Build: " __DATE__ " " __TIME__);
+	ImGui::Spacing();
+	centerItem(ImGui::CalcTextSize("GitHub project").x);
+	if (ImGui::TextLink("GitHub project")) ofLaunchBrowser("https://github.com/armadillu/ofxRemoteUI");
+	ImGui::End();
+}
 
 void ofApp::drawLogPanel() {
 	ImGui::SetNextWindowSize(ImVec2(650, 190), ImGuiCond_FirstUseEver);
