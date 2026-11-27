@@ -5,6 +5,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "ClientPaths.h"
+#include "ClientStyle.h"
 #include <cstring>
 #include <cmath>
 
@@ -70,13 +71,13 @@ bool ofxRemoteUIClient_ImGui::setup(GLFWwindow *window, bool docking, bool multi
 		std::memcpy(bytes, data.getData(), data.size());
 		return io.Fonts->AddFontFromMemoryTTF(bytes, static_cast<int>(data.size()), fontSize, &config);
 	};
-	ImFont *regularFont = loadFont("fonts/Rubik-Regular.ttf", 17.f, -1.f, 1.0f);
+	ImFont *regularFont = loadFont("fonts/Rubik-Regular.ttf", ClientStyle::baseFontSize, -1.f, 1.0f);
 	if (!regularFont) {
 		ofLogWarning("ofxRemoteUIImGui") << "Rubik font could not be read; using the embedded vector font";
 		regularFont = io.Fonts->AddFontDefaultVector();
 	}
 	io.FontDefault = regularFont;
-	groupHeaderFont = loadFont("fonts/Rubik-Medium.ttf", 17.f, 0.f, 1.1f);
+	groupHeaderFont = loadFont("fonts/Rubik-Medium.ttf", ClientStyle::baseFontSize, 0.f, 1.1f);
 	if (!groupHeaderFont) groupHeaderFont = regularFont;
 	if (docking) io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	if (multiViewport) io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;

@@ -1,4 +1,5 @@
 #include "ofAppImGuiHelpers.h"
+#include "ClientStyle.h"
 #include "imgui.h"
 #include <algorithm>
 #include <cctype>
@@ -48,8 +49,7 @@ bool copyParameterValue(RemoteUIParam &target, const RemoteUIParam &source) {
 }
 
 float parameterFontScale(float rowHeight) {
-	// Keep the row-size control relative to the client's 17px reference font.
-	return rowHeight > 0.f ? std::max(10.f, rowHeight - 2.f) / 17.f : 1.f;
+	return rowHeight > 0.f ? std::max(10.f, rowHeight - 2.f) / ClientStyle::baseFontSize : 1.f;
 }
 
 bool framedCheckbox(const char *label, bool *value) {

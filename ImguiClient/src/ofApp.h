@@ -87,7 +87,7 @@ private:
 	bool bindingPopupActive = false;
 	std::string bindingServerFilter;
 	bool highlightPresetDiff = true;
-	float windowColor[4] = {0.06f, 0.06f, 0.06f, 1.f};
+	float windowColor[4] = {47.f/255.f, 47.f/255.f, 54.f/255.f, 1.0f};
 	bool showLogPanel = false;
 	bool showServerLogPanel = false;
 	bool autoScrollLog = true;
@@ -123,7 +123,7 @@ private:
 	float lastLag = -1.0f;
 	bool presetReplyPending = false;
 	bool autoSavePreferences = true;
-	float rowHeight = 0.0f;
+	float rowHeight = 20.7f;
 	float columnBaseWidth = 300.0f;
 	std::string activeMouseSlider;
 	float virtualSliderMouseX = 0.0f;
