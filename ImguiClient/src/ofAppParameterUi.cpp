@@ -169,7 +169,21 @@ void ofApp::drawParameterPanel() {
 	const float hostWidth = std::max(1.f, std::floor(std::min(110.f * footerScale, footerWidth - ImGui::CalcTextSize("Host:").x - footerSpacing)));
 	const float portWidth = std::max(1.f, std::floor(std::min(60.f * footerScale, footerWidth - ImGui::CalcTextSize("Port:").x - footerSpacing)));
 	const float hostPortGap = 10.f * footerScale;
-	const std::string pendingText = pendingPresetFiles.empty() ? "" : ofToString(pendingPresetFiles.size()) + " preset file(s) waiting for sync";
+	const bool syncingParams = client.isReadyToSend() && (client.isSyncingParameters() || !receivedFullSync);
+	std::string syncProgressText;
+	if (syncingParams) {
+		const int total = client.getSyncTotalCount();
+		if (client.isSyncingParameters() && total >= 0) {
+			syncProgressText = "Receiving parameters: " + std::to_string(client.getSyncReceivedCount()) + "/" + std::to_string(total);
+		} else {
+			syncProgressText = "Waiting for parameter sync";
+		}
+	}
+	std::string pendingText = syncProgressText;
+	if (!pendingPresetFiles.empty()) {
+		if (!pendingText.empty()) pendingText += " · ";
+		pendingText += ofToString(pendingPresetFiles.size()) + " preset file(s) waiting for sync";
+	}
 	const auto neighbors = client.getNeighbors();
 	const char *serverLabel = "Servers:";
 	std::string serverPreview = "(" + ofToString(neighbors.size()) + ")";
@@ -428,11 +442,22 @@ void ofApp::drawParameterPanel() {
 	ImGui::Dummy(ImVec2(ImGui::GetFrameHeight(), ImGui::GetFrameHeight()));
 	const ImVec2 indicatorMin = ImGui::GetItemRectMin(), indicatorMax = ImGui::GetItemRectMax();
 	const ImVec2 indicatorCenter((indicatorMin.x + indicatorMax.x) * .5f, (indicatorMin.y + indicatorMax.y) * .5f);
-	const ImU32 indicatorColor = status == "Connecting…" ? IM_COL32(240, 190, 45, 255) :
+	const ImU32 indicatorColor = status == "Connecting…" || syncingParams ? IM_COL32(240, 190, 45, 255) :
 		(client.isReadyToSend() ? IM_COL32(75, 210, 100, 255) : IM_COL32(145, 145, 145, 255));
 	ImGui::GetWindowDrawList()->AddCircleFilled(indicatorCenter, ImGui::GetFrameHeight() * .25f,
 		indicatorColor);
-	if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", status.c_str());
+	if (ImGui::IsItemHovered()) {
+		ImGui::BeginTooltip();
+		if (syncingParams) {
+			ImGui::TextUnformatted(syncProgressText.c_str());
+			const int total = client.getSyncTotalCount();
+			if (client.isSyncingParameters() && total > 0) {
+				const float fraction = std::min(1.f, static_cast<float>(client.getSyncReceivedCount()) / total);
+				ImGui::ProgressBar(fraction, ImVec2(180.f, 0.f));
+			}
+		} else ImGui::TextUnformatted(status.c_str());
+		ImGui::EndTooltip();
+	}
 	ImGui::SameLine(); if (client.isReadyToSend()) { if (ImGui::Button("Disconnect", ImVec2(connectButtonWidth, 0))) disconnectFromServer(); } else if (ImGui::Button("Connect", ImVec2(connectButtonWidth, 0))) connectTo(hostBuffer, port);
 	if (!pendingText.empty()) { footerNext(connectionWidths[3]); ImGui::TextDisabled("%s", pendingText.c_str()); }
 	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + footerRowGap);

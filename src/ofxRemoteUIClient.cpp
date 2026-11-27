@@ -32,6 +32,7 @@ bool ofxRemoteUIClient::setup(string address, int port_){
 	syncInProgress = false;
 	syncCompleted = false;
 	syncRequestPending = false;
+	legacySyncPending = false;
 
 	params.clear();
 	orderedKeys.clear();
@@ -89,6 +90,7 @@ void ofxRemoteUIClient::disconnect(){
 	syncInProgress = false;
 	syncCompleted = false;
 	syncRequestPending = false;
+	legacySyncPending = false;
 
 	if (!OSCsetup) return;
 	if (readyToSend){
@@ -184,6 +186,7 @@ void ofxRemoteUIClient::update(float dt){
 
 		if (syncRequestPending && (syncRequestTimer += dt) >= 2.f) {
 			syncRequestTimer = 0.f;
+			RLOG_WARNING << "Parameter sync request unanswered; retrying";
 			ofxOscMessage request;
 			request.setAddress("/REQU");
 			request.addStringArg("ACK1");
@@ -261,8 +264,17 @@ void ofxRemoteUIClient::update(float dt){
 						const int token = m.getArgAsInt32(1);
 						if (phase == "ACK1_BEGIN") {
 							syncRequestPending = false;
-							if (!syncInProgress || syncToken != token) { syncToken = token; syncCompleted = false; syncOrder.clear(); }
+							if (!syncInProgress || syncToken != token) { syncToken = token; syncCompleted = false; syncOrder.clear(); syncTotalCount = -1; syncRetryCount = 0; }
 							syncInProgress = true;
+							if (m.getNumArgs() >= 3 && m.getArgType(2) == OFXOSC_TYPE_INT32) syncTotalCount = m.getArgAsInt32(2);
+							if (m.getNumArgs() >= 5 && m.getArgType(3) == OFXOSC_TYPE_INT32 && m.getArgType(4) == OFXOSC_TYPE_INT32) {
+								const int retries = m.getArgAsInt32(3);
+								if (retries > syncRetryCount) {
+									syncRetryCount = retries;
+									RLOG_WARNING << "Parameter sync retry " << retries << ": " << m.getArgAsInt32(4)
+										<< " parameters still unacknowledged (data or acknowledgements may have been lost or delayed)";
+								}
+							}
 							break;
 						}
 						if (phase == "ACK1_END") {
@@ -282,7 +294,7 @@ void ofxRemoteUIClient::update(float dt){
 						}
 					}
 					else if (syncInProgress && !syncCompleted) break;
-					else syncRequestPending = false;
+					else { syncRequestPending = false; legacySyncPending = false; }
 					if(verbose_) RLOG_VERBOSE << host << " says REQUEST_ACTION!" ;
 					if(callBack != NULL){
 						cbArg.action = SERVER_SENT_FULL_PARAMS_UPDATE;
@@ -690,7 +702,11 @@ void ofxRemoteUIClient::requestCompleteUpdate(){
 		syncInProgress = false;
 		syncCompleted = false;
 		syncRequestPending = true;
+		legacySyncPending = false;
 		syncRequestTimer = 0.f;
+		syncOrder.clear();
+		syncTotalCount = -1;
+		syncRetryCount = 0;
 		ofxOscMessage request;
 		request.setAddress("/REQU");
 		request.addStringArg("ACK1");
@@ -706,6 +722,8 @@ void ofxRemoteUIClient::requestUnacknowledgedUpdate(){
 	syncInProgress = false;
 	syncCompleted = false;
 	syncRequestPending = false;
+	legacySyncPending = true;
+	syncTotalCount = -1;
 	sendREQU();
 	vector<string> presets;
 	sendPREL(presets);

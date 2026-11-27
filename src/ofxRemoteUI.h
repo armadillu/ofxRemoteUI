@@ -98,6 +98,7 @@
  // Optional acknowledged parameter sync (OSC arguments shown after each address):
  CLIENT: /REQU "ACK1"                          // request acknowledged sync
  SERVER: /REQU "ACK1_BEGIN" TOKEN              // TOKEN is an int32 sync identifier
+                                               // optional int32s: total parameters, retry count, unacknowledged count
  SERVER: /SEND TYPE PARAM_NAME ... TOKEN INDEX // normal arguments followed by int32 token and order index
  CLIENT: /ACKP TOKEN PARAM_NAME                // acknowledge each received parameter (string name)
  SERVER: /REQU "ACK1_END" TOKEN                // all parameters acknowledged

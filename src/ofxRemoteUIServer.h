@@ -426,6 +426,8 @@ protected:
 	int syncToken = 0;
 	float syncTimer = 0.f;
 	bool syncAwaitingAck = false;
+	bool syncRetryPending = false;
+	int syncRetryCount = 0;
 	std::string syncClientIP;
 	static ofxRemoteUIServer* 								singleton;
 

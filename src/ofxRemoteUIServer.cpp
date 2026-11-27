@@ -1731,6 +1731,8 @@ void ofxRemoteUIServer::updateServer(float dt){
 					syncToken = syncToken == INT_MAX ? 1 : syncToken + 1;
 					syncCursor = 0;
 					syncTimer = 1.f;
+					syncRetryPending = false;
+					syncRetryCount = 0;
 					syncClientIP = remoteIP;
 					syncAwaitingAck = true;
 				} else {
@@ -1966,10 +1968,19 @@ void ofxRemoteUIServer::updateServer(float dt){
 		syncTimer += dt;
 		if (syncTimer >= .02f) {
 			syncTimer = 0.f;
+			if (syncRetryPending && !syncUnacknowledged.empty()) {
+				++syncRetryCount;
+				RLOG_WARNING << "Parameter sync retry " << syncRetryCount << ": " << syncUnacknowledged.size()
+					<< " parameters still unacknowledged (data or acknowledgements may have been lost or delayed)";
+			}
+			syncRetryPending = false;
 			ofxOscMessage marker;
 			marker.setAddress("/REQU");
 			marker.addStringArg("ACK1_BEGIN");
 			marker.addIntArg(syncToken);
+			marker.addIntArg(static_cast<int>(syncParams.size()));
+			marker.addIntArg(syncRetryCount);
+			marker.addIntArg(static_cast<int>(syncUnacknowledged.size()));
 			sendMessage(marker);
 			if (!syncUnacknowledged.empty()) {
 				int sent = 0;
@@ -1979,7 +1990,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 					auto it = params.find(name);
 					if (syncUnacknowledged.count(name) && it != params.end()) { sendParam(name, it->second, syncToken, index); ++sent; }
 				}
-				if (syncCursor == syncParams.size()) { syncCursor = 0; syncTimer = -.48f; }
+				if (syncCursor == syncParams.size()) { syncCursor = 0; syncTimer = -.48f; syncRetryPending = true; }
 			} else {
 				ofxOscMessage done;
 				done.setAddress("/REQU");
