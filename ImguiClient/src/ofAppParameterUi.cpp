@@ -87,6 +87,7 @@ static bool drawColorEditor(float color[4], float width) {
 
 void ofApp::drawParameterPanel() {
 	const ImGuiViewport *viewport = ImGui::GetMainViewport();
+	ImGui::SetNextWindowViewport(viewport->ID);
 	ImGui::SetNextWindowPos(viewport->WorkPos);
 	ImGui::SetNextWindowSize(viewport->WorkSize);
 	if (!ImGui::Begin("Parameters", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking)) { ImGui::End(); return; }

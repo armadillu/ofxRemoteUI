@@ -81,6 +81,8 @@ bool ofxRemoteUIClient_ImGui::setup(GLFWwindow *window, bool docking, bool multi
 	if (!groupHeaderFont) groupHeaderFont = regularFont;
 	if (docking) io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	if (multiViewport) io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+	io.ConfigViewportsNoAutoMerge = true;
+	io.ConfigDockingWithShift = true;
 	multiViewportEnabled = multiViewport;
 
 	ImGui::StyleColorsDark();
