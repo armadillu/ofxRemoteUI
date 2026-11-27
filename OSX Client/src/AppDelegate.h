@@ -17,7 +17,7 @@
 
 #include "constants.h"
 
-#define MEASURE_PERFORMANCE TRUE
+#define MEASURE_PERFORMANCE FALSE
 
 enum RowHeightSize : unsigned char { SMALL_26 = 0, LARGE_34 = 1, TINY_20 = 2};
 

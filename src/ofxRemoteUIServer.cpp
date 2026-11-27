@@ -1973,7 +1973,7 @@ void ofxRemoteUIServer::updateServer(float dt){
 			sendMessage(marker);
 			if (!syncUnacknowledged.empty()) {
 				int sent = 0;
-				while (syncCursor < syncParams.size() && sent < 64) {
+				while (syncCursor < syncParams.size() && sent < 64) { //64 params per batch,
 					const int index = static_cast<int>(syncCursor);
 					const string &name = syncParams[syncCursor++];
 					auto it = params.find(name);
