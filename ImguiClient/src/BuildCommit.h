@@ -1,1 +1,0 @@
-#define OFX_REMOTEUI_BUILD_COMMIT "387e390aaad8370ea7b6a7b74ab1a58d7de35fad"
